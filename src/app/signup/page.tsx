@@ -18,59 +18,76 @@ export default function SignupPage() {
   const [error, setError] = useState("");
 
   const handleSignup = async () => {
-    setError("");
+  setError('')
 
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
-      return;
-    }
+  if (password !== confirmPassword) {
+    setError('Las contraseñas no coinciden.')
+    return
+  }
 
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
-      {
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${SITE_URL}/app/dashboard`,
+    },
+  })
+
+  // --- Error during sign up ---
+  if (signUpError) {
+    const msg = signUpError.message.toLowerCase()
+
+    // User already exists (confirmed or unconfirmed)
+    if (msg.includes('already registered') || msg.includes('already exists')) {
+      // Try to resend confirmation (works if the user is unconfirmed)
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
         email,
-        password,
-        options: {
-          emailRedirectTo: `${SITE_URL}/app/dashboard`,
-        },
+        options: { emailRedirectTo: `${SITE_URL}/app/dashboard` },
+      })
+
+      if (resendError) {
+        // If resend fails, guide to login/reset
+        setError(
+          'Este correo ya está registrado. Inicia sesión o recupera tu contraseña.'
+        )
+        return
       }
-    );
 
-    if (signUpError) {
-      setError(signUpError.message);
-      return;
+      // Resend succeeded → show notice to check email
+      setConfirmationNotice(true)
+      return
     }
 
-    if (signUpData.user?.confirmation_sent_at) {
-      setConfirmationNotice(true);
-      return;
-    }
+    // Other errors
+    setError(signUpError.message || 'No se pudo crear la cuenta.')
+    return
+  }
 
-    // user confirmed immediately → insert into DB
-    const userId = signUpData.user?.id;
-    if (!userId) {
-      setError("No se pudo obtener el ID del usuario.");
-      return;
-    }
+  // --- Success: capture business profile, then redirect ---
+  const userId = signUpData.user?.id
+  if (!userId) {
+    setError('No se pudo obtener el ID del usuario.')
+    return
+  }
 
-    const { error: insertError } = await supabase
-      .from("business_profiles")
-      .insert([
-        {
-          id: userId,
-          nombre_negocio: nombreNegocio,
-          nombre_contacto: nombreContacto,
-          telefono,
-        },
-      ]);
+  const { error: insertError } = await supabase.from('business_profiles').insert([
+    {
+      id: userId,
+      nombre_negocio: nombreNegocio,
+      nombre_contacto: nombreContacto,
+      telefono,
+    },
+  ])
 
-    if (insertError) {
-      setError("Error al guardar la información del negocio.");
-      return;
-    }
+  if (insertError) {
+    setError('Error al guardar la información del negocio.')
+    return
+  }
 
-    // Redirect to dashboard
-    router.push("/app/dashboard");
-  };
+  // Redirect to dashboard (dashboard will gate unverified users)
+  router.push('/app/dashboard')
+}
 
   return (
     <div className="max-w-md mx-auto mt-16 px-4">
