@@ -6,15 +6,12 @@ import { BusinessProfile } from "@/types/supabase";
 
 export default function DashboardPage() {
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
-  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
 
   useEffect(() => {
     const load = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       const user = session?.user;
       if (!user) return;
 
@@ -26,9 +23,10 @@ export default function DashboardPage() {
         .eq("id", user.id)
         .single();
 
-        if (error) {
-  console.error('Error loading business profile:', error.message);
-}
+      if (error) {
+        console.error("Error loading business profile:", error.message);
+        return;
+      }
 
       if (data) {
         setBusiness(data);
@@ -36,8 +34,9 @@ export default function DashboardPage() {
         // Calculate trial days left
         const createdAt = new Date(data.created_at);
         const today = new Date();
-        const msDiff = today.getTime() - createdAt.getTime();
-        const daysPassed = Math.floor(msDiff / (1000 * 60 * 60 * 24));
+        const daysPassed = Math.floor(
+          (today.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24)
+        );
         const trialDays = 30;
         setDaysLeft(Math.max(trialDays - daysPassed, 0));
       }
@@ -62,6 +61,23 @@ export default function DashboardPage() {
       {daysLeft !== null && (
         <div className="mb-6 text-sm text-gray-600">
           ⏳ {daysLeft} días restantes de prueba gratuita
+        </div>
+      )}
+
+      {business && (
+        <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-2">{business.nombre_negocio}</h2>
+          <p className="text-gray-700">
+            <strong>Contacto:</strong> {business.nombre_contacto}
+          </p>
+          <p className="text-gray-700">
+            <strong>Teléfono:</strong> {business.telefono}
+          </p>
+          {daysLeft !== null && (
+            <p className="mt-4 text-sm text-gray-500">
+              Te quedan {daysLeft} días de prueba.
+            </p>
+          )}
         </div>
       )}
 
