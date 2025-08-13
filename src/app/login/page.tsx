@@ -1,15 +1,19 @@
 "use client";
 
-// File: src/app/login/page.tsx
-// Purpose:
-//   Email/password login with optional redirect via query param (?redirect=/...).
-//   Next.js 15 requires useSearchParams() to be inside a <Suspense> boundary.
+/**
+ * File: src/app/login/page.tsx
+ * Purpose:
+ *   Email/password login with optional redirect via ?redirect=/...
+ *   Next.js 15 requires useSearchParams() inside a <Suspense> boundary.
+ * Notes:
+ *   - All user-facing strings are Spanish (per project convention).
+ */
 
 import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-// ====== Page shell (does not call useSearchParams) ======
+// Page shell (does not call useSearchParams)
 export default function LoginPage() {
   return (
     <Suspense fallback={<LoginFallback />}>
@@ -18,11 +22,11 @@ export default function LoginPage() {
   );
 }
 
-// ====== Fallback UI while Suspense resolves searchParams ======
+// Fallback UI while Suspense resolves searchParams
 function LoginFallback() {
   return (
     <div className="max-w-md mx-auto mt-16 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-center">Sign in to Aliigo</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Inicia sesión en Aliigo</h1>
       <div className="animate-pulse space-y-4">
         <div className="h-10 bg-gray-200 rounded" />
         <div className="h-10 bg-gray-200 rounded" />
@@ -32,7 +36,7 @@ function LoginFallback() {
   );
 }
 
-// ====== Actual login component (safe to use useSearchParams here) ======
+// Actual login component (safe to use useSearchParams here)
 function LoginWithSearchParams() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,7 +55,7 @@ function LoginWithSearchParams() {
     const normalizedPassword = password;
 
     if (!normalizedEmail || !normalizedPassword) {
-      setError("Please enter your email and password.");
+      setError("Por favor, introduce tu correo y contraseña.");
       return;
     }
 
@@ -66,11 +70,9 @@ function LoginWithSearchParams() {
     if (loginError) {
       const msg = (loginError.message || "").toLowerCase();
       if (msg.includes("confirm")) {
-        setError(
-          "Please confirm your email before signing in. Check your inbox for the link."
-        );
+        setError("Confirma tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.");
       } else {
-        setError("Incorrect email or password.");
+        setError("Correo o contraseña incorrectos.");
       }
       setLoading(false);
       return;
@@ -88,7 +90,8 @@ function LoginWithSearchParams() {
           ✅ Tu correo ha sido verificado. Ahora puedes iniciar sesión.
         </p>
       )}
-      <h1 className="text-2xl font-bold mb-6 text-center">Sign in to Aliigo</h1>
+
+      <h1 className="text-2xl font-bold mb-6 text-center">Inicia sesión en Aliigo</h1>
 
       {/* Error message (if any) */}
       {error && <p className="text-red-600 mb-4">{error}</p>}
@@ -97,23 +100,26 @@ function LoginWithSearchParams() {
         {/* Email */}
         <input
           type="email"
-          placeholder="Email address"
+          placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border px-4 py-2 rounded"
           autoComplete="email"
-          aria-label="Email"
+          aria-label="Correo electrónico"
         />
 
         {/* Password */}
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full border px-4 py-2 rounded"
           autoComplete="current-password"
-          aria-label="Password"
+          aria-label="Contraseña"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !loading) handleLogin();
+          }}
         />
 
         {/* Submit */}
@@ -122,14 +128,14 @@ function LoginWithSearchParams() {
           className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 disabled:opacity-50"
           disabled={loading}
         >
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? "Entrando…" : "Iniciar sesión"}
         </button>
 
         {/* Link to reset flow */}
         <p className="text-sm text-gray-600 text-center mt-4">
-          Forgot your password?{" "}
+          ¿Has olvidado tu contraseña?{" "}
           <a href="/reset-password" className="text-blue-600 underline">
-            Reset it
+            Restablecer contraseña
           </a>
         </p>
 
