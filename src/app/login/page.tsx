@@ -3,19 +3,43 @@
 // File: app/login/page.tsx
 // Purpose:
 //   Authenticate with email/password and navigate to the dashboard.
-//   Shows a generic error if credentials are invalid.
+//   Supports an optional ?redirect=/path using useSearchParams.
 //
-// Notes:
-//   - Supports a future optional `?redirect=/path` query param.
-//   - You can add "remember me", lockout after N attempts, etc., later.
+// Next.js 15 note:
+//   useSearchParams() MUST be within a <Suspense> boundary to avoid prerender errors.
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+// -------- Page shell (does NOT call useSearchParams) --------
 export default function LoginPage() {
+  return (
+    // Suspense boundary required for any component that calls useSearchParams
+    <Suspense fallback={<LoginFallback />}>
+      <LoginWithSearchParams />
+    </Suspense>
+  );
+}
+
+// Optional, simple fallback while params resolve (very quick)
+function LoginFallback() {
+  return (
+    <div className="max-w-md mx-auto mt-16 px-4">
+      <h1 className="text-2xl font-bold mb-6 text-center">Sign in to Aliigo</h1>
+      <div className="animate-pulse space-y-4">
+        <div className="h-10 bg-gray-200 rounded" />
+        <div className="h-10 bg-gray-200 rounded" />
+        <div className="h-10 bg-gray-200 rounded" />
+      </div>
+    </div>
+  );
+}
+
+// -------- Actual login component (safe to use useSearchParams here) --------
+function LoginWithSearchParams() {
   const router = useRouter();
-  const searchParams = useSearchParams(); // for optional ?redirect=/path
+  const searchParams = useSearchParams(); // ✅ now safely inside Suspense
 
   // Form/UI state
   const [email, setEmail] = useState("");
@@ -48,8 +72,7 @@ export default function LoginPage() {
       return;
     }
 
-    // Successful login → redirect
-    // If a ?redirect=/path param exists, use it; otherwise go to /dashboard
+    // Successful login → redirect (honor ?redirect=/path if present)
     const redirect = searchParams.get("redirect");
     router.push(redirect || "/dashboard");
   };
