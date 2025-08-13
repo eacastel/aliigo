@@ -2,9 +2,19 @@
 
 // File: app/dashboard/page.tsx
 // Purpose:
-//   Gate the page behind auth, show a banner if email is unconfirmed,
-//   load the business profile by PK `id = auth.users.id`,
-//   and show trial days based on profile.created_at.
+//   Match the agreed flow:
+//   - After signup, user is sent to /dashboard even before confirming email.
+//   - If there's no session but we detect a "pending signup" marker in localStorage,
+//     we show the "check your email" banner + trial days and disable features.
+//   - If there's a session, we load the real profile by PK (id = auth.users.id),
+//     show the banner until email is confirmed, then enable features.
+//   - If there's neither a session nor a pending marker, redirect to /signup.
+//
+// Notes:
+//   - The pending marker is written by /signup as "aliigo_pending_signup" and has:
+//       { email, businessName, contactName, phone, createdAtMs }
+//   - We only use the marker to keep UX consistent pre-confirmation; we DO NOT trust it for data.
+//   - RLS ensures only the owner can fetch their business profile when a session exists.
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,35 +28,73 @@ type BusinessProfile = {
   created_at: string | null;
 };
 
+// Shape of the pending marker saved by /signup
+type PendingSignup = {
+  email: string;
+  businessName?: string;
+  contactName?: string;
+  phone?: string;
+  createdAtMs: number;
+};
+
 export default function DashboardPage() {
   const router = useRouter();
 
-  // --- UI/State ---
+  // UI/state
   const [loading, setLoading] = useState(true);
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  const [pending, setPending] = useState<PendingSignup | null>(null); // no-session UX state
 
-  // 1) Load session + profile
+  // Main loader:
+  //  - Try to get a session.
+  //  - If no session: check localStorage for "aliigo_pending_signup".
+  //    * If found -> show banner/trial with data from marker; do NOT query Supabase.
+  //    * If not found -> redirect to /signup.
+  //  - If there is a session: clear marker, load real profile, compute trial from created_at.
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
       try {
-        // 1a) Get current session
         const { data: { session } } = await supabase.auth.getSession();
 
-        // If not logged in → redirect to signup (you already have login/reset flows, keeping your flow)
         if (!session?.user) {
+          // No session — check if this user just signed up (client marker).
+          let marker: PendingSignup | null = null;
+          try {
+            const raw = localStorage.getItem("aliigo_pending_signup");
+            if (raw) marker = JSON.parse(raw) as PendingSignup;
+          } catch {
+            // ignore storage/JSON issues
+          }
+
+          if (marker) {
+            // Show banner + trial based on marker.createdAtMs. No Supabase queries yet.
+            setPending(marker);
+            setIsConfirmed(false); // clearly unconfirmed at this point
+
+            const daysPassed = Math.floor((Date.now() - marker.createdAtMs) / 86_400_000);
+            setDaysLeft(Math.max(30 - daysPassed, 0));
+            setBusiness(null);
+            return; // leave loading=false in finally
+          }
+
+          // No session and no pending marker → user didn't sign up here; send to /signup
           router.replace("/signup");
           return;
         }
 
-        // 1b) Track email confirmation
+        // We have a session → clear any stale marker
+        try {
+          localStorage.removeItem("aliigo_pending_signup");
+        } catch {}
+
         const user = session.user;
         setIsConfirmed(Boolean(user.email_confirmed_at));
 
-        // 1c) Load profile by PK id = user.id
+        // Load the business profile by PK: id = auth.users.id
         const { data: row, error } = await supabase
           .from("business_profiles")
           .select("id,nombre_negocio,nombre_contacto,telefono,created_at")
@@ -55,14 +103,14 @@ export default function DashboardPage() {
           .maybeSingle();
 
         if (error) {
-          // Not fatal; page still renders
-          console.error("Error loading business profile:", error.message);
+          // Not fatal; we still render the page and show a placeholder.
+          console.error("Error loading business profile:", (error as { message?: string })?.message ?? error);
         }
 
         if (!cancelled && row) {
           setBusiness(row);
 
-          // 1d) Compute trial days: 30 days from created_at
+          // Trial days: 30 days from record's created_at
           if (row.created_at) {
             const createdAt = new Date(row.created_at);
             const daysPassed = Math.floor((Date.now() - createdAt.getTime()) / 86_400_000);
@@ -72,7 +120,6 @@ export default function DashboardPage() {
           }
         }
       } catch (e: unknown) {
-        // ESLint-friendly error logging
         if (e instanceof Error) {
           console.error("Unexpected error in dashboard load:", e.message);
         } else {
@@ -85,11 +132,11 @@ export default function DashboardPage() {
 
     load();
     return () => {
-      cancelled = true; // avoid setState after unmount
+      cancelled = true;
     };
   }, [router]);
 
-  // 2) BONUS: auto-refresh email confirmation state every 10s
+  // BONUS: auto-refresh email confirmation every 10s (if user confirms in another tab)
   useEffect(() => {
     const interval = setInterval(async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -98,73 +145,105 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // 3) Loading screen while we check session/profile
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-sm text-gray-600">Cargando…</p>
+        <p className="text-sm text-gray-600">Loading…</p>
       </div>
     );
   }
 
-  // 4) Page content
   return (
     <div className="max-w-3xl mx-auto mt-10 px-4">
       <h1 className="text-2xl font-bold mb-4">
-        {/* Greeting with safe fallbacks */}
-        Bienvenido a Aliigo, {business?.nombre_contacto ?? "usuario"} 👋
+        {/* If we have a real profile, greet by contact; otherwise use a neutral fallback */}
+        Welcome to Aliigo{business?.nombre_contacto ? `, ${business.nombre_contacto}` : ""} 👋
       </h1>
 
-      {/* Banner if email not confirmed */}
-      {!isConfirmed && (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded">
-          ⚠️ Tu cuenta aún no está confirmada. Revisa tu correo para activarla.
-        </div>
-      )}
+      {/* === Pending (no session yet, but just signed up) === */}
+      {!business && pending && (
+        <>
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded">
+            ⚠️ Please confirm your email to activate your account. We sent a link to{" "}
+            <strong>{pending.email}</strong>.
+          </div>
 
-      {/* Trial days */}
-      {daysLeft !== null && (
-        <div className="mb-6 text-sm text-gray-600">
-          ⏳ {daysLeft} días restantes de prueba gratuita
-        </div>
-      )}
-
-      {/* Business profile card */}
-      {business ? (
-        <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-2">
-            {business.nombre_negocio ?? "Tu negocio"}
-          </h2>
-          <p className="text-gray-700">
-            <strong>Contacto:</strong> {business.nombre_contacto ?? "—"}
-          </p>
-          <p className="text-gray-700">
-            <strong>Teléfono:</strong> {business.telefono ?? "—"}
-          </p>
           {daysLeft !== null && (
-            <p className="mt-4 text-sm text-gray-500">
-              Te quedan {daysLeft} días de prueba.
-            </p>
+            <div className="mb-6 text-sm text-gray-600">
+              ⏳ {daysLeft} days remaining in your free trial
+            </div>
           )}
-        </div>
-      ) : (
-        <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 mb-6 rounded">
-          Aún no has completado tu perfil de negocio.
-        </div>
+
+          <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-2">
+              {pending.businessName ?? "Your business"}
+            </h2>
+            <p className="text-gray-700">
+              <strong>Contact:</strong> {pending.contactName ?? "—"}
+            </p>
+            <p className="text-gray-700">
+              <strong>Email:</strong> {pending.email}
+            </p>
+            <p className="text-gray-700">
+              <strong>Phone:</strong> {pending.phone ?? "—"}
+            </p>
+            <p className="mt-4 text-sm text-gray-500">
+              Features are disabled until you confirm your email.
+            </p>
+          </div>
+        </>
       )}
 
-      {/* Feature grid (disabled while unconfirmed) */}
-      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${!isConfirmed ? "opacity-50 pointer-events-none" : ""}`}>
+      {/* === Session present (loaded profile) === */}
+      {business && (
+        <>
+          {!isConfirmed && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded">
+              ⚠️ Your account isn’t confirmed yet. Check your email to activate it.
+            </div>
+          )}
+
+          {daysLeft !== null && (
+            <div className="mb-6 text-sm text-gray-600">
+              ⏳ {daysLeft} days remaining in your free trial
+            </div>
+          )}
+
+          <div className="bg-white border rounded-lg shadow-sm p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-2">
+              {business.nombre_negocio ?? "Your business"}
+            </h2>
+            <p className="text-gray-700">
+              <strong>Contact:</strong> {business.nombre_contacto ?? "—"}
+            </p>
+            <p className="text-gray-700">
+              <strong>Phone:</strong> {business.telefono ?? "—"}
+            </p>
+            {daysLeft !== null && (
+              <p className="mt-4 text-sm text-gray-500">
+                You have {daysLeft} trial days left.
+              </p>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Feature grid (disabled while unconfirmed or while in pending state) */}
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${
+          (!isConfirmed || !!pending) ? "opacity-50 pointer-events-none" : ""
+        }`}
+      >
         <div className="bg-white border rounded p-4 shadow-sm">
-          <h2 className="font-semibold text-lg mb-2">Enviar reseñas</h2>
+          <h2 className="font-semibold text-lg mb-2">Request reviews</h2>
           <p className="text-sm text-gray-600">
-            Envía solicitudes de reseñas a tus clientes.
+            Send review requests to your customers.
           </p>
         </div>
         <div className="bg-white border rounded p-4 shadow-sm">
-          <h2 className="font-semibold text-lg mb-2">Campañas de SMS</h2>
+          <h2 className="font-semibold text-lg mb-2">SMS campaigns</h2>
           <p className="text-sm text-gray-600">
-            Crea y lanza campañas de mensajería.
+            Create and launch direct messaging campaigns.
           </p>
         </div>
       </div>

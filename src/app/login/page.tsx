@@ -61,21 +61,22 @@ function LoginWithSearchParams() {
     setLoading(true);
 
     // Attempt password-based sign-in
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
-      password: normalizedPassword,
-    });
+const { error: loginError } = await supabase.auth.signInWithPassword({
+  email: normalizedEmail,
+  password: normalizedPassword,
+});
 
-    if (loginError) {
-      setError("Incorrect email or password.");
-      setLoading(false);
-      return;
-    }
+if (loginError) {
+  const msg = (loginError.message || "").toLowerCase();
+  if (msg.includes("confirm")) {
+    setError("Please confirm your email before signing in. Check your inbox for the link.");
+  } else {
+    setError("Incorrect email or password.");
+  }
+  setLoading(false);
+  return;
+}
 
-    // Successful login → redirect (honor ?redirect=/path if present)
-    const redirect = searchParams.get("redirect");
-    router.push(redirect || "/dashboard");
-  };
 
   return (
     <div className="max-w-md mx-auto mt-16 px-4">

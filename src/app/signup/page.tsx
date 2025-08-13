@@ -2,9 +2,15 @@
 
 // File: app/signup/page.tsx
 // Purpose:
-//   Collect user + business info, create Supabase Auth user (unconfirmed),
-//   then create the business profile via a server route, and finally
-//   redirect to /dashboard (where we show an "unconfirmed" banner until email is confirmed).
+//   Collect user + business info, create Supabase Auth user (email unconfirmed),
+//   insert the business profile via a server route (insert-only),
+//   then redirect to /dashboard right away.
+//   The dashboard will show "check your email" + trial while unconfirmed.
+//
+// Notes:
+//   - We stash a lightweight "pending signup" marker in localStorage so the
+//     dashboard can show the banner/trial even if there is no session yet.
+//   - Ensure NEXT_PUBLIC_SITE_URL points to your live domain so email links are correct.
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,7 +19,7 @@ import { supabase } from "@/lib/supabase";
 export default function SignupPage() {
   const router = useRouter();
 
-  // 🧾 Form state (controlled inputs)
+  // Form state (controlled inputs)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nombreNegocio, setNombreNegocio] = useState("");
@@ -24,7 +30,7 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Public URL used by Supabase to send the confirmation email redirect link
+  // Used by Supabase to build the email confirmation redirect
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://aliigo.vercel.app";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,18 +39,17 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // 1) Create auth user (unconfirmed email at this point)
+      // 1) Create the auth user (email unconfirmed until they click the email)
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          // After the user clicks the email link, Supabase will redirect them here
-          // (You already have login/reset; keeping this simple per your flow)
+          // After confirming, Supabase will redirect to /dashboard
           emailRedirectTo: `${SITE_URL}/dashboard`,
         },
       });
 
-      // 1a) Clear message for duplicate email (user already exists)
+      // Handle duplicate email or other signup errors
       if (signUpError) {
         const msg = (signUpError.message || "").toLowerCase();
         if (msg.includes("already registered") || msg.includes("user already registered")) {
@@ -55,15 +60,14 @@ export default function SignupPage() {
         return;
       }
 
-      // 1b) We expect a user id even if unconfirmed
+      // We expect a user id even if unconfirmed
       const userId = data?.user?.id;
       if (!userId) {
         setError("No se pudo obtener el usuario después del registro.");
         return;
       }
 
-      // 2) Create business profile on the server (insert only)
-      //    This succeeds even if the user hasn't confirmed the email yet.
+      // 2) Insert business profile on the server (insert-only; no overwrite on conflict)
       const resp = await fetch("/api/profiles/ensure", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -76,14 +80,27 @@ export default function SignupPage() {
       });
 
       if (!resp.ok) {
-        // Not fatal for auth; the user can still land on dashboard
+        // Not fatal to the flow; dashboard will still load and show banner
         console.error("Fallo al crear el perfil de negocio (server).");
       }
 
-      // 3) Redirect to dashboard
+      // 3) Stash a "pending signup" marker so /dashboard can show banner/trial without a session yet
+      try {
+        const pending = {
+          email: email.trim(),
+          businessName: nombreNegocio,     // ✅ use your actual state variable
+          contactName: nombreContacto,     // ✅ use your actual state variable
+          phone: telefono,                  // ✅ use your actual state variable
+          createdAtMs: Date.now(),          // used for client-side trial countdown UX
+        };
+        localStorage.setItem("aliigo_pending_signup", JSON.stringify(pending));
+      } catch {
+        // If storage is unavailable, /dashboard will just redirect to /signup when no session
+      }
+
+      // 4) Go to dashboard regardless of session (per your flow)
       router.replace("/dashboard");
     } catch (e: unknown) {
-      // ESLint-friendly logging
       setError(e instanceof Error ? e.message : "Error inesperado.");
     } finally {
       setLoading(false);
@@ -101,7 +118,7 @@ export default function SignupPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* --- Business fields --- */}
+        {/* Business fields */}
         <div>
           <label className="block text-sm font-medium mb-1">Nombre del negocio</label>
           <input
@@ -130,7 +147,7 @@ export default function SignupPage() {
           />
         </div>
 
-        {/* --- Credentials --- */}
+        {/* Credentials */}
         <div>
           <label className="block text-sm font-medium mb-1">Email</label>
           <input
@@ -158,7 +175,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-black text-white rounded px-4 py-2"
+          className="w-full bg-black text-white rounded px-4 py-2 disabled:opacity-50"
         >
           {loading ? "Creando..." : "Crear cuenta"}
         </button>
