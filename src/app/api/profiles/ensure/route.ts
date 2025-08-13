@@ -29,19 +29,25 @@ export async function POST(req: Request) {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 
+    // Safe fingerprints for quick sanity checks (DON'T log full secrets)
+    const keyFingerprint = serviceRoleKey ? serviceRoleKey.slice(0, 6) + "…" : null;
+    const projectRef = url?.match(/https:\/\/([a-z0-9-]+)\.supabase\.co/i)?.[1] ?? null;
+
     console.log("[profiles/ensure] envs present?", {
       hasURL: Boolean(url),
       hasServiceRoleKey: Boolean(serviceRoleKey),
+      urlProjectRef: projectRef,
+      keyFingerprint,
     });
 
-    if (!url || !serviceRoleKey) {
-      return NextResponse.json(
-        { error: "Server misconfigured: SUPABASE env vars are missing." },
-        { status: 500 }
-      );
-    }
-
-    const supabaseAdmin = createClient(url, serviceRoleKey);
+if (!url || !serviceRoleKey) {
+  return NextResponse.json(
+    { error: "Server misconfigured: SUPABASE env vars are missing." },
+    { status: 500 }
+  );
+}
+console.log("[profiles/ensure] using URL:", url);
+const supabaseAdmin = createClient(url, serviceRoleKey);
 
     const { error } = await supabaseAdmin
       .from("business_profiles")
@@ -72,13 +78,12 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
-
-    // eslint-disable-next-line no-console
+    console.log("[profiles/ensure] using URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
     console.log("[profiles/ensure] success", { id });
     return NextResponse.json({ ok: true, id });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    // eslint-disable-next-line no-console
+
     console.error("[profiles/ensure] unexpected error", msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
