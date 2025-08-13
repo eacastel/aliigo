@@ -36,6 +36,7 @@ function LoginFallback() {
 function LoginWithSearchParams() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const from = searchParams.get("from");
 
   // Form/UI state
   const [email, setEmail] = useState("");
@@ -65,7 +66,9 @@ function LoginWithSearchParams() {
     if (loginError) {
       const msg = (loginError.message || "").toLowerCase();
       if (msg.includes("confirm")) {
-        setError("Please confirm your email before signing in. Check your inbox for the link.");
+        setError(
+          "Please confirm your email before signing in. Check your inbox for the link."
+        );
       } else {
         setError("Incorrect email or password.");
       }
@@ -80,6 +83,11 @@ function LoginWithSearchParams() {
 
   return (
     <div className="max-w-md mx-auto mt-16 px-4">
+      {from === "confirm" && (
+        <p className="bg-green-100 text-green-800 p-3 rounded mb-4 text-center">
+          ✅ Tu correo ha sido verificado. Ahora puedes iniciar sesión.
+        </p>
+      )}
       <h1 className="text-2xl font-bold mb-6 text-center">Sign in to Aliigo</h1>
 
       {/* Error message (if any) */}
