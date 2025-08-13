@@ -31,81 +31,87 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   // Used by Supabase to build the email confirmation redirect
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://aliigo.vercel.app";
+  const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://aliigo.vercel.app";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  setLoading(true);
 
-    try {
-      // 1) Create the auth user (email unconfirmed until they click the email)
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          // After confirming, Supabase will redirect to /dashboard
-          emailRedirectTo: `${SITE_URL}/dashboard`,
-        },
-      });
+  try {
+    // 1) Crear usuario (queda sin confirmar hasta click en email)
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: `${SITE_URL}/dashboard` },
+    });
 
-      // Handle duplicate email or other signup errors
-      if (signUpError) {
-        const msg = (signUpError.message || "").toLowerCase();
-        if (msg.includes("already registered") || msg.includes("user already registered")) {
-          setError("Este email ya existe. Inicia sesión o restablece tu contraseña.");
-        } else {
-          setError("No pudimos crear tu cuenta. Inténtalo de nuevo.");
-        }
-        return;
+    if (signUpError) {
+      const msg = (signUpError.message || "").toLowerCase();
+      if (msg.includes("already registered") || msg.includes("user already registered")) {
+        setError("Este email ya existe. Inicia sesión o restablece tu contraseña.");
+      } else {
+        setError("No pudimos crear tu cuenta. Inténtalo de nuevo.");
       }
-
-      // We expect a user id even if unconfirmed
-      const userId = data?.user?.id;
-      if (!userId) {
-        setError("No se pudo obtener el usuario después del registro.");
-        return;
-      }
-
-      // 2) Insert business profile on the server (insert-only; no overwrite on conflict)
-      const resp = await fetch("/api/profiles/ensure", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: userId,
-          nombre_negocio: nombreNegocio,
-          nombre_contacto: nombreContacto,
-          telefono,
-        }),
-      });
-
-      if (!resp.ok) {
-        // Not fatal to the flow; dashboard will still load and show banner
-        console.error("Fallo al crear el perfil de negocio (server).");
-      }
-
-      // 3) Stash a "pending signup" marker so /dashboard can show banner/trial without a session yet
-      try {
-        const pending = {
-          email: email.trim(),
-          businessName: nombreNegocio,     // ✅ use your actual state variable
-          contactName: nombreContacto,     // ✅ use your actual state variable
-          phone: telefono,                  // ✅ use your actual state variable
-          createdAtMs: Date.now(),          // used for client-side trial countdown UX
-        };
-        localStorage.setItem("aliigo_pending_signup", JSON.stringify(pending));
-      } catch {
-        // If storage is unavailable, /dashboard will just redirect to /signup when no session
-      }
-
-      // 4) Go to dashboard regardless of session (per your flow)
-      router.replace("/dashboard");
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Error inesperado.");
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+
+    const userId = data?.user?.id;
+    if (!userId) {
+      setError("No se pudo obtener el usuario después del registro.");
+      return;
+    }
+
+    // 2) Insertar perfil de negocio una sola vez, con logging claro
+    const profileResp = await fetch("/api/profiles/ensure", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: userId,
+        nombre_negocio: nombreNegocio,
+        nombre_contacto: nombreContacto,
+        telefono,
+      }),
+    });
+
+    const profileJson: unknown = await profileResp.json().catch(() => ({}));
+
+    if (!profileResp.ok) {
+      console.error("Profile insert failed:", {
+        status: profileResp.status,
+        json: profileJson,
+      });
+      // No es fatal: seguimos al dashboard, el banner avisará de confirmación pendiente
+    } else {
+      console.log("Profile insert OK:", profileJson);
+    }
+
+    // 3) Guardar marcador local para UX pre‑confirmación
+    try {
+      localStorage.setItem(
+        "aliigo_pending_signup",
+        JSON.stringify({
+          email: email.trim(),
+          businessName: nombreNegocio,
+          contactName: nombreContacto,
+          phone: telefono,
+          createdAtMs: Date.now(),
+        })
+      );
+    } catch {
+      /* sin bloqueo */
+    }
+
+    // 4) Redirigir al dashboard
+    router.replace("/dashboard");
+  } catch (e) {
+    setError(e instanceof Error ? e.message : "Error inesperado.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="max-w-md mx-auto mt-10 px-4">
@@ -120,7 +126,9 @@ export default function SignupPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Business fields */}
         <div>
-          <label className="block text-sm font-medium mb-1">Nombre del negocio</label>
+          <label className="block text-sm font-medium mb-1">
+            Nombre del negocio
+          </label>
           <input
             className="w-full border rounded px-3 py-2"
             value={nombreNegocio}
@@ -130,7 +138,9 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Nombre de contacto</label>
+          <label className="block text-sm font-medium mb-1">
+            Nombre de contacto
+          </label>
           <input
             className="w-full border rounded px-3 py-2"
             value={nombreContacto}
