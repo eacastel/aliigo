@@ -1,28 +1,24 @@
 "use client";
 
-// File: app/login/page.tsx
+// File: src/app/login/page.tsx
 // Purpose:
-//   Authenticate with email/password and navigate to the dashboard.
-//   Supports an optional ?redirect=/path using useSearchParams.
-//
-// Next.js 15 note:
-//   useSearchParams() MUST be within a <Suspense> boundary to avoid prerender errors.
+//   Email/password login with optional redirect via query param (?redirect=/...).
+//   Next.js 15 requires useSearchParams() to be inside a <Suspense> boundary.
 
-import { Suspense, useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-// -------- Page shell (does NOT call useSearchParams) --------
+// ====== Page shell (does not call useSearchParams) ======
 export default function LoginPage() {
   return (
-    // Suspense boundary required for any component that calls useSearchParams
     <Suspense fallback={<LoginFallback />}>
       <LoginWithSearchParams />
     </Suspense>
   );
 }
 
-// Optional, simple fallback while params resolve (very quick)
+// ====== Fallback UI while Suspense resolves searchParams ======
 function LoginFallback() {
   return (
     <div className="max-w-md mx-auto mt-16 px-4">
@@ -36,10 +32,10 @@ function LoginFallback() {
   );
 }
 
-// -------- Actual login component (safe to use useSearchParams here) --------
+// ====== Actual login component (safe to use useSearchParams here) ======
 function LoginWithSearchParams() {
   const router = useRouter();
-  const searchParams = useSearchParams(); // ✅ now safely inside Suspense
+  const searchParams = useSearchParams();
 
   // Form/UI state
   const [email, setEmail] = useState("");
@@ -61,22 +57,26 @@ function LoginWithSearchParams() {
     setLoading(true);
 
     // Attempt password-based sign-in
-const { error: loginError } = await supabase.auth.signInWithPassword({
-  email: normalizedEmail,
-  password: normalizedPassword,
-});
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password: normalizedPassword,
+    });
 
-if (loginError) {
-  const msg = (loginError.message || "").toLowerCase();
-  if (msg.includes("confirm")) {
-    setError("Please confirm your email before signing in. Check your inbox for the link.");
-  } else {
-    setError("Incorrect email or password.");
-  }
-  setLoading(false);
-  return;
-}
+    if (loginError) {
+      const msg = (loginError.message || "").toLowerCase();
+      if (msg.includes("confirm")) {
+        setError("Please confirm your email before signing in. Check your inbox for the link.");
+      } else {
+        setError("Incorrect email or password.");
+      }
+      setLoading(false);
+      return;
+    }
 
+    // Successful login → redirect (?redirect=/path supported)
+    const redirect = searchParams.get("redirect");
+    router.push(redirect || "/dashboard");
+  };
 
   return (
     <div className="max-w-md mx-auto mt-16 px-4">
