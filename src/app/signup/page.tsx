@@ -73,6 +73,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         nombre_negocio: nombreNegocio,
         nombre_contacto: nombreContacto,
         telefono,
+        email,
       }),
     });
 

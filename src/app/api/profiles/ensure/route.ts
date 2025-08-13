@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const startedAt = new Date().toISOString();
   try {
     const body = await req.json();
-    const { id, nombre_negocio, nombre_contacto = null, telefono = null } = body ?? {};
+    const { id, nombre_negocio, nombre_contacto = null, telefono = null, email = null } = body ?? {};
 
 
     console.log("[profiles/ensure] start", { startedAt, body });
@@ -45,10 +45,10 @@ export async function POST(req: Request) {
 
     const { error } = await supabaseAdmin
       .from("business_profiles")
-      .upsert([{ id, nombre_negocio, nombre_contacto, telefono }], {
-        onConflict: "id",
-        ignoreDuplicates: true,
-      });
+      .upsert(
+        [{ id, nombre_negocio, nombre_contacto, telefono, email }],
+        { onConflict: "id", ignoreDuplicates: true }
+      );
 
     if (error) {
       const err = error as PostgrestError;
