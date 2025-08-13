@@ -1,41 +1,29 @@
 // File: app/api/profiles/ensure/route.ts
-// Purpose:
-//   Insert a business profile row for a newly signed-up user.
-//   If the row already exists (same PK = auth.users.id), we do nothing
-//   and return OK (no overwrite).
-//
-// Why server route?
-//   - We need to create the profile even if the email is unconfirmed and
-//     there is no client session yet. The Service Role key can do that,
-//     but it must ONLY run on the server.
-//
-// Security:
-//   - Put SUPABASE_SERVICE_ROLE_KEY in Vercel env vars (project > settings > env).
-//   - NEVER expose it to client-side code.
+// Goal:
+// - Avoid reading env vars at module scope (which breaks at build time).
+// - Ensure Node.js runtime and dynamic execution (no static optimization).
+// - Keep service role ONLY on the server.
 
 import { NextResponse } from "next/server";
-import { createClient, type PostgrestError } from "@supabase/supabase-js"; // 👈 typed PostgrestError
+import { createClient, type PostgrestError } from "@supabase/supabase-js";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // ⚠️ server-only
+// Force Node runtime (service key is not allowed on Edge) and dynamic execution
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+// Alternatively (either is fine):
+// export const revalidate = 0;
 
-// Admin client with Service Role (bypasses RLS, used ONLY on server)
-const supabaseAdmin = createClient(url, serviceRoleKey);
-
-// Type predicate to check for the PostgrestError.code without using `any`
-function isUniqueViolation(err: unknown): boolean {
-  // PostgrestError has a `code?: string`
-  const code = (err as Pick<PostgrestError, "code"> | undefined)?.code;
-  return code === "23505"; // duplicate key / unique violation
+function isUniqueViolation(err: unknown): err is Pick<PostgrestError, "code"> {
+  return typeof (err as { code?: unknown })?.code === "string"
+    && (err as { code: string }).code === "23505";
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // ✅ minimal validation
     const {
-      id,                   // PK = auth.users.id
+      id,                   // PK = auth.users.id (uuid)
       nombre_negocio,       // required
       nombre_contacto = null,
       telefono = null,
@@ -43,29 +31,43 @@ export async function POST(req: Request) {
 
     if (!id || !nombre_negocio) {
       return NextResponse.json(
-        { error: "Faltan campos requeridos: id, nombre_negocio" },
+        { error: "Missing required fields: id, nombre_negocio" },
         { status: 400 }
       );
     }
 
-    // ✅ INSERT only — we DO NOT overwrite on conflict
+    // IMPORTANT: Read env vars INSIDE the handler, at request time.
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!url || !serviceRoleKey) {
+      // Don’t throw during build; return a clear runtime error instead.
+      return NextResponse.json(
+        { error: "Server misconfigured: SUPABASE env vars are missing." },
+        { status: 500 }
+      );
+    }
+
+    // Create the admin client at request time (safe on server only)
+    const supabaseAdmin = createClient(url, serviceRoleKey);
+
+    // INSERT only — do not overwrite on conflict.
     const { error } = await supabaseAdmin
       .from("business_profiles")
       .insert([{ id, nombre_negocio, nombre_contacto, telefono }]);
 
     if (error) {
-      // If row already exists (create-if-not-exists semantics), accept and return OK
       if (isUniqueViolation(error)) {
-        return NextResponse.json({ ok: true, note: "Ya existía, no se sobreescribe." });
+        return NextResponse.json({ ok: true, note: "Already existed; not overwritten." });
       }
-      // Any other DB error → 500
-      console.error("Insert business_profile error:", error.message);
-      return NextResponse.json({ error: "No se pudo crear el perfil." }, { status: 500 });
+      // Use a type guard here so TS knows .message exists
+      const msg = (error as PostgrestError).message ?? "Unknown error";
+      console.error("Insert business_profile error:", msg);
+      return NextResponse.json({ error: "Could not create profile." }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
-    // Safe, ESLint-friendly error logging
     const msg = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
