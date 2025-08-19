@@ -40,6 +40,8 @@ const handleSubmit = async (e: React.FormEvent) => {
   setError(null);
   setLoading(true);
 
+  
+
   try {
     // 1) Crear usuario (queda sin confirmar hasta click en email)
     const { data, error: signUpError } = await supabase.auth.signUp({

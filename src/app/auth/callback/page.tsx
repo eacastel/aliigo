@@ -23,7 +23,7 @@ export default function AuthCallbackPage() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <p className="text-sm text-gray-600">Signing you in…</p>
+      <p className="text-sm text-gray-600">Iniciando sesión…</p>
     </div>
   );
 }
