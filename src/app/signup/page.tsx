@@ -45,7 +45,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${SITE_URL}/login?from=confirm` },
+      options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
     });
 
     if (signUpError) {
@@ -106,7 +106,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     }
 
     // 4) Redirigir al dashboard
-router.replace(`/check-email?email=${encodeURIComponent(email.trim())}`);
+    router.replace("/dashboard");
   } catch (e) {
     setError(e instanceof Error ? e.message : "Error inesperado.");
   } finally {
