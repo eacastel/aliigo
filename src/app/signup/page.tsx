@@ -15,6 +15,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { getPublicOrigin } from "@/lib/url";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -44,10 +45,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     // 1) Crear usuario (queda sin confirmar hasta click en email)
+    const origin = getPublicOrigin();
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
+      options: { emailRedirectTo: `${origin}/auth/callback` },
     });
 
     if (signUpError) {
