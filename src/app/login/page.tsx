@@ -16,7 +16,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { AuthError } from "@supabase/supabase-js";
 
-// If you want to use "resend confirmation" from login, set NEXT_PUBLIC_SITE_URL
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
 export default function LoginPage() {
@@ -50,11 +49,15 @@ function LoginWithSearchParams() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<{ type: "ok" | "error" | "info"; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Controls visibility of "resend confirmation" button only after 422 attempt
+  const [canResend, setCanResend] = useState(false);
   const [resending, setResending] = useState(false);
 
   // Handle login attempt with safe error messaging
   const handleLogin = async () => {
     setMsg(null);
+    setCanResend(false); // reset before attempt
 
     const normalizedEmail = email.trim();
     const normalizedPassword = password;
@@ -74,23 +77,20 @@ function LoginWithSearchParams() {
       if (error) {
         const e = error as AuthError;
 
-        // Distinguish a few useful cases without confirming account existence
         if (e.status === 422) {
-          // Email not confirmed
+          // Email exists but not confirmed → allow resend
+          setCanResend(true);
           setMsg({
             type: "error",
             text:
               "Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada o reenvía la confirmación.",
           });
         } else if (e.status === 429) {
-          // Rate limited
-          setMsg({
-            type: "error",
-            text: "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
-          });
+          setMsg({ type: "error", text: "Demasiados intentos. Inténtalo de nuevo en unos minutos." });
+          setCanResend(false);
         } else {
-          // Generic invalid credentials (do not reveal whether the email exists)
           setMsg({ type: "error", text: "Correo electrónico o contraseña no válidos." });
+          setCanResend(false);
         }
         return;
       }
@@ -103,7 +103,7 @@ function LoginWithSearchParams() {
     }
   };
 
-  // Optional: allow resending the confirmation email from the login screen
+  // Resend confirmation only when canResend=true (i.e., after a 422)
   const handleResendConfirmation = async () => {
     setMsg(null);
 
@@ -122,7 +122,6 @@ function LoginWithSearchParams() {
       });
 
       if (error) {
-        // Keep response generic
         setMsg({
           type: "error",
           text: "No se pudo reenviar la confirmación en este momento. Inténtalo de nuevo.",
@@ -136,6 +135,18 @@ function LoginWithSearchParams() {
     } finally {
       setResending(false);
     }
+  };
+
+  // If user edits inputs, clear message and hide resend until next 422
+  const onEmailChange = (v: string) => {
+    setEmail(v);
+    if (msg) setMsg(null);
+    if (canResend) setCanResend(false);
+  };
+  const onPasswordChange = (v: string) => {
+    setPassword(v);
+    if (msg) setMsg(null);
+    if (canResend) setCanResend(false);
   };
 
   return (
@@ -169,7 +180,7 @@ function LoginWithSearchParams() {
           type="email"
           placeholder="Correo electrónico"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => onEmailChange(e.target.value)}
           className="w-full border px-4 py-2 rounded"
           autoComplete="email"
           aria-label="Correo electrónico"
@@ -180,7 +191,7 @@ function LoginWithSearchParams() {
           type="password"
           placeholder="Contraseña"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => onPasswordChange(e.target.value)}
           className="w-full border px-4 py-2 rounded"
           autoComplete="current-password"
           aria-label="Contraseña"
@@ -206,15 +217,17 @@ function LoginWithSearchParams() {
           </a>
         </p>
 
-        {/* Optional: Resend confirmation (does not reveal existence) */}
-        <button
-          type="button"
-          onClick={handleResendConfirmation}
-          className="w-full border border-gray-300 py-2 rounded hover:bg-gray-50 disabled:opacity-50 mt-2"
-          disabled={resending}
-        >
-          {resending ? "Reenviando…" : "Reenviar correo de confirmación"}
-        </button>
+        {/* Conditionally render resend confirmation ONLY after a 422 error */}
+        {canResend && (
+          <button
+            type="button"
+            onClick={handleResendConfirmation}
+            className="w-full border border-gray-300 py-2 rounded hover:bg-gray-50 disabled:opacity-50 mt-2"
+            disabled={resending}
+          >
+            {resending ? "Reenviando…" : "Reenviar correo de confirmación"}
+          </button>
+        )}
 
         {/* TODO: Add magic-link or OAuth providers in the future */}
       </div>
