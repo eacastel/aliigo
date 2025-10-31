@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import "./globals.css";
+import "./../globals.css";
 import SiteHeaderPublic from "@/components/SiteHeaderPublic";
 import SiteFooter from "@/components/SiteFooter";
 
