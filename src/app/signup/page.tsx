@@ -39,13 +39,25 @@ export default function SignupPage() {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setError(null);
+
+  // ---- client-side sanity checks ----
+  if (password.length < 8) {
+    setError("La contraseña debe tener al menos 8 caracteres.");
+    return;
+  }
+  if (!/\d/.test(password)) {
+    setError("La contraseña debe incluir al menos un número.");
+    return;
+  }
+  if (telefono && !/^[0-9+\-\s]{6,20}$/.test(telefono)) {
+    setError("El número de teléfono no tiene un formato válido.");
+    return;
+  }
+
   setLoading(true);
-
-  
-
   try {
-    // 1) Crear usuario (queda sin confirmar hasta click en email)
     const origin = getPublicOrigin();
+
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -53,11 +65,24 @@ const handleSubmit = async (e: React.FormEvent) => {
     });
 
     if (signUpError) {
-      const msg = (signUpError.message || "").toLowerCase();
-      if (msg.includes("already registered") || msg.includes("user already registered")) {
-        setError("Este email ya existe. Inicia sesión o restablece tu contraseña.");
+      console.error("Supabase signup error:", signUpError);
+
+      // expose the underlying reason instead of a generic one
+      const msg = signUpError.message?.toLowerCase() || "";
+
+      if (msg.includes("password")) {
+        setError(`Error de contraseña: ${signUpError.message}`);
+      } else if (msg.includes("email")) {
+        setError(`Error de email: ${signUpError.message}`);
+      } else if (
+        msg.includes("already registered") ||
+        msg.includes("user already registered")
+      ) {
+        setError(
+          "Este email ya existe. Inicia sesión o restablece tu contraseña."
+        );
       } else {
-        setError("No pudimos crear tu cuenta. Inténtalo de nuevo.");
+        setError(signUpError.message || "No pudimos crear tu cuenta.");
       }
       return;
     }
@@ -68,7 +93,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
-    // 2) Insertar perfil de negocio una sola vez, con logging claro
+    // Insert business profile
     const profileResp = await fetch("/api/profiles/ensure", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -81,19 +106,12 @@ const handleSubmit = async (e: React.FormEvent) => {
       }),
     });
 
-    const profileJson: unknown = await profileResp.json().catch(() => ({}));
-
     if (!profileResp.ok) {
-      console.error("Profile insert failed:", {
-        status: profileResp.status,
-        json: profileJson,
-      });
-      // No es fatal: seguimos al dashboard, el banner avisará de confirmación pendiente
-    } else {
-      console.log("Profile insert OK:", profileJson);
+      const json = await profileResp.json().catch(() => ({}));
+      console.warn("Profile insert failed", { status: profileResp.status, json });
     }
 
-    // 3) Guardar marcador local para UX pre‑confirmación
+    // stash local marker
     try {
       localStorage.setItem(
         "aliigo_pending_signup",
@@ -106,17 +124,20 @@ const handleSubmit = async (e: React.FormEvent) => {
         })
       );
     } catch {
-      /* sin bloqueo */
+      /* ignore */
     }
 
-    // 4) Redirigir al dashboard
     router.replace("/dashboard");
   } catch (e) {
-    setError(e instanceof Error ? e.message : "Error inesperado.");
+    console.error("Unexpected signup error:", e);
+    setError(
+      e instanceof Error ? e.message : "Ocurrió un error inesperado al crear la cuenta."
+    );
   } finally {
     setLoading(false);
   }
 };
+
 
   return (
     <div className="max-w-md mx-auto mt-10 px-4">
