@@ -1,16 +1,16 @@
-// src/app/layout.tsx
+// app/layout.tsx
 import type { ReactNode } from "react";
 import "./globals.css";
-import SiteHeaderPublic from "@/components/SiteHeaderPublic";
-import SiteFooter from "@/components/SiteFooter";
+import { Geist, Geist_Mono } from "next/font/google"; // or @next/font/local
+
+const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
-      <body className="bg-zinc-950 text-zinc-100 flex min-h-dvh flex-col">
-        <SiteHeaderPublic />
-        <main className="grow">{children}</main> {/* ← This renders page.tsx or nested layouts/pages */}
-        <SiteFooter />
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-background text-foreground`}>
+        {children}
       </body>
     </html>
   );
