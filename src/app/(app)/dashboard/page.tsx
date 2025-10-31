@@ -21,6 +21,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { AliigoChatWidget } from "@/components/AliigoChatWidget";
 
 type BusinessProfile = {
   id: string;
@@ -270,6 +271,7 @@ export default function DashboardPage() {
         </div>
         {/* Add more feature cards here */}
       </div>
+       <AliigoChatWidget businessSlug="horchata-labs" brand="Aliigo" />
     </div>
   );
 }
