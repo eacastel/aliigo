@@ -1,3 +1,4 @@
+// src/app/(public)/signup/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -21,18 +22,9 @@ export default function SignupPage() {
     e.preventDefault();
     setError(null);
 
-    if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.");
-      return;
-    }
-    if (!/\d/.test(password)) {
-      setError("La contraseña debe incluir al menos un número.");
-      return;
-    }
-    if (telefono && !/^[0-9+\-\s]{6,20}$/.test(telefono)) {
-      setError("El número de teléfono no tiene un formato válido.");
-      return;
-    }
+    if (password.length < 8) return setError("La contraseña debe tener al menos 8 caracteres.");
+    if (!/\d/.test(password)) return setError("La contraseña debe incluir al menos un número.");
+    if (telefono && !/^[0-9+\-\s]{6,20}$/.test(telefono)) return setError("El teléfono no es válido.");
 
     setLoading(true);
     try {
@@ -41,14 +33,13 @@ export default function SignupPage() {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: `${origin}/auth/callback` }, // <-- important
+        options: { emailRedirectTo: `${origin}/auth/callback` }, // <— use callback
       });
+
       if (signUpError) {
         const msg = (signUpError.message || "").toLowerCase();
         if (msg.includes("already")) {
-          setError(
-            "Este email ya existe. Inicia sesión o restablece tu contraseña."
-          );
+          setError("Este email ya existe. Inicia sesión o restablece tu contraseña.");
         } else {
           setError(signUpError.message || "No pudimos crear tu cuenta.");
         }
@@ -61,8 +52,8 @@ export default function SignupPage() {
         return;
       }
 
-      // Ensure profile + business linkage on the server
-      await fetch("/api/profiles/ensure", {
+      // Create business + profile on the server
+      const resp = await fetch("/api/profiles/ensure", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -72,9 +63,16 @@ export default function SignupPage() {
           telefono: telefono || null,
           email,
         }),
-      }).catch(() => {});
+      });
 
-      // Marker for pending trial while email is unconfirmed
+      const payload = await resp.json().catch(() => ({}));
+      if (!resp.ok || payload?.ok === false) {
+        console.error("[signup] /api/profiles/ensure failed:", resp.status, payload);
+        setError(payload?.error || `No se pudo guardar el perfil (HTTP ${resp.status}).`);
+        return;
+      }
+
+      // Marker for pending trial
       try {
         localStorage.setItem(
           "aliigo_pending_signup",
@@ -90,9 +88,7 @@ export default function SignupPage() {
 
       router.replace("/dashboard");
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Error inesperado al crear la cuenta."
-      );
+      setError(e instanceof Error ? e.message : "Error inesperado al crear la cuenta.");
     } finally {
       setLoading(false);
     }
@@ -109,67 +105,31 @@ export default function SignupPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Business */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Nombre del negocio
-          </label>
-          <input
-            className="w-full border rounded px-3 py-2"
-            value={nombreNegocio}
-            onChange={(e) => setNombreNegocio(e.target.value)}
-            required
-          />
+          <label className="block text-sm mb-1">Nombre del negocio</label>
+          <input className="w-full border rounded px-3 py-2" value={nombreNegocio} onChange={(e) => setNombreNegocio(e.target.value)} required />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Nombre de contacto</label>
+          <input className="w-full border rounded px-3 py-2" value={nombreContacto} onChange={(e) => setNombreContacto(e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Teléfono</label>
+          <input className="w-full border rounded px-3 py-2" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
         </div>
 
+        {/* Credentials */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Nombre de contacto
-          </label>
-          <input
-            className="w-full border rounded px-3 py-2"
-            value={nombreContacto}
-            onChange={(e) => setNombreContacto(e.target.value)}
-          />
+          <label className="block text-sm mb-1">Email</label>
+          <input className="w-full border rounded px-3 py-2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Contraseña</label>
+          <input className="w-full border rounded px-3 py-2" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" required />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Teléfono</label>
-          <input
-            className="w-full border rounded px-3 py-2"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
-            className="w-full border rounded px-3 py-2"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Contraseña</label>
-          <input
-            className="w-full border rounded px-3 py-2"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-black text-white rounded px-4 py-2 disabled:opacity-50"
-        >
+        <button type="submit" disabled={loading} className="w-full bg-black text-white rounded px-4 py-2 disabled:opacity-50">
           {loading ? "Creando..." : "Crear cuenta"}
         </button>
       </form>
