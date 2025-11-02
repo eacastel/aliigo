@@ -2,7 +2,7 @@
 
 
 import { NextRequest, NextResponse } from "next/server";
-import { adminFromTable } from "@/lib/supabaseClient";
+import { adminFromTable } from "@/lib/supabaseAdmin";
 
 export async function POST(req: NextRequest) {
   try {
