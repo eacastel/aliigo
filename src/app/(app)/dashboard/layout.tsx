@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const path = usePathname();
   return (
     <div className="min-h-screen grid grid-cols-12">
-      <aside className="col-span-12 sm:col-span-3 lg:col-span-2 border-r bg-white">
+      <aside className="col-span-12 sm:col-span-3 lg:col-span-2 border-r bg-black">
         <div className="p-4 border-b">
           <div className="font-bold">Aliigo</div>
           <div className="text-xs text-gray-500">Dashboard</div>

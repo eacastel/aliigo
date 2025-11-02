@@ -1,11 +1,10 @@
-// src/app/(app)/dashboard/widget/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import {
   supabase,
   fromTable,
-  // Row types are optional; keep them only if you’ll use `.returns<T>()`:
+  // Row types are optional; keep them only if you’ll use `.overrideTypes<T>()`:
   type BusinessRow,
   type BusinessProfileRow,
   type EmbedTokenRow,
@@ -55,7 +54,7 @@ export default function WidgetSettingsPage() {
         .select("business_id")
         .eq("id", uid)
         .single()
-        .returns<Pick<BusinessProfileRow, "business_id">>(); // <-- optional typing
+        .overrideTypes<Pick<BusinessProfileRow, "business_id">, { merge: false }>();
 
       const businessId = prof?.business_id;
       if (!businessId) return;
@@ -66,10 +65,7 @@ export default function WidgetSettingsPage() {
         .eq("id", businessId)
         .single()
         .overrideTypes<
-          Pick<
-            BusinessRow,
-            "id" | "slug" | "system_prompt" | "allowed_domains"
-          >,
+          Pick<BusinessRow, "id" | "slug" | "system_prompt" | "allowed_domains">,
           { merge: false }
         >();
 
@@ -122,8 +118,7 @@ export default function WidgetSettingsPage() {
   };
 
   const embedCode = useMemo(() => {
-    const base =
-      process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.vercel.app";
+    const base = process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.vercel.app";
     const themeParam = encodeURIComponent(JSON.stringify(theme));
     const slug = biz?.slug || "horchata-labs";
     const tk = token || "SET_TOKEN";
@@ -158,9 +153,7 @@ export default function WidgetSettingsPage() {
         {/* Settings */}
         <section className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Allowed domains
-            </label>
+            <label className="block text-sm font-medium mb-1">Allowed domains</label>
             <input
               className="w-full border rounded px-3 py-2"
               placeholder="example.com, store.example.com"
@@ -179,35 +172,22 @@ export default function WidgetSettingsPage() {
                 )
               }
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Domains allowed to embed your widget.
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Domains allowed to embed your widget.</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Assistant instructions
-            </label>
+            <label className="block text-sm font-medium mb-1">Assistant instructions</label>
             <textarea
               className="w-full border rounded px-3 py-2"
               rows={6}
               value={biz.system_prompt || ""}
-              onChange={(e) =>
-                setBiz((b) => (b ? { ...b, system_prompt: e.target.value } : b))
-              }
+              onChange={(e) => setBiz((b) => (b ? { ...b, system_prompt: e.target.value } : b))}
             />
           </div>
 
           <div className="flex gap-2">
-            <button
-              className="bg-black text-white rounded px-4 py-2"
-              onClick={saveSettings}
-            >
-              Save
-            </button>
-            <button className="border rounded px-4 py-2" onClick={rotateToken}>
-              Rotate token
-            </button>
+            <button className="bg-black text-white rounded px-4 py-2" onClick={saveSettings}>Save</button>
+            <button className="border rounded px-4 py-2" onClick={rotateToken}>Rotate token</button>
           </div>
 
           <div className="text-sm text-gray-600">
@@ -215,77 +195,62 @@ export default function WidgetSettingsPage() {
           </div>
         </section>
 
-        {/* Live Preview */}
+        {/* Live Preview: IMPORTANT — pass slug + token */}
         <section className="border rounded p-4">
           <h2 className="font-semibold mb-2">Live preview</h2>
           <div className="relative h-[420px] border rounded">
             <AliigoChatWidget
               businessSlug={biz.slug}
               brand={brand}
+              token={token ?? undefined}
               theme={theme}
             />
           </div>
 
           <div className="mt-4 grid sm:grid-cols-2 gap-2">
             <label className="text-sm">Brand</label>
-            <input
-              className="border rounded px-3 py-2"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-            />
+            <input className="border rounded px-3 py-2" value={brand} onChange={(e) => setBrand(e.target.value)} />
 
             <label className="text-sm">Header bg (Tailwind)</label>
             <input
               className="border rounded px-3 py-2"
               value={theme.headerBg}
-              onChange={(e) =>
-                setTheme((t) => ({ ...t, headerBg: e.target.value }))
-              }
+              onChange={(e) => setTheme((t) => ({ ...t, headerBg: e.target.value }))}
             />
 
             <label className="text-sm">Header text</label>
             <input
               className="border rounded px-3 py-2"
               value={theme.headerText}
-              onChange={(e) =>
-                setTheme((t) => ({ ...t, headerText: e.target.value }))
-              }
+              onChange={(e) => setTheme((t) => ({ ...t, headerText: e.target.value }))}
             />
 
             <label className="text-sm">User bubble</label>
             <input
               className="border rounded px-3 py-2"
               value={theme.bubbleUser}
-              onChange={(e) =>
-                setTheme((t) => ({ ...t, bubbleUser: e.target.value }))
-              }
+              onChange={(e) => setTheme((t) => ({ ...t, bubbleUser: e.target.value }))}
             />
 
             <label className="text-sm">Bot bubble</label>
             <input
               className="border rounded px-3 py-2"
               value={theme.bubbleBot}
-              onChange={(e) =>
-                setTheme((t) => ({ ...t, bubbleBot: e.target.value }))
-              }
+              onChange={(e) => setTheme((t) => ({ ...t, bubbleBot: e.target.value }))}
             />
 
             <label className="text-sm">Send bg</label>
             <input
               className="border rounded px-3 py-2"
               value={theme.sendBg}
-              onChange={(e) =>
-                setTheme((t) => ({ ...t, sendBg: e.target.value }))
-              }
+              onChange={(e) => setTheme((t) => ({ ...t, sendBg: e.target.value }))}
             />
 
             <label className="text-sm">Send text</label>
             <input
               className="border rounded px-3 py-2"
               value={theme.sendText}
-              onChange={(e) =>
-                setTheme((t) => ({ ...t, sendText: e.target.value }))
-              }
+              onChange={(e) => setTheme((t) => ({ ...t, sendText: e.target.value }))}
             />
           </div>
         </section>
@@ -294,12 +259,7 @@ export default function WidgetSettingsPage() {
       {/* Embed snippet */}
       <section className="mt-8">
         <h2 className="font-semibold mb-2">Embed snippet</h2>
-        <textarea
-          className="w-full border rounded px-3 py-2 text-xs"
-          rows={10}
-          value={embedCode}
-          readOnly
-        />
+        <textarea className="w-full border rounded px-3 py-2 text-xs" rows={10} value={embedCode} readOnly />
         <p className="text-xs text-gray-500 mt-2">
           Paste before the closing <code>&lt;/body&gt;</code> tag of your site.
         </p>

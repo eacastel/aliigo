@@ -1,7 +1,5 @@
-// app/page.tsx
 import Link from "next/link";
-// If you’ve added the chat widget already, uncomment:
-// import { AliigoChatWidget } from "@/components/AliigoChatWidget";
+import { AliigoSupportWidget } from "@/components/AliigoSupportWidget";
 
 export const metadata = {
   title: "Aliigo — Reputación y Automatización Local",
@@ -44,11 +42,8 @@ export default function HomePage() {
             </div>
 
             <div className="relative">
-              {/* Placeholder screenshot/card */}
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-2xl">
-                <div className="h-56 md:h-64 lg:h-80 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-800">
-                  {/* Replace with a real dashboard screenshot later */}
-                </div>
+                <div className="h-56 md:h-64 lg:h-80 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-800" />
                 <div className="mt-4 grid grid-cols-3 gap-3 text-xs text-zinc-400">
                   <div className="rounded-lg border border-zinc-800 p-3">
                     ⭐ Reseñas nuevas
@@ -64,7 +59,6 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              {/* Decorative glow */}
               <div className="pointer-events-none absolute -inset-4 -z-10 bg-[radial-gradient(40%_40%_at_70%_30%,rgba(59,130,246,0.25),transparent_60%)]" />
             </div>
           </div>
@@ -78,7 +72,6 @@ export default function HomePage() {
             Elegido por clínicas, comercios y servicios locales.
           </p>
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 opacity-70">
-            {/* Replace with small client logos */}
             <div className="h-10 rounded border border-zinc-800" />
             <div className="h-10 rounded border border-zinc-800" />
             <div className="h-10 rounded border border-zinc-800" />
@@ -93,7 +86,9 @@ export default function HomePage() {
       <section className="bg-zinc-950 border-y border-zinc-800">
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold text-white">Todo lo clave, sin complicaciones</h2>
+            <h2 className="text-2xl font-bold text-white">
+              Todo lo clave, sin complicaciones
+            </h2>
             <p className="mt-2 text-zinc-300">
               Enfocado en lo que mueve la aguja. Menos menús, más resultados.
             </p>
@@ -121,12 +116,20 @@ export default function HomePage() {
             <Feature
               title="Resumen de reputación"
               desc="Tus reseñas, resumidas cada semana con insights accionables. Sin perder tiempo."
-              bullets={["Tendencias y alertas", "Sentimiento", "Acciones sugeridas"]}
+              bullets={[
+                "Tendencias y alertas",
+                "Sentimiento",
+                "Acciones sugeridas",
+              ]}
             />
             <Feature
               title="Directorios y NAP"
               desc="Mantén nombre, dirección y teléfono sincronizados en los principales directorios."
-              bullets={["Google / Bing / Apple / FB", "Sync programado", "Control desde el panel"]}
+              bullets={[
+                "Google / Bing / Apple / FB",
+                "Sync programado",
+                "Control desde el panel",
+              ]}
             />
           </div>
         </div>
@@ -142,21 +145,9 @@ export default function HomePage() {
             </p>
           </div>
           <ol className="mt-8 grid gap-6 md:grid-cols-3">
-            <Step
-              n={1}
-              title="Crea tu cuenta"
-              desc="Configura tu negocio y usuarios. Sin tarjeta, 30 días gratis."
-            />
-            <Step
-              n={2}
-              title="Activa canales"
-              desc="Instala el chat web. Conecta WhatsApp. Personaliza mensajes."
-            />
-            <Step
-              n={3}
-              title="Mide y mejora"
-              desc="Ve reseñas, conversaciones y resultados en el panel."
-            />
+            <Step n={1} title="Crea tu cuenta" desc="Configura tu negocio y usuarios. Sin tarjeta, 30 días gratis." />
+            <Step n={2} title="Activa canales" desc="Instala el chat web. Conecta WhatsApp. Personaliza mensajes." />
+            <Step n={3} title="Mide y mejora" desc="Ve reseñas, conversaciones y resultados en el panel." />
           </ol>
         </div>
       </section>
@@ -168,8 +159,8 @@ export default function HomePage() {
             <div>
               <h2 className="text-2xl font-bold text-white">Precios simples</h2>
               <p className="mt-2 text-zinc-300">
-                Plan único para empezar. Actualiza cuando necesites más volumen o
-                funciones avanzadas.
+                Plan único para empezar. Actualiza cuando necesites más volumen
+                o funciones avanzadas.
               </p>
               <ul className="mt-6 space-y-2 text-sm text-zinc-300">
                 <li>• Chat web + WhatsApp</li>
@@ -187,9 +178,12 @@ export default function HomePage() {
               </div>
             </div>
             <div className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/50">
-              <p className="text-5xl font-extrabold text-white">€XX<span className="text-2xl align-top">/mes</span></p>
+              <p className="text-5xl font-extrabold text-white">
+                €XX<span className="text-2xl align-top">/mes</span>
+              </p>
               <p className="mt-2 text-zinc-400 text-sm">
-                Precio de lanzamiento. Cambia cuando publiquemos el módulo de campañas.
+                Precio de lanzamiento. Cambia cuando publiquemos el módulo de
+                campañas.
               </p>
               <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-lg border border-zinc-800 p-3">Usuarios incluidos</div>
@@ -218,9 +212,7 @@ export default function HomePage() {
       {/* CTA */}
       <section className="bg-zinc-950 border-t border-zinc-800">
         <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">
-            Listo para empezar
-          </h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">Listo para empezar</h2>
           <p className="mt-3 text-zinc-300">
             Crea tu cuenta en minutos y activa el chat. Todo desde un solo panel.
           </p>
@@ -235,31 +227,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* If you want the chat widget on the homepage, uncomment below */}
-      {/* <AliigoChatWidget businessSlug="horchata-labs" brand="Aliigo" /> */}
+      {/* Aliigo help widget (client) */}
+      <AliigoSupportWidget />
     </>
   );
 }
 
-// --- Small presentational components ---
-
-function Feature({
-  title,
-  desc,
-  bullets,
-}: {
-  title: string;
-  desc: string;
-  bullets: string[];
-}) {
+function Feature({ title, desc, bullets }: { title: string; desc: string; bullets: string[] }) {
   return (
     <div className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/40">
       <h3 className="text-lg font-semibold text-white">{title}</h3>
       <p className="mt-2 text-zinc-300 text-sm">{desc}</p>
       <ul className="mt-4 space-y-1 text-sm text-zinc-400">
-        {bullets.map((b, i) => (
-          <li key={i}>• {b}</li>
-        ))}
+        {bullets.map((b, i) => <li key={i}>• {b}</li>)}
       </ul>
     </div>
   );

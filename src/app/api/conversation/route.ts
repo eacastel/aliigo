@@ -1,56 +1,48 @@
-// app/api/conversation/route.ts
+// src/app/api/conversation/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
-import { supabaseAdmin } from "@/lib/supabaseAdmin"; // <-- server-only client
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/* ---------- Types local to this route ---------- */
-type ChatRole = "user" | "assistant" | "system" | "tool";
-type MessagesRow = { role: ChatRole; content: string; created_at: string };
+// server-only admin client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { persistSession: false } }
+);
 
-/* ---------- OpenAI (optional) ---------- */
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
 
-/* ---------- Helpers ---------- */
-class RateLimitError extends Error {
-  status = 429 as const;
-  constructor(message = "Rate limited") {
-    super(message);
-    this.name = "RateLimitError";
-  }
-}
+type ChatRole = "user" | "assistant" | "system" | "tool";
+type MessagesRow = { role: ChatRole; content: string; created_at: string };
 
-const corsHeaders: Record<string, string> = {
-  // If you want stricter CORS, echo the exact origin instead of "*"
+class RateLimitError extends Error { status = 429 as const; constructor(m="Rate limited"){ super(m);} }
+
+const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-function clientIp(req: NextRequest): string {
+function clientIp(req: NextRequest) {
   const fwd = req.headers.get("x-forwarded-for");
   return fwd?.split(",")[0]?.trim() || "0.0.0.0";
 }
-
-function originHost(req: NextRequest): string {
+function originHost(req: NextRequest) {
   const raw = req.headers.get("origin") || req.headers.get("referer") || "";
-  try {
-    return new URL(raw).hostname.toLowerCase();
-  } catch {
-    return "";
-  }
+  try { return new URL(raw).hostname.toLowerCase(); } catch { return ""; }
 }
 
-async function rateLimit(businessId: string, ip: string): Promise<void> {
-  // 20 messages / 5 minutes per business+IP
-  const WINDOW_MS = 5 * 60 * 1000;
-  const LIMIT = 20;
+async function rateLimit(businessId: string, ip: string) {
+  // Dev: make it lenient
+  const WINDOW_MS = process.env.NODE_ENV === "production" ? 5 * 60 * 1000 : 30 * 1000;
+  const LIMIT = process.env.NODE_ENV === "production" ? 20 : 1000;
 
-  const ins = await supabaseAdmin.from("rate_events").insert({
+  const ins = await supabase.from("rate_events").insert({
     ip,
     bucket: `chat:${businessId}`,
     business_id: businessId,
@@ -58,114 +50,88 @@ async function rateLimit(businessId: string, ip: string): Promise<void> {
   if (ins.error) throw ins.error;
 
   const since = new Date(Date.now() - WINDOW_MS).toISOString();
-  const countRes = await supabaseAdmin
+  const countRes = await supabase
     .from("rate_events")
     .select("*", { head: true, count: "exact" })
     .gte("created_at", since)
     .eq("ip", ip)
     .eq("business_id", businessId)
     .eq("bucket", `chat:${businessId}`);
-
   if (countRes.error) throw countRes.error;
   if ((countRes.count ?? 0) > LIMIT) throw new RateLimitError();
 }
 
-/** Validate token + domain before allowing chat */
-async function validateEmbedAccess(token: string, host: string): Promise<
-  | { ok: true; businessId: string }
-  | { ok: false; reason: string }
-> {
-  if (!token) return { ok: false, reason: "Missing token" };
-  if (!host) return { ok: false, reason: "Missing host" };
+async function validateEmbedAccess(token: string, host: string) {
+  if (!token) return { ok: false as const, reason: "Missing token" };
+  if (!host) return { ok: false as const, reason: "Missing host" };
 
-  // 1) Resolve the business by token
-  const tok = await supabaseAdmin
-    .from("embed_tokens")
-    .select("business_id")
-    .eq("token", token)
-    .single();
-  if (tok.error || !tok.data) return { ok: false, reason: "Invalid token" };
+  const tok = await supabase.from("embed_tokens")
+    .select("business_id").eq("token", token).single();
+  if (tok.error || !tok.data) return { ok: false as const, reason: "Invalid token" };
 
-  // 2) Validate allowed domains
-  const biz = await supabaseAdmin
-    .from("businesses")
-    .select("id, allowed_domains")
-    .eq("id", tok.data.business_id)
-    .single();
-  if (biz.error || !biz.data) return { ok: false, reason: "Business missing" };
+  const biz = await supabase.from("businesses")
+    .select("id,allowed_domains").eq("id", tok.data.business_id).single();
+  if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
 
   const allowed = (biz.data.allowed_domains || []).map((d: string) => d.toLowerCase());
-  const hostOk = allowed.some((d: string) => host === d || host.endsWith(`.${d}`));
-  if (!hostOk) return { ok: false, reason: "Domain not allowed" };
+  const ok = allowed.some((d: string) => host === d || host.endsWith(`.${d}`));
+  if (!ok) return { ok: false as const, reason: "Domain not allowed" };
 
-  return { ok: true, businessId: biz.data.id };
+  return { ok: true as const, businessId: biz.data.id };
 }
 
-/* ---------- CORS preflight ---------- */
-export function OPTIONS() {
+export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-/* ---------- POST ---------- */
 export async function POST(req: NextRequest) {
   try {
     const ip = clientIp(req);
     const host = originHost(req);
-
-    // The widget should send { token, message, conversationId?, customerName? }
-    const {
-      token,
-      conversationId: inputConvId,
-      message,
-      customerName,
-    }: {
-      token?: string;
-      conversationId?: string;
-      message?: string;
-      customerName?: string;
-    } = await req.json();
+    const { token, conversationId: inputConvId, message, customerName } =
+      (await req.json()) as {
+        token?: string;
+        conversationId?: string;
+        message?: string;
+        customerName?: string;
+      };
 
     if (!message) {
       return NextResponse.json({ error: "Missing message" }, { status: 400, headers: corsHeaders });
     }
 
-    // 🔐 Gate: token + domain
+    // validate token + host
     const gate = await validateEmbedAccess(token || "", host);
     if (!gate.ok) {
       return NextResponse.json({ error: `Forbidden: ${gate.reason}` }, { status: 403, headers: corsHeaders });
     }
     const businessId = gate.businessId;
 
-    // Rate limit
     await rateLimit(businessId, ip);
 
-    // Ensure conversation
+    // ensure conversation
     let conversationId = inputConvId ?? null;
     if (!conversationId) {
-      const convRes = await supabaseAdmin
+      const convRes = await supabase
         .from("conversations")
-        .insert({
-          business_id: businessId,
-          channel: "web",
-          customer_name: customerName ?? null,
-        })
+        .insert({ business_id: businessId, channel: "web", customer_name: customerName ?? null })
         .select("id")
         .single<{ id: string }>();
       if (convRes.error || !convRes.data) throw convRes.error ?? new Error("Conversation create failed");
       conversationId = convRes.data.id;
     }
 
-    // Save user message
-    const msgIns = await supabaseAdmin.from("messages").insert({
+    // persist user message
+    const m1 = await supabase.from("messages").insert({
       conversation_id: conversationId,
       channel: "web",
       role: "user",
       content: message,
     });
-    if (msgIns.error) throw msgIns.error;
+    if (m1.error) throw m1.error;
 
-    // Fetch last 20 messages (ordered)
-    const historyRes = await supabaseAdmin
+    // get last 20 for context
+    const historyRes = await supabase
       .from("messages")
       .select("role,content,created_at")
       .eq("conversation_id", conversationId)
@@ -173,24 +139,20 @@ export async function POST(req: NextRequest) {
       .limit(20);
     const history = (historyRes.data as MessagesRow[]) ?? [];
 
-    // Business context for system prompt
-    const bizRes = await supabaseAdmin
+    // business prompt
+    const bizRes = await supabase
       .from("businesses")
       .select("name, timezone, system_prompt")
       .eq("id", businessId)
       .single<{ name: string; timezone: string; system_prompt: string | null }>();
-
-    const bizName = bizRes.data?.name ?? "your business";
-    const tz = bizRes.data?.timezone ?? "UTC";
-    const systemPrompt =
+    const sys =
       (bizRes.data?.system_prompt ?? "").trim() ||
-      `You are the AI assistant for ${bizName}. Be concise, helpful, and polite. Timezone: ${tz}.`;
+      `You are the AI assistant for ${bizRes.data?.name ?? "the business"}. Be concise, helpful, and polite. Timezone: ${bizRes.data?.timezone ?? "UTC"}.`;
 
-    // AI reply (fallback if OPENAI_API_KEY not set)
     let reply = "Gracias por tu mensaje. Te respondemos enseguida.";
     if (openai) {
       const messages = [
-        { role: "system" as const, content: systemPrompt },
+        { role: "system" as const, content: sys },
         ...history.map((m) => ({
           role: (m.role === "tool" ? "system" : m.role) as "user" | "assistant" | "system",
           content: m.content,
@@ -205,14 +167,14 @@ export async function POST(req: NextRequest) {
       reply = completion.choices?.[0]?.message?.content?.trim() || reply;
     }
 
-    // Persist assistant reply
-    const aRes = await supabaseAdmin.from("messages").insert({
+    // persist assistant reply
+    const m2 = await supabase.from("messages").insert({
       conversation_id: conversationId,
       channel: "web",
       role: "assistant",
       content: reply,
     });
-    if (aRes.error) throw aRes.error;
+    if (m2.error) throw m2.error;
 
     return NextResponse.json({ conversationId, reply }, { status: 200, headers: corsHeaders });
   } catch (e: unknown) {

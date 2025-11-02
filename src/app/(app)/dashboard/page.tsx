@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { AliigoChatWidget } from "@/components/AliigoChatWidget";
 
-type BusinessProfileRow = {
+type BusinessProfile = {
   id: string;
   nombre_negocio: string | null;
   nombre_contacto: string | null;
   telefono: string | null;
   created_at: string | null;
-  business_id?: string | null; // ✅ add this
+  business_id?: string | null; 
 };
 
 type PendingSignup = {
@@ -27,7 +27,7 @@ export default function DashboardPage() {
 
   // ✅ Hooks live INSIDE the component
   const [loading, setLoading] = useState(true);
-  const [business, setBusiness] = useState<BusinessProfileRow | null>(null);
+  const [business, setBusiness] = useState<BusinessProfile | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [pending, setPending] = useState<PendingSignup | null>(null);
@@ -169,7 +169,7 @@ export default function DashboardPage() {
   return (
     <div className="max-w-3xl mx-auto mt-10 px-4">
       <h1 className="text-2xl font-bold mb-4">
-        Bienvenido {business?.nombre_contacto ? `, ${business.nombre_contacto}` : ""}
+        Bienvenido {business?.nombre_contacto ? `, ${business.nombre_contacto}` : ""} 👋
       </h1>
 
       {!business && pending && (
