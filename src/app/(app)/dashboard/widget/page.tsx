@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
   supabase,
   fromTable,
-  // Row types are optional; keep them only if you’ll use `.overrideTypes<T>()`:
   type BusinessRow,
   type BusinessProfileRow,
   type EmbedTokenRow,
@@ -29,6 +28,7 @@ type Theme = {
 
 export default function WidgetSettingsPage() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [unauth, setUnauth] = useState(false);
   const [biz, setBiz] = useState<BizLocal | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [brand, setBrand] = useState("Aliigo");
@@ -40,66 +40,82 @@ export default function WidgetSettingsPage() {
     sendBg: "bg-blue-600",
     sendText: "text-white",
   });
+  const [loading, setLoading] = useState(true);
 
-  // Load current user + business + latest token
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      const uid = data.session?.user?.id || null;
-      setUserId(uid);
-      if (!uid) return;
+      try {
+        const { data } = await supabase.auth.getSession();
+        const uid = data.session?.user?.id || null;
+        setUserId(uid);
 
-      // profile -> business_id
-      const { data: prof } = await fromTable("business_profiles")
-        .select("business_id")
-        .eq("id", uid)
-        .single()
-        .overrideTypes<Pick<BusinessProfileRow, "business_id">, { merge: false }>();
+        if (!uid) {
+          setUnauth(true);
+          setLoading(false);
+          return;
+        }
 
-      const businessId = prof?.business_id;
-      if (!businessId) return;
+        // profile -> business_id
+        const profRes = await fromTable("business_profiles")
+          .select("business_id")
+          .eq("id", uid)
+          .limit(1)
+          .maybeSingle()
+          .overrideTypes<Pick<BusinessProfileRow, "business_id">, { merge: false }>();
 
-      // business row
-      const { data: b } = await fromTable("businesses")
-        .select("id,slug,system_prompt,allowed_domains")
-        .eq("id", businessId)
-        .single()
-        .overrideTypes<
-          Pick<BusinessRow, "id" | "slug" | "system_prompt" | "allowed_domains">,
-          { merge: false }
-        >();
+        const businessId = profRes.data?.business_id;
+        if (!businessId) {
+          setBiz(null);
+          return;
+        }
 
-      if (b) {
-        setBiz({
-          id: b.id,
-          slug: b.slug,
-          system_prompt: b.system_prompt,
-          allowed_domains: b.allowed_domains ?? [],
-        });
+        // business row
+        const bRes = await fromTable("businesses")
+          .select("id,slug,system_prompt,allowed_domains")
+          .eq("id", businessId)
+          .limit(1)
+          .maybeSingle()
+          .overrideTypes<
+            Pick<BusinessRow, "id" | "slug" | "system_prompt" | "allowed_domains">,
+            { merge: false }
+          >();
+
+        if (bRes.data) {
+          setBiz({
+            id: bRes.data.id,
+            slug: bRes.data.slug,
+            system_prompt: bRes.data.system_prompt,
+            allowed_domains: bRes.data.allowed_domains ?? [],
+          });
+        } else {
+          setBiz(null);
+        }
+
+        // latest embed token (if any)
+        const tRes = await fromTable("embed_tokens")
+          .select("token")
+          .eq("business_id", businessId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+          .overrideTypes<Pick<EmbedTokenRow, "token">, { merge: false }>();
+
+        if (tRes.data?.token) setToken(tRes.data.token);
+      } finally {
+        setLoading(false);
       }
-
-      // latest embed token (if any)
-      const { data: t } = await fromTable("embed_tokens")
-        .select("token")
-        .eq("business_id", businessId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle()
-        .overrideTypes<Pick<EmbedTokenRow, "token">, { merge: false }>();
-
-      if (t?.token) setToken(t.token);
     })();
   }, []);
 
   const saveSettings = async () => {
-    if (!userId) return;
+    if (!userId || !biz) return;
     await fetch("/api/widget/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId,
-        system_prompt: biz?.system_prompt || "",
-        allowed_domains: biz?.allowed_domains || [],
+        system_prompt: biz.system_prompt || "",
+        allowed_domains: biz.allowed_domains || [],
       }),
     });
     alert("Widget settings saved.");
@@ -143,7 +159,28 @@ export default function WidgetSettingsPage() {
     ].join("\n");
   }, [biz?.slug, brand, theme, token]);
 
-  if (!biz) return <p className="p-4">Cargando…</p>;
+  if (loading) return <p className="p-4">Cargando…</p>;
+  if (unauth) {
+    return (
+      <div className="max-w-lg p-4">
+        <h1 className="text-xl font-semibold mb-2">Necesitas iniciar sesión</h1>
+        <p className="text-sm text-gray-600">
+          Accede a tu cuenta para configurar tu widget.
+        </p>
+      </div>
+    );
+  }
+  if (!biz) {
+    return (
+      <div className="max-w-lg p-4">
+        <h1 className="text-xl font-semibold mb-2">Sin negocio vinculado</h1>
+        <p className="text-sm text-gray-600">
+          Aún no encontramos un negocio asociado a tu perfil. Completa tu
+          <span className="font-medium"> Perfil de negocio</span> en Settings.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl">
@@ -172,7 +209,9 @@ export default function WidgetSettingsPage() {
                 )
               }
             />
-            <p className="text-xs text-gray-500 mt-1">Domains allowed to embed your widget.</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Domains allowed to embed your widget.
+            </p>
           </div>
 
           <div>
@@ -186,8 +225,12 @@ export default function WidgetSettingsPage() {
           </div>
 
           <div className="flex gap-2">
-            <button className="bg-black text-white rounded px-4 py-2" onClick={saveSettings}>Save</button>
-            <button className="border rounded px-4 py-2" onClick={rotateToken}>Rotate token</button>
+            <button className="bg-black text-white rounded px-4 py-2" onClick={saveSettings}>
+              Save
+            </button>
+            <button className="border rounded px-4 py-2" onClick={rotateToken}>
+              Rotate token
+            </button>
           </div>
 
           <div className="text-sm text-gray-600">
@@ -195,7 +238,7 @@ export default function WidgetSettingsPage() {
           </div>
         </section>
 
-        {/* Live Preview: IMPORTANT — pass slug + token */}
+        {/* Live Preview */}
         <section className="border rounded p-4">
           <h2 className="font-semibold mb-2">Live preview</h2>
           <div className="relative h-[420px] border rounded">
@@ -209,7 +252,11 @@ export default function WidgetSettingsPage() {
 
           <div className="mt-4 grid sm:grid-cols-2 gap-2">
             <label className="text-sm">Brand</label>
-            <input className="border rounded px-3 py-2" value={brand} onChange={(e) => setBrand(e.target.value)} />
+            <input
+              className="border rounded px-3 py-2"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+            />
 
             <label className="text-sm">Header bg (Tailwind)</label>
             <input
