@@ -169,7 +169,7 @@ export default function DashboardPage() {
   return (
     <div className="max-w-3xl mx-auto mt-10 px-4">
       <h1 className="text-2xl font-bold mb-4">
-        Bienvenido/a a Aliigo{business?.nombre_contacto ? `, ${business.nombre_contacto}` : ""} 👋
+        Bienvenido {business?.nombre_contacto ? `, ${business.nombre_contacto}` : ""}
       </h1>
 
       {!business && pending && (
