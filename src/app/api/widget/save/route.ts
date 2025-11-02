@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import type { BusinessProfileRow } from "@/types/tables";
+// app/api/widget/save/route.ts
 
-const admin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+
+import { NextRequest, NextResponse } from "next/server";
+import { adminFromTable } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,26 +12,22 @@ export async function POST(req: NextRequest) {
       system_prompt: string;
     };
 
-    const { data: prof, error: profErr } = await admin
-      .from<BusinessProfileRow>("business_profiles")
+    const { data: prof, error: profErr } = await adminFromTable("business_profiles")
       .select("business_id")
       .eq("id", userId)
       .single();
-
     if (profErr || !prof?.business_id) {
       return NextResponse.json({ error: "Business not linked" }, { status: 400 });
     }
 
-    const { error } = await admin
-      .from("businesses")
+    const { error } = await adminFromTable("businesses")
       .update({ allowed_domains, system_prompt })
       .eq("id", prof.business_id);
-
     if (error) throw error;
 
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const msg = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

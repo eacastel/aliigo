@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { AliigoChatWidget } from "@/components/AliigoChatWidget";
 
-type BusinessProfile = {
+type BusinessProfileRow = {
   id: string;
   nombre_negocio: string | null;
   nombre_contacto: string | null;
@@ -27,7 +27,7 @@ export default function DashboardPage() {
 
   // ✅ Hooks live INSIDE the component
   const [loading, setLoading] = useState(true);
-  const [business, setBusiness] = useState<BusinessProfile | null>(null);
+  const [business, setBusiness] = useState<BusinessProfileRow | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [pending, setPending] = useState<PendingSignup | null>(null);

@@ -1,18 +1,13 @@
+// src/app/api/settings/business/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import type { BusinessProfileRow } from "@/types/tables";
-
-const admin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { adminFromTable } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
     const { userId, profile, business } = (await req.json()) as {
       userId: string;
-      profile: { nombre_negocio?: string; nombre_contacto?: string; telefono?: string };
-      business: { name?: string; timezone?: string };
+      profile?: { nombre_negocio?: string; nombre_contacto?: string; telefono?: string };
+      business?: { name?: string; timezone?: string };
     };
 
     if (!userId) {
@@ -21,8 +16,7 @@ export async function POST(req: NextRequest) {
 
     // Update profile
     if (profile) {
-      const { error } = await admin
-        .from("business_profiles")
+      const { error } = await adminFromTable("business_profiles")
         .update({
           nombre_negocio: profile.nombre_negocio,
           nombre_contacto: profile.nombre_contacto,
@@ -34,8 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Resolve business_id
-    const { data: prof, error: profErr } = await admin
-      .from<BusinessProfileRow>("business_profiles")
+    const { data: prof, error: profErr } = await adminFromTable("business_profiles")
       .select("business_id")
       .eq("id", userId)
       .single();
@@ -46,8 +39,7 @@ export async function POST(req: NextRequest) {
 
     // Update business
     if (business) {
-      const { error } = await admin
-        .from("businesses")
+      const { error } = await adminFromTable("businesses")
         .update({
           name: business.name,
           timezone: business.timezone,
