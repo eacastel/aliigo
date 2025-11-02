@@ -69,7 +69,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Sidebar (dark) */}
         <aside className="col-span-12 sm:col-span-3 lg:col-span-2 border-r border-zinc-800 bg-zinc-950">
           <div className="p-4 border-b border-zinc-800">
-            <div className="font-bold text-white">Aliigo</div>
             <div className="text-xs text-zinc-500">Dashboard</div>
           </div>
           <nav className="p-3 space-y-1">

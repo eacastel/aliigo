@@ -1,3 +1,4 @@
+// src/app/(app)/dashboard/settings/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -31,45 +32,119 @@ export default function SettingsBusinessPage() {
   });
   const [msg, setMsg] = useState<string | null>(null);
 
+  // --- helper: (re)link business if needed using your service-role route
+  const ensureLinkedBusiness = async ({
+    id,
+    nombre_negocio,
+    nombre_contacto,
+    telefono,
+    email,
+  }: {
+    id: string;
+    nombre_negocio: string;
+    nombre_contacto: string | null;
+    telefono: string | null;
+    email: string | null;
+  }) => {
+    const res = await fetch("/api/profiles/ensure", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        nombre_negocio,
+        nombre_contacto,
+        telefono,
+        email,
+      }),
+    });
+    // ignore non-200 here; UI will keep going and show empty fields if failed
+    await res.json().catch(() => ({}));
+  };
+
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase.auth.getSession();
-        const uid = data.session?.user?.id || null;
+        const { data: session } = await supabase.auth.getSession();
+        const uid = session.session?.user?.id || null;
         setUserId(uid);
 
         if (!uid) {
-          // No session: stop spinner and show unauth UI (or redirect)
           setUnauth(true);
           setLoading(false);
           return;
         }
 
-        // Load profile (+ business_id)
+        // 1) Load profile (+ business_id)
         const p = await supabase
           .from("business_profiles")
-          .select("nombre_negocio,nombre_contacto,telefono,business_id")
+          .select("nombre_negocio,nombre_contacto,telefono,email,business_id")
           .eq("id", uid)
           .limit(1)
           .maybeSingle();
 
-        if (p.data) {
+        if (!p.error && p.data) {
+          const {
+            nombre_negocio = "",
+            nombre_contacto = "",
+            telefono = "",
+            email = null,
+            business_id = null,
+          } = p.data as {
+            nombre_negocio: string | null;
+            nombre_contacto: string | null;
+            telefono: string | null;
+            email: string | null;
+            business_id: string | null;
+          };
+
           setProfile({
-            nombre_negocio: p.data.nombre_negocio || "",
-            nombre_contacto: p.data.nombre_contacto || "",
-            telefono: p.data.telefono || "",
+            nombre_negocio: nombre_negocio || "",
+            nombre_contacto: nombre_contacto || "",
+            telefono: telefono || "",
           });
 
-          // If linked, load business public fields
-          if (p.data.business_id) {
-            const b = await supabase
-              .from("businesses")
-              .select("name,timezone")
-              .eq("id", p.data.business_id)
+          // 2) If missing link, try to repair via /api/profiles/ensure, then re-fetch
+          if (!business_id && nombre_negocio) {
+            await ensureLinkedBusiness({
+              id: uid,
+              nombre_negocio,
+              nombre_contacto: nombre_contacto || null,
+              telefono: telefono || null,
+              email,
+            });
+
+            // re-fetch with the same query to get the new business_id
+            const p2 = await supabase
+              .from("business_profiles")
+              .select("business_id")
+              .eq("id", uid)
               .limit(1)
               .maybeSingle();
 
-            if (b.data) {
+            if (!p2.error && p2.data?.business_id) {
+              const b2 = await supabase
+                .from("businesses")
+                .select("name,timezone")
+                .eq("id", p2.data.business_id)
+                .limit(1)
+                .maybeSingle();
+              if (!b2.error && b2.data) {
+                setBusiness({
+                  name: b2.data.name || "",
+                  timezone: b2.data.timezone || "Europe/Madrid",
+                });
+              }
+            }
+          } else if (business_id) {
+            // 3) If linked, load business public fields
+            const b = await supabase
+              .from("businesses")
+              .select("name,timezone")
+              .eq("id", business_id)
+              .limit(1)
+              .maybeSingle();
+
+            if (!b.error && b.data) {
               setBusiness({
                 name: b.data.name || "",
                 timezone: b.data.timezone || "Europe/Madrid",

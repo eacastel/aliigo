@@ -1,13 +1,8 @@
+// src/app/(app)/dashboard/widget/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  supabase,
-  fromTable,
-  type BusinessRow,
-  type BusinessProfileRow,
-  type EmbedTokenRow,
-} from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { AliigoChatWidget } from "@/components/AliigoChatWidget";
 
 type BizLocal = {
@@ -28,7 +23,6 @@ type Theme = {
 
 export default function WidgetSettingsPage() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [unauth, setUnauth] = useState(false);
   const [biz, setBiz] = useState<BizLocal | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [brand, setBrand] = useState("Aliigo");
@@ -42,65 +36,95 @@ export default function WidgetSettingsPage() {
   });
   const [loading, setLoading] = useState(true);
 
+  const ensureLinkedBusiness = async (payload: {
+    id: string;
+    nombre_negocio: string;
+    nombre_contacto: string | null;
+    telefono: string | null;
+    email: string | null;
+  }) => {
+    const res = await fetch("/api/profiles/ensure", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    await res.json().catch(() => ({}));
+  };
+
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase.auth.getSession();
-        const uid = data.session?.user?.id || null;
+        const { data: session } = await supabase.auth.getSession();
+        const uid = session.session?.user?.id || null;
         setUserId(uid);
+        if (!uid) return;
 
-        if (!uid) {
-          setUnauth(true);
+        // Load profile (need business_id + fields to repair if missing)
+        const prof = await supabase
+          .from("business_profiles")
+          .select("business_id,nombre_negocio,nombre_contacto,telefono,email")
+          .eq("id", uid)
+          .limit(1)
+          .maybeSingle();
+
+        if (prof.error) {
           setLoading(false);
           return;
         }
 
-        // profile -> business_id
-        const profRes = await fromTable("business_profiles")
-          .select("business_id")
-          .eq("id", uid)
-          .limit(1)
-          .maybeSingle()
-          .overrideTypes<Pick<BusinessProfileRow, "business_id">, { merge: false }>();
+        let businessId = prof.data?.business_id as string | null;
 
-        const businessId = profRes.data?.business_id;
+        // Repair link if missing and we have a business name
+        if (!businessId && prof.data?.nombre_negocio) {
+          await ensureLinkedBusiness({
+            id: uid,
+            nombre_negocio: prof.data.nombre_negocio || "Negocio",
+            nombre_contacto: prof.data.nombre_contacto || null,
+            telefono: prof.data.telefono || null,
+            email: prof.data.email || null,
+          });
+          const p2 = await supabase
+            .from("business_profiles")
+            .select("business_id")
+            .eq("id", uid)
+            .limit(1)
+            .maybeSingle();
+          businessId = p2.data?.business_id || null;
+        }
+
         if (!businessId) {
           setBiz(null);
+          setLoading(false);
           return;
         }
 
-        // business row
-        const bRes = await fromTable("businesses")
+        // Business row
+        const b = await supabase
+          .from("businesses")
           .select("id,slug,system_prompt,allowed_domains")
           .eq("id", businessId)
           .limit(1)
-          .maybeSingle()
-          .overrideTypes<
-            Pick<BusinessRow, "id" | "slug" | "system_prompt" | "allowed_domains">,
-            { merge: false }
-          >();
+          .maybeSingle();
 
-        if (bRes.data) {
+        if (!b.error && b.data) {
           setBiz({
-            id: bRes.data.id,
-            slug: bRes.data.slug,
-            system_prompt: bRes.data.system_prompt,
-            allowed_domains: bRes.data.allowed_domains ?? [],
+            id: b.data.id,
+            slug: b.data.slug,
+            system_prompt: b.data.system_prompt,
+            allowed_domains: b.data.allowed_domains ?? [],
           });
-        } else {
-          setBiz(null);
         }
 
-        // latest embed token (if any)
-        const tRes = await fromTable("embed_tokens")
+        // Latest token
+        const t = await supabase
+          .from("embed_tokens")
           .select("token")
           .eq("business_id", businessId)
           .order("created_at", { ascending: false })
           .limit(1)
-          .maybeSingle()
-          .overrideTypes<Pick<EmbedTokenRow, "token">, { merge: false }>();
+          .maybeSingle();
 
-        if (tRes.data?.token) setToken(tRes.data.token);
+        if (!t.error && t.data?.token) setToken(t.data.token);
       } finally {
         setLoading(false);
       }
@@ -108,14 +132,14 @@ export default function WidgetSettingsPage() {
   }, []);
 
   const saveSettings = async () => {
-    if (!userId || !biz) return;
+    if (!userId) return;
     await fetch("/api/widget/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId,
-        system_prompt: biz.system_prompt || "",
-        allowed_domains: biz.allowed_domains || [],
+        system_prompt: biz?.system_prompt || "",
+        allowed_domains: biz?.allowed_domains || [],
       }),
     });
     alert("Widget settings saved.");
@@ -160,23 +184,12 @@ export default function WidgetSettingsPage() {
   }, [biz?.slug, brand, theme, token]);
 
   if (loading) return <p className="p-4">Cargando…</p>;
-  if (unauth) {
-    return (
-      <div className="max-w-lg p-4">
-        <h1 className="text-xl font-semibold mb-2">Necesitas iniciar sesión</h1>
-        <p className="text-sm text-gray-600">
-          Accede a tu cuenta para configurar tu widget.
-        </p>
-      </div>
-    );
-  }
   if (!biz) {
     return (
-      <div className="max-w-lg p-4">
-        <h1 className="text-xl font-semibold mb-2">Sin negocio vinculado</h1>
+      <div className="max-w-xl p-4">
+        <h1 className="text-lg font-semibold mb-2">Sin negocio vinculado</h1>
         <p className="text-sm text-gray-600">
-          Aún no encontramos un negocio asociado a tu perfil. Completa tu
-          <span className="font-medium"> Perfil de negocio</span> en Settings.
+          Aún no encontramos un negocio asociado a tu perfil. Completa tu Perfil de negocio en Settings.
         </p>
       </div>
     );
@@ -209,9 +222,7 @@ export default function WidgetSettingsPage() {
                 )
               }
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Domains allowed to embed your widget.
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Domains allowed to embed your widget.</p>
           </div>
 
           <div>
@@ -225,12 +236,8 @@ export default function WidgetSettingsPage() {
           </div>
 
           <div className="flex gap-2">
-            <button className="bg-black text-white rounded px-4 py-2" onClick={saveSettings}>
-              Save
-            </button>
-            <button className="border rounded px-4 py-2" onClick={rotateToken}>
-              Rotate token
-            </button>
+            <button className="bg-black text-white rounded px-4 py-2" onClick={saveSettings}>Save</button>
+            <button className="border rounded px-4 py-2" onClick={rotateToken}>Rotate token</button>
           </div>
 
           <div className="text-sm text-gray-600">
@@ -252,11 +259,7 @@ export default function WidgetSettingsPage() {
 
           <div className="mt-4 grid sm:grid-cols-2 gap-2">
             <label className="text-sm">Brand</label>
-            <input
-              className="border rounded px-3 py-2"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-            />
+            <input className="border rounded px-3 py-2" value={brand} onChange={(e) => setBrand(e.target.value)} />
 
             <label className="text-sm">Header bg (Tailwind)</label>
             <input
