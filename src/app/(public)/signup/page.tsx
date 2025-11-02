@@ -14,7 +14,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { getPublicOrigin } from "@/lib/url";
 
 export default function SignupPage() {

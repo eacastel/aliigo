@@ -13,7 +13,7 @@
 
 import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import type { AuthError } from "@supabase/supabase-js";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";

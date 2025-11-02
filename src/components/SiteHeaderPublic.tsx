@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function SiteHeaderPublic() {
   const [email, setEmail] = useState<string | null>(null);

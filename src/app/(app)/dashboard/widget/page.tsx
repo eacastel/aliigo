@@ -9,7 +9,7 @@ import {
   type BusinessRow,
   type BusinessProfileRow,
   type EmbedTokenRow,
-} from "@/lib/supabase";
+} from "@/lib/supabaseClient";
 import { AliigoChatWidget } from "@/components/AliigoChatWidget";
 
 type BizLocal = {

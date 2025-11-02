@@ -1,6 +1,6 @@
 // src/app/api/settings/business/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { adminFromTable } from "@/lib/supabase";
+import { adminFromTable } from "@/lib/supabaseClient";
 
 export async function POST(req: NextRequest) {
   try {

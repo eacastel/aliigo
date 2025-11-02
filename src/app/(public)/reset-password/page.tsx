@@ -15,7 +15,7 @@
 //   - Basic email validation can reduce unnecessary requests.
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { SITE_URL } from "@/lib/config";
 
 export default function ResetPasswordPage() {

@@ -5,7 +5,7 @@
  * - Returns the user if everything is OK.
  */
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export async function enforceValidSession(
