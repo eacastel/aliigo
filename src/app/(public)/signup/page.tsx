@@ -41,12 +41,14 @@ export default function SignupPage() {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: `${origin}/dashboard` },
+        options: { emailRedirectTo: `${origin}/auth/callback` }, // <-- important
       });
       if (signUpError) {
         const msg = (signUpError.message || "").toLowerCase();
         if (msg.includes("already")) {
-          setError("Este email ya existe. Inicia sesión o restablece tu contraseña.");
+          setError(
+            "Este email ya existe. Inicia sesión o restablece tu contraseña."
+          );
         } else {
           setError(signUpError.message || "No pudimos crear tu cuenta.");
         }
@@ -88,7 +90,9 @@ export default function SignupPage() {
 
       router.replace("/dashboard");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error inesperado al crear la cuenta.");
+      setError(
+        e instanceof Error ? e.message : "Error inesperado al crear la cuenta."
+      );
     } finally {
       setLoading(false);
     }
@@ -106,7 +110,9 @@ export default function SignupPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Nombre del negocio</label>
+          <label className="block text-sm font-medium mb-1">
+            Nombre del negocio
+          </label>
           <input
             className="w-full border rounded px-3 py-2"
             value={nombreNegocio}
@@ -116,7 +122,9 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Nombre de contacto</label>
+          <label className="block text-sm font-medium mb-1">
+            Nombre de contacto
+          </label>
           <input
             className="w-full border rounded px-3 py-2"
             value={nombreContacto}
