@@ -29,7 +29,9 @@ export default function LoginPage() {
 function LoginFallback() {
   return (
     <div className="max-w-md mx-auto mt-16 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-center">Inicia sesión en Aliigo</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Inicia sesión en Aliigo
+      </h1>
       <div className="animate-pulse space-y-4">
         <div className="h-10 bg-gray-200 rounded" />
         <div className="h-10 bg-gray-200 rounded" />
@@ -44,10 +46,18 @@ function LoginWithSearchParams() {
   const searchParams = useSearchParams();
   const from = searchParams.get("from"); // e.g. "confirm" after email verification
 
+  const origin =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || "";
+
   // Form/UI state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState<{ type: "ok" | "error" | "info"; text: string } | null>(null);
+  const [msg, setMsg] = useState<{
+    type: "ok" | "error" | "info";
+    text: string;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Controls visibility of "resend confirmation" button only after 422 attempt
@@ -63,7 +73,10 @@ function LoginWithSearchParams() {
     const normalizedPassword = password;
 
     if (!normalizedEmail || !normalizedPassword) {
-      setMsg({ type: "error", text: "Por favor, introduce tu correo y contraseña." });
+      setMsg({
+        type: "error",
+        text: "Por favor, introduce tu correo y contraseña.",
+      });
       return;
     }
 
@@ -82,14 +95,19 @@ function LoginWithSearchParams() {
           setCanResend(true);
           setMsg({
             type: "error",
-            text:
-              "Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada o reenvía la confirmación.",
+            text: "Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada o reenvía la confirmación.",
           });
         } else if (e.status === 429) {
-          setMsg({ type: "error", text: "Demasiados intentos. Inténtalo de nuevo en unos minutos." });
+          setMsg({
+            type: "error",
+            text: "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
+          });
           setCanResend(false);
         } else {
-          setMsg({ type: "error", text: "Correo electrónico o contraseña no válidos." });
+          setMsg({
+            type: "error",
+            text: "Correo electrónico o contraseña no válidos.",
+          });
           setCanResend(false);
         }
         return;
@@ -109,7 +127,10 @@ function LoginWithSearchParams() {
 
     const targetEmail = email.trim();
     if (!targetEmail) {
-      setMsg({ type: "error", text: "Introduce tu correo electrónico para reenviar la confirmación." });
+      setMsg({
+        type: "error",
+        text: "Introduce tu correo electrónico para reenviar la confirmación.",
+      });
       return;
     }
 
@@ -118,7 +139,8 @@ function LoginWithSearchParams() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: targetEmail,
-        options: SITE_URL ? { emailRedirectTo: `${SITE_URL}/dashboard` } : undefined,
+        // 🔴 change /dashboard -> /auth/callback
+        options: { emailRedirectTo: `${origin}/auth/callback` },
       });
 
       if (error) {
@@ -157,7 +179,9 @@ function LoginWithSearchParams() {
         </p>
       )}
 
-      <h1 className="text-2xl font-bold mb-6 text-center">Inicia sesión en Aliigo</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Inicia sesión en Aliigo
+      </h1>
 
       {/* Message area */}
       {msg && (
