@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
+/* ---------- Types ---------- */
 type ProfileState = {
   nombre_negocio: string;
   nombre_contacto: string;
@@ -13,6 +14,33 @@ type BusinessState = {
   name: string;
   timezone: string;
 };
+type JoinedBusiness = {
+  name: string | null;
+  timezone: string | null;
+  slug?: string | null;
+} | null;
+
+type ProfileJoinRow = {
+  nombre_negocio: string | null;
+  nombre_contacto: string | null;
+  telefono: string | null;
+  business_id: string | null;
+  // Supabase embed alias
+  businesses: JoinedBusiness;
+};
+
+/* Type guard to avoid any */
+function isProfileJoinRow(x: unknown): x is ProfileJoinRow {
+  if (!x || typeof x !== "object") return false;
+  const o = x as Record<string, unknown>;
+  return (
+    "business_id" in o &&
+    "nombre_negocio" in o &&
+    "nombre_contacto" in o &&
+    "telefono" in o &&
+    "businesses" in o
+  );
+}
 
 export default function SettingsBusinessPage() {
   const router = useRouter();
@@ -42,12 +70,12 @@ export default function SettingsBusinessPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // ---------- load current user + linked business ----------
+  // Load profile + linked business with a joined select (no `any`)
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase.auth.getSession();
-        const uid = data.session?.user?.id || null;
+        const { data: sess } = await supabase.auth.getSession();
+        const uid = sess.session?.user?.id || null;
         setUserId(uid);
 
         if (!uid) {
@@ -55,59 +83,60 @@ export default function SettingsBusinessPage() {
           return;
         }
 
-        // profile (+ business_id)
-        const p = await supabase
+        const { data, error } = await supabase
           .from("business_profiles")
-          .select("nombre_negocio,nombre_contacto,telefono,business_id")
+          .select(
+            `
+            nombre_negocio,
+            nombre_contacto,
+            telefono,
+            business_id,
+            businesses:business_id (
+              name,
+              timezone,
+              slug
+            )
+          `
+          )
           .eq("id", uid)
           .limit(1)
           .maybeSingle();
 
-        if (p.error) {
-          setMsg("No se pudo cargar el perfil.");
+        if (error) {
+          console.error("[settings] profile join error:", error.message);
+          setMsg("Could not load your profile.");
+          return;
+        }
+        if (!isProfileJoinRow(data)) {
+          setMsg("Profile not found. Please log in again.");
           return;
         }
 
-        if (!p.data) {
-          // No profile row yet (shouldn't happen if /api/profiles/ensure ran) — nudge user
-          setMsg("No encontramos tu perfil. Vuelve a iniciar sesión.");
-          return;
-        }
+        // Profile
+        const pNombre = data.nombre_negocio ?? "";
+        const pContacto = data.nombre_contacto ?? "";
+        const pTelefono = data.telefono ?? "";
 
         setProfile({
-          nombre_negocio: p.data.nombre_negocio || "",
-          nombre_contacto: p.data.nombre_contacto || "",
-          telefono: p.data.telefono || "",
+          nombre_negocio: pNombre,
+          nombre_contacto: pContacto,
+          telefono: pTelefono,
         });
         initialProfile.current = {
-          nombre_negocio: p.data.nombre_negocio || "",
-          nombre_contacto: p.data.nombre_contacto || "",
-          telefono: p.data.telefono || "",
+          nombre_negocio: pNombre,
+          nombre_contacto: pContacto,
+          telefono: pTelefono,
         };
 
-        if (p.data.business_id) {
-          setBusinessId(p.data.business_id);
-          const b = await supabase
-            .from("businesses")
-            .select("name,timezone")
-            .eq("id", p.data.business_id)
-            .limit(1)
-            .maybeSingle();
-
-          if (b.error) {
-            setMsg("No se pudo cargar el negocio vinculado.");
-          } else if (b.data) {
-            setBusiness({
-              name: b.data.name || "",
-              timezone: b.data.timezone || "Europe/Madrid",
-            });
-            initialBusiness.current = {
-              name: b.data.name || "",
-              timezone: b.data.timezone || "Europe/Madrid",
-            };
-          }
+        // Business (joined)
+        const biz = data.businesses;
+        if (data.business_id && biz) {
+          const bName = biz.name ?? "";
+          const bTz = biz.timezone ?? "Europe/Madrid";
+          setBusinessId(data.business_id);
+          setBusiness({ name: bName, timezone: bTz });
+          initialBusiness.current = { name: bName, timezone: bTz };
         } else {
-          // No business linked
           setBusinessId(null);
           initialBusiness.current = { name: "", timezone: "Europe/Madrid" };
         }
@@ -117,7 +146,6 @@ export default function SettingsBusinessPage() {
     })();
   }, []);
 
-  // ---------- dirty / valid guards ----------
   const dirty = useMemo(() => {
     const ip = initialProfile.current;
     const ib = initialBusiness.current;
@@ -131,14 +159,12 @@ export default function SettingsBusinessPage() {
     );
   }, [profile, business]);
 
-  // Require business.name not blank to allow save
   const valid = useMemo(() => business.name.trim().length > 0, [business.name]);
 
-  // ---------- actions ----------
   const save = async () => {
     setMsg(null);
     if (!userId) {
-      setMsg("Debes iniciar sesión.");
+      setMsg("You must be logged in.");
       return;
     }
     if (!dirty || !valid) return;
@@ -148,38 +174,34 @@ export default function SettingsBusinessPage() {
       const res = await fetch("/api/settings/business", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // merge-only route ignores blanks; we can safely send the full state
         body: JSON.stringify({ userId, profile, business }),
       });
-      const j = await res.json().catch(() => ({}));
+      const j: { error?: string; business?: { name?: string | null; timezone?: string | null } } =
+        await res.json().catch(() => ({} as { error?: string }));
 
       if (!res.ok) {
-        setMsg(`Error al guardar: ${j.error || "desconocido"}`);
+        setMsg(`Save error: ${j.error || "unknown"}`);
         return;
       }
 
-      // refresh snapshots so the button disables again
       initialProfile.current = {
         nombre_negocio: profile.nombre_negocio,
         nombre_contacto: profile.nombre_contacto,
         telefono: profile.telefono,
       };
+
       if (j.business) {
-        initialBusiness.current = {
-          name: j.business.name || "",
-          timezone: j.business.timezone || "Europe/Madrid",
-        };
-        setBusiness({
-          name: j.business.name || "",
-          timezone: j.business.timezone || "Europe/Madrid",
-        });
-      } else {
+        const bName = j.business.name ?? "";
+        const bTz = j.business.timezone ?? "Europe/Madrid";
+        initialBusiness.current = { name: bName, timezone: bTz };
+        setBusiness({ name: bName, timezone: bTz });
+      } else if (initialBusiness.current) {
         initialBusiness.current = { ...business };
       }
 
-      setMsg("Guardado.");
-     } catch (_e) {
-      setMsg("No se pudo guardar ahora. Inténtalo de nuevo.");
+      setMsg("Saved.");
+    } catch {
+      setMsg("Could not save now. Try again.");
     } finally {
       setSaving(false);
     }
@@ -190,42 +212,47 @@ export default function SettingsBusinessPage() {
     if (!userId) return;
     setLoading(true);
     try {
-      const p = await supabase
+      const { data, error } = await supabase
         .from("business_profiles")
-        .select("nombre_negocio,nombre_contacto,telefono,business_id")
+        .select(
+          `
+          nombre_negocio,
+          nombre_contacto,
+          telefono,
+          business_id,
+          businesses:business_id (
+            name,
+            timezone,
+            slug
+          )
+        `
+        )
         .eq("id", userId)
         .limit(1)
         .maybeSingle();
 
-      if (p.data) {
+      if (!error && isProfileJoinRow(data)) {
+        const pNombre = data.nombre_negocio ?? "";
+        const pContacto = data.nombre_contacto ?? "";
+        const pTelefono = data.telefono ?? "";
+
         setProfile({
-          nombre_negocio: p.data.nombre_negocio || "",
-          nombre_contacto: p.data.nombre_contacto || "",
-          telefono: p.data.telefono || "",
+          nombre_negocio: pNombre,
+          nombre_contacto: pContacto,
+          telefono: pTelefono,
         });
         initialProfile.current = {
-          nombre_negocio: p.data.nombre_negocio || "",
-          nombre_contacto: p.data.nombre_contacto || "",
-          telefono: p.data.telefono || "",
+          nombre_negocio: pNombre,
+          nombre_contacto: pContacto,
+          telefono: pTelefono,
         };
 
-        if (p.data.business_id) {
-          const b = await supabase
-            .from("businesses")
-            .select("name,timezone")
-            .eq("id", p.data.business_id)
-            .single();
-
-          if (b.data) {
-            setBusiness({
-              name: b.data.name || "",
-              timezone: b.data.timezone || "Europe/Madrid",
-            });
-            initialBusiness.current = {
-              name: b.data.name || "",
-              timezone: b.data.timezone || "Europe/Madrid",
-            };
-          }
+        const biz = data.businesses;
+        if (data.business_id && biz) {
+          const bName = biz.name ?? "";
+          const bTz = biz.timezone ?? "Europe/Madrid";
+          setBusiness({ name: bName, timezone: bTz });
+          initialBusiness.current = { name: bName, timezone: bTz };
         }
       }
     } finally {
@@ -233,20 +260,19 @@ export default function SettingsBusinessPage() {
     }
   };
 
-  // ---------- render ----------
   if (loading) return <p className="p-4 text-sm text-zinc-400">Cargando…</p>;
   if (unauth) {
     return (
-      <div className="max-w-lg p-4">
-        <h1 className="text-xl font-semibold mb-2 text-white">Necesitas iniciar sesión</h1>
+      <div className="max-w-lg p-4 text-white">
+        <h1 className="text-xl font-semibold mb-2">Login required</h1>
         <p className="text-sm text-zinc-400 mb-4">
-          Accede a tu cuenta para editar la configuración del negocio.
+          Please sign in to edit business settings.
         </p>
         <button
           onClick={() => router.push("/login")}
           className="bg-white text-black rounded px-4 py-2"
         >
-          Iniciar sesión
+          Sign in
         </button>
       </div>
     );
@@ -254,17 +280,17 @@ export default function SettingsBusinessPage() {
 
   if (!businessId) {
     return (
-      <div className="max-w-lg p-4">
-        <h1 className="text-xl font-semibold mb-2 text-white">Sin negocio vinculado</h1>
+      <div className="max-w-lg p-4 text-white">
+        <h1 className="text-xl font-semibold mb-2">No linked business</h1>
         <p className="text-sm text-zinc-400">
-          No encontramos un negocio asociado a tu perfil. Si acabas de registrarte y confirmaste el
-          correo, recarga la página. Si persiste, vuelve a completar el alta.
+          We didn’t find a business linked to your profile. If you just signed up,
+          reload the page. If it persists, try the signup again.
         </p>
         <button
           onClick={resetToServer}
           className="mt-3 border border-zinc-700 text-white rounded px-4 py-2 hover:bg-zinc-900"
         >
-          Reintentar
+          Retry
         </button>
       </div>
     );
@@ -275,42 +301,36 @@ export default function SettingsBusinessPage() {
       <h1 className="text-2xl font-bold mb-4">Business Settings</h1>
 
       {msg && (
-        <div
-          className={`mb-4 text-sm ${
-            msg.startsWith("Guardado") ? "text-green-400" : "text-red-400"
-          }`}
-        >
+        <div className={`mb-4 text-sm ${msg.startsWith("Saved") ? "text-green-400" : "text-red-400"}`}>
           {msg}
         </div>
       )}
 
       <div className="space-y-8">
-        {/* Perfil */}
+        {/* Profile */}
         <section className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
-          <h2 className="font-semibold mb-3">Perfil</h2>
+          <h2 className="font-semibold mb-3">Profile</h2>
           <div className="grid gap-3">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">
-                Nombre del negocio (muestra)
-              </label>
+              <label className="block text-xs text-zinc-400 mb-1">Business name (profile)</label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Nombre del negocio"
+                placeholder="Business name"
                 value={profile.nombre_negocio}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, nombre_negocio: e.target.value }))
                 }
               />
               <p className="text-[11px] text-zinc-500 mt-1">
-                Este campo actualiza tu perfil. El nombre público del negocio vive abajo.
+                This updates your profile’s display. Public name lives below.
               </p>
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Nombre de contacto</label>
+              <label className="block text-xs text-zinc-400 mb-1">Contact name</label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Nombre de contacto"
+                placeholder="Contact name"
                 value={profile.nombre_contacto}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, nombre_contacto: e.target.value }))
@@ -319,10 +339,10 @@ export default function SettingsBusinessPage() {
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Teléfono</label>
+              <label className="block text-xs text-zinc-400 mb-1">Phone</label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Teléfono"
+                placeholder="Phone"
                 value={profile.telefono}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, telefono: e.target.value }))
@@ -348,9 +368,7 @@ export default function SettingsBusinessPage() {
                   setBusiness((b) => ({ ...b, name: e.target.value }))
                 }
               />
-              <p className="text-[11px] text-zinc-500 mt-1">
-                Nombre público que verán tus clientes (no se guardará vacío).
-              </p>
+              <p className="text-[11px] text-zinc-500 mt-1">Must not be blank when saving.</p>
             </div>
 
             <div>
@@ -373,13 +391,13 @@ export default function SettingsBusinessPage() {
             disabled={!dirty || !valid || saving}
             className="bg-white text-black rounded px-4 py-2 disabled:opacity-50"
           >
-            {saving ? "Guardando…" : "Guardar"}
+            {saving ? "Saving…" : "Save"}
           </button>
           <button
             onClick={resetToServer}
             className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
           >
-            Deshacer cambios
+            Reset changes
           </button>
         </div>
       </div>
