@@ -1,3 +1,5 @@
+// src/app/lib/supabaseClient.ts
+
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /* ---------- Shared row types ---------- */

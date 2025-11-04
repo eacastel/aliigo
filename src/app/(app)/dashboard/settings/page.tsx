@@ -1,3 +1,5 @@
+// app/(app)/dashboard/settings/page.tsx
+
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -91,7 +93,8 @@ export default function SettingsBusinessPage() {
             nombre_contacto,
             telefono,
             business_id,
-            businesses:business_id (
+            businesses:businesses!business_profiles_business_id_fkey (
+              id,
               name,
               timezone,
               slug
@@ -176,8 +179,10 @@ export default function SettingsBusinessPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, profile, business }),
       });
-      const j: { error?: string; business?: { name?: string | null; timezone?: string | null } } =
-        await res.json().catch(() => ({} as { error?: string }));
+      const j: {
+        error?: string;
+        business?: { name?: string | null; timezone?: string | null };
+      } = await res.json().catch(() => ({} as { error?: string }));
 
       if (!res.ok) {
         setMsg(`Save error: ${j.error || "unknown"}`);
@@ -220,7 +225,8 @@ export default function SettingsBusinessPage() {
           nombre_contacto,
           telefono,
           business_id,
-          businesses:business_id (
+          businesses:businesses!business_profiles_business_id_fkey (
+            id,
             name,
             timezone,
             slug
@@ -283,8 +289,8 @@ export default function SettingsBusinessPage() {
       <div className="max-w-lg p-4 text-white">
         <h1 className="text-xl font-semibold mb-2">No linked business</h1>
         <p className="text-sm text-zinc-400">
-          We didn’t find a business linked to your profile. If you just signed up,
-          reload the page. If it persists, try the signup again.
+          We didn’t find a business linked to your profile. If you just signed
+          up, reload the page. If it persists, try the signup again.
         </p>
         <button
           onClick={resetToServer}
@@ -301,7 +307,11 @@ export default function SettingsBusinessPage() {
       <h1 className="text-2xl font-bold mb-4">Business Settings</h1>
 
       {msg && (
-        <div className={`mb-4 text-sm ${msg.startsWith("Saved") ? "text-green-400" : "text-red-400"}`}>
+        <div
+          className={`mb-4 text-sm ${
+            msg.startsWith("Saved") ? "text-green-400" : "text-red-400"
+          }`}
+        >
           {msg}
         </div>
       )}
@@ -312,7 +322,9 @@ export default function SettingsBusinessPage() {
           <h2 className="font-semibold mb-3">Profile</h2>
           <div className="grid gap-3">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Business name (profile)</label>
+              <label className="block text-xs text-zinc-400 mb-1">
+                Business name (profile)
+              </label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
                 placeholder="Business name"
@@ -327,7 +339,9 @@ export default function SettingsBusinessPage() {
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Contact name</label>
+              <label className="block text-xs text-zinc-400 mb-1">
+                Contact name
+              </label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
                 placeholder="Contact name"
@@ -368,11 +382,15 @@ export default function SettingsBusinessPage() {
                   setBusiness((b) => ({ ...b, name: e.target.value }))
                 }
               />
-              <p className="text-[11px] text-zinc-500 mt-1">Must not be blank when saving.</p>
+              <p className="text-[11px] text-zinc-500 mt-1">
+                Must not be blank when saving.
+              </p>
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Timezone</label>
+              <label className="block text-xs text-zinc-400 mb-1">
+                Timezone
+              </label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
                 placeholder="Europe/Madrid"

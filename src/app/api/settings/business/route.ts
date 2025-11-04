@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Update business
+    // Update business
     if (business) {
       const { error } = await adminFromTable("businesses")
         .update({
@@ -48,7 +49,15 @@ export async function POST(req: NextRequest) {
       if (error) throw error;
     }
 
-    return NextResponse.json({ ok: true });
+    // Return the current business row so the client can refresh its snapshot
+    const { data: currentBiz, error: readErr } = await adminFromTable("businesses")
+      .select("name, timezone")
+      .eq("id", prof.business_id)
+      .single();
+
+    if (readErr) throw readErr;
+
+    return NextResponse.json({ ok: true, business: currentBiz });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Server error";
     return NextResponse.json({ error: message }, { status: 500 });
