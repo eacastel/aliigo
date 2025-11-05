@@ -31,6 +31,10 @@ type ProfileJoinRow = {
   businesses: JoinedBusiness;
 };
 
+const { data } = await supabase.auth.getSession();
+console.log("uid", data.session?.user?.id, "email", data.session?.user?.email, "has token", !!data.session?.access_token);
+
+
 /* Type guard to avoid any */
 function isProfileJoinRow(x: unknown): x is ProfileJoinRow {
   if (!x || typeof x !== "object") return false;
