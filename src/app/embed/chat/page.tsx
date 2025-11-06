@@ -1,7 +1,18 @@
+// src/app/embed/chat/page.tsx
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { AliigoChatWidget } from "@/components/AliigoChatWidget";
+
+// Don't prerender; always handle at request time (safer for query params)
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+// Keep crawlers from indexing the iframe endpoint
+export const metadata = {
+  robots: { index: false, follow: false },
+};
 
 type Theme = {
   headerBg?: string;
@@ -12,11 +23,7 @@ type Theme = {
   sendText?: string;
 };
 
-/**
- * Iframe endpoint for embedding the widget on external sites.
- * Reads ?slug=&brand=&token=&theme= from the URL and renders the widget.
- */
-export default function EmbeddedChatPage() {
+function ChatInner() {
   const params = useSearchParams();
 
   const slug = params.get("slug") ?? "default";
@@ -29,7 +36,7 @@ export default function EmbeddedChatPage() {
     try {
       theme = JSON.parse(themeParam) as Theme;
     } catch {
-      // ignore bad theme param
+      // ignore malformed theme param
     }
   }
 
@@ -42,5 +49,23 @@ export default function EmbeddedChatPage() {
         theme={theme}
       />
     </div>
+  );
+}
+
+export default function EmbeddedChatPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            width: "100%",
+            height: "100vh",
+            background: "transparent",
+          }}
+        />
+      }
+    >
+      <ChatInner />
+    </Suspense>
   );
 }
