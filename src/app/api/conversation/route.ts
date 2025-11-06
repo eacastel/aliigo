@@ -1,4 +1,3 @@
-// src/app/api/conversation/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
@@ -6,7 +5,7 @@ import OpenAI from "openai";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// server-only admin client
+// --- single admin client (server-only) ---
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -20,7 +19,10 @@ const openai = process.env.OPENAI_API_KEY
 type ChatRole = "user" | "assistant" | "system" | "tool";
 type MessagesRow = { role: ChatRole; content: string; created_at: string };
 
-class RateLimitError extends Error { status = 429 as const; constructor(m="Rate limited"){ super(m);} }
+class RateLimitError extends Error {
+  status = 429 as const;
+  constructor(m = "Rate limited") { super(m); }
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,15 +39,17 @@ function originHost(req: NextRequest) {
   try { return new URL(raw).hostname.toLowerCase(); } catch { return ""; }
 }
 
+// --- lead intent heuristic (simple keywords; expand as needed) ---
+function wantsLead(s: string) {
+  return /precio|presupuesto|cita|reserva|comprar|contratar|cotización|quote|price|book|schedule|estimate|budget/i.test(s || "");
+}
+
 async function rateLimit(businessId: string, ip: string) {
-  // Dev: make it lenient
   const WINDOW_MS = process.env.NODE_ENV === "production" ? 5 * 60 * 1000 : 30 * 1000;
   const LIMIT = process.env.NODE_ENV === "production" ? 20 : 1000;
 
   const ins = await supabase.from("rate_events").insert({
-    ip,
-    bucket: `chat:${businessId}`,
-    business_id: businessId,
+    ip, bucket: `chat:${businessId}`, business_id: businessId,
   });
   if (ins.error) throw ins.error;
 
@@ -63,7 +67,7 @@ async function rateLimit(businessId: string, ip: string) {
 
 async function validateEmbedAccess(token: string, host: string) {
   if (!token) return { ok: false as const, reason: "Missing token" };
-  if (!host) return { ok: false as const, reason: "Missing host" };
+  if (!host)  return { ok: false as const, reason: "Missing host" };
 
   const tok = await supabase.from("embed_tokens")
     .select("business_id").eq("token", token).single();
@@ -86,7 +90,7 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = clientIp(req);
+    const ip   = clientIp(req);
     const host = originHost(req);
     const { token, conversationId: inputConvId, message, customerName } =
       (await req.json()) as {
@@ -100,7 +104,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing message" }, { status: 400, headers: corsHeaders });
     }
 
-    // validate token + host
+    // token + domain gate
     const gate = await validateEmbedAccess(token || "", host);
     if (!gate.ok) {
       return NextResponse.json({ error: `Forbidden: ${gate.reason}` }, { status: 403, headers: corsHeaders });
@@ -123,14 +127,11 @@ export async function POST(req: NextRequest) {
 
     // persist user message
     const m1 = await supabase.from("messages").insert({
-      conversation_id: conversationId,
-      channel: "web",
-      role: "user",
-      content: message,
+      conversation_id: conversationId, channel: "web", role: "user", content: message,
     });
     if (m1.error) throw m1.error;
 
-    // get last 20 for context
+    // last 20 for context
     const historyRes = await supabase
       .from("messages")
       .select("role,content,created_at")
@@ -142,13 +143,29 @@ export async function POST(req: NextRequest) {
     // business prompt
     const bizRes = await supabase
       .from("businesses")
-      .select("name, timezone, system_prompt")
+      .select("name, timezone, system_prompt, slug")
       .eq("id", businessId)
-      .single<{ name: string; timezone: string; system_prompt: string | null }>();
-    const sys =
-      (bizRes.data?.system_prompt ?? "").trim() ||
-      `You are the AI assistant for ${bizRes.data?.name ?? "the business"}. Be concise, helpful, and polite. Timezone: ${bizRes.data?.timezone ?? "UTC"}.`;
+      .single<{ name: string; timezone: string; system_prompt: string | null; slug: string }>();
 
+    const defaultSys =
+`You are the AI concierge for ${bizRes.data?.name ?? "the business"} (${bizRes.data?.slug ?? ""}).
+Be concise, friendly, and professional. Default language: Spanish (Castilian) unless the user writes in another language.
+Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.
+If you are unsure of a fact, say so briefly.`;
+
+    let sys = (bizRes.data?.system_prompt ?? "").trim() || defaultSys;
+
+    // lead intent → collect contact details
+    if (wantsLead(message)) {
+      sys += `
+
+Lead intent detected.
+- Ask for full name, email, and phone in ONE short message.
+- After collecting, confirm we'll contact them soon and offer to keep answering questions.
+- Keep it under ~4 sentences. Do not invent prices or guarantees.`;
+    }
+
+    // reply
     let reply = "Gracias por tu mensaje. Te respondemos enseguida.";
     if (openai) {
       const messages = [
@@ -159,7 +176,7 @@ export async function POST(req: NextRequest) {
         })),
       ];
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages,
         temperature: 0.3,
         max_tokens: 300,
@@ -169,10 +186,7 @@ export async function POST(req: NextRequest) {
 
     // persist assistant reply
     const m2 = await supabase.from("messages").insert({
-      conversation_id: conversationId,
-      channel: "web",
-      role: "assistant",
-      content: reply,
+      conversation_id: conversationId, channel: "web", role: "assistant", content: reply,
     });
     if (m2.error) throw m2.error;
 
