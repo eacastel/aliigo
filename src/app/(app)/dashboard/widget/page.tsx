@@ -134,7 +134,7 @@ export default function WidgetSettingsPage() {
   };
 
   const embedCode = useMemo(() => {
-    const base = process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.vercel.app";
+    const base = process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com";
     const themeParam = encodeURIComponent(JSON.stringify(theme));
     const slug = biz?.slug || "horchata-labs";
     const tk = token || "SET_TOKEN";
