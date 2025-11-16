@@ -8,6 +8,30 @@ export const metadata = {
     "Aliigo ayuda a negocios locales a conseguir más reseñas, responder más rápido y centralizar conversaciones en un solo panel. Acceso en beta privada por invitación.",
 };
 
+function IndustryItem({
+  src,
+  label,
+  alt,
+}: {
+  src: string;
+  label: string;
+  alt: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center gap-2">
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover grayscale brightness-90 contrast-90"
+        />
+      </div>
+      <span className="text-xs text-zinc-300">{label}</span>
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
@@ -56,96 +80,54 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SOCIAL PROOF (placeholder) */}
-      <section className="bg-zinc-950">
-        <div className="max-w-6xl mx-auto px-4 py-10">
-          <p className="text-center text-sm text-zinc-400">
-            Diseñado para clínicas, comercios y servicios locales que viven de
-            su reputación.
-          </p>
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {/* Medicina estética */}
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
-                <Image
-                  src="/clinica-estetica.png"
-                  alt="Profesional de medicina estética atendiendo a una paciente"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <span className="text-xs text-zinc-300">Medicina estética</span>
-            </div>
+      {/* SOCIAL PROOF */}
+<section className="bg-zinc-950">
+  <div className="max-w-6xl mx-auto px-4 py-10">
+    <p className="text-center text-sm text-zinc-400">
+      Diseñado para clínicas, escuelas y servicios profesionales que viven de su reputación.
+    </p>
 
-            {/* Clínica veterinaria */}
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
-                <Image
-                  src="/clinica-veterinaria.png"
-                  alt="Veterinaria atendiendo a un perro en clínica"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <span className="text-xs text-zinc-300">Clínica veterinaria</span>
-            </div>
+    <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
 
-            {/* Escuelas privadas */}
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
-                <Image
-                  src="/escuelas-privadas.png"
-                  alt="Profesora en una escuela privada"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <span className="text-xs text-zinc-300">Escuelas privadas</span>
-            </div>
+      <IndustryItem
+        src="/clinica-estetica.png"
+        label="Medicina estética"
+        alt="Profesional de medicina estética atendiendo a una paciente"
+      />
 
-            {/* Fisioterapia */}
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
-                <Image
-                  src="/fisioterapia.png"
-                  alt="Profesional de fisioterapia atendiendo a un paciente"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <span className="text-xs text-zinc-300">Fisioterapia</span>
-            </div>
+      <IndustryItem
+        src="/clinica-veterinaria.png"
+        label="Clínica veterinaria"
+        alt="Veterinaria atendiendo a un perro en clínica"
+      />
 
-            {/* Servicios de construcción */}
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
-                <Image
-                  src="/servicios-construccion.png"
-                  alt="Técnico de construcción revisando un proyecto"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <span className="text-xs text-zinc-300">
-                Servicios de construcción
-              </span>
-            </div>
+      <IndustryItem
+        src="/escuelas-privadas.png"
+        label="Escuelas privadas"
+        alt="Profesora en una escuela privada"
+      />
 
-            {/* Taller mecánico */}
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
-                <Image
-                  src="/taller-mecanico.png"
-                  alt="Mecánico trabajando en un vehículo"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <span className="text-xs text-zinc-300">Taller mecánico</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <IndustryItem
+        src="/fisioterapia.png"
+        label="Fisioterapia"
+        alt="Profesional de fisioterapia atendiendo a un paciente"
+      />
+
+      <IndustryItem
+        src="/servicios-construccion.png"
+        label="Servicios de construcción"
+        alt="Técnico de construcción revisando un proyecto"
+      />
+
+      <IndustryItem
+        src="/taller-mecanico.png"
+        label="Taller mecánico"
+        alt="Mecánico trabajando en un vehículo"
+      />
+
+    </div>
+  </div>
+</section>
 
       {/* FEATURES */}
       <section className="bg-zinc-950 border-y border-zinc-800">
