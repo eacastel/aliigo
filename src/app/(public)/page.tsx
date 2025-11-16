@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AliigoSupportWidget } from "@/components/AliigoSupportWidget";
 
 export const metadata = {
@@ -33,33 +34,24 @@ export default function HomePage() {
               </div>
               <p className="mt-3 text-xs text-zinc-500">
                 Estamos en beta privada. Seleccionamos unos pocos negocios cada
-                mes y les damos condiciones de lanzamiento.
+                mes y les damos condiciones de lanzamiento desde{" "}
+                <span className="font-semibold text-zinc-200">
+                  49 €/mes
+                </span>
+                .
               </p>
             </div>
 
             <div className="relative">
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-2xl">
-                <div className="h-56 md:h-64 lg:h-80 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-800" />
-                <div className="mt-4 grid grid-cols-3 gap-3 text-xs text-zinc-400">
-                  <div className="rounded-lg border border-zinc-800 p-3">
-                    ⭐ Reseñas nuevas
-                    <div className="mt-1 text-white text-lg font-semibold">
-                      +18
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-zinc-800 p-3">
-                    💬 Conversaciones
-                    <div className="mt-1 text-white text-lg font-semibold">
-                      +42
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-zinc-800 p-3">
-                    ⏱️ Respuesta media
-                    <div className="mt-1 text.white text-lg font-semibold">
-                      2m
-                    </div>
-                  </div>
-                </div>
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 shadow-2xl">
+                <Image
+                  src="/aliigo-dashboard-mock.svg"
+                  alt="Panel de Aliigo con bandeja de entrada, reseñas y métricas"
+                  width={1200}
+                  height={720}
+                  className="w-full h-auto rounded-xl"
+                  priority
+                />
               </div>
               <div className="pointer-events-none absolute -inset-4 -z-10 bg-[radial-gradient(40%_40%_at_70%_30%,rgba(59,130,246,0.25),transparent_60%)]" />
             </div>
@@ -174,11 +166,14 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
-              <h2 className="text-2xl font-bold text-white">Precios de lanzamiento</h2>
+              <h2 className="text-2xl font-bold text-white">
+                Precios de lanzamiento
+              </h2>
               <p className="mt-2 text-zinc-300">
                 Estamos definiendo la estructura final de precios. Los negocios
-                que entren en la beta tendrán condiciones preferentes y sin
-                permanencia.
+                que entren en la beta tendrán condiciones preferentes, sin
+                permanencia y con un precio de entrada desde{" "}
+                <span className="font-semibold text-zinc-100">49 €/mes</span>.
               </p>
               <ul className="mt-6 space-y-2 text-sm text-zinc-300">
                 <li>• Plan sencillo para una o pocas ubicaciones</li>
@@ -200,13 +195,13 @@ export default function HomePage() {
                 Referencia de rango
               </p>
               <p className="text-5xl font-extrabold text-white">
-                €XX
+                49€
                 <span className="text-2xl align-top">/mes</span>
               </p>
               <p className="mt-2 text-zinc-400 text-sm">
-                Rango orientativo pensado para negocios locales con 1–3
-                ubicaciones. Ajustaremos el precio final según volumen de
-                mensajes y ubicaciones.
+                Precio de referencia para negocios locales con 1–3 ubicaciones.
+                Ajustaremos el precio final según volumen de mensajes, canales y
+                número de sedes.
               </p>
               <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-lg border border-zinc-800 p-3">
@@ -307,7 +302,7 @@ function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
       <div className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 text-sm text-zinc-300">
         {n}
       </div>
-      <h3 className="mt-3 text-lg font-semibold text.white">{title}</h3>
+      <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
       <p className="mt-1 text-sm text-zinc-300">{desc}</p>
     </li>
   );
