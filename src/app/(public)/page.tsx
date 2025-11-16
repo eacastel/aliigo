@@ -35,10 +35,7 @@ export default function HomePage() {
               <p className="mt-3 text-xs text-zinc-500">
                 Estamos en beta privada. Seleccionamos unos pocos negocios cada
                 mes y les damos condiciones de lanzamiento desde{" "}
-                <span className="font-semibold text-zinc-200">
-                  49 €/mes
-                </span>
-                .
+                <span className="font-semibold text-zinc-200">49 €/mes</span>.
               </p>
             </div>
 
@@ -66,13 +63,86 @@ export default function HomePage() {
             Diseñado para clínicas, comercios y servicios locales que viven de
             su reputación.
           </p>
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 opacity-70">
-            <div className="h-10 rounded border border-zinc-800" />
-            <div className="h-10 rounded border border-zinc-800" />
-            <div className="h-10 rounded border border-zinc-800" />
-            <div className="h-10 rounded border border-zinc-800" />
-            <div className="h-10 rounded border border-zinc-800" />
-            <div className="h-10 rounded border border-zinc-800" />
+          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {/* Medicina estética */}
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+                <Image
+                  src="/clinica-estetica.png"
+                  alt="Profesional de medicina estética atendiendo a una paciente"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="text-xs text-zinc-300">Medicina estética</span>
+            </div>
+
+            {/* Clínica veterinaria */}
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+                <Image
+                  src="/clinica-veterinaria.png"
+                  alt="Veterinaria atendiendo a un perro en clínica"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="text-xs text-zinc-300">Clínica veterinaria</span>
+            </div>
+
+            {/* Escuelas privadas */}
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+                <Image
+                  src="/escuelas-privadas.png"
+                  alt="Profesora en una escuela privada"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="text-xs text-zinc-300">Escuelas privadas</span>
+            </div>
+
+            {/* Fisioterapia */}
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+                <Image
+                  src="/fisioterapia.png"
+                  alt="Profesional de fisioterapia atendiendo a un paciente"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="text-xs text-zinc-300">Fisioterapia</span>
+            </div>
+
+            {/* Servicios de construcción */}
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+                <Image
+                  src="/servicios-construccion.png"
+                  alt="Técnico de construcción revisando un proyecto"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="text-xs text-zinc-300">
+                Servicios de construcción
+              </span>
+            </div>
+
+            {/* Taller mecánico */}
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900">
+                <Image
+                  src="/taller-mecanico.png"
+                  alt="Mecánico trabajando en un vehículo"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="text-xs text-zinc-300">Taller mecánico</span>
+            </div>
           </div>
         </div>
       </section>
@@ -225,7 +295,9 @@ export default function HomePage() {
       {/* FAQ */}
       <section className="bg-zinc-950">
         <div className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold text-white">Preguntas frecuentes</h2>
+          <h2 className="text-2xl font-bold text-white">
+            Preguntas frecuentes
+          </h2>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             <Faq
               q="¿Aliigo está disponible para cualquiera?"
