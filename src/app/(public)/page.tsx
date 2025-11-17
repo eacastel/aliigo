@@ -82,78 +82,74 @@ export default function HomePage() {
         </div>
       </section>
 
-          {/* FEATURES */}
-          <section className="bg-zinc-950 border-y border-zinc-800">
-            <div className="max-w-6xl mx-auto px-4 py-16">
-              <div className="max-w-2xl">
-                <h2 className="text-2xl font-bold text-white">
-                  Todo lo clave, sin complicaciones
-                </h2>
-                <p className="mt-2 text-zinc-300">
-                  Empezamos por lo que de verdad mueve la aguja: que te
-                  escriban, que puedas responder rápido y que tus reseñas de
-                  Google se vean mejor que las de la competencia.
-                </p>
-              </div>
+      {/* FEATURES */}
+      <section className="bg-zinc-950 border-y border-zinc-800">
+        <div className="max-w-6xl mx-auto px-4 py-16">
+          <div className="max-w-2xl">
+            <h2 className="text-2xl font-bold text-white">
+              Todo lo clave, sin complicaciones
+            </h2>
+            <p className="mt-2 text-zinc-300">
+              Empezamos por lo que de verdad mueve la aguja: que te escriban,
+              que puedas responder rápido y que tu reputación en Google esté
+              bajo control.
+            </p>
+          </div>
 
-              <div className="mt-10 grid gap-6 md:grid-cols-2">
-                <Feature
-                  n={1}
-                  title="Chat con IA para tu web"
-                  desc="Un asistente que responde automáticamente usando la información de tu negocio."
-                  bullets={[
-                    "Entrénalo con tus servicios, horarios y preguntas frecuentes",
-                    "Respuestas inmediatas por IA",
-                    "Transferencia a humano cuando la IA no está segura",
-                  ]}
-                />
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <Feature
+              n={1}
+              title="Chat con IA para tu web"
+              desc="Un asistente que responde automáticamente usando la información que tú le das sobre tu negocio (en beta privada)."
+              bullets={[
+                "Entrénalo con tus servicios, horarios y preguntas frecuentes",
+                "Respuestas inmediatas 24/7 (en pruebas dentro de la beta)",
+                "Diseñado para que puedas intervenir cuando lo necesites",
+              ]}
+            />
 
-                <Feature
-                  n={2}
-                  title="Un solo buzón para todas tus conversaciones"
-                  desc="Gestión centralizada para mensajes del widget web y, pronto, más canales."
-                  bullets={[
-                    "Historial por cliente",
-                    "Notas internas",
-                    "Etiquetas personalizadas",
-                  ]}
-                />
+            <Feature
+              n={2}
+              title="Un solo buzón para tus conversaciones"
+              desc="Gestión centralizada para los mensajes que llegan desde el widget web; más canales se irán añadiendo en las siguientes versiones."
+              bullets={[
+                "Historial por cliente",
+                "Notas internas",
+                "Etiquetas personalizadas",
+              ]}
+            />
 
-                <Feature
-                  n={3}
-                  title="Reseñas de Google en un solo lugar"
-                  desc="Consulta y gestiona tus reseñas sin entrar a Google Business."
-                  bullets={[
-                    "Panel con todas tus reseñas",
-                    "Acceso directo para responder",
-                    "Alertas automáticas",
-                  ]}
-                />
+            <Feature
+              n={3}
+              title="Reseñas de Google en un solo lugar"
+              desc="Consulta de un vistazo tus reseñas de Google y detecta problemas antes de que se hagan grandes."
+              bullets={[
+                "Listado de reseñas recientes",
+                "Indicadores de volumen y valoración media",
+                "Enlace directo para responder desde Google Business Profile",
+              ]}
+            />
 
-                <Feature
-                  n={4}
-                  title="Solicitudes de reseñas"
-                  desc="Envía enlaces directos y anima a tus clientes satisfechos a dejar reseña."
-                  bullets={[
-                    "Plantillas listas para copiar",
-                    "Texto optimizado para WhatsApp o email",
-                    "Enlace directo a tu perfil de Google",
-                  ]}
-                />
-              </div>
+            <Feature
+              n={4}
+              title="Solicitudes de reseñas"
+              desc="Envía enlaces directos y anima a tus clientes satisfechos a dejar reseña."
+              bullets={[
+                "Plantillas listas para copiar",
+                "Texto optimizado para WhatsApp o email",
+                "Enlace directo a tu ficha de Google",
+              ]}
+            />
+          </div>
 
-              <p className="mt-6 text-xs text-zinc-500">
-                *En desarrollo: integración WhatsApp Business, sincronización
-                completa con Google Business Profile, y más automatizaciones de
-                reputación.
-              <br />
-                **En desarrollo para las siguientes versiones: integración directa
-                con WhatsApp Business, sincronización con Bing Places y Apple
-                Business Connect, y más automatizaciones de reputación.
-              </p>
-            </div>
-          </section>
-
+          <p className="mt-6 text-xs text-zinc-500">
+            En desarrollo dentro de la beta: integración con WhatsApp Business,
+            lectura automática de reseñas de Google Business Profile y resúmenes
+            de reputación por IA. Más adelante: conexión con otros directorios
+            (Bing, Apple, etc.).
+          </p>
+        </div>
+      </section>
 
       {/* HOW IT WORKS */}
       <section className="bg-zinc-950">
@@ -198,8 +194,14 @@ export default function HomePage() {
               </p>
               <ul className="mt-6 space-y-2 text-sm text-zinc-300">
                 <li>• Plan sencillo para una o pocas ubicaciones</li>
-                <li>• Incluye chat web + WhatsApp y solicitudes de reseñas</li>
-                <li>• Resumen de reputación por IA</li>
+                <li>
+                  • Incluye chat web y solicitudes de reseñas (WhatsApp Business
+                  en desarrollo)
+                </li>
+                <li>
+                  • Resumen básico de reputación, con IA en pruebas dentro de la
+                  beta
+                </li>
                 <li>• Sin permanencia, cancelación en cualquier momento</li>
               </ul>
               <div className="mt-6">
@@ -226,7 +228,7 @@ export default function HomePage() {
               </p>
               <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-lg border border-zinc-800 p-3">
-                  1 Usuario incluidos
+                  1 usuario incluido
                 </div>
                 <div className="rounded-lg border border-zinc-800 p-3">
                   Soporte por email
@@ -235,7 +237,7 @@ export default function HomePage() {
                   Reportes básicos
                 </div>
                 <div className="rounded-lg border border-zinc-800 p-3">
-                  API conversacional
+                  API conversacional (beta)
                 </div>
               </div>
             </div>
