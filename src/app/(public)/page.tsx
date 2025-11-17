@@ -210,7 +210,7 @@ export default function HomePage() {
               </p>
               <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-lg border border-zinc-800 p-3">
-                  Usuarios incluidos
+                  1 Usuario incluidos
                 </div>
                 <div className="rounded-lg border border-zinc-800 p-3">
                   Soporte por email
