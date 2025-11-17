@@ -56,38 +56,36 @@ export default function HomePage() {
         </div>
       </section>
 
-{/* SOCIAL PROOF */}
-<section className="bg-zinc-950 border-b border-zinc-900/50">
-  <div className="max-w-6xl mx-auto px-4 py-8">
-<h2 className="text-2xl font-bold text-white text-center px-4 md:max-w-2xl mx-auto">
-  Diseñado para empresas, autónomos y servicios profesionales que viven de su reputación.
-</h2>
+      {/* SOCIAL PROOF */}
+      <section className="bg-zinc-950 border-b border-zinc-900/50">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <h2 className="text-2xl font-bold text-white text-center px-4 md:max-w-2xl mx-auto">
+            Diseñado para empresas, autónomos y servicios profesionales que
+            viven de su reputación.
+          </h2>
 
-    <div className="mt-10 mb-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      {[
-        "Clínicas",
-        "Escuelas",
-        "Estética avanzada",
-        "Fisioterapia",
-        "Servicios profesionales",
-        "Centros médicos",
-      ].map((label) => (
-        <div
-          key={label}
-          className="flex items-center justify-center 
-          py-3 rounded-lg 
-          border border-zinc-700 
-          bg-zinc-900/60 
-           text-zinc-200 font-medium"
-        >
-          {label}
+          <div className="mt-10 mb-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              "Clínicas",
+              "Escuelas",
+              "Estética avanzada",
+              "Fisioterapia",
+              "Servicios profesionales",
+              "Centros médicos",
+            ].map((label) => (
+              <div
+                key={label}
+                className="flex items-center justify-center 
+      py-3 px-2 whitespace-nowrap
+      rounded-lg border border-zinc-700 
+      bg-zinc-900/60 text-zinc-200 font-medium text-sm"
+              >
+                {label}
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
-
-
+      </section>
 
       {/* FEATURES */}
       <section className="bg-zinc-950 border-y border-zinc-800">
