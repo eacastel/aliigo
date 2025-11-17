@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import HeroRotator from "@/components/HeroRotator";
 import { AliigoSupportWidget } from "@/components/AliigoSupportWidget";
 
 export const metadata = {
@@ -39,16 +39,9 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="relative">
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 shadow-2xl">
-                <Image
-                  src="/aliigo-dashboard-mock.svg"
-                  alt="Panel de Aliigo con bandeja de entrada, reseñas y métricas"
-                  width={1200}
-                  height={720}
-                  className="w-full h-auto rounded-xl"
-                  priority
-                />
+            <div className="relative"> <div className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 shadow-2xl">
+                <HeroRotator
+                 />
               </div>
               <div className="pointer-events-none absolute -inset-4 -z-10 bg-[radial-gradient(40%_40%_at_70%_30%,rgba(59,130,246,0.25),transparent_60%)]" />
             </div>
