@@ -39,9 +39,10 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="relative"> <div className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 shadow-2xl">
-                <HeroRotator
-                 />
+            <div className="relative">
+              {" "}
+              <div className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 shadow-2xl">
+                <HeroRotator />
               </div>
               <div className="pointer-events-none absolute -inset-4 -z-10 bg-[radial-gradient(40%_40%_at_70%_30%,rgba(59,130,246,0.25),transparent_60%)]" />
             </div>
@@ -57,7 +58,7 @@ export default function HomePage() {
             viven de su reputación.
           </h2>
 
-          <div className="mt-10 mb-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="mt-10 mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
               "Clínicas",
               "Escuelas",
@@ -95,6 +96,7 @@ export default function HomePage() {
 
           <div className="mt-10 grid gap-6 md:grid-cols-2">
             <Feature
+              n={1}
               title="Solicitudes de reseñas"
               desc="Envía invitaciones por SMS o WhatsApp y consigue reseñas reales en los sitios que importan."
               bullets={[
@@ -104,6 +106,7 @@ export default function HomePage() {
               ]}
             />
             <Feature
+              n={2}
               title="Chat unificado"
               desc="Conversa desde web y WhatsApp en un solo buzón. No más pestañas abiertas por todas partes."
               bullets={[
@@ -113,6 +116,7 @@ export default function HomePage() {
               ]}
             />
             <Feature
+              n={3}
               title="Resumen de reputación"
               desc="Tus reseñas, resumidas cada semana con insights accionables para el equipo."
               bullets={[
@@ -122,6 +126,7 @@ export default function HomePage() {
               ]}
             />
             <Feature
+              n={4}
               title="Directorios y NAP"
               desc="Nombre, dirección y teléfono coherentes en los principales directorios."
               bullets={[
@@ -146,17 +151,14 @@ export default function HomePage() {
           </div>
           <ol className="mt-8 grid gap-6 md:grid-cols-3">
             <Step
-              n={1}
               title="Solicita invitación"
               desc="Déjanos tu email y los datos básicos de tu negocio."
             />
             <Step
-              n={2}
               title="Revisión rápida"
               desc="Revisamos tu ficha y volumen de reseñas para asegurar buen encaje."
             />
             <Step
-              n={3}
               title="Activa Aliigo"
               desc="Recibes un código de activación con condiciones especiales de lanzamiento."
             />
@@ -280,18 +282,34 @@ export default function HomePage() {
 }
 
 function Feature({
+  n,
   title,
   desc,
   bullets,
 }: {
+  n: number;
   title: string;
   desc: string;
   bullets: string[];
 }) {
   return (
     <div className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/40">
-      <h3 className="text-lg font-semibold text-white">{title}</h3>
-      <p className="mt-2 text-zinc-300 text-sm">{desc}</p>
+      <div className="flex items-start gap-4">
+        <div className="flex-shrink-0">
+          <div
+            className="h-8 w-8 flex items-center justify-center
+            rounded-full border border-zinc-700 text-zinc-300 text-sm font-medium"
+          >
+            {n}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          <p className="mt-2 text-zinc-300 text-sm">{desc}</p>
+        </div>
+      </div>
+
       <ul className="mt-4 space-y-1 text-sm text-zinc-400">
         {bullets.map((b, i) => (
           <li key={i}>• {b}</li>
@@ -301,14 +319,19 @@ function Feature({
   );
 }
 
-function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
+function Step({ title, desc }: { title: string; desc: string }) {
   return (
-    <li className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/40">
-      <div className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 text-sm text-zinc-300">
-        {n}
+    <li className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/40 flex gap-4 min-h-[160px]">
+      {/* Arrow */}
+      <div className="text-3xl leading-none text-zinc-500 flex-shrink-0 mt-1">
+        →
       </div>
-      <h3 className="mt-3 text-lg font-semibold text-white">{title}</h3>
-      <p className="mt-1 text-sm text-zinc-300">{desc}</p>
+
+      {/* Text */}
+      <div>
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <p className="mt-1 text-sm text-zinc-300">{desc}</p>
+      </div>
     </li>
   );
 }
