@@ -17,13 +17,14 @@ export default function HomePage() {
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <div>
               <h1 className="text-4xl/tight md:text-5xl font-extrabold tracking-tight text-white">
-                Reputación y conversaciones en un solo lugar.
+                Chat con IA y reputación en un solo lugar.
               </h1>
               <p className="mt-5 text-lg text-zinc-300">
-                Aliigo te ayuda a conseguir más reseñas, responder más rápido y
-                convertir mejor, con un panel sencillo y automatizaciones listas
-                para clínicas, comercios y servicios locales.
+                Aliigo combina un asistente con IA que responde al instante
+                usando la información de tu negocio, un buzón centralizado para
+                tus mensajes y tus reseñas de Google en un solo panel.
               </p>
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/signup"
@@ -32,15 +33,15 @@ export default function HomePage() {
                   Solicitar invitación
                 </Link>
               </div>
+
               <p className="mt-3 text-xs text-zinc-500">
-                Estamos en beta privada. Seleccionamos unos pocos negocios cada
-                mes y les damos condiciones de lanzamiento desde{" "}
+                Beta privada. Aceptamos unos pocos negocios por mes con
+                condiciones especiales desde{" "}
                 <span className="font-semibold text-zinc-200">49 €/mes</span>.
               </p>
             </div>
 
             <div className="relative">
-              {" "}
               <div className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 shadow-2xl">
                 <HeroRotator />
               </div>
@@ -81,63 +82,78 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="bg-zinc-950 border-y border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold text-white">
-              Todo lo clave, sin complicaciones
-            </h2>
-            <p className="mt-2 text-zinc-300">
-              Enfocado en lo que mueve la aguja: reseñas, mensajes y tiempo de
-              respuesta. Menos menús, más resultados.
-            </p>
-          </div>
+          {/* FEATURES */}
+          <section className="bg-zinc-950 border-y border-zinc-800">
+            <div className="max-w-6xl mx-auto px-4 py-16">
+              <div className="max-w-2xl">
+                <h2 className="text-2xl font-bold text-white">
+                  Todo lo clave, sin complicaciones
+                </h2>
+                <p className="mt-2 text-zinc-300">
+                  Empezamos por lo que de verdad mueve la aguja: que te
+                  escriban, que puedas responder rápido y que tus reseñas de
+                  Google se vean mejor que las de la competencia.
+                </p>
+              </div>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <Feature
-              n={1}
-              title="Solicitudes de reseñas"
-              desc="Envía invitaciones por SMS o WhatsApp y consigue reseñas reales en los sitios que importan."
-              bullets={[
-                "Enlaces directos a Google / Facebook",
-                "Recordatorios automáticos",
-                "Plantillas con el tono de tu marca",
-              ]}
-            />
-            <Feature
-              n={2}
-              title="Chat unificado"
-              desc="Conversa desde web y WhatsApp en un solo buzón. No más pestañas abiertas por todas partes."
-              bullets={[
-                "Widget web instalable en 2 minutos",
-                "WhatsApp Business (API o bridging)",
-                "Historial, etiquetas y notas internas",
-              ]}
-            />
-            <Feature
-              n={3}
-              title="Resumen de reputación"
-              desc="Tus reseñas, resumidas cada semana con insights accionables para el equipo."
-              bullets={[
-                "Detección de tendencias y caídas",
-                "Análisis de sentimiento",
-                "Acciones sugeridas para mejorar",
-              ]}
-            />
-            <Feature
-              n={4}
-              title="Directorios y NAP"
-              desc="Nombre, dirección y teléfono coherentes en los principales directorios."
-              bullets={[
-                "Google / Bing / Apple / FB",
-                "Sync básico programado",
-                "Control desde el panel de Aliigo",
-              ]}
-            />
-          </div>
-        </div>
-      </section>
+              <div className="mt-10 grid gap-6 md:grid-cols-2">
+                <Feature
+                  n={1}
+                  title="Chat con IA para tu web"
+                  desc="Un asistente que responde automáticamente usando la información de tu negocio."
+                  bullets={[
+                    "Entrénalo con tus servicios, horarios y preguntas frecuentes",
+                    "Respuestas inmediatas por IA",
+                    "Transferencia a humano cuando la IA no está segura",
+                  ]}
+                />
+
+                <Feature
+                  n={2}
+                  title="Un solo buzón para todas tus conversaciones"
+                  desc="Gestión centralizada para mensajes del widget web y, pronto, más canales."
+                  bullets={[
+                    "Historial por cliente",
+                    "Notas internas",
+                    "Etiquetas personalizadas",
+                  ]}
+                />
+
+                <Feature
+                  n={3}
+                  title="Reseñas de Google en un solo lugar"
+                  desc="Consulta y gestiona tus reseñas sin entrar a Google Business."
+                  bullets={[
+                    "Panel con todas tus reseñas",
+                    "Acceso directo para responder",
+                    "Alertas automáticas",
+                  ]}
+                />
+
+                <Feature
+                  n={4}
+                  title="Solicitudes de reseñas"
+                  desc="Envía enlaces directos y anima a tus clientes satisfechos a dejar reseña."
+                  bullets={[
+                    "Plantillas listas para copiar",
+                    "Texto optimizado para WhatsApp o email",
+                    "Enlace directo a tu perfil de Google",
+                  ]}
+                />
+              </div>
+
+              <p className="mt-6 text-xs text-zinc-500">
+                *En desarrollo: integración WhatsApp Business, sincronización
+                completa con Google Business Profile, y más automatizaciones de
+                reputación.
+              <br />
+                **En desarrollo para las siguientes versiones: integración directa
+                con WhatsApp Business, sincronización con Bing Places y Apple
+                Business Connect, y más automatizaciones de reputación.
+              </p>
+            </div>
+          </section>
+
 
       {/* HOW IT WORKS */}
       <section className="bg-zinc-950">
