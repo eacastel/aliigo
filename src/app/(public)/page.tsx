@@ -251,22 +251,36 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-white">
             Preguntas frecuentes
           </h2>
+
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             <Faq
-              q="¿Aliigo está disponible para cualquiera?"
-              a="Durante el lanzamiento estamos en beta privada. Priorizamos negocios locales que ya reciben consultas o reseñas y quieren profesionalizar su reputación."
+              q="¿Qué hace exactamente Aliigo?"
+              a="Aliigo combina un widget de chat con IA para tu web, un buzón para gestionar las conversaciones y un panel para ver mejor tus reseñas de Google. La idea es que tengas en un solo sitio lo que hoy está repartido entre varias herramientas."
             />
+
             <Faq
-              q="¿Tiene compromiso de permanencia?"
-              a="No. Queremos que sigas en Aliigo porque te funciona, no por contrato. Podrás cancelar cuando quieras."
+              q="¿Qué funciones están disponibles en la beta?"
+              a="Empezamos con el widget de chat en tu web con el asistente con IA, el buzón de conversaciones y un panel básico para tus reseñas de Google. Durante la beta iremos activando, de forma progresiva más automatizaciones según el tipo de negocio."
             />
+
             <Faq
-              q="¿Necesito tarjeta para entrar en la beta?"
-              a="No para solicitar invitación. Si eres aceptado, te explicaremos condiciones y pasos antes de activar el plan."
+              q="¿Quién configura el widget y el asistente con IA?"
+              a="Tú decides qué quiere decir el asistente: servicios, horarios, preguntas frecuentes, etc. Desde Aliigo te damos plantillas y un checklist sencillo. Instalar el widget es copiar y pegar un pequeño código en tu web (o se lo envías a tu desarrollador)."
             />
+
             <Faq
-              q="¿Quién configura todo esto?"
-              a="Te guiamos en la configuración inicial de canales y mensajes. El objetivo es dejarlo funcionando en poco tiempo sin que tengas que volverte loco."
+              q="¿Hay compromiso de permanencia?"
+              a="No. Queremos que sigas en Aliigo porque te aporta clientes y claridad, no por un contrato. Podrás cancelar cuando quieras desde el propio panel."
+            />
+
+            <Faq
+              q="¿Necesito tarjeta para solicitar invitación?"
+              a="No. Para pedir invitación solo necesitamos tus datos básicos. Si eres aceptado en la beta, te explicaremos las condiciones y, solo entonces, decidirás si activas el plan de pago."
+            />
+
+            <Faq
+              q="¿Cómo pido ayuda si me bloqueo?"
+              a="Durante la beta tendrás soporte por email y un pequeño widget de ayuda dentro del panel para contactarnos. Si en algún punto te atascas con la configuración, te guiamos para que puedas dejarlo funcionando sin complicaciones."
             />
           </div>
         </div>
