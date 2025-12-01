@@ -1,25 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/routing"; 
 import { supabase } from "@/lib/supabaseClient";
-
-const nav = [
-  { href: "/dashboard", label: "Resumen" },
-  { href: "/dashboard/settings", label: "Negocio" },
-  { href: "/dashboard/widget", label: "Widget" },
-  { href: "/dashboard/billing", label: "Facturación" },
-];
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations('Navigation');
   const path = usePathname();
+  const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
+
+  const nav = [
+    { href: "/dashboard", label: t('links.dashboard') },
+    { href: "/dashboard/settings", label: t('links.settings') },
+    { href: "/dashboard/widget", label: t('links.widget') },
+    { href: "/dashboard/billing", label: t('links.billing') },
+  ];
 
   useEffect(() => {
     (async () => {
@@ -30,7 +33,7 @@ export default function DashboardLayout({
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = "/login";
+    router.push('/login'); 
   };
 
   return (
@@ -38,41 +41,53 @@ export default function DashboardLayout({
 
       {/* HEADER */}
       <header className="bg-zinc-950 border-b border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 pb-4  pt-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/aliigo-logo-white.svg"
-              alt="Aliigo"
-              width={120}
-              height={36}
-              priority
-            />
-            <span className="sr-only">Aliigo</span>
-          </Link>
+        <div className="max-w-6xl mx-auto px-4 pb-4 pt-6 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <Link href="/" className="flex items-center gap-2">
+              <Image
+                src="/aliigo-logo-white.svg"
+                alt="Aliigo"
+                width={120}
+                height={36}
+                priority
+              />
+              <span className="sr-only">Aliigo</span>
+            </Link>
+            
+            {/* 👈 Added Switcher Here: Visible on Desktop */}
+            <div className="hidden sm:block">
+              <LanguageSwitcher />
+            </div>
+          </div>
 
           <nav className="flex items-center gap-4 text-sm">
+            {/* 👈 Added Switcher Here: Visible on Mobile only */}
+            <div className="sm:hidden">
+              <LanguageSwitcher />
+            </div>
+
             <Link
               href="/dashboard"
-              className="text-zinc-300 hover:text-white transition"
+              className="text-zinc-300 hover:text-white transition hidden sm:block"
             >
-              Panel
+              {t('actions.panel')}
             </Link>
 
             {email ? (
               <>
-                <span className="text-zinc-500 text-xs hidden sm:inline">
+                <span className="text-zinc-500 text-xs hidden md:inline">
                   {email}
                 </span>
                 <button
                   onClick={handleLogout}
                   className="text-zinc-300 hover:text-white transition"
                 >
-                  Cerrar sesión
+                  {t('actions.logout')}
                 </button>
               </>
             ) : (
               <Link href="/login" className="text-zinc-300 hover:text-white">
-                Iniciar sesión
+                {t('actions.login')}
               </Link>
             )}
           </nav>
@@ -81,11 +96,10 @@ export default function DashboardLayout({
 
       {/* BODY */}
       <div className="flex-1 grid grid-cols-12">
-        
         {/* SIDEBAR */}
         <aside className="col-span-12 sm:col-span-3 lg:col-span-2 border-r border-zinc-800 bg-zinc-950">
           <div className="px-4 py-4 border-b border-zinc-800">
-            <div className="text-xs text-zinc-500">Dashboard</div>
+            <div className="text-xs text-zinc-500">{t('actions.sidebarTitle')}</div>
           </div>
           <nav className="p-3 space-y-1">
             {nav.map((n) => {
@@ -114,16 +128,14 @@ export default function DashboardLayout({
             {children}
           </div>
         </main>
-
       </div>
 
       {/* FOOTER */}
       <footer className="bg-zinc-950 border-t border-zinc-800">
         <div className="max-w-6xl mx-auto px-4 py-5 text-center text-sm text-zinc-500">
-          © {new Date().getFullYear()} Aliigo — Todos los derechos reservados.
+          © {new Date().getFullYear()} Aliigo — {t('footer')}
         </div>
       </footer>
-
     </div>
   );
 }

@@ -1,0 +1,45 @@
+{
+    "Navigation": {
+        "brand": "Aliigo",
+        "links": {
+            "dashboard": "Overview",
+            "settings": "Business",
+            "widget": "Widget",
+            "billing": "Billing"
+        },
+        "publicLinks": {
+            "features": "Cómo funciona",
+            "pricing": "Precios",
+            "blog": "Recursos"
+        },
+        "actions": {
+            "panel": "Panel",
+            "login": "Log in",
+            "logout": "Log out",
+            "sidebarTitle": "Dashboard"
+        },
+        "footer": "All rights reserved."
+    },
+    "Dashboard": {
+        "welcome": "Bienvenido, {name}",
+        "welcomeGeneric": "Bienvenido",
+        "trialDays": "{days} días de prueba",
+        "verifyTitle": "Verifica tu correo electrónico",
+        "verifyMessage": "Hemos enviado un enlace a {email}. Debes confirmarlo para acceder a todas las funciones.",
+        "resendButton": "Reenviar correo",
+        "resendSuccess": "Correo enviado. Revisa tu bandeja de spam.",
+        "resendError": "Error al enviar: {error}",
+        "businessInfo": {
+            "defaultName": "Tu Negocio",
+            "contactLabel": "Contacto:",
+            "phoneLabel": "Teléfono:"
+        },
+        "cards": {
+            "reviewsTitle": "Solicitar reseñas",
+            "reviewsDesc": "Envía SMS o Email a tus clientes.",
+            "campaignsTitle": "Campañas",
+            "campaignsDesc": "Automatiza mensajes masivos."
+        },
+        "loading": "Cargando..."
+    }
+}

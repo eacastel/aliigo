@@ -1,0 +1,45 @@
+{
+    "Navigation": {
+        "brand": "Aliigo",
+        "links": {
+            "dashboard": "Resumen",
+            "settings": "Negocio",
+            "widget": "Widget",
+            "billing": "Facturación"
+        },
+        "publicLinks": {
+            "features": "How it works",
+            "pricing": "Pricing",
+            "blog": "Resources"
+        },
+        "actions": {
+            "panel": "Panel",
+            "login": "Iniciar sesión",
+            "logout": "Cerrar sesión",
+            "sidebarTitle": "Dashboard"
+        },
+        "footer": "Todos los derechos reservados."
+    },
+    "Dashboard": {
+        "welcome": "Welcome, {name}",
+        "welcomeGeneric": "Welcome",
+        "trialDays": "{days} days left in trial",
+        "verifyTitle": "Verify your email",
+        "verifyMessage": "We sent a link to {email}. You must confirm it to access all features.",
+        "resendButton": "Resend Email",
+        "resendSuccess": "Email sent. Check your spam folder.",
+        "resendError": "Error sending: {error}",
+        "businessInfo": {
+            "defaultName": "Your Business",
+            "contactLabel": "Contact:",
+            "phoneLabel": "Phone:"
+        },
+        "cards": {
+            "reviewsTitle": "Request Reviews",
+            "reviewsDesc": "Send SMS or Email to your clients.",
+            "campaignsTitle": "Campaigns",
+            "campaignsDesc": "Automate bulk messaging."
+        },
+        "loading": "Loading..."
+    }
+}

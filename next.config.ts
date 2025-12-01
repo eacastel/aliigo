@@ -1,10 +1,16 @@
-// next.config.ts
 import type { NextConfig } from "next";
+import createNextIntlPlugin from 'next-intl/plugin';
+
+// 1. Initialize the next-intl plugin
+const withNextIntl = createNextIntlPlugin(
+  './src/i18n/request.ts'
+);
 
 const NEXT_PUBLIC_EMBED_ALLOW =
   process.env.NEXT_PUBLIC_EMBED_ALLOW ??
   "https://horchatalabs.com https://www.horchatalabs.com http://localhost:3000";
 
+// 2. Your existing config stays exactly the same
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
@@ -38,17 +44,10 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  /**
-   * Redirects:
-   * For host-level (www → apex) redirects, do this in Vercel → Project → Domains
-   * (recommended). If you prefer code, use middleware.ts to inspect the Host header.
-   */
   async redirects() {
-    return [
-      // Example path-level redirects (add any you need)
-      // { source: "/old", destination: "/new", permanent: true },
-    ];
+    return [];
   },
 };
 
-export default nextConfig;
+// 3. Export using the wrapper
+export default withNextIntl(nextConfig);
