@@ -15,6 +15,7 @@ import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import type { AuthError } from "@supabase/supabase-js";
+import { Link } from "@/i18n/routing";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
 
@@ -236,9 +237,9 @@ function LoginWithSearchParams() {
         {/* Reset password link */}
         <p className="text-sm text-gray-600 text-center mt-2">
           ¿Has olvidado tu contraseña?{" "}
-          <a href="/reset-password" className="text-blue-600 underline">
+          <Link href="/reset-password" className="text-blue-600 underline">
             Restablécela
-          </a>
+          </Link>
         </p>
 
         {/* Conditionally render resend confirmation ONLY after a 422 error */}
