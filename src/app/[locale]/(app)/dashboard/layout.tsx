@@ -42,46 +42,31 @@ export default function DashboardLayout({
       {/* HEADER */}
       <header className="bg-zinc-950 border-b border-zinc-800">
         <div className="max-w-6xl mx-auto px-4 pb-4 pt-6 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/aliigo-logo-white.svg"
-                alt="Aliigo"
-                width={120}
-                height={36}
-                priority
-              />
-              <span className="sr-only">Aliigo</span>
-            </Link>
+          
+          {/* LEFT: Just the Brand */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/aliigo-logo-white.svg" alt="Aliigo" width={120} height={36} priority />
+            <span className="sr-only">Aliigo</span>
+          </Link>
+
+          {/* RIGHT: Actions + Switcher */}
+          <nav className="flex items-center gap-4 text-sm">
             
-            {/* 👈 Added Switcher Here: Visible on Desktop */}
+            {/* ✅ MOVED SWITCHER HERE (Desktop) */}
             <div className="hidden sm:block">
               <LanguageSwitcher />
             </div>
-          </div>
 
-          <nav className="flex items-center gap-4 text-sm">
-            {/* 👈 Added Switcher Here: Visible on Mobile only */}
-            <div className="sm:hidden">
-              <LanguageSwitcher />
-            </div>
-
-            <Link
-              href="/dashboard"
-              className="text-zinc-300 hover:text-white transition hidden sm:block"
-            >
+            <Link href="/dashboard" className="text-zinc-300 hover:text-white transition hidden sm:block">
               {t('actions.panel')}
             </Link>
 
             {email ? (
               <>
-                <span className="text-zinc-500 text-xs hidden md:inline">
+                <span className="text-zinc-500 text-xs hidden md:inline border-l border-zinc-800 pl-4 ml-2">
                   {email}
                 </span>
-                <button
-                  onClick={handleLogout}
-                  className="text-zinc-300 hover:text-white transition"
-                >
+                <button onClick={handleLogout} className="text-zinc-300 hover:text-white transition">
                   {t('actions.logout')}
                 </button>
               </>
@@ -90,6 +75,12 @@ export default function DashboardLayout({
                 {t('actions.login')}
               </Link>
             )}
+
+            
+       {/* Mobile Switcher (Keep here for small screens) */}
+            <div className="sm:hidden">
+              <LanguageSwitcher />
+            </div>
           </nav>
         </div>
       </header>

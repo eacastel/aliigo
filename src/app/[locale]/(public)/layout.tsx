@@ -1,48 +1,52 @@
-import { Link } from "@/i18n/routing"; // ✅ Use localized link
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import LanguageSwitcher from "@/components/LanguageSwitcher"; // ✅ Add the switcher
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // ✅ Connect to the "Navigation" dictionary we created earlier
   const t = useTranslations('Navigation');
 
   return (
-     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
-      {/* HEADER */}
-      <header className="bg-zinc-950 border-b border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 pb-4 pt-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+    <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-[#84c9ad]/30">
+      
+      {/* HEADER - NOW STICKY & GLASS */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-zinc-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-950/50">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          
+          {/* 1. Logo (Prevents shrinking) */}
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <span className="sr-only">{t('brand')}</span>
             <Image
               src="/aliigo-logo-white.svg"
-              alt="Aliigo"
-              width={120}
-              height={36}
+              alt="Aliigo Logo"
+              width={100}
+              height={32}
               priority
+              className="w-24 sm:w-28" // Slightly smaller on very small phones
             />
-            <span className="sr-only">{t('brand')}</span>
           </Link>
 
-          <nav className="flex items-center gap-4 text-sm">
-            {/* 1. Language Switcher */}
+          {/* 2. Navigation */}
+          <nav className="flex items-center gap-3 sm:gap-6 text-sm">
+            
             <LanguageSwitcher />
 
-            {/* 2. Login Link (Optional, but good for UX) */}
+            {/* Hidden on mobile, visible on tablet+ */}
             <Link 
               href="/login" 
-              className="hidden sm:block text-zinc-400 hover:text-white transition-colors"
+              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
             >
               {t('actions.login')}
             </Link>
 
-            {/* 3. CTA Button */}
+            {/* Compact button on mobile */}
             <Link
               href="/signup"
-              className="bg-white text-black px-3 py-1.5 rounded-md hover:bg-zinc-100 transition-colors font-medium"
+              className="bg-white text-black px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-md hover:bg-zinc-200 transition-colors whitespace-nowrap"
             >
               {t('actions.getStarted')}
             </Link>
@@ -52,9 +56,8 @@ export default function PublicLayout({
 
       <main className="flex-1">{children}</main>
 
-      {/* FOOTER */}
       <footer className="bg-zinc-950 border-t border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-5 text-center text-sm text-zinc-500">
+        <div className="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-zinc-500">
           © {new Date().getFullYear()} Aliigo — {t('footer')}
         </div>
       </footer>

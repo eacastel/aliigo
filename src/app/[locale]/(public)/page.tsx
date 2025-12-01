@@ -1,378 +1,285 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import HeroRotator from "@/components/HeroRotator";
 import { AliigoSupportWidget } from "@/components/AliigoSupportWidget";
 
-export const metadata = {
-  title: "Aliigo — Reputación y Automatización Local (Acceso por invitación)",
-  description:
-    "Aliigo ayuda a negocios locales a conseguir más reseñas, responder más rápido y centralizar conversaciones en un solo panel. Acceso en beta privada por invitación.",
-};
-
 export default function HomePage() {
+  const t = useTranslations('Landing');
+
   return (
-    <>
-      {/* HERO */}
-      <section className="bg-zinc-950 border-b border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-20">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
-            <div>
-              <h1 className="text-4xl/tight md:text-5xl font-extrabold tracking-tight text-white">
-                Chat con IA y reputación en un solo lugar.
+    <div className="bg-zinc-950 overflow-hidden selection:bg-[#84c9ad]/30">
+      
+      {/* 1. HERO SECTION WITH GRADIENT MESH */}
+      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-28 border-b border-white/5">
+        {/* Teal Gradient Blob */}
+        <div className="absolute top-0 right-0 -z-10 opacity-20 blur-[100px] pointer-events-none">
+          <div className="w-[500px] h-[500px] bg-[#84c9ad] rounded-full mix-blend-screen" />
+        </div>
+        
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Left Content */}
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#84c9ad]/10 border border-[#84c9ad]/20 text-[#84c9ad] text-xs font-medium mb-6">
+                ✨ {t('hero.betaNote')}
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                {t('hero.title')} <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#84c9ad] to-emerald-400">
+                  {t('hero.titleHighlight')}
+                </span>
               </h1>
-              <p className="mt-5 text-lg text-zinc-300">
-                Aliigo combina un asistente con IA que responde al instante
-                usando la información de tu negocio, un buzón centralizado para
-                tus mensajes y tus reseñas de Google en un solo panel.
+              
+              <p className="mt-6 text-lg text-zinc-400 leading-relaxed max-w-lg">
+                {t('hero.subtitle')}
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center rounded-lg bg-white text-black px-5 py-3 text-sm font-medium hover:bg-zinc-100"
+                  className="inline-flex items-center justify-center rounded-lg bg-[#84c9ad] text-black px-6 py-3 text-sm font-semibold hover:bg-[#73bba0] transition-all shadow-[0_0_20px_rgba(132,201,173,0.3)]"
                 >
-                  Solicitar invitación
+                  {t('hero.ctaPrimary')}
+                </Link>
+                <Link
+                  href="#how-it-works"
+                  className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
+                >
+                  {t('hero.ctaSecondary')}
                 </Link>
               </div>
-
-              <p className="mt-3 text-xs text-zinc-500">
-                Beta privada. Aceptamos unos pocos negocios por mes con
-                condiciones especiales desde{" "}
-                <span className="font-semibold text-zinc-200">49 €/mes</span>.
-              </p>
             </div>
 
+            {/* Right Visual (Rotator) */}
             <div className="relative">
-              <div className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 shadow-2xl">
+              <div className="relative rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-2 shadow-2xl ring-1 ring-white/10">
                 <HeroRotator />
               </div>
-              <div className="pointer-events-none absolute -inset-4 -z-10 bg-[radial-gradient(40%_40%_at_70%_30%,rgba(59,130,246,0.25),transparent_60%)]" />
+              {/* Decorative Elements */}
+              <div className="absolute -inset-1 -z-10 bg-gradient-to-tr from-[#84c9ad] to-blue-600 opacity-20 blur-xl rounded-2xl" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* SOCIAL PROOF */}
-      <section className="bg-zinc-950 border-b border-zinc-900/50">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <h2 className="text-2xl font-bold text-white text-center px-4 md:max-w-2xl mx-auto">
-            Diseñado para empresas, autónomos y servicios profesionales que
-            viven de su reputación.
-          </h2>
-
-          <div className="mt-10 mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* 2. SOCIAL PROOF (Ticker Tape Style) */}
+      <section className="border-b border-white/5 bg-zinc-900/30">
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          <p className="text-center text-sm font-medium text-zinc-500 mb-6 uppercase tracking-wider">
+            {t('socialProof.title')}
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
             {[
-              "Clínicas",
-              "Escuelas",
-              "Estética avanzada",
-              "Fisioterapia",
-              "Servicios profesionales",
-              "Centros médicos",
-            ].map((label) => (
-              <div
-                key={label}
-                className="flex items-center justify-center 
-      py-3 px-2 whitespace-nowrap
-      rounded-lg border border-zinc-700 
-      bg-zinc-900/60 text-zinc-200 font-medium text-sm"
+              "Clínicas", "Escuelas", "Estética", 
+              "Fisioterapia", "Legal", "Dental"
+            ].map((tag, i) => (
+              <span 
+                key={i} 
+                className="px-4 py-2 rounded-lg bg-white/5 border border-white/5 text-zinc-300 text-sm font-medium hover:bg-white/10 hover:border-[#84c9ad]/30 hover:text-[#84c9ad] transition-all cursor-default"
               >
-                {label}
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. BENTO GRID FEATURES (Replacing the vertical list) */}
+      <section className="py-24 bg-zinc-950 relative">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold text-white mb-4">{t('features.title')}</h2>
+            <p className="text-zinc-400">{t('features.subtitle')}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 auto-rows-[300px]">
+            
+            {/* Big Card (AI Web Chat) */}
+            <div className="md:col-span-2 rounded-3xl border border-white/10 bg-zinc-900/50 p-8 relative overflow-hidden group hover:border-[#84c9ad]/30 transition-all flex flex-col justify-between">
+              
+              {/* Glow Effect */}
+              <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-40 transition-opacity pointer-events-none">
+                <div className="w-32 h-32 bg-[#84c9ad] blur-[60px] rounded-full" />
+              </div>
+
+              {/* Text Content */}
+              <div className="relative z-10 mb-8">
+                <h3 className="text-2xl font-bold text-white mb-2">{t('features.f1.title')}</h3>
+                <p className="text-zinc-400 max-w-sm">{t('features.f1.desc')}</p>
+              </div>
+
+              {/* ✨ VISUAL: Simulated Chat UI */}
+              <div className="relative w-full max-w-md ml-auto mt-auto translate-y-4 translate-x-4">
+                <div className="w-full bg-zinc-950 border border-white/10 rounded-tl-xl rounded-tr-xl shadow-2xl p-4 space-y-3">
+                  
+                  {/* Message 1: Incoming (Customer) */}
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-zinc-800 flex-shrink-0" />
+                    <div className="bg-zinc-800 rounded-2xl rounded-tl-none px-4 py-2 text-xs text-zinc-300">
+                      <div className="h-2 w-24 bg-zinc-700 rounded mb-1.5 opacity-50"></div>
+                      <div className="h-2 w-16 bg-zinc-700 rounded opacity-50"></div>
+                    </div>
+                  </div>
+
+                  {/* Message 2: Outgoing (Aliigo AI) */}
+                  <div className="flex gap-3 flex-row-reverse">
+                    <div className="w-8 h-8 rounded-full bg-[#84c9ad] flex items-center justify-center text-zinc-900 text-[10px] font-bold flex-shrink-0">
+                      AI
+                    </div>
+                    <div className="bg-[#84c9ad]/10 border border-[#84c9ad]/20 rounded-2xl rounded-tr-none px-4 py-2 text-xs text-[#84c9ad]">
+                      <div className="h-2 w-32 bg-[#84c9ad] rounded mb-1.5 opacity-40"></div>
+                      <div className="h-2 w-20 bg-[#84c9ad] rounded opacity-40"></div>
+                    </div>
+                  </div>
+
+                  {/* Input Area */}
+                  <div className="pt-2 border-t border-white/5 flex gap-2">
+                    <div className="h-8 flex-1 bg-zinc-900 rounded-full border border-white/5" />
+                    <div className="h-8 w-8 bg-[#84c9ad] rounded-full opacity-20" />
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            {/* Tall Card (Reviews) */}
+            <div className="md:row-span-2 rounded-3xl border border-white/10 bg-zinc-900/50 p-8 relative overflow-hidden group hover:border-yellow-500/30 transition-all">
+               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-30 transition-opacity">
+                <div className="w-32 h-32 bg-yellow-500 blur-[60px] rounded-full" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">{t('features.f3.title')}</h3>
+              <p className="text-zinc-400">{t('features.f3.desc')}</p>
+               <div className="mt-8 space-y-3">
+                  {[5,5,4].map((stars, i) => (
+                    <div key={i} className="p-3 bg-zinc-950/50 rounded-lg border border-white/5">
+                      <div className="flex gap-1 text-yellow-500 text-xs mb-1">{"★".repeat(stars)}</div>
+                      <div className="h-2 w-20 bg-zinc-800 rounded mb-1" />
+                      <div className="h-2 w-12 bg-zinc-800 rounded" />
+                    </div>
+                  ))}
+               </div>
+            </div>
+
+            {/* Small Card (Inbox) */}
+            <div className="rounded-3xl border border-white/10 bg-zinc-900/50 p-8 hover:bg-zinc-900 transition-all">
+               <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4">
+                 📥
+               </div>
+               <h3 className="text-xl font-bold text-white mb-2">{t('features.f2.title')}</h3>
+               <p className="text-zinc-400 text-sm">{t('features.f2.desc')}</p>
+            </div>
+
+            {/* Small Card (Campaigns) */}
+            <div className="rounded-3xl border border-white/10 bg-zinc-900/50 p-8 hover:bg-zinc-900 transition-all">
+               <div className="w-10 h-10 rounded-lg bg-[#84c9ad]/20 flex items-center justify-center text-[#84c9ad] mb-4">
+                 🚀
+               </div>
+               <h3 className="text-xl font-bold text-white mb-2">{t('features.f4.title')}</h3>
+               <p className="text-zinc-400 text-sm">{t('features.f4.desc')}</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 4. PRICING (Card Highlight) */}
+      <section className="py-24 border-t border-white/5 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 relative z-10">
+          <div className="rounded-3xl bg-zinc-900 border border-white/10 p-1 lg:p-2 flex flex-col md:flex-row gap-8 items-center overflow-hidden">
+            
+            {/* Visual Side */}
+            <div className="flex-1 p-8 md:p-12 text-center md:text-left">
+              <h2 className="text-3xl font-bold text-white mb-4">{t('pricing.title')}</h2>
+              <p className="text-zinc-400 mb-6">{t('pricing.desc')}</p>
+              <ul className="space-y-3 text-sm text-zinc-300 text-left mx-auto max-w-xs md:mx-0">
+                <li className="flex items-center gap-2"><span className="text-[#84c9ad]">✓</span> 1 User Included</li>
+                <li className="flex items-center gap-2"><span className="text-[#84c9ad]">✓</span> AI Chatbot (Unlimited)</li>
+                <li className="flex items-center gap-2"><span className="text-[#84c9ad]">✓</span> Google Review Sync</li>
+              </ul>
+            </div>
+
+            {/* Price Side */}
+            <div className="w-full md:w-80 bg-[#84c9ad] rounded-2xl p-8 text-center text-zinc-900 flex flex-col justify-center min-h-[300px]">
+              <div className="text-sm font-bold uppercase tracking-wide opacity-80 mb-2">Beta Access</div>
+              <div className="text-6xl font-extrabold mb-1">{t('pricing.price')}</div>
+              <div className="opacity-80 mb-8 font-medium">{t('pricing.period')}</div>
+              <Link href="/signup" className="block w-full py-3 px-4 bg-black text-white rounded-xl font-bold hover:bg-zinc-800 transition-colors">
+                {t('pricing.cta')}
+              </Link>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 5. HOW IT WORKS (Restored & Redesigned) */}
+      <section id="how-it-works" className="py-24 bg-zinc-900/30 border-t border-white/5 relative">
+        <div className="max-w-6xl mx-auto px-4 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold text-white mb-4">{t('howItWorks.title')}</h2>
+            <p className="text-zinc-400">{t('howItWorks.subtitle')}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="relative group">
+                {/* Connecting Line (Desktop only) */}
+                {step !== 3 && (
+                  <div className="hidden md:block absolute top-8 left-1/2 w-full h-[2px] bg-gradient-to-r from-zinc-800 to-zinc-900 z-0" />
+                )}
+                
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-center text-xl font-bold text-white mb-6 shadow-lg group-hover:border-[#84c9ad]/50 group-hover:text-[#84c9ad] transition-all duration-300">
+                    {step}
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    {t(`howItWorks.step${step}.title`)}
+                  </h3>
+                  <p className="text-zinc-400 text-sm leading-relaxed px-4">
+                    {t(`howItWorks.step${step}.desc`)}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="bg-zinc-950 border-y border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold text-white">
-              Todo lo clave, sin complicaciones
-            </h2>
-            <p className="mt-2 text-zinc-300">
-              Empezamos por lo que de verdad mueve la aguja: que te escriban,
-              que puedas responder rápido y que tu reputación en Google esté
-              bajo control.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <Feature
-              n={1}
-              title="Chat con IA para tu web"
-              desc="Un asistente que responde automáticamente usando la información que tú le das sobre tu negocio (en beta privada)."
-              bullets={[
-                "Entrénalo con tus servicios, horarios y preguntas frecuentes",
-                "Respuestas inmediatas 24/7 (en pruebas dentro de la beta)",
-                "Diseñado para que puedas intervenir cuando lo necesites",
-              ]}
-            />
-
-            <Feature
-              n={2}
-              title="Un solo buzón para tus conversaciones"
-              desc="Gestión centralizada para los mensajes que llegan desde el widget web; más canales se irán añadiendo en las siguientes versiones."
-              bullets={[
-                "Historial por cliente",
-                "Notas internas",
-                "Etiquetas personalizadas",
-              ]}
-            />
-
-            <Feature
-              n={3}
-              title="Reseñas de Google en un solo lugar"
-              desc="Consulta de un vistazo tus reseñas de Google y detecta problemas antes de que se hagan grandes."
-              bullets={[
-                "Listado de reseñas recientes",
-                "Indicadores de volumen y valoración media",
-                "Enlace directo para responder desde Google Business Profile",
-              ]}
-            />
-
-            <Feature
-              n={4}
-              title="Solicitudes de reseñas"
-              desc="Envía enlaces directos y anima a tus clientes satisfechos a dejar reseña."
-              bullets={[
-                "Plantillas listas para copiar",
-                "Texto optimizado para WhatsApp o email",
-                "Enlace directo a tu ficha de Google",
-              ]}
-            />
-          </div>
-
-          <p className="mt-6 text-xs text-zinc-500">
-            En desarrollo dentro de la beta: integración con WhatsApp Business,
-            lectura automática de reseñas de Google Business Profile y resúmenes
-            de reputación por IA. Más adelante: conexión con otros directorios
-            (Bing, Apple, etc.).
-          </p>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="bg-zinc-950">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold text-white">Cómo funciona</h2>
-            <p className="mt-2 text-zinc-300">
-              Estamos en beta privada. El proceso es simple: te apuntas, te
-              revisamos y, si encaja, te activamos.
-            </p>
-          </div>
-          <ol className="mt-8 grid gap-6 md:grid-cols-3">
-            <Step
-              title="Solicita invitación"
-              desc="Déjanos tu email y los datos básicos de tu negocio."
-            />
-            <Step
-              title="Revisión rápida"
-              desc="Revisamos tu ficha y volumen de reseñas para asegurar buen encaje."
-            />
-            <Step
-              title="Activa Aliigo"
-              desc="Recibes un código de activación con condiciones especiales de lanzamiento."
-            />
-          </ol>
-        </div>
-      </section>
-
-      {/* PRICING TEASER */}
-      <section className="bg-zinc-950 border-y border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="grid gap-10 lg:grid-cols-2">
-            <div>
-              <h2 className="text-2xl font-bold text-white">
-                Precios de lanzamiento
-              </h2>
-              <p className="mt-2 text-zinc-300">
-                Estamos definiendo la estructura final de precios. Los negocios
-                que entren en la beta tendrán condiciones preferentes, sin
-                permanencia y con un precio de entrada desde{" "}
-                <span className="font-semibold text-zinc-100">49 €/mes</span>.
-              </p>
-              <ul className="mt-6 space-y-2 text-sm text-zinc-300">
-                <li>• Plan sencillo para una o pocas ubicaciones</li>
-                <li>
-                  • Incluye chat web y solicitudes de reseñas (WhatsApp Business
-                  en desarrollo)
-                </li>
-                <li>
-                  • Resumen básico de reputación, con IA en pruebas dentro de la
-                  beta
-                </li>
-                <li>• Sin permanencia, cancelación en cualquier momento</li>
-              </ul>
-              <div className="mt-6">
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center justify-center rounded-lg bg-white text-black px-5 py-3 text-sm font-medium hover:bg-zinc-100"
-                >
-                  Quiero ser parte de la beta
-                </Link>
+      {/* 6. FAQ (Restored & Redesigned) */}
+      <section className="py-24 bg-zinc-950">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-white mb-12 text-center">{t('faq.title')}</h2>
+          
+          <div className="space-y-4">
+            {['q1', 'q2', 'q3', 'q4'].map((q) => (
+              <div key={q} className="rounded-2xl border border-white/5 bg-zinc-900/20 p-6 hover:bg-zinc-900/40 transition-colors">
+                <h3 className="text-lg font-semibold text-white mb-2 flex items-start gap-3">
+                  <span className="text-[#84c9ad] mt-1">?</span>
+                  {t(`faq.${q}.q`)}
+                </h3>
+                <p className="text-zinc-400 text-sm pl-7 leading-relaxed">
+                  {t(`faq.${q}.a`)}
+                </p>
               </div>
-            </div>
-            <div className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/50">
-              <p className="text-sm uppercase tracking-wide text-zinc-400 mb-2">
-                Referencia de rango
-              </p>
-              <p className="text-5xl font-extrabold text-white">
-                49€
-                <span className="text-2xl align-top">/mes</span>
-              </p>
-              <p className="mt-2 text-zinc-400 text-sm">
-                Precio de referencia para negocios locales con 1–3 ubicaciones.
-                Ajustaremos el precio final según volumen de mensajes, canales y
-                número de sedes.
-              </p>
-              <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border border-zinc-800 p-3">
-                  1 usuario incluido
-                </div>
-                <div className="rounded-lg border border-zinc-800 p-3">
-                  Soporte por email
-                </div>
-                <div className="rounded-lg border border-zinc-800 p-3">
-                  Reportes básicos
-                </div>
-                <div className="rounded-lg border border-zinc-800 p-3">
-                  API conversacional (beta)
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="bg-zinc-950">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold text-white">
-            Preguntas frecuentes
-          </h2>
-
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <Faq
-              q="¿Qué hace exactamente Aliigo?"
-              a="Aliigo combina un widget de chat con IA para tu web, un buzón para gestionar las conversaciones y un panel para ver mejor tus reseñas de Google. La idea es que tengas en un solo sitio lo que hoy está repartido entre varias herramientas."
-            />
-
-            <Faq
-              q="¿Qué funciones están disponibles en la beta?"
-              a="Empezamos con el widget de chat en tu web con el asistente con IA, el buzón de conversaciones y un panel básico para tus reseñas de Google. Durante la beta iremos activando, de forma progresiva más automatizaciones según el tipo de negocio."
-            />
-
-            <Faq
-              q="¿Quién configura el widget y el asistente con IA?"
-              a="Tú decides qué quiere decir el asistente: servicios, horarios, preguntas frecuentes, etc. Desde Aliigo te damos plantillas y un checklist sencillo. Instalar el widget es copiar y pegar un pequeño código en tu web (o se lo envías a tu desarrollador)."
-            />
-
-            <Faq
-              q="¿Hay compromiso de permanencia?"
-              a="No. Queremos que sigas en Aliigo porque te aporta clientes y claridad, no por un contrato. Podrás cancelar cuando quieras desde el propio panel."
-            />
-
-            <Faq
-              q="¿Necesito tarjeta para solicitar invitación?"
-              a="No. Para pedir invitación solo necesitamos tus datos básicos. Si eres aceptado en la beta, te explicaremos las condiciones y, solo entonces, decidirás si activas el plan de pago."
-            />
-
-            <Faq
-              q="¿Cómo pido ayuda si me bloqueo?"
-              a="Durante la beta tendrás soporte por email y un pequeño widget de ayuda dentro del panel para contactarnos. Si en algún punto te atascas con la configuración, te guiamos para que puedas dejarlo funcionando sin complicaciones."
-            />
-          </div>
-        </div>
+      {/* FINAL CTA */}
+      <section className="py-20 text-center">
+        <h2 className="text-3xl font-bold text-white mb-6">{t('finalCta.title')}</h2>
+        <Link
+           href="/signup"
+           className="inline-flex items-center justify-center rounded-lg bg-white text-black px-8 py-4 text-base font-bold hover:bg-zinc-200 transition-all"
+        >
+           {t('finalCta.button')}
+        </Link>
       </section>
 
-      {/* CTA FINAL */}
-      <section className="bg-zinc-950 border-t border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">
-            Da a tu reputación el sitio que merece
-          </h2>
-          <p className="mt-3 text-zinc-300">
-            Apúntate a la beta privada de Aliigo y sé de los primeros en probar
-            el panel que une reseñas, chat y reputación en un solo lugar.
-          </p>
-          <div className="mt-7">
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center rounded-lg bg-white text-black px-6 py-3 text-sm font-medium hover:bg-zinc-100"
-            >
-              Solicitar invitación
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Aliigo help widget (client) */}
       <AliigoSupportWidget />
-    </>
-  );
-}
-
-function Feature({
-  n,
-  title,
-  desc,
-  bullets,
-}: {
-  n: number;
-  title: string;
-  desc: string;
-  bullets: string[];
-}) {
-  return (
-    <div className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/40">
-      <div className="flex items-start gap-4">
-        <div className="flex-shrink-0">
-          <div
-            className="h-8 w-8 flex items-center justify-center
-            rounded-full border border-zinc-700 text-zinc-300 text-sm font-medium"
-          >
-            {n}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <p className="mt-2 text-zinc-300 text-sm">{desc}</p>
-        </div>
-      </div>
-
-      <ul className="mt-4 space-y-1 text-sm text-zinc-400">
-        {bullets.map((b, i) => (
-          <li key={i}>• {b}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function Step({ title, desc }: { title: string; desc: string }) {
-  return (
-    <li className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/40 flex gap-4 min-h-[160px]">
-      {/* Arrow */}
-      <div className="text-3xl leading-none text-zinc-500 flex-shrink-0 mt-1">
-        →
-      </div>
-
-      {/* Text */}
-      <div>
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-        <p className="mt-1 text-sm text-zinc-300">{desc}</p>
-      </div>
-    </li>
-  );
-}
-
-function Faq({ q, a }: { q: string; a: string }) {
-  return (
-    <div className="rounded-2xl border border-zinc-800 p-6 bg-zinc-900/40">
-      <h3 className="text-white font-semibold">{q}</h3>
-      <p className="mt-2 text-sm text-zinc-300">{a}</p>
     </div>
   );
 }

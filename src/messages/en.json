@@ -2,10 +2,10 @@
     "Navigation": {
         "brand": "Aliigo",
         "links": {
-            "dashboard": "Resumen",
-            "settings": "Negocio",
+            "dashboard": "Overview",
+            "settings": "Business",
             "widget": "Widget",
-            "billing": "Facturación"
+            "billing": "Billing"
         },
         "publicLinks": {
             "features": "How it works",
@@ -13,12 +13,13 @@
             "blog": "Resources"
         },
         "actions": {
-            "panel": "Panel",
-            "login": "Iniciar sesión",
-            "logout": "Cerrar sesión",
-            "sidebarTitle": "Dashboard"
+            "panel": "Dashboard",
+            "login": "Log in",
+            "logout": "Log out",
+            "sidebarTitle": "Dashboard",
+            "getStarted": "Get Invite"
         },
-        "footer": "Todos los derechos reservados."
+        "footer": "All rights reserved."
     },
     "Dashboard": {
         "welcome": "Welcome, {name}",
@@ -41,5 +42,84 @@
             "campaignsDesc": "Automate bulk messaging."
         },
         "loading": "Loading..."
+    },
+    "Landing": {
+        "hero": {
+            "betaNote": "Private Beta Live 🚀",
+            "title": "Your local reputation,",
+            "titleHighlight": "automated.",
+            "subtitle": "Turn Google reviews into loyal customers and automate WhatsApp. All in one dashboard designed for local businesses.",
+            "ctaPrimary": "Request Invite",
+            "ctaSecondary": "See how it works"
+        },
+        "socialProof": {
+            "title": "TRUSTED BY THOSE WHO RELY ON REPUTATION"
+        },
+        "features": {
+            "title": "All the essentials, zero clutter",
+            "subtitle": "We focus on what actually moves the needle: getting messages, replying fast, and keeping your Google reputation under control.",
+            "f1": {
+                "title": "AI Web Chat",
+                "desc": "An assistant that replies 24/7 using your business's real info. Train it with your services and hours in minutes."
+            },
+            "f2": {
+                "title": "Unified Inbox",
+                "desc": "Manage web and WhatsApp messages in one place. Customer history, internal notes, and custom tags."
+            },
+            "f3": {
+                "title": "Google Reviews",
+                "desc": "See your reviews at a glance, spot issues before they grow, and reply directly from the dashboard."
+            },
+            "f4": {
+                "title": "Review Requests",
+                "desc": "Send direct links via SMS or Email to encourage happy customers to leave you 5 stars."
+            }
+        },
+        "pricing": {
+            "title": "Launch Pricing",
+            "desc": "We are finalizing pricing. Businesses joining the beta get preferential terms and locked-in rates.",
+            "price": "49€",
+            "period": "/mo",
+            "cta": "Join Beta"
+        },
+        "howItWorks": {
+            "title": "How it works",
+            "subtitle": "No complex technical setup. You are live in 3 steps.",
+            "step1": {
+                "title": "Request Invite",
+                "desc": "Leave your details. We verify your business fits our private beta criteria."
+            },
+            "step2": {
+                "title": "Connect Profile",
+                "desc": "We sync your Google Business Profile and train the AI assistant with your info."
+            },
+            "step3": {
+                "title": "Autopilot Mode",
+                "desc": "Receive your activation code and start replying to customers and reviews instantly."
+            }
+        },
+        "faq": {
+            "title": "Frequently Asked Questions",
+            "q1": {
+                "q": "What does Aliigo actually do?",
+                "a": "It combines an AI web chat, a unified inbox, and Google Review management in one dashboard."
+            },
+            "q2": {
+                "q": "What features are in Beta?",
+                "a": "AI Web Chat, Unified Inbox, and Review Management. WhatsApp Business is coming in the next update."
+            },
+            "q3": {
+                "q": "Is there a contract?",
+                "a": "No. We want you to stay for the results, not a contract. Cancel anytime."
+            },
+            "q4": {
+                "q": "Do I need technical skills?",
+                "a": "Zero. We give you a small snippet for your website (or send it to your webmaster) and that's it."
+            }
+        },
+        "finalCta": {
+            "title": "Give your reputation the place it deserves",
+            "button": "Request Invite"
+        }
     }
 }
