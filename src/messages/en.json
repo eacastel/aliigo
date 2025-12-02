@@ -164,6 +164,17 @@
             "errorPassword": "Password must be at least 6 characters.",
             "loading": "Sending request..."
         },
+        "checkEmail": {
+            "title": "Thanks for requesting an invite",
+            "subtitle": "We have received your application successfully.",
+            "desc1": "During this private beta phase, we review each business manually to ensure the best service.",
+            "desc2": "If your business fits the program, you will receive an email shortly with:",
+            "list1": "Your exclusive activation code",
+            "list2": "Immediate dashboard access",
+            "list3": "Special lifetime conditions",
+            "footer": "Did you enter the wrong email?",
+            "backLink": "Go back home"
+        },
         "reset": {
             "title": "Reset password",
             "desc": "Enter your email and we'll send you a recovery link.",

@@ -166,6 +166,17 @@
             "errorPassword": "La contraseña debe tener al menos 6 caracteres.",
             "loading": "Enviando solicitud..."
         },
+        "checkEmail": {
+            "title": "Gracias por solicitar tu invitación",
+            "subtitle": "Hemos recibido tu solicitud correctamente.",
+            "desc1": "Durante esta fase de beta privada, revisamos cada negocio de forma manual para asegurar el mejor servicio.",
+            "desc2": "Si tu negocio encaja con el programa, recibirás un email en breve con:",
+            "list1": "Tu código de activación exclusivo",
+            "list2": "Acceso inmediato al panel",
+            "list3": "Condiciones especiales de por vida",
+            "footer": "¿Te has equivocado de email?",
+            "backLink": "Volver al inicio"
+        },
         "reset": {
             "title": "Restablecer contraseña",
             "desc": "Introduce tu correo y te enviaremos un enlace para recuperar el acceso.",
