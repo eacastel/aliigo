@@ -14,7 +14,7 @@ export default function PublicLayout({
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-[#84c9ad]/30">
       
       {/* HEADER - NOW STICKY & GLASS */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-zinc-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-950/50">
+      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-zinc-950/80 backdrop-blur-md supports-backdrop-filter:bg-zinc-950/50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           
           {/* 1. Logo (Prevents shrinking) */}
@@ -56,9 +56,31 @@ export default function PublicLayout({
 
       <main className="flex-1">{children}</main>
 
-      <footer className="bg-zinc-950 border-t border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-zinc-500">
-          © {new Date().getFullYear()} Aliigo — {t('footer')}
+     {/* FOOTER */}
+      <footer className="bg-zinc-950 border-t border-zinc-800 py-12">
+        <div className="max-w-6xl mx-auto px-4 lg:px-8 flex flex-col items-center">
+          
+          {/* Legal Links Row */}
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-6 text-xs font-medium text-zinc-500">
+            <Link href="/legal/aviso-legal" className="hover:text-zinc-300 transition-colors">
+              {t('footerLinks.avisoLegal')}
+            </Link>
+            <Link href="/legal/privacidad" className="hover:text-zinc-300 transition-colors">
+              {t('footerLinks.privacidad')}
+            </Link>
+            <Link href="/legal/cookies" className="hover:text-zinc-300 transition-colors">
+              {t('footerLinks.cookies')}
+            </Link>
+            <Link href="/legal/terminos" className="hover:text-zinc-300 transition-colors">
+              {t('footerLinks.terminos')}
+            </Link>
+          </div>
+
+          <div className="text-center">
+             <p className="text-xs leading-5 text-zinc-600">
+               &copy; {new Date().getFullYear()} Aliigo — {t('footer')}
+             </p>
+          </div>
         </div>
       </footer>
     </div>

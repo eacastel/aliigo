@@ -1,256 +1,213 @@
-// src/app/(public)/signup/page.tsx
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
-import { getPublicOrigin } from "@/lib/url";
+import { getMetaBrowserIDs } from "@/lib/metaHelpers";
 
-type Status = "idle" | "loading" | "error";
-
-export default function SignupWaitlistPage() {
+export default function SignupPage() {
+  const t = useTranslations('Auth.signup');
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [nombreContacto, setNombreContacto] = useState("");
-  const [nombreNegocio, setNombreNegocio] = useState("");
-  const [website, setWebsite] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [password, setPassword] = useState("");
+  // State
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [businessName, setBusinessName] = useState('');
+  const [googleUrl, setGoogleUrl] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [status, setStatus] = useState<Status>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("loading");
-    setErrorMessage("");
-
-    // Validaciones igual que antes
-    if (password.length < 8) {
-      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
-      setStatus("error");
-      return;
-    }
-    if (!/\d/.test(password)) {
-      setErrorMessage("La contraseña debe incluir al menos un número.");
-      setStatus("error");
-      return;
-    }
-    if (telefono && !/^[0-9+\-\s]{6,20}$/.test(telefono)) {
-      setErrorMessage("El teléfono no es válido.");
-      setStatus("error");
-      return;
-    }
-
+  const fireLeadCAPIEvent = async (userEmail: string) => {
     try {
-      const origin = getPublicOrigin();
-
-      // === Supabase signup (igual que antes) ===
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: `${origin}/auth/callback` },
-      });
-
-      if (signUpError) {
-        const msg = (signUpError.message || "").toLowerCase();
-        if (msg.includes("already")) {
-          setErrorMessage(
-            "Este email ya existe. Inicia sesión o restablece tu contraseña."
-          );
-        } else {
-          setErrorMessage(signUpError.message || "No pudimos crear tu cuenta.");
-        }
-        setStatus("error");
-        return;
-      }
-
-      const userId = data?.user?.id;
-      if (!userId) {
-        setErrorMessage("No se pudo obtener el usuario después del registro.");
-        setStatus("error");
-        return;
-      }
-
-      // === business_profiles upsert (igual que antes) ===
-      const resp = await fetch("/api/profiles/ensure", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const { fbc, fbp } = getMetaBrowserIDs();
+      await fetch('/api/meta-events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: userId,
-          nombre_negocio: nombreNegocio,
-          nombre_contacto: nombreContacto || null,
-          telefono: telefono || null,
-          email,
+          event_name: 'Lead',
+          email: userEmail,
+          fbc: fbc,
+          fbp: fbp,
         }),
       });
-
-      // Parse response safely
-      let payload: { ok?: boolean; error?: string } = {};
-      try {
-        payload = (await resp.json()) as { ok?: boolean; error?: string };
-      } catch {
-        // leave payload as empty object if JSON fails
-      }
-
-      if (!resp.ok || payload.ok === false) {
-        console.error(
-          "[signup] /api/profiles/ensure failed:",
-          resp.status,
-          payload
-        );
-
-        setErrorMessage(
-          payload.error || `No se pudo guardar el perfil (HTTP ${resp.status}).`
-        );
-        setStatus("error");
-        return;
-      }
-
-      // === marcador local de alta pendiente (igual que antes) ===
-      try {
-        localStorage.setItem(
-          "aliigo_pending_signup",
-          JSON.stringify({
-            email: email.trim(),
-            businessName: nombreNegocio,
-            contactName: nombreContacto,
-            phone: telefono,
-            website,
-            createdAtMs: Date.now(),
-          })
-        );
-      } catch {
-        // ignoramos error de localStorage
-      }
-
-      // ✅ NUEVO: en vez de ir al dashboard, vamos a página de gracias / revisión
-      router.replace("/check-email");
-    } catch (err) {
-      console.error(err);
-      setErrorMessage(
-        err instanceof Error
-          ? err.message
-          : "Error inesperado al crear la cuenta."
-      );
-      setStatus("error");
-    } finally {
-      setStatus((prev) => (prev === "loading" ? "idle" : prev));
+    } catch (e) {
+      console.error("CAPI Error:", e);
     }
-  }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!email.trim() || !businessName.trim() || !password) {
+      setError(t('errorValidation'));
+      return;
+    }
+    if (password.length < 6) {
+      setError(t('errorPassword'));
+      return;
+    }
+
+    setLoading(true);
+
+    const { data: { user }, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          full_name: name,
+          business_name: businessName,
+          google_url: googleUrl,
+          phone: phone
+        }
+      }
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    if (user) {
+      void fireLeadCAPIEvent(email);
+    }
+
+    localStorage.setItem('aliigo_pending_signup', JSON.stringify({ email, businessName }));
+    router.push('/check-email');
+  };
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
-      <div className="max-w-xl mx-auto px-4 py-16">
-        <h1 className="text-3xl font-extrabold tracking-tight">
-          Solicitar invitación a Aliigo
+    <div className="max-w-lg mx-auto mt-12 px-4 pb-20 relative">
+      
+      {/* 1. Background Glow Blob (Subtle atmosphere) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 opacity-30 blur-[80px] pointer-events-none">
+        <div className="w-[300px] h-[300px] bg-[#84c9ad] rounded-full mix-blend-screen" />
+      </div>
+
+      {/* Header */}
+      <div className="text-center mb-8">
+        {/* 2. Gradient Title (Brand Connection) */}
+        <h1 className="text-3xl font-bold tracking-tight text-white mb-3">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+            {t('introTitle')}
+          </span>
         </h1>
-        <p className="mt-3 text-zinc-300 text-sm">
-          Durante el lanzamiento, Aliigo está disponible solo por invitación.
-          Crea tu cuenta y cuéntanos un poco sobre tu negocio. Revisaremos tu
-          solicitud y, si encaja con el programa, activaremos tu acceso.
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-zinc-200">
-              Email de contacto *
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-200">
-              Tu nombre
-            </label>
-            <input
-              type="text"
-              value={nombreContacto}
-              onChange={(e) => setNombreContacto(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-200">
-              Nombre del negocio *
-            </label>
-            <input
-              type="text"
-              required
-              value={nombreNegocio}
-              onChange={(e) => setNombreNegocio(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-200">
-              Web o ficha de Google
-            </label>
-            <input
-              type="text"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              placeholder="https://..."
-              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500"
-            />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-zinc-200">
-                Teléfono
-              </label>
-              <input
-                type="text"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-zinc-200">
-                Contraseña *
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500"
-                autoComplete="new-password"
-              />
-            </div>
-          </div>
-
-          {status === "error" && (
-            <p className="text-sm text-red-400">{errorMessage}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="inline-flex items-center justify-center rounded-lg bg-white text-black px-5 py-2.5 text-sm font-medium hover:bg-zinc-100 disabled:opacity-60 w-full"
-          >
-            {status === "loading"
-              ? "Enviando..."
-              : "Crear cuenta y solicitar invitación"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-xs text-zinc-500">
-          Usaremos tus datos solo para ponernos en contacto sobre Aliigo y la
-          activación de tu cuenta.
+        <p className="text-sm text-zinc-400 leading-relaxed max-w-sm mx-auto">
+          {t('introText')}
         </p>
       </div>
-    </main>
+
+      {/* Card Container */}
+      <form 
+        onSubmit={handleSubmit} 
+        // 3. Form Styling: Dark Glass + Subtle Teal Glow Shadow
+        className="space-y-5 bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md"
+      >
+        
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center font-medium">
+            {error}
+          </div>
+        )}
+
+        {/* Email */}
+        <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('emailPlaceholder')}</label>
+            <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+            required
+            />
+        </div>
+
+        {/* Name */}
+        <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('namePlaceholder')}</label>
+            <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+            />
+        </div>
+
+        {/* Business Name */}
+        <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('businessPlaceholder')}</label>
+            <input
+            type="text"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+            required
+            />
+        </div>
+
+        {/* Google URL */}
+        <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('googleUrlPlaceholder')}</label>
+            <input
+            type="text" 
+            value={googleUrl}
+            onChange={(e) => setGoogleUrl(e.target.value)}
+            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+            />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Phone */}
+            <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('phonePlaceholder')}</label>
+                <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+                />
+            </div>
+            
+            {/* Password */}
+            <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('passwordPlaceholder')}</label>
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+                    required
+                />
+            </div>
+        </div>
+
+        {/* CTA Button */}
+        <button
+          type="submit"
+          className="w-full bg-[#84c9ad] text-zinc-950 py-3.5 rounded-xl font-bold hover:bg-[#73bba0] disabled:opacity-50 transition-all mt-4 shadow-[0_0_20px_rgba(132,201,173,0.15)] hover:shadow-[0_0_25px_rgba(132,201,173,0.3)] transform active:scale-[0.98]"
+          disabled={loading}
+        >
+          {loading ? t('loading') : t('submitButton')}
+        </button>
+
+        <p className="text-[10px] text-zinc-500 text-center leading-normal px-4 pt-2">
+          {t('disclaimer')}
+        </p>
+
+        <div className="border-t border-white/10 pt-6 mt-6 text-center">
+            <p className="text-sm text-zinc-400">
+            {t('alreadyAccount')}{" "}
+            <Link href="/login" className="text-[#84c9ad] hover:text-white transition-colors font-medium ml-1">
+                {t('signInLink')}
+            </Link>
+            </p>
+        </div>
+      </form>
+    </div>
   );
 }

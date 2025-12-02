@@ -1,83 +1,62 @@
 "use client";
 
-/**
- * File: src/app/login/page.tsx
- * Purpose:
- *   Email/password login with optional redirect via ?redirect=/...
- *   Next.js 15 requires useSearchParams() inside a <Suspense> boundary.
- * Notes:
- *   - UI text: Spanish (Castilian)
- *   - Comments + code: English
- *   - Security: do NOT reveal whether an email exists on login (avoid enumeration).
- */
-
 import React, { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Link, useRouter } from "@/i18n/routing";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import type { AuthError } from "@supabase/supabase-js";
-import { Link } from "@/i18n/routing";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
+import { useTranslations } from "next-intl";
+import { getMetaBrowserIDs } from '@/lib/metaHelpers'; 
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<LoginFallback />}>
+    <Suspense fallback={<div className="h-screen bg-zinc-950" />}>
       <LoginWithSearchParams />
     </Suspense>
   );
 }
 
-function LoginFallback() {
-  return (
-    <div className="max-w-md mx-auto mt-16 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-center">
-        Inicia sesión en Aliigo
-      </h1>
-      <div className="animate-pulse space-y-4">
-        <div className="h-10 bg-gray-200 rounded" />
-        <div className="h-10 bg-gray-200 rounded" />
-        <div className="h-10 bg-gray-200 rounded" />
-      </div>
-    </div>
-  );
-}
-
 function LoginWithSearchParams() {
+  const t = useTranslations('Auth.login');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from"); // e.g. "confirm" after email verification
+  const from = searchParams.get("from"); 
 
-  const origin =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_SITE_URL || "";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-  // Form/UI state
+  // State
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState<{
-    type: "ok" | "error" | "info";
-    text: string;
-  } | null>(null);
+  const [msg, setMsg] = useState<{ type: "ok" | "error"; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
-
-  // Controls visibility of "resend confirmation" button only after 422 attempt
   const [canResend, setCanResend] = useState(false);
   const [resending, setResending] = useState(false);
 
-  // Handle login attempt with safe error messaging
+  // CAPI Logic
+  const fireLoginEvent = async (normalizedEmail: string) => {
+    try {
+      const { fbc, fbp } = getMetaBrowserIDs();
+      await fetch('/api/meta-events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_name: 'LogIn',
+          email: normalizedEmail,
+          fbc, fbp,
+        }),
+      });
+    } catch (e) {
+      console.error("CAPI Error:", e);
+    }
+  };
+
   const handleLogin = async () => {
     setMsg(null);
-    setCanResend(false); // reset before attempt
+    setCanResend(false); 
 
     const normalizedEmail = email.trim();
-    const normalizedPassword = password;
-
-    if (!normalizedEmail || !normalizedPassword) {
-      setMsg({
-        type: "error",
-        text: "Por favor, introduce tu correo y contraseña.",
-      });
+    if (!normalizedEmail || !password) {
+      setMsg({ type: "error", text: t('msgValidation') });
       return;
     }
 
@@ -85,36 +64,24 @@ function LoginWithSearchParams() {
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
-        password: normalizedPassword,
+        password: password,
       });
 
       if (error) {
         const e = error as AuthError;
-
         if (e.status === 422) {
-          // Email exists but not confirmed → allow resend
           setCanResend(true);
-          setMsg({
-            type: "error",
-            text: "Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada o reenvía la confirmación.",
-          });
+          setMsg({ type: "error", text: t('msgUnconfirmed') });
         } else if (e.status === 429) {
-          setMsg({
-            type: "error",
-            text: "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
-          });
-          setCanResend(false);
+          setMsg({ type: "error", text: t('msgTooManyRequests') });
         } else {
-          setMsg({
-            type: "error",
-            text: "Correo electrónico o contraseña no válidos.",
-          });
-          setCanResend(false);
+          setMsg({ type: "error", text: t('msgInvalidCreds') });
         }
         return;
       }
 
-      // Successful login → redirect (?redirect=/path supported)
+      // Success
+      void fireLoginEvent(normalizedEmail);
       const redirect = searchParams.get("redirect");
       router.push(redirect || "/dashboard");
     } finally {
@@ -122,139 +89,104 @@ function LoginWithSearchParams() {
     }
   };
 
-  // Resend confirmation only when canResend=true (i.e., after a 422)
   const handleResendConfirmation = async () => {
     setMsg(null);
-
-    const targetEmail = email.trim();
-    if (!targetEmail) {
-      setMsg({
-        type: "error",
-        text: "Introduce tu correo electrónico para reenviar la confirmación.",
-      });
-      return;
-    }
-
     setResending(true);
     try {
       const { error } = await supabase.auth.resend({
         type: "signup",
-        email: targetEmail,
-        // 🔴 change /dashboard -> /auth/callback
-        options: { emailRedirectTo: `${origin}/auth/callback` },
+        email: email.trim(),
+        options: { emailRedirectTo: `${origin}/auth/callback` }, 
       });
 
       if (error) {
-        setMsg({
-          type: "error",
-          text: "No se pudo reenviar la confirmación en este momento. Inténtalo de nuevo.",
-        });
+        setMsg({ type: "error", text: t('msgResendError') });
       } else {
-        setMsg({
-          type: "ok",
-          text: "Si existe una cuenta con ese correo, hemos reenviado el mensaje de confirmación.",
-        });
+        setMsg({ type: "ok", text: t('msgResendSuccess') });
       }
     } finally {
       setResending(false);
     }
   };
 
-  // If user edits inputs, clear message and hide resend until next 422
-  const onEmailChange = (v: string) => {
-    setEmail(v);
-    if (msg) setMsg(null);
-    if (canResend) setCanResend(false);
-  };
-  const onPasswordChange = (v: string) => {
-    setPassword(v);
-    if (msg) setMsg(null);
-    if (canResend) setCanResend(false);
-  };
-
   return (
-    <div className="max-w-md mx-auto mt-16 px-4">
+    <div className="max-w-md mx-auto mt-20 px-4 pb-20 relative">
+      
+      {/* 1. Background Glow (Teal) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 opacity-30 blur-[80px] pointer-events-none">
+        <div className="w-[300px] h-[300px] bg-[#84c9ad] rounded-full mix-blend-screen" />
+      </div>
+
       {from === "confirm" && (
-        <p className="bg-green-100 text-green-800 p-3 rounded mb-4 text-center">
-          ✅ Tu correo ha sido verificado. Ahora puedes iniciar sesión.
-        </p>
+        <div className="mb-6 p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-center text-sm">
+          {t('okVerified')}
+        </div>
       )}
 
-      <h1 className="text-2xl font-bold mb-6 text-center">
-        Inicia sesión en Aliigo
+      {/* 2. Title with Teal Gradient */}
+      <h1 className="text-3xl font-bold text-center text-white mb-8 tracking-tight">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+          {t('title')}
+        </span>
       </h1>
 
-      {/* Message area */}
-      {msg && (
-        <p
-          className={
-            msg.type === "error"
-              ? "text-red-600 mb-4"
-              : msg.type === "ok"
-              ? "text-green-700 mb-4"
-              : "text-blue-700 mb-4"
-          }
-        >
-          {msg.text}
-        </p>
-      )}
+      {/* 3. Card with Teal Shadow */}
+      <div className="space-y-6 bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md">
+        
+        {msg && (
+          <div className={`p-3 rounded-lg text-sm text-center border ${
+            msg.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+          }`}>
+            {msg.text}
+          </div>
+        )}
 
-      <div className="space-y-4">
-        {/* Email */}
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => onEmailChange(e.target.value)}
-          className="w-full border px-4 py-2 rounded"
-          autoComplete="email"
-          aria-label="Correo electrónico"
-        />
+        <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('emailLabel')}</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+            />
+        </div>
 
-        {/* Password */}
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => onPasswordChange(e.target.value)}
-          className="w-full border px-4 py-2 rounded"
-          autoComplete="current-password"
-          aria-label="Contraseña"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !loading) void handleLogin();
-          }}
-        />
+        <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('passwordLabel')}</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+              onKeyDown={(e) => e.key === "Enter" && !loading && handleLogin()}
+            />
+        </div>
 
-        {/* Submit */}
+        {/* 4. Button with Teal Background & Shadow */}
         <button
           onClick={handleLogin}
-          className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 disabled:opacity-50"
+          className="w-full bg-[#84c9ad] text-zinc-950 py-3.5 rounded-xl font-bold hover:bg-[#73bba0] disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(132,201,173,0.15)] hover:shadow-[0_0_25px_rgba(132,201,173,0.3)] transform active:scale-[0.98]"
           disabled={loading}
         >
-          {loading ? "Entrando…" : "Iniciar sesión"}
+          {loading ? t('loading') : t('submitButton')}
         </button>
 
-        {/* Reset password link */}
-        <p className="text-sm text-gray-600 text-center mt-2">
-          ¿Has olvidado tu contraseña?{" "}
-          <Link href="/reset-password" className="text-blue-600 underline">
-            Restablécela
-          </Link>
-        </p>
-
-        {/* Conditionally render resend confirmation ONLY after a 422 error */}
         {canResend && (
           <button
-            type="button"
             onClick={handleResendConfirmation}
-            className="w-full border border-gray-300 py-2 rounded hover:bg-gray-50 disabled:opacity-50 mt-2"
+            className="w-full py-2 text-sm text-[#84c9ad] hover:text-white transition-colors"
             disabled={resending}
           >
-            {resending ? "Reenviando…" : "Reenviar correo de confirmación"}
+            {resending ? t('resending') : t('resendButton')}
           </button>
         )}
 
-        {/* TODO: Add magic-link or OAuth providers in the future */}
+        <p className="text-sm text-zinc-500 text-center pt-2">
+          {t('forgotPassword')}{" "}
+          <Link href="/reset-password" className="text-[#84c9ad] hover:text-white transition-colors font-medium ml-1">
+            {t('resetLink')}
+          </Link>
+        </p>
       </div>
     </div>
   );

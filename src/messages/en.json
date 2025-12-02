@@ -19,7 +19,13 @@
             "sidebarTitle": "Dashboard",
             "getStarted": "Get Invite"
         },
-        "footer": "All rights reserved."
+        "footer": "All rights reserved.",
+        "footerLinks": {
+            "avisoLegal": "Legal Notice",
+            "privacidad": "Privacy",
+            "cookies": "Cookies",
+            "terminos": "Terms of Use"
+        }
     },
     "Dashboard": {
         "welcome": "Welcome, {name}",
@@ -120,6 +126,180 @@
         "finalCta": {
             "title": "Give your reputation the place it deserves",
             "button": "Request Invite"
+        }
+    },
+    "Auth": {
+        "login": {
+            "title": "Log In",
+            "emailLabel": "Email address",
+            "passwordLabel": "Password",
+            "submitButton": "Log In",
+            "loading": "Logging in...",
+            "forgotPassword": "Forgot password?",
+            "resetLink": "Reset it",
+            "okVerified": "✅ Email verified. You can now log in.",
+            "msgValidation": "Please enter your email and password.",
+            "msgUnconfirmed": "You must confirm your email before logging in.",
+            "msgTooManyRequests": "Too many attempts. Try again later.",
+            "msgInvalidCreds": "Invalid credentials.",
+            "resendButton": "Resend confirmation",
+            "resending": "Resending...",
+            "msgResendSuccess": "Confirmation email resent.",
+            "msgResendError": "Error resending. Try again later."
+        },
+        "signup": {
+            "introTitle": "Request invitation to Aliigo",
+            "introText": "During launch, Aliigo is available by invitation only. Create your account and tell us a bit about your business. We will review your application and, if it fits the program, activate your access.",
+            "emailPlaceholder": "Contact Email *",
+            "namePlaceholder": "Your Name",
+            "businessPlaceholder": "Business Name *",
+            "googleUrlPlaceholder": "Website or Google Profile",
+            "phonePlaceholder": "Phone",
+            "passwordPlaceholder": "Password *",
+            "submitButton": "Create account and request invitation",
+            "disclaimer": "We will use your data only to contact you about Aliigo and your account activation.",
+            "alreadyAccount": "Already have an account?",
+            "signInLink": "Log in",
+            "errorValidation": "Please complete all required fields.",
+            "errorPassword": "Password must be at least 6 characters.",
+            "loading": "Sending request..."
+        },
+        "reset": {
+            "title": "Reset password",
+            "desc": "Enter your email and we'll send you a recovery link.",
+            "emailPlaceholder": "you@example.com",
+            "submitButton": "Send link",
+            "loading": "Sending...",
+            "success": "✉️ Link sent. Check your inbox (and spam).",
+            "errorEmail": "Please enter a valid email.",
+            "backToLogin": "Back to Log In"
+        },
+        "update": {
+            "title": "New Password",
+            "desc": "Enter your new password to secure your account.",
+            "passwordLabel": "New password",
+            "submitButton": "Update Password",
+            "success": "Password updated! Redirecting...",
+            "errorLength": "Password must be at least 6 characters."
+        }
+    },
+    "Legal": {
+        "avisoLegal": {
+            "title": "Legal Notice",
+            "lastUpdated": "Last updated: {date}",
+            "intro": "In compliance with the duty of information contained in Article 10 of Law 34/2002, of July 11, on Information Society Services and Electronic Commerce (LSSI-CE), the following general information data of the website is declared:",
+            "section1": {
+                "title": "1. Identifying Data",
+                "owner": "Legal Owner:",
+                "brand": "Commercial Name:",
+                "nif": "Tax ID (NIF):",
+                "address": "Address:",
+                "email": "Email:"
+            },
+            "section2": {
+                "title": "2. Purpose",
+                "content": "This Legal Notice regulates the access, navigation, and use of the website, as well as the responsibilities derived from the use of its contents (understanding 'contents' as texts, graphics, drawings, designs, codes, software, photographs, music, videos, sounds, databases, images, expressions, and information, as well as any other creation protected by national laws and international treaties on intellectual and industrial property)."
+            },
+            "section3": {
+                "title": "3. Users",
+                "content": "Access and/or use of this portal attributes the condition of USER, who accepts, from said access and/or use, the General Conditions of Use reflected here. Said Conditions shall apply regardless of the General Contracting Conditions that may be mandatory."
+            },
+            "section4": {
+                "title": "4. Use of the Portal",
+                "content": "Aliigo provides access to a multitude of information, services, programs, or data on the Internet belonging to the Owner or its licensors to which the USER may have access. The USER assumes responsibility for the use of the portal. This responsibility extends to the registration necessary to access certain services or contents. In such registration, the USER will be responsible for providing truthful and lawful information."
+            },
+            "section5": {
+                "title": "5. Intellectual and Industrial Property",
+                "content": "The Owner, by itself or as an assignee, is the owner of all intellectual and industrial property rights of its website, as well as the elements contained therein (by way of example: images, sound, audio, video, software or texts; trademarks or logos, color combinations, structure and design, selection of materials used, computer programs necessary for its operation, access and use, etc.), ownership of the Owner or its licensors."
+            },
+            "section6": {
+                "title": "6. Exclusion of Guarantees and Responsibility",
+                "content": "The Owner is not responsible, in any case, for damages of any nature that could cause, by way of example: errors or omissions in the contents, lack of availability of the portal, or the transmission of viruses or malicious or harmful programs in the contents, despite having adopted all necessary technological measures to avoid it."
+            }
+        },
+        "cookies": {
+            "title": "Cookie Policy",
+            "lastUpdated": "Last updated: {date}",
+            "intro": "This policy explains what cookies are, how we use them at Aliigo, and how you can manage them.",
+            "section1": {
+                "title": "1. What are cookies?",
+                "content": "A cookie is a small text file that is stored in your browser when you visit almost any web page. Its utility is that the web is capable of remembering your visit when you browse that page again. Cookies usually store technical information, personal preferences, content personalization, usage statistics, links to social networks, access to user accounts, etc."
+            },
+            "section2": {
+                "title": "2. Cookies used on this website",
+                "technical": "Technical Cookies (Necessary):",
+                "technicalDesc": "Those that allow the user to navigate through the web page and use the different options or services that exist in it, such as identifying the session, accessing restricted access parts (Dashboard), or carrying out the purchase process.",
+                "analytical": "Analytical Cookies:",
+                "analyticalDesc": "Those that, treated by us or by third parties (such as Google Analytics), allow us to quantify the number of users and thus carry out the measurement and statistical analysis of the use made by users of the service offered."
+            },
+            "section3": {
+                "title": "3. Third Parties",
+                "content": "This website may use third-party services that will collect information for statistical purposes, use of the Site by the user, and for the provision of other services related to the activity of the Website and other Internet services. In particular, this website uses Google Analytics and Supabase (for session management)."
+            },
+            "section4": {
+                "title": "4. Management and deactivation of cookies",
+                "content": "At any time you can exercise your right to deactivate or delete cookies from this website. These actions are performed differently depending on the browser you are using (Chrome, Safari, Firefox, Edge)."
+            }
+        },
+        "privacidad": {
+            "title": "Privacy Policy",
+            "lastUpdated": "Last updated: {date}",
+            "intro": "At Aliigo, we take your privacy very seriously. This policy describes how we collect, use, and protect your personal data in compliance with the GDPR and LOPDGDD.",
+            "section1": {
+                "title": "1. Data Controller",
+                "label": "Identity:",
+                "address": "Address:",
+                "email": "Email:"
+            },
+            "section2": {
+                "title": "2. Purpose of treatment",
+                "content": "We treat the information provided by interested persons in order to:",
+                "point1": "Manage registration and provision of the SaaS (Software as a Service) service.",
+                "point2": "Manage billing and collection of contracted services.",
+                "point3": "Send commercial communications about our products or services (only if you have given your consent).",
+                "dataRetention": "The personal data provided will be kept as long as the commercial relationship is maintained or its deletion is not requested by the interested party."
+            },
+            "section3": {
+                "title": "3. Legitimation",
+                "content": "The legal basis for the processing of your data is the execution of the subscription contract to Aliigo (Terms and Conditions) and, for the sending of commercial communications, the consent of the interested party."
+            },
+            "section4": {
+                "title": "4. Recipients",
+                "content": "Data will not be communicated to third parties unless legally obliged or to suppliers necessary for the provision of the service (Data Processors) such as hosting providers (Vercel), database (Supabase), or payment gateways (Stripe)."
+            },
+            "section5": {
+                "title": "5. Rights",
+                "content": "Any person has the right to obtain confirmation as to whether or not we are treating personal data concerning them at Aliigo. Interested persons have the right to access their personal data, as well as to request the rectification of inaccurate data or request its deletion when, among other reasons, the data is no longer necessary for the purposes for which it was collected."
+            }
+        },
+        "terminos": {
+            "title": "Terms and Conditions of Use",
+            "lastUpdated": "Last updated: {date}",
+            "intro": "These General Conditions regulate the use of the services offered by Aliigo through the website.",
+            "section1": {
+                "title": "1. The Service",
+                "content": "Aliigo is a SaaS platform that allows local businesses to manage their online reputation, reviews, and communications. The service is currently offered in 'Private Beta' mode, which implies that there may be changes, interruptions, or new features added progressively."
+            },
+            "section2": {
+                "title": "2. User Account",
+                "content": "To use the service, you must register and create an account. You are responsible for maintaining the confidentiality of your password and for all activities that occur under your account. You must notify us immediately of any unauthorized use."
+            },
+            "section3": {
+                "title": "3. Prices and Payments",
+                "content": "During the Beta phase, the service may be offered under special pricing conditions. Aliigo reserves the right to modify rates with reasonable notice. Payments are recurring (monthly) and can be canceled at any time before the next billing cycle."
+            },
+            "section4": {
+                "title": "4. Cancellation",
+                "content": "The user can cancel their subscription at any time from their dashboard. The service will remain active until the end of the paid billing period."
+            },
+            "section5": {
+                "title": "5. Limitation of Liability",
+                "content": "Aliigo does not guarantee that the service will be uninterrupted or error-free. To the maximum extent permitted by law, Aliigo shall not be liable for indirect, incidental, or consequential damages derived from the use of the service."
+            },
+            "section6": {
+                "title": "6. Applicable Legislation",
+                "content": "These conditions shall be governed and interpreted in accordance with the laws of Spain. For any controversy, the parties submit to the courts and tribunals of the Owner's domicile."
+            }
         }
     }
 }
