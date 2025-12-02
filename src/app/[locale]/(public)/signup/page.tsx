@@ -6,10 +6,13 @@ import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { getMetaBrowserIDs } from "@/lib/metaHelpers";
 
-// ✅ 1. Define GTM Helper ONCE here
 const pushToGTM = (event: string, data?: Record<string, unknown>) => {
-  if (typeof window !== 'undefined' && (window as any).dataLayer) {
-    (window as any).dataLayer.push({ event, ...data });
+  if (typeof window === 'undefined') return;
+
+  const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
+  
+  if (w.dataLayer) {
+    w.dataLayer.push({ event, ...data });
   }
 };
 
