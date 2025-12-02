@@ -59,7 +59,15 @@
             "ctaSecondary": "See how it works"
         },
         "socialProof": {
-            "title": "TRUSTED BY THOSE WHO RELY ON REPUTATION"
+            "title": "BUILT FOR INDUSTRIES WHERE TRUST IS EVERYTHING",
+            "industries": {
+                "clinics": "Medical Clinics",
+                "schools": "Education",
+                "aesthetics": "Aesthetics",
+                "physio": "Physiotherapy",
+                "legal": "Legal Services",
+                "dental": "Dental Clinics"
+            }
         },
         "features": {
             "title": "All the essentials, zero clutter",

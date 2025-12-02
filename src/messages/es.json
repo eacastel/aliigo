@@ -59,7 +59,15 @@
             "ctaSecondary": "Ver cómo funciona"
         },
         "socialProof": {
-            "title": "CONFIANZA PARA QUIENES VIVEN DE SU REPUTACIÓN"
+            "title": "DISEÑADO PARA SECTORES DONDE LA CONFIANZA LO ES TODO",
+            "industries": {
+                "clinics": "Clínicas Médicas",
+                "schools": "Educación",
+                "aesthetics": "Estética Avanzada",
+                "physio": "Fisioterapia",
+                "legal": "Servicios Legales",
+                "dental": "Clínicas Dentales"
+            }
         },
         "features": {
             "title": "Todo lo clave, sin complicaciones",
