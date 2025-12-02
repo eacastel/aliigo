@@ -6,6 +6,13 @@ import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { getMetaBrowserIDs } from "@/lib/metaHelpers";
 
+// ✅ 1. Define GTM Helper ONCE here
+const pushToGTM = (event: string, data?: Record<string, unknown>) => {
+  if (typeof window !== 'undefined' && (window as any).dataLayer) {
+    (window as any).dataLayer.push({ event, ...data });
+  }
+};
+
 export default function SignupPage() {
   const t = useTranslations('Auth.signup');
   const router = useRouter();
@@ -17,6 +24,8 @@ export default function SignupPage() {
   const [googleUrl, setGoogleUrl] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  
+  // UI State
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +51,7 @@ export default function SignupPage() {
     e.preventDefault();
     setError(null);
 
+    // Validation
     if (!email.trim() || !businessName.trim() || !password) {
       setError(t('errorValidation'));
       return;
@@ -73,8 +83,16 @@ export default function SignupPage() {
       return;
     }
 
+    // Success Handling
     if (user) {
+      // 1. Fire Server CAPI
       void fireLeadCAPIEvent(email);
+      
+      // 2. Fire Browser GTM
+      pushToGTM('generate_lead', { 
+        email: email, 
+        source: 'signup_form' 
+      });
     }
 
     localStorage.setItem('aliigo_pending_signup', JSON.stringify({ email, businessName }));
@@ -84,14 +102,13 @@ export default function SignupPage() {
   return (
     <div className="max-w-lg mx-auto mt-12 px-4 pb-20 relative">
       
-      {/* 1. Background Glow Blob (Subtle atmosphere) */}
+      {/* 1. Background Glow Blob */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 opacity-30 blur-[80px] pointer-events-none">
         <div className="w-[300px] h-[300px] bg-[#84c9ad] rounded-full mix-blend-screen" />
       </div>
 
       {/* Header */}
       <div className="text-center mb-8">
-        {/* 2. Gradient Title (Brand Connection) */}
         <h1 className="text-3xl font-bold tracking-tight text-white mb-3">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
             {t('introTitle')}
@@ -105,7 +122,6 @@ export default function SignupPage() {
       {/* Card Container */}
       <form 
         onSubmit={handleSubmit} 
-        // 3. Form Styling: Dark Glass + Subtle Teal Glow Shadow
         className="space-y-5 bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md"
       >
         
