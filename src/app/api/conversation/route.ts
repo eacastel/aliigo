@@ -24,11 +24,25 @@ class RateLimitError extends Error {
   constructor(m = "Rate limited") { super(m); }
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+function corsHeadersFor(req: NextRequest): HeadersInit {
+  const origin = req.headers.get("origin") || "";
+
+  const base: Record<string, string> = {
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
+  if (!origin) return base;
+
+  return {
+    ...base,
+    "Access-Control-Allow-Origin": origin,
+    Vary: "Origin",
+  };
+}
+
+
+
 
 function clientIp(req: NextRequest) {
   const fwd = req.headers.get("x-forwarded-for");
@@ -36,7 +50,12 @@ function clientIp(req: NextRequest) {
 }
 function originHost(req: NextRequest) {
   const raw = req.headers.get("origin") || req.headers.get("referer") || "";
-  try { return new URL(raw).hostname.toLowerCase(); } catch { return ""; }
+  try {
+    return new URL(raw).hostname.toLowerCase();
+  } catch {
+    // fallback (same-origin or stripped headers)
+    return (req.headers.get("host") || "").split(":")[0].toLowerCase();
+  }
 }
 
 // --- lead intent heuristic (simple keywords; expand as needed) ---
@@ -67,7 +86,7 @@ async function rateLimit(businessId: string, ip: string) {
 
 async function validateEmbedAccess(token: string, host: string) {
   if (!token) return { ok: false as const, reason: "Missing token" };
-  if (!host)  return { ok: false as const, reason: "Missing host" };
+  if (!host) return { ok: false as const, reason: "Missing host" };
 
   const tok = await supabase.from("embed_tokens")
     .select("business_id").eq("token", token).single();
@@ -84,13 +103,13 @@ async function validateEmbedAccess(token: string, host: string) {
   return { ok: true as const, businessId: biz.data.id };
 }
 
-export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeadersFor(req) });
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const ip   = clientIp(req);
+    const ip = clientIp(req);
     const host = originHost(req);
     const { token, conversationId: inputConvId, message, customerName } =
       (await req.json()) as {
@@ -101,17 +120,36 @@ export async function POST(req: NextRequest) {
       };
 
     if (!message) {
-      return NextResponse.json({ error: "Missing message" }, { status: 400, headers: corsHeaders });
+      return NextResponse.json({ error: "Missing message" }, { status: 400, headers: corsHeadersFor(req) });
     }
 
     // token + domain gate
     const gate = await validateEmbedAccess(token || "", host);
     if (!gate.ok) {
-      return NextResponse.json({ error: `Forbidden: ${gate.reason}` }, { status: 403, headers: corsHeaders });
+      return NextResponse.json({ error: `Forbidden: ${gate.reason}` }, { status: 403, headers: corsHeadersFor(req) });
     }
     const businessId = gate.businessId;
 
     await rateLimit(businessId, ip);
+
+    // If client provides a conversationId, verify it belongs to this business
+    if (inputConvId) {
+      const own = await supabase
+        .from("conversations")
+        .select("id")
+        .eq("id", inputConvId)
+        .eq("business_id", businessId)
+        .maybeSingle();
+
+      if (own.error) throw own.error;
+      if (!own.data?.id) {
+        return NextResponse.json(
+          { error: "Forbidden: conversation not found" },
+          { status: 403, headers: corsHeadersFor(req) }
+        );
+      }
+    }
+
 
     // ensure conversation
     let conversationId = inputConvId ?? null;
@@ -127,7 +165,11 @@ export async function POST(req: NextRequest) {
 
     // persist user message
     const m1 = await supabase.from("messages").insert({
-      conversation_id: conversationId, channel: "web", role: "user", content: message,
+      conversation_id: conversationId,
+      channel: "web",
+      role: "user",
+      content: message,
+      meta: {},
     });
     if (m1.error) throw m1.error;
 
@@ -143,18 +185,29 @@ export async function POST(req: NextRequest) {
     // business prompt
     const bizRes = await supabase
       .from("businesses")
-      .select("name, timezone, system_prompt, slug")
+      .select("name, timezone, system_prompt, slug, knowledge")
       .eq("id", businessId)
-      .single<{ name: string; timezone: string; system_prompt: string | null; slug: string }>();
+      .single<{ name: string; timezone: string; system_prompt: string | null; slug: string; knowledge: string | null; }>();
 
     const defaultSys =
-`You are the AI concierge for ${bizRes.data?.name ?? "the business"} (${bizRes.data?.slug ?? ""}).
+      `You are the AI concierge for ${bizRes.data?.name ?? "the business"} (${bizRes.data?.slug ?? ""}).
 Be concise, friendly, and professional. Default language: Spanish (Castilian) unless the user writes in another language.
 Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.
 If you are unsure of a fact, say so briefly.`;
 
     let sys = (bizRes.data?.system_prompt ?? "").trim() || defaultSys;
 
+    const knowledge = (bizRes.data?.knowledge ?? "").trim();
+    if (knowledge) {
+      sys += `
+
+Business knowledge (authoritative):
+${knowledge}
+
+Rules:
+- Prefer the business knowledge when answering.
+- If the knowledge does not cover it, say so briefly and ask 1 follow-up question.`;
+    }
     // lead intent → collect contact details
     if (wantsLead(message)) {
       sys += `
@@ -167,33 +220,60 @@ Lead intent detected.
 
     // reply
     let reply = "Gracias por tu mensaje. Te respondemos enseguida.";
+
     if (openai) {
-      const messages = [
-        { role: "system" as const, content: sys },
-        ...history.map((m) => ({
-          role: (m.role === "tool" ? "system" : m.role) as "user" | "assistant" | "system",
-          content: m.content,
-        })),
-      ];
-      const completion = await openai.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-        messages,
-        temperature: 0.3,
-        max_tokens: 300,
-      });
-      reply = completion.choices?.[0]?.message?.content?.trim() || reply;
+      try {
+        const messages = [
+          { role: "system" as const, content: sys },
+          ...history.map((m) => ({
+            role: (m.role === "tool" ? "system" : m.role) as
+              | "user"
+              | "assistant"
+              | "system",
+            content: m.content,
+          })),
+        ];
+
+        const completion = await openai.chat.completions.create({
+          model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+          messages,
+          temperature: 0.3,
+          max_tokens: 300,
+        });
+
+        reply = completion.choices?.[0]?.message?.content?.trim() || reply;
+      } catch (err: unknown) {
+        // OpenAI SDK errors often expose `status` (number) but we keep this lint-safe.
+        const status =
+          typeof err === "object" && err !== null && "status" in err
+            ? (err as { status?: number }).status
+            : undefined;
+
+        if (status === 429 || status === 401 || status === 403) {
+          reply =
+            "Gracias por tu mensaje. Ahora mismo no puedo responder automáticamente, pero te contactaremos en breve. Si quieres, déjame tu nombre y un teléfono o email.";
+        } else {
+          reply =
+            "Gracias por tu mensaje. Hemos tenido un problema temporal y te responderemos en breve.";
+        }
+      }
     }
+
 
     // persist assistant reply
     const m2 = await supabase.from("messages").insert({
-      conversation_id: conversationId, channel: "web", role: "assistant", content: reply,
+      conversation_id: conversationId,
+      channel: "web",
+      role: "assistant",
+      content: reply,
+      meta: {},
     });
     if (m2.error) throw m2.error;
 
-    return NextResponse.json({ conversationId, reply }, { status: 200, headers: corsHeaders });
+    return NextResponse.json({ conversationId, reply }, { status: 200, headers: corsHeadersFor(req) });
   } catch (e: unknown) {
     const status = e instanceof RateLimitError ? e.status : 500;
     const message = e instanceof Error ? e.message : "Server error";
-    return NextResponse.json({ error: message }, { status, headers: corsHeaders });
+    return NextResponse.json({ error: message }, { status, headers: corsHeadersFor(req) });
   }
 }

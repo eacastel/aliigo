@@ -1,5 +1,4 @@
-// app/(app)/dashboard/settings/page.tsx
-
+// src/app/(app)/dashboard/settings/page.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -12,14 +11,23 @@ type ProfileState = {
   nombre_contacto: string;
   telefono: string;
 };
+
 type BusinessState = {
   name: string;
   timezone: string;
+  system_prompt: string;
+  knowledge: string;
+  allowed_domains: string; // textarea, one per line
 };
+
 type JoinedBusiness = {
+  id?: string | null;
   name: string | null;
   timezone: string | null;
   slug?: string | null;
+  system_prompt?: string | null;
+  knowledge?: string | null;
+  allowed_domains?: string[] | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -27,15 +35,9 @@ type ProfileJoinRow = {
   nombre_contacto: string | null;
   telefono: string | null;
   business_id: string | null;
-  // Supabase embed alias
   businesses: JoinedBusiness;
 };
 
-const { data } = await supabase.auth.getSession();
-console.log("uid", data.session?.user?.id, "email", data.session?.user?.email, "has token", !!data.session?.access_token);
-
-
-/* Type guard to avoid any */
 function isProfileJoinRow(x: unknown): x is ProfileJoinRow {
   if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
@@ -48,13 +50,23 @@ function isProfileJoinRow(x: unknown): x is ProfileJoinRow {
   );
 }
 
+function domainsToText(domains: string[] | null | undefined): string {
+  return (domains ?? []).join("\n");
+}
+function textToDomains(text: string): string[] {
+  return text
+    .split("\n")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+    .filter((d, i, a) => a.indexOf(d) === i);
+}
+
 export default function SettingsBusinessPage() {
   const router = useRouter();
 
   // auth / identity
   const [loading, setLoading] = useState(true);
   const [unauth, setUnauth] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const [businessId, setBusinessId] = useState<string | null>(null);
 
   // editable state
@@ -63,12 +75,16 @@ export default function SettingsBusinessPage() {
     nombre_contacto: "",
     telefono: "",
   });
+
   const [business, setBusiness] = useState<BusinessState>({
     name: "",
     timezone: "Europe/Madrid",
+    system_prompt: "",
+    knowledge: "",
+    allowed_domains: "",
   });
 
-  // snapshots for "dirty" detection
+  // snapshots for dirty detection
   const initialProfile = useRef<ProfileState | null>(null);
   const initialBusiness = useRef<BusinessState | null>(null);
 
@@ -76,151 +92,18 @@ export default function SettingsBusinessPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Load profile + linked business with a joined select (no `any`)
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data: sess } = await supabase.auth.getSession();
-        const uid = sess.session?.user?.id || null;
-        setUserId(uid);
-
-        if (!uid) {
-          setUnauth(true);
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from("business_profiles")
-          .select(
-            `
-            nombre_negocio,
-            nombre_contacto,
-            telefono,
-            business_id,
-            businesses:businesses!business_profiles_business_id_fkey (
-              id,
-              name,
-              timezone,
-              slug
-            )
-          `
-          )
-          .eq("id", uid)
-          .limit(1)
-          .maybeSingle();
-
-        if (error) {
-          console.error("[settings] profile join error:", error.message);
-          setMsg("Could not load your profile.");
-          return;
-        }
-        if (!isProfileJoinRow(data)) {
-          setMsg("Profile not found. Please log in again.");
-          return;
-        }
-
-        // Profile
-        const pNombre = data.nombre_negocio ?? "";
-        const pContacto = data.nombre_contacto ?? "";
-        const pTelefono = data.telefono ?? "";
-
-        setProfile({
-          nombre_negocio: pNombre,
-          nombre_contacto: pContacto,
-          telefono: pTelefono,
-        });
-        initialProfile.current = {
-          nombre_negocio: pNombre,
-          nombre_contacto: pContacto,
-          telefono: pTelefono,
-        };
-
-        // Business (joined)
-        const biz = data.businesses;
-        if (data.business_id && biz) {
-          const bName = biz.name ?? "";
-          const bTz = biz.timezone ?? "Europe/Madrid";
-          setBusinessId(data.business_id);
-          setBusiness({ name: bName, timezone: bTz });
-          initialBusiness.current = { name: bName, timezone: bTz };
-        } else {
-          setBusinessId(null);
-          initialBusiness.current = { name: "", timezone: "Europe/Madrid" };
-        }
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  const dirty = useMemo(() => {
-    const ip = initialProfile.current;
-    const ib = initialBusiness.current;
-    if (!ip || !ib) return false;
-    return (
-      profile.nombre_negocio.trim() !== ip.nombre_negocio.trim() ||
-      profile.nombre_contacto.trim() !== ip.nombre_contacto.trim() ||
-      profile.telefono.trim() !== ip.telefono.trim() ||
-      business.name.trim() !== ib.name.trim() ||
-      business.timezone.trim() !== ib.timezone.trim()
-    );
-  }, [profile, business]);
-
-  const valid = useMemo(() => business.name.trim().length > 0, [business.name]);
-
-  const save = async () => {
+  async function load() {
     setMsg(null);
-    if (!userId) {
-      setMsg("You must be logged in.");
-      return;
-    }
-    if (!dirty || !valid) return;
-
-    setSaving(true);
+    setLoading(true);
     try {
-      const res = await fetch("/api/settings/business", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, profile, business }),
-      });
-      const j: {
-        error?: string;
-        business?: { name?: string | null; timezone?: string | null };
-      } = await res.json().catch(() => ({} as { error?: string }));
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user?.id || null;
 
-      if (!res.ok) {
-        setMsg(`Save error: ${j.error || "unknown"}`);
+      if (!uid) {
+        setUnauth(true);
         return;
       }
 
-      initialProfile.current = {
-        nombre_negocio: profile.nombre_negocio,
-        nombre_contacto: profile.nombre_contacto,
-        telefono: profile.telefono,
-      };
-
-      if (j.business) {
-        const bName = j.business.name ?? "";
-        const bTz = j.business.timezone ?? "Europe/Madrid";
-        initialBusiness.current = { name: bName, timezone: bTz };
-        setBusiness({ name: bName, timezone: bTz });
-      } else if (initialBusiness.current) {
-        initialBusiness.current = { ...business };
-      }
-
-      setMsg("Saved.");
-    } catch {
-      setMsg("Could not save now. Try again.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const resetToServer = async () => {
-    setMsg(null);
-    if (!userId) return;
-    setLoading(true);
-    try {
       const { data, error } = await supabase
         .from("business_profiles")
         .select(
@@ -233,44 +116,175 @@ export default function SettingsBusinessPage() {
             id,
             name,
             timezone,
-            slug
+            slug,
+            system_prompt,
+            knowledge,
+            allowed_domains
           )
         `
         )
-        .eq("id", userId)
+        .eq("id", uid)
         .limit(1)
         .maybeSingle();
 
-      if (!error && isProfileJoinRow(data)) {
-        const pNombre = data.nombre_negocio ?? "";
-        const pContacto = data.nombre_contacto ?? "";
-        const pTelefono = data.telefono ?? "";
+      if (error) {
+        console.error("[settings] profile join error:", error.message);
+        setMsg("Could not load your profile.");
+        return;
+      }
+      if (!isProfileJoinRow(data)) {
+        setMsg("Profile not found. Please log in again.");
+        return;
+      }
 
-        setProfile({
-          nombre_negocio: pNombre,
-          nombre_contacto: pContacto,
-          telefono: pTelefono,
-        });
-        initialProfile.current = {
-          nombre_negocio: pNombre,
-          nombre_contacto: pContacto,
-          telefono: pTelefono,
+      // Profile
+      const pNombre = data.nombre_negocio ?? "";
+      const pContacto = data.nombre_contacto ?? "";
+      const pTelefono = data.telefono ?? "";
+
+      const nextProfile: ProfileState = {
+        nombre_negocio: pNombre,
+        nombre_contacto: pContacto,
+        telefono: pTelefono,
+      };
+      setProfile(nextProfile);
+      initialProfile.current = nextProfile;
+
+      // Business
+      const biz = data.businesses;
+      if (data.business_id && biz) {
+        setBusinessId(data.business_id);
+
+        const nextBusiness: BusinessState = {
+          name: biz.name ?? "",
+          timezone: biz.timezone ?? "Europe/Madrid",
+          system_prompt: biz.system_prompt ?? "",
+          knowledge: biz.knowledge ?? "",
+          allowed_domains: domainsToText(biz.allowed_domains),
         };
-
-        const biz = data.businesses;
-        if (data.business_id && biz) {
-          const bName = biz.name ?? "";
-          const bTz = biz.timezone ?? "Europe/Madrid";
-          setBusiness({ name: bName, timezone: bTz });
-          initialBusiness.current = { name: bName, timezone: bTz };
-        }
+        setBusiness(nextBusiness);
+        initialBusiness.current = nextBusiness;
+      } else {
+        setBusinessId(null);
+        const empty: BusinessState = {
+          name: "",
+          timezone: "Europe/Madrid",
+          system_prompt: "",
+          knowledge: "",
+          allowed_domains: "",
+        };
+        initialBusiness.current = empty;
+        setBusiness(empty);
       }
     } finally {
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const dirty = useMemo(() => {
+    const ip = initialProfile.current;
+    const ib = initialBusiness.current;
+    if (!ip || !ib) return false;
+
+    return (
+      profile.nombre_negocio.trim() !== ip.nombre_negocio.trim() ||
+      profile.nombre_contacto.trim() !== ip.nombre_contacto.trim() ||
+      profile.telefono.trim() !== ip.telefono.trim() ||
+      business.name.trim() !== ib.name.trim() ||
+      business.timezone.trim() !== ib.timezone.trim() ||
+      business.system_prompt.trim() !== ib.system_prompt.trim() ||
+      business.knowledge.trim() !== ib.knowledge.trim() ||
+      business.allowed_domains.trim() !== ib.allowed_domains.trim()
+    );
+  }, [profile, business]);
+
+  const valid = useMemo(() => business.name.trim().length > 0, [business.name]);
+
+  const save = async () => {
+    setMsg(null);
+    if (!dirty || !valid) return;
+
+    setSaving(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+
+      if (!token) {
+        setMsg("You must be logged in.");
+        setUnauth(true);
+        return;
+      }
+
+      const payload = {
+        profile,
+        business: {
+          name: business.name,
+          timezone: business.timezone,
+          system_prompt: business.system_prompt,
+          knowledge: business.knowledge,
+          allowed_domains: textToDomains(business.allowed_domains),
+        },
+      };
+
+      const res = await fetch("/api/settings/business", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const j: {
+        error?: string;
+        business?: {
+          name?: string | null;
+          timezone?: string | null;
+          system_prompt?: string | null;
+          knowledge?: string | null;
+          allowed_domains?: string[] | null;
+        };
+      } = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setMsg(`Save error: ${j.error || "unknown"}`);
+        return;
+      }
+
+      // Snapshots
+      initialProfile.current = { ...profile };
+
+      // refresh business snapshot from server response
+      if (j.business) {
+        const nextBusiness: BusinessState = {
+          name: j.business.name ?? business.name,
+          timezone: j.business.timezone ?? business.timezone,
+          system_prompt: j.business.system_prompt ?? business.system_prompt,
+          knowledge: j.business.knowledge ?? business.knowledge,
+          allowed_domains: domainsToText(j.business.allowed_domains),
+        };
+        initialBusiness.current = nextBusiness;
+        setBusiness(nextBusiness);
+      } else {
+        initialBusiness.current = { ...business };
+      }
+
+      setMsg("Saved.");
+    } catch (e: unknown) {
+      console.error(e);
+      setMsg("Could not save now. Try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <p className="p-4 text-sm text-zinc-400">Cargando…</p>;
+
   if (unauth) {
     return (
       <div className="max-w-lg p-4 text-white">
@@ -293,11 +307,11 @@ export default function SettingsBusinessPage() {
       <div className="max-w-lg p-4 text-white">
         <h1 className="text-xl font-semibold mb-2">No linked business</h1>
         <p className="text-sm text-zinc-400">
-          We didn’t find a business linked to your profile. If you just signed
-          up, reload the page. If it persists, try the signup again.
+          We didn’t find a business linked to your profile. Reload the page. If
+          it persists, try signup again.
         </p>
         <button
-          onClick={resetToServer}
+          onClick={() => void load()}
           className="mt-3 border border-zinc-700 text-white rounded px-4 py-2 hover:bg-zinc-900"
         >
           Retry
@@ -307,7 +321,7 @@ export default function SettingsBusinessPage() {
   }
 
   return (
-    <div className="max-w-2xl text-white">
+    <div className="max-w-3xl text-white">
       <h1 className="text-2xl font-bold mb-4">Business Settings</h1>
 
       {msg && (
@@ -386,9 +400,6 @@ export default function SettingsBusinessPage() {
                   setBusiness((b) => ({ ...b, name: e.target.value }))
                 }
               />
-              <p className="text-[11px] text-zinc-500 mt-1">
-                Must not be blank when saving.
-              </p>
             </div>
 
             <div>
@@ -404,6 +415,55 @@ export default function SettingsBusinessPage() {
                 }
               />
             </div>
+
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">
+                System prompt (style)
+              </label>
+              <textarea
+                className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                placeholder="Tone, rules, do/don’t…"
+                value={business.system_prompt}
+                onChange={(e) =>
+                  setBusiness((b) => ({ ...b, system_prompt: e.target.value }))
+                }
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">
+                Knowledge (facts / policies)
+              </label>
+              <textarea
+                className="w-full min-h-[180px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                placeholder="Hours, services, pricing policy, cancellations, locations, etc."
+                value={business.knowledge}
+                onChange={(e) =>
+                  setBusiness((b) => ({ ...b, knowledge: e.target.value }))
+                }
+              />
+              <p className="text-[11px] text-zinc-500 mt-1">
+                This is injected as authoritative business context for the AI.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">
+                Allowed domains (one per line)
+              </label>
+              <textarea
+                className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                placeholder={"example.com\nwww.example.com"}
+                value={business.allowed_domains}
+                onChange={(e) =>
+                  setBusiness((b) => ({ ...b, allowed_domains: e.target.value }))
+                }
+              />
+              <p className="text-[11px] text-zinc-500 mt-1">
+                Widget requests are accepted only from these hostnames (and
+                subdomains).
+              </p>
+            </div>
           </div>
         </section>
 
@@ -415,8 +475,9 @@ export default function SettingsBusinessPage() {
           >
             {saving ? "Saving…" : "Save"}
           </button>
+
           <button
-            onClick={resetToServer}
+            onClick={() => void load()}
             className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
           >
             Reset changes
