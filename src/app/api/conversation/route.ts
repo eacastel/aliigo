@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { originHost, hostAllowed } from "@/lib/embedGate";
+
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -48,15 +50,7 @@ function clientIp(req: NextRequest) {
   const fwd = req.headers.get("x-forwarded-for");
   return fwd?.split(",")[0]?.trim() || "0.0.0.0";
 }
-function originHost(req: NextRequest) {
-  const raw = req.headers.get("origin") || req.headers.get("referer") || "";
-  try {
-    return new URL(raw).hostname.toLowerCase();
-  } catch {
-    // fallback (same-origin or stripped headers)
-    return (req.headers.get("host") || "").split(":")[0].toLowerCase();
-  }
-}
+
 
 // --- lead intent heuristic (simple keywords; expand as needed) ---
 function wantsLead(s: string) {
@@ -96,9 +90,10 @@ async function validateEmbedAccess(token: string, host: string) {
     .select("id,allowed_domains").eq("id", tok.data.business_id).single();
   if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
 
-  const allowed = (biz.data.allowed_domains || []).map((d: string) => d.toLowerCase());
-  const ok = allowed.some((d: string) => host === d || host.endsWith(`.${d}`));
-  if (!ok) return { ok: false as const, reason: "Domain not allowed" };
+if (!hostAllowed(host, biz.data.allowed_domains)) {
+  return { ok: false as const, reason: "Domain not allowed" };
+}
+
 
   return { ok: true as const, businessId: biz.data.id };
 }

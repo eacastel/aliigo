@@ -26,11 +26,11 @@ export function AliigoSupportWidget() {
       brand="Aliigo Soporte"
       token={token}
       theme={{
-        headerBg: "bg-gray-900",
+        headerBg: "bg-emerald-600",
         headerText: "text-white",
-        bubbleUser: "bg-blue-600 text-white",
-        bubbleBot: "bg-gray-100 text-gray-900",
-        sendBg: "bg-blue-600",
+        bubbleUser: "bg-emerald-600 text-white",
+        bubbleBot: "bg-emerald-50 text-emerald-950",
+        sendBg: "bg-emerald-600",
         sendText: "text-white",
       }}
     />
