@@ -22,7 +22,17 @@ export async function GET(req: NextRequest) {
 
     const host = originHost(req);
     if (!host) {
-      return NextResponse.json({ error: "Missing host" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Missing host",
+          debug: {
+            origin: req.headers.get("origin"),
+            referer: req.headers.get("referer"),
+            host: req.headers.get("host"),
+          },
+        },
+        { status: 400 }
+      );
     }
 
     // 1) Find business by public key
@@ -37,8 +47,21 @@ export async function GET(req: NextRequest) {
     }
 
     // 2) Validate host is allowlisted
-    if (!hostAllowed(host, bizRes.data.allowed_domains || [])) {
-      return NextResponse.json({ error: "Domain not allowed" }, { status: 403 });
+    const allowed = bizRes.data.allowed_domains || [];
+
+    if (!hostAllowed(host, allowed)) {
+      return NextResponse.json(
+        {
+          error: "Domain not allowed",
+          debug: {
+            extractedHost: host,
+            allowedDomains: allowed,
+            // useful to confirm we matched the expected business
+            businessId: bizRes.data.id,
+          },
+        },
+        { status: 403 }
+      );
     }
 
     // 3) Return latest embed token for that business
