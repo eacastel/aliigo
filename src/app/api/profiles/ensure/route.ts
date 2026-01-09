@@ -1,6 +1,6 @@
 // src/app/api/profiles/ensure/route.ts
 import { NextResponse } from "next/server";
-import { createClient, type PostgrestError } from "@supabase/supabase-js";
+import { createClient, type PostgrestError, type SupabaseClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,32 +20,66 @@ const looksLikeUUID = (v: unknown) =>
 
 function toSlug(name: string, fallback: string) {
   const base = name
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase().replace(/[^a-z0-9]+/g, "-")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
   return base || fallback;
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function getAuthUserWithRetry(supabaseAdmin: SupabaseClient, id: string) {
+  const waits = [0, 200, 600, 1200]; // ms
+  for (const w of waits) {
+    if (w) await sleep(w);
+    const { data, error } = await supabaseAdmin.auth.admin.getUserById(id);
+    if (!error && data?.user) return data.user;
+  }
+  return null;
+}
+
+async function readJson(req: Request): Promise<Record<string, unknown>> {
+  try {
+    const j = await req.json();
+    return j && typeof j === "object" ? (j as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
 }
 
 export async function POST(req: Request) {
   const startedAt = new Date().toISOString();
 
   try {
-    const body = await req.json().catch(() => ({}));
-    const {
-      id,
-      nombre_negocio,
-      nombre_contacto = null,
-      telefono = null,
-      email = null,
-    } = body ?? {};
+    const body = await readJson(req);
 
-    // Basic input guard
-    if (!id || !looksLikeUUID(id) || !nombre_negocio) {
+    const idRaw = body.id;
+    const nombre_negocio = body.nombre_negocio;
+
+    const nombre_contacto = (body.nombre_contacto ?? null) as string | null;
+    const telefono = (body.telefono ?? null) as string | null;
+    const email = (body.email ?? null) as string | null;
+
+    // Optional extras
+    const google_url = (body.google_url ?? null) as string | null;
+    const source = (body.source ?? null) as string | null;
+
+    if (!looksLikeUUID(idRaw) || typeof nombre_negocio !== "string" || !nombre_negocio.trim()) {
       return NextResponse.json(
-        { ok: false, where: "input", error: "Missing/invalid fields: id(uuid), nombre_negocio", body },
+        {
+          ok: false,
+          where: "input",
+          error: "Missing/invalid fields: id(uuid), nombre_negocio",
+        },
         { status: 400, headers: CORS }
       );
     }
+
+    // ✅ TS-safe narrowing boundary
+    const id = idRaw as string;
+
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -61,6 +95,28 @@ export async function POST(req: Request) {
       auth: { persistSession: false },
     });
 
+    // 0) Verify auth user exists (retry handles occasional propagation delay)
+    const authUser = await getAuthUserWithRetry(supabaseAdmin, id);
+    if (!authUser) {
+      const host = (() => {
+        try {
+          return new URL(url).host;
+        } catch {
+          return url;
+        }
+      })();
+
+      return NextResponse.json(
+        {
+          ok: false,
+          where: "auth.admin.getUserById",
+          error: "User not found in auth.users (after retry)",
+          debug: { id, supabaseUrlHost: host },
+        },
+        { status: 409, headers: CORS }
+      );
+    }
+
     // 1) Ensure business
     const rawName = String(nombre_negocio).trim() || "Negocio";
     const slug = toSlug(rawName, `biz-${String(id).slice(0, 8)}`);
@@ -72,45 +128,36 @@ export async function POST(req: Request) {
       .single();
 
     if (bizErr || !biz) {
+      const err = bizErr as PostgrestError | null;
       return NextResponse.json(
-        { ok: false, where: "businesses.upsert", error: bizErr?.message || "Upsert failed" },
+        {
+          ok: false,
+          where: "businesses.upsert",
+          error: err?.message || "Upsert failed",
+          details: err?.details ?? null,
+          hint: err?.hint ?? null,
+        },
         { status: 400, headers: CORS }
       );
     }
-
-    // 0) Verify the auth user exists in THIS Supabase project
-const { data: u, error: uErr } = await supabaseAdmin.auth.admin.getUserById(id);
-
-if (uErr || !u?.user) {
-  return NextResponse.json(
-    {
-      ok: false,
-      where: "auth.admin.getUserById",
-      error: uErr?.message || "User not found in auth.users for this project",
-      debug: {
-        id,
-        supabaseUrlHost: (() => {
-          try { return new URL(url).host; } catch { return url; }
-        })(),
-      },
-    },
-    { status: 409, headers: CORS }
-  );
-}
 
     // 2) Upsert profile linking business_id
     const { error: profErr } = await supabaseAdmin
       .from("business_profiles")
       .upsert(
-        [{
-          id, // PK = auth.users.id
-          nombre_negocio: rawName,
-          nombre_contacto,
-          telefono,
-          email,
-          business_id: biz.id,
-          updated_at: new Date().toISOString(),
-        }],
+        [
+          {
+            id, // FK -> auth.users.id
+            nombre_negocio: rawName,
+            nombre_contacto,
+            telefono,
+            email,
+            google_url, // remove if column doesn't exist
+            source, // remove if column doesn't exist
+            business_id: biz.id,
+            updated_at: new Date().toISOString(),
+          },
+        ],
         { onConflict: "id" }
       );
 

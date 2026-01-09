@@ -1,3 +1,5 @@
+// /src/app/[locale]/chat/page.tsx
+
 import { Suspense } from "react";
 import ClientEmbed from "./ClientEmbed";
 

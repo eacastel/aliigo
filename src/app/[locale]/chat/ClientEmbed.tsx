@@ -1,3 +1,4 @@
+// /src/app/[locale]/chat/ClientEmbed.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -20,17 +21,16 @@ export default function ClientEmbed() {
 
   const slug = params.get("slug") ?? "default";
   const brand = params.get("brand") ?? "Aliigo";
-  const key = params.get("key") ?? ""; // public embed key
+  const key = params.get("key") ?? "";
 
   const [token, setToken] = useState<string | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const theme: Theme | undefined = useMemo(() => {
     const themeParam = params.get("theme");
     if (!themeParam) return undefined;
-
-    // theme is URL-encoded JSON in your snippet, so decode first
     try {
       const decoded = decodeURIComponent(themeParam);
       const parsed: unknown = JSON.parse(decoded);
@@ -48,49 +48,77 @@ export default function ClientEmbed() {
       setErr(null);
       setBlocked(false);
       setToken(null);
+      setLoading(true);
 
       if (!key) {
         setErr("Missing key");
+        setLoading(false);
         return;
       }
 
+      // IMPORTANT: always same-origin to Aliigo (this page is on aliigo.vercel.app)
       const url = `/api/embed/session?key=${encodeURIComponent(key)}`;
 
       let res: Response;
       try {
-        res = await fetch(url, { method: "GET", cache: "no-store" });
+        res = await fetch(url, {
+          method: "GET",
+          cache: "no-store",
+          credentials: "omit", // embed should not depend on cookies
+          headers: { "Accept": "application/json" },
+        });
       } catch {
-        if (!cancelled) setErr("Network error");
+        if (!cancelled) {
+          setErr("Network error calling /api/embed/session");
+          setLoading(false);
+        }
         return;
       }
 
+      // If API returns HTML (like a redirect or error page), res.json() will fail.
+      const ct = res.headers.get("content-type") || "";
       let data: SessionResp | null = null;
-      try {
-        data = (await res.json()) as SessionResp;
-      } catch {
-        data = null;
+
+      if (ct.includes("application/json")) {
+        try {
+          data = (await res.json()) as SessionResp;
+        } catch {
+          data = null;
+        }
+      } else {
+        // capture a small snippet so you can see what's coming back
+        const text = await res.text().catch(() => "");
+        if (!cancelled) {
+          setErr(`Unexpected response (${res.status}) from /api/embed/session: ${text.slice(0, 120)}`);
+          setLoading(false);
+        }
+        return;
       }
 
       if (cancelled) return;
 
-      // If domain is not allowlisted, we treat it as "not embeddable": render nothing.
+      // Domain block: show a visible message (no more silent blank)
       if (res.status === 403 && (data?.error || "").toLowerCase().includes("domain")) {
         setBlocked(true);
+        setLoading(false);
         return;
       }
 
       if (!res.ok) {
-        setErr(data?.error || "Failed to create embed session");
+        setErr(data?.error || `Failed to create embed session (${res.status})`);
+        setLoading(false);
         return;
       }
 
       const t = data?.token ?? null;
       if (!t) {
-        setErr("No token available");
+        setErr("No token returned from /api/embed/session");
+        setLoading(false);
         return;
       }
 
       setToken(t);
+      setLoading(false);
     }
 
     void run();
@@ -99,27 +127,38 @@ export default function ClientEmbed() {
     };
   }, [key]);
 
-  // ✅ If blocked, show nothing (no button, no panel)
-  if (blocked) return null;
+  // Always show something so debugging isn't “black box”
+  if (blocked) {
+    return (
+      <div className="w-full h-dvh flex items-center justify-center bg-transparent">
+        <div className="text-xs px-3 py-2 rounded-xl border border-white/20 bg-black/40 text-white">
+          Embed blocked: domain not allowlisted for this key.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-dvh bg-transparent">
-      {/* ✅ Only render the widget once we have a token */}
-      {token ? (
-        <AliigoChatWidget
-          businessSlug={slug}
-          brand={brand}
-          token={token}
-          theme={theme}
-        />
-      ) : null}
-
-      {/* Optional: show errors ONLY for real failures (not domain blocks) */}
-      {err && (
-        <div className="fixed bottom-4 left-4 bg-white border border-gray-200 shadow-lg rounded-xl px-3 py-2 text-xs text-gray-700">
-          {err}
+      {loading && (
+        <div className="w-full h-dvh flex items-center justify-center">
+          <div className="text-xs px-3 py-2 rounded-xl border border-white/20 bg-black/40 text-white">
+            Loading Aliigo widget…
+          </div>
         </div>
       )}
+
+      {!loading && err && (
+        <div className="w-full h-dvh flex items-center justify-center">
+          <div className="max-w-[90vw] text-xs px-3 py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-red-200">
+            {err}
+          </div>
+        </div>
+      )}
+
+      {!loading && token && !err ? (
+        <AliigoChatWidget businessSlug={slug} brand={brand} token={token} theme={theme} />
+      ) : null}
     </div>
   );
 }
