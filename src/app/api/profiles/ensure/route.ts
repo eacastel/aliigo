@@ -78,6 +78,26 @@ export async function POST(req: Request) {
       );
     }
 
+    // 0) Verify the auth user exists in THIS Supabase project
+const { data: u, error: uErr } = await supabaseAdmin.auth.admin.getUserById(id);
+
+if (uErr || !u?.user) {
+  return NextResponse.json(
+    {
+      ok: false,
+      where: "auth.admin.getUserById",
+      error: uErr?.message || "User not found in auth.users for this project",
+      debug: {
+        id,
+        supabaseUrlHost: (() => {
+          try { return new URL(url).host; } catch { return url; }
+        })(),
+      },
+    },
+    { status: 409, headers: CORS }
+  );
+}
+
     // 2) Upsert profile linking business_id
     const { error: profErr } = await supabaseAdmin
       .from("business_profiles")
