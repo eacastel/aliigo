@@ -153,7 +153,7 @@ export default function ClientEmbed() {
   }
 
   return (
-    <div className="w-full h-dvh bg-transparent">
+    <div className="bg-transparent">
       {loading && (
         <div className="w-full h-dvh flex items-center justify-center">
           <div className="text-xs px-3 py-2 rounded-xl border border-white/20 bg-black/40 text-white">
