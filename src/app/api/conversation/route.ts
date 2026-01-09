@@ -112,6 +112,19 @@ export async function OPTIONS(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // TEMP DEBUG (remove after)
+  const dbg = new URL(req.url).searchParams.get("debug") === "1";
+  if (dbg) {
+    return NextResponse.json(
+      {
+        hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+        openAIKeyLen: (process.env.OPENAI_API_KEY || "").length,
+        model: process.env.OPENAI_MODEL || null,
+        nodeEnv: process.env.NODE_ENV || null,
+      },
+      { status: 200 }
+    );
+  }
   try {
     const ip = clientIp(req);
 
