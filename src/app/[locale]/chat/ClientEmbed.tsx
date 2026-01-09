@@ -47,51 +47,44 @@ export default function ClientEmbed() {
     try { return new URL(ref).host.replace(/:\d+$/, ""); } catch { return null; }
   }
 
-  const hostFromQuery = params.get("host")?.trim() || "";
-  const refHost = getReferrerHost();
-  const host = (hostFromQuery || refHost || "").toLowerCase();
-
-  const url =
-    `/api/embed/session?key=${encodeURIComponent(key)}` +
-    (host ? `&host=${encodeURIComponent(host)}` : "");
-
-
   useEffect(() => {
-    let cancelled = false;
+  let cancelled = false;
 
-    async function run() {
-      setErr(null);
-      setBlocked(false);
-      setToken(null);
-      setLoading(true);
+  async function run() {
+    setErr(null);
+    setBlocked(false);
+    setToken(null);
+    setLoading(true);
 
-      if (!key) {
-        setErr("Missing key");
+    if (!key) {
+      setErr("Missing key");
+      setLoading(false);
+      return;
+    }
+
+    const hostFromQuery = (params.get("host") || "").trim().toLowerCase();
+    const refHost = (getReferrerHost() || "").toLowerCase();
+    const host = hostFromQuery || refHost;
+
+    const url =
+      `/api/embed/session?key=${encodeURIComponent(key)}` +
+      (host ? `&host=${encodeURIComponent(host)}` : "");
+
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: "GET",
+        cache: "no-store",
+        credentials: "omit",
+        headers: { Accept: "application/json" },
+      });
+    } catch {
+      if (!cancelled) {
+        setErr("Network error calling /api/embed/session");
         setLoading(false);
-        return;
       }
-
-      // IMPORTANT: always same-origin to Aliigo (this page is on aliigo.vercel.app)
-      const refHost = getReferrerHost();
-      const url =
-        `/api/embed/session?key=${encodeURIComponent(key)}` +
-        (refHost ? `&host=${encodeURIComponent(refHost)}` : "");
-
-      let res: Response;
-      try {
-        res = await fetch(url, {
-          method: "GET",
-          cache: "no-store",
-          credentials: "omit", // embed should not depend on cookies
-          headers: { "Accept": "application/json" },
-        });
-      } catch {
-        if (!cancelled) {
-          setErr("Network error calling /api/embed/session");
-          setLoading(false);
-        }
-        return;
-      }
+      return;
+    }
 
       // If API returns HTML (like a redirect or error page), res.json() will fail.
       const ct = res.headers.get("content-type") || "";
@@ -143,7 +136,7 @@ export default function ClientEmbed() {
     return () => {
       cancelled = true;
     };
-  }, [key]);
+  }, [key, params]);
 
   // Always show something so debugging isn't “black box”
   if (blocked) {
