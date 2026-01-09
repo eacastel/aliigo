@@ -31,7 +31,7 @@ function corsHeadersFor(req: NextRequest): HeadersInit {
 
   const base: Record<string, string> = {
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
 
   if (!origin) return base;
@@ -43,14 +43,23 @@ function corsHeadersFor(req: NextRequest): HeadersInit {
   };
 }
 
-
-
-
 function clientIp(req: NextRequest) {
   const fwd = req.headers.get("x-forwarded-for");
   return fwd?.split(",")[0]?.trim() || "0.0.0.0";
 }
 
+
+function embedHostFromReq(req: NextRequest): string {
+  // Prefer explicit host passed in referer: /es/chat?...&host=asociacion-avast.org
+  const ref = req.headers.get("referer") || "";
+  try {
+    const u = new URL(ref);
+    const h = (u.searchParams.get("host") || "").trim().toLowerCase();
+    return h.replace(/:\d+$/, "");
+  } catch {
+    return "";
+  }
+}
 
 // --- lead intent heuristic (simple keywords; expand as needed) ---
 function wantsLead(s: string) {
@@ -105,7 +114,7 @@ export async function OPTIONS(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const ip = clientIp(req);
-    const host = originHost(req);
+    const host = embedHostFromReq(req);
     const { token, conversationId: inputConvId, message, customerName } =
       (await req.json()) as {
         token?: string;
