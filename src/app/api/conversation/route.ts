@@ -114,7 +114,10 @@ export async function OPTIONS(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const ip = clientIp(req);
-    const host = embedHostFromReq(req);
+    const host =
+      embedHostFromReq(req) ||
+      originHost(req) ||
+      "";
     const { token, conversationId: inputConvId, message, customerName } =
       (await req.json()) as {
         token?: string;

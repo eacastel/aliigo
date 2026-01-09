@@ -11,6 +11,12 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
+function errExtras(err: unknown): { details?: unknown; hint?: unknown; code?: unknown } {
+  if (!err || typeof err !== "object") return {};
+  const rec = err as Record<string, unknown>;
+  return { details: rec.details, hint: rec.hint, code: rec.code };
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -24,24 +30,37 @@ export async function GET(req: NextRequest) {
     if (!host) return NextResponse.json({ error: "Missing host" }, { status: 400 });
 
     const bizRes = await supabase
-      .from("businesses")
-      .select("id, allowed_domains")
-      .eq("public_embed_key", key)
-      .single<{ id: string; allowed_domains: string[] | null }>();
+        .from("businesses")
+        .select("id, allowed_domains")
+        .eq("public_embed_key", key)
+        .maybeSingle();
 
-    if (bizRes.error || !bizRes.data) {
-      return NextResponse.json(
-        { error: "Invalid key", debug: { keyReceived: key, hostReceived: host } },
-        { status: 403 }
-      );
-    }
+      if (bizRes.error) {
+  const extra = errExtras(bizRes.error);
+  return NextResponse.json(
+    {
+      error: "Supabase error",
+      debug: {
+        keyReceived: key,
+        hostReceived: host,
+        hostParam,
+        hostFromReq,
+        supabaseError: {
+          message: bizRes.error.message,
+          ...extra,
+        },
+      },
+    },
+    { status: 500 }
+  );
+}
 
-    if (!hostAllowed(host, bizRes.data.allowed_domains || [])) {
-      return NextResponse.json(
-        { error: "Domain not allowed", debug: { host, allowed: bizRes.data.allowed_domains || [] } },
-        { status: 403 }
-      );
-    }
+      if (!bizRes.data) {
+        return NextResponse.json(
+          { error: "Invalid key", debug: { keyReceived: key, hostReceived: host, hostParam, hostFromReq } },
+          { status: 403 }
+        );
+      }
 
     const tokRes = await supabase
       .from("embed_tokens")

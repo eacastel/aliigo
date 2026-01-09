@@ -42,15 +42,19 @@ export default function ClientEmbed() {
   }, [params]);
 
   function getReferrerHost(): string | null {
-    if (typeof document === "undefined") return null;
     const ref = document.referrer;
     if (!ref) return null;
-    try {
-      return new URL(ref).host.replace(/:\d+$/, ""); // strip port
-    } catch {
-      return null;
-    }
+    try { return new URL(ref).host.replace(/:\d+$/, ""); } catch { return null; }
   }
+
+  const hostFromQuery = params.get("host")?.trim() || "";
+  const refHost = getReferrerHost();
+  const host = (hostFromQuery || refHost || "").toLowerCase();
+
+  const url =
+    `/api/embed/session?key=${encodeURIComponent(key)}` +
+    (host ? `&host=${encodeURIComponent(host)}` : "");
+
 
   useEffect(() => {
     let cancelled = false;
