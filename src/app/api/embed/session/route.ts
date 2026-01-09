@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { originHost, hostAllowed } from "@/lib/embedGate";
+import crypto from "crypto";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,7 +65,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 3) Return latest embed token for that business
+    // 3) Get latest embed token; if none exists, create one
     const tokRes = await supabase
       .from("embed_tokens")
       .select("token")
@@ -73,7 +74,27 @@ export async function GET(req: NextRequest) {
       .limit(1)
       .maybeSingle<{ token: string }>();
 
-    return NextResponse.json({ token: tokRes.data?.token ?? null }, { status: 200 });
+    if (!tokRes.data?.token) {
+      const token = crypto.randomUUID().replace(/-/g, "");
+
+      const ins = await supabase
+        .from("embed_tokens")
+        .insert({ business_id: bizRes.data.id, token })
+        .select("token")
+        .single<{ token: string }>();
+
+      if (ins.error || !ins.data?.token) {
+        return NextResponse.json(
+          { error: "Failed to create embed token", details: ins.error?.message },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ token: ins.data.token }, { status: 200 });
+    }
+
+
+    return NextResponse.json({ token: tokRes.data.token }, { status: 200 });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     return NextResponse.json({ error: message }, { status: 500 });
