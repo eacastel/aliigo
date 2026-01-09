@@ -30,15 +30,15 @@ export async function GET(req: NextRequest) {
       .single<{ id: string; allowed_domains: string[] | null }>();
 
     if (bizRes.error || !bizRes.data) {
-      return NextResponse.json({ error: "Invalid key" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Invalid key", debug: { keyReceived: key, hostReceived: host } },
+        { status: 403 }
+      );
     }
 
     if (!hostAllowed(host, bizRes.data.allowed_domains || [])) {
       return NextResponse.json(
-        {
-          error: "Domain not allowed",
-          debug: { host, allowed: bizRes.data.allowed_domains || [] },
-        },
+        { error: "Domain not allowed", debug: { host, allowed: bizRes.data.allowed_domains || [] } },
         { status: 403 }
       );
     }
@@ -66,10 +66,16 @@ export async function GET(req: NextRequest) {
         );
       }
 
-      return NextResponse.json({ token: ins.data.token }, { status: 200 });
+      return NextResponse.json(
+        { token: ins.data.token, debug: { keyReceived: key, hostReceived: host } },
+        { status: 200 }
+      );
     }
 
-    return NextResponse.json({ token: tokRes.data.token }, { status: 200 });
+    return NextResponse.json(
+      { token: tokRes.data.token, debug: { keyReceived: key, hostReceived: host } },
+      { status: 200 }
+    );
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     return NextResponse.json({ error: message }, { status: 500 });
