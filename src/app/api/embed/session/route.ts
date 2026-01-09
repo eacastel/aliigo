@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { originHost, hostAllowed } from "@/lib/embedGate";
-import crypto from "crypto";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,27 +15,14 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const key = searchParams.get("key")?.trim() || "";
+    const hostParam = (searchParams.get("host") || "").trim().toLowerCase();
 
-    if (!key) {
-      return NextResponse.json({ error: "Missing key" }, { status: 400 });
-    }
+    if (!key) return NextResponse.json({ error: "Missing key" }, { status: 400 });
 
-    const host = originHost(req);
-    if (!host) {
-      return NextResponse.json(
-        {
-          error: "Missing host",
-          debug: {
-            origin: req.headers.get("origin"),
-            referer: req.headers.get("referer"),
-            host: req.headers.get("host"),
-          },
-        },
-        { status: 400 }
-      );
-    }
+    const hostFromReq = originHost(req);
+    const host = (hostParam || hostFromReq || "").replace(/:\d+$/, "");
+    if (!host) return NextResponse.json({ error: "Missing host" }, { status: 400 });
 
-    // 1) Find business by public key
     const bizRes = await supabase
       .from("businesses")
       .select("id, allowed_domains")
@@ -47,25 +33,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Invalid key" }, { status: 403 });
     }
 
-    // 2) Validate host is allowlisted
-    const allowed = bizRes.data.allowed_domains || [];
-
-    if (!hostAllowed(host, allowed)) {
+    if (!hostAllowed(host, bizRes.data.allowed_domains || [])) {
       return NextResponse.json(
         {
           error: "Domain not allowed",
-          debug: {
-            extractedHost: host,
-            allowedDomains: allowed,
-            // useful to confirm we matched the expected business
-            businessId: bizRes.data.id,
-          },
+          debug: { host, allowed: bizRes.data.allowed_domains || [] },
         },
         { status: 403 }
       );
     }
 
-    // 3) Get latest embed token; if none exists, create one
     const tokRes = await supabase
       .from("embed_tokens")
       .select("token")
@@ -76,7 +53,6 @@ export async function GET(req: NextRequest) {
 
     if (!tokRes.data?.token) {
       const token = crypto.randomUUID().replace(/-/g, "");
-
       const ins = await supabase
         .from("embed_tokens")
         .insert({ business_id: bizRes.data.id, token })
@@ -92,7 +68,6 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json({ token: ins.data.token }, { status: 200 });
     }
-
 
     return NextResponse.json({ token: tokRes.data.token }, { status: 200 });
   } catch (e: unknown) {

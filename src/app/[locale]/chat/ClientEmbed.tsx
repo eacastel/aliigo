@@ -41,6 +41,17 @@ export default function ClientEmbed() {
     }
   }, [params]);
 
+  function getReferrerHost(): string | null {
+    if (typeof document === "undefined") return null;
+    const ref = document.referrer;
+    if (!ref) return null;
+    try {
+      return new URL(ref).host.replace(/:\d+$/, ""); // strip port
+    } catch {
+      return null;
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -57,7 +68,10 @@ export default function ClientEmbed() {
       }
 
       // IMPORTANT: always same-origin to Aliigo (this page is on aliigo.vercel.app)
-      const url = `/api/embed/session?key=${encodeURIComponent(key)}`;
+      const refHost = getReferrerHost();
+      const url =
+        `/api/embed/session?key=${encodeURIComponent(key)}` +
+        (refHost ? `&host=${encodeURIComponent(refHost)}` : "");
 
       let res: Response;
       try {
