@@ -64,11 +64,11 @@ export default function SignupPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: input.id,
+        id: input.id, // REQUIRED uuid
         email: input.email,
-        full_name: input.name || null,
-        business_name: input.businessName,
-        phone: input.phone || null,
+        nombre_negocio: input.businessName, // REQUIRED
+        nombre_contacto: input.name || null,
+        telefono: input.phone || null,
         google_url: input.googleUrl || null,
         source: "signup",
       }),
