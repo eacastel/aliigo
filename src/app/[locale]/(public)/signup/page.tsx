@@ -1,3 +1,5 @@
+// /app/[locale]/(public)/signup/page.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -50,6 +52,42 @@ export default function SignupPage() {
     }
   };
 
+  async function ensureBusinessProfile(input: {
+    id: string;
+    email: string;
+    name?: string;
+    businessName: string;
+    phone?: string;
+    googleUrl?: string;
+  }) {
+    const res = await fetch("/api/profiles/ensure", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: input.id,
+        email: input.email,
+        full_name: input.name || null,
+        business_name: input.businessName,
+        phone: input.phone || null,
+        google_url: input.googleUrl || null,
+        source: "signup",
+      }),
+    });
+
+    const raw: unknown = await res.json().catch(() => ({}));
+    const j = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+
+
+    if (!res.ok) {
+      const err = typeof j.error === "string" ? j.error : "";
+      const msg = err || `profiles/ensure failed (${res.status})`;
+      throw new Error(msg);
+    }
+
+    return j;
+  }
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -82,6 +120,29 @@ export default function SignupPage() {
 
     if (authError) {
       setError(authError.message);
+      setLoading(false);
+      return;
+    }
+    
+    const userId = user?.id;
+    if (!userId) {
+      setError("No se pudo obtener el usuario después del registro.");
+      setLoading(false);
+      return;
+    }
+
+
+    try {
+      await ensureBusinessProfile({
+        id: userId,
+        email,
+        name,
+        businessName,
+        phone,
+        googleUrl,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo crear el negocio/perfil.");
       setLoading(false);
       return;
     }

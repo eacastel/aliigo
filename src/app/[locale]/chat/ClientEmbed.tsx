@@ -1,4 +1,3 @@
-// src/app/[locale]/chat/ClientEmbed.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -14,21 +13,29 @@ type Theme = {
   sendText?: string;
 };
 
+type SessionResp = { token: string | null; error?: string };
+
 export default function ClientEmbed() {
   const params = useSearchParams();
 
   const slug = params.get("slug") ?? "default";
   const brand = params.get("brand") ?? "Aliigo";
-  const key = params.get("key") ?? ""; // public key
+  const key = params.get("key") ?? ""; // public embed key
 
-  const [token, setToken] = useState<string | undefined>(undefined);
+  const [token, setToken] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const theme: Theme | undefined = useMemo(() => {
     const themeParam = params.get("theme");
     if (!themeParam) return undefined;
+
+    // theme is URL-encoded JSON in your snippet, so decode first
     try {
-      return JSON.parse(themeParam) as Theme;
+      const decoded = decodeURIComponent(themeParam);
+      const parsed: unknown = JSON.parse(decoded);
+      if (!parsed || typeof parsed !== "object") return undefined;
+      return parsed as Theme;
     } catch {
       return undefined;
     }
@@ -39,50 +46,47 @@ export default function ClientEmbed() {
 
     async function run() {
       setErr(null);
-      setToken(undefined);
+      setBlocked(false);
+      setToken(null);
 
       if (!key) {
         setErr("Missing key");
         return;
       }
 
-      // IMPORTANT: use the route path you will actually create:
-      // src/app/api/embed/session/route.ts  ->  /api/embed/session
-      const url = `/api/embed/session?key=${encodeURIComponent(
-        key
-      )}&slug=${encodeURIComponent(slug)}`;
+      const url = `/api/embed/session?key=${encodeURIComponent(key)}`;
 
       let res: Response;
       try {
-        res = await fetch(url, {
-          method: "GET",
-          cache: "no-store",
-          credentials: "include",
-        });
+        res = await fetch(url, { method: "GET", cache: "no-store" });
       } catch {
         if (!cancelled) setErr("Network error");
         return;
       }
 
-      let data: unknown = null;
+      let data: SessionResp | null = null;
       try {
-        data = await res.json();
+        data = (await res.json()) as SessionResp;
       } catch {
-        // non-json response
+        data = null;
       }
 
       if (cancelled) return;
 
-      const obj = (data && typeof data === "object") ? (data as Record<string, unknown>) : {};
-
-      if (!res.ok) {
-        setErr((obj.error as string) || "Failed to create embed session");
+      // If domain is not allowlisted, we treat it as "not embeddable": render nothing.
+      if (res.status === 403 && (data?.error || "").toLowerCase().includes("domain")) {
+        setBlocked(true);
         return;
       }
 
-      const t = obj.token;
-      if (typeof t !== "string" || !t) {
-        setErr("No token available for this business");
+      if (!res.ok) {
+        setErr(data?.error || "Failed to create embed session");
+        return;
+      }
+
+      const t = data?.token ?? null;
+      if (!t) {
+        setErr("No token available");
         return;
       }
 
@@ -93,12 +97,24 @@ export default function ClientEmbed() {
     return () => {
       cancelled = true;
     };
-  }, [key, slug]);
+  }, [key]);
+
+  // ✅ If blocked, show nothing (no button, no panel)
+  if (blocked) return null;
 
   return (
     <div className="w-full h-dvh bg-transparent">
-      <AliigoChatWidget businessSlug={slug} brand={brand} token={token} theme={theme} />
+      {/* ✅ Only render the widget once we have a token */}
+      {token ? (
+        <AliigoChatWidget
+          businessSlug={slug}
+          brand={brand}
+          token={token}
+          theme={theme}
+        />
+      ) : null}
 
+      {/* Optional: show errors ONLY for real failures (not domain blocks) */}
       {err && (
         <div className="fixed bottom-4 left-4 bg-white border border-gray-200 shadow-lg rounded-xl px-3 py-2 text-xs text-gray-700">
           {err}
