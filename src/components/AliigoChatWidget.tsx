@@ -52,6 +52,14 @@ export function AliigoChatWidget({
   //   if (!token) setDisabled("token");
   // }, [token]);
 
+  function getParentHost(): string {
+    try {
+      return new URL(document.referrer).host.replace(/:\d+$/, "").toLowerCase();
+    } catch {
+      return "";
+    }
+  }
+
   async function send(content: string) {
     if (!content.trim()) return;
 
@@ -67,6 +75,8 @@ export function AliigoChatWidget({
       return;
     }
 
+    const parentHost = getParentHost();
+
     setBusy(true);
     setMsgs((m) => [...m, { role: "user", content }]);
 
@@ -74,7 +84,12 @@ export function AliigoChatWidget({
       const res = await fetch("/api/conversation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, conversationId, message: content }),
+        body: JSON.stringify({
+          token,
+          conversationId,
+          message: content,
+          host: parentHost, // ✅ this is the key
+        }),
       });
 
       const raw: unknown = await res.json().catch(() => ({}));

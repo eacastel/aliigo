@@ -114,20 +114,32 @@ export async function OPTIONS(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const ip = clientIp(req);
+
+    // 1) Parse body first
+    const {
+      token,
+      conversationId: inputConvId,
+      message,
+      customerName,
+      host: bodyHost,
+    } = (await req.json()) as {
+      token?: string;
+      conversationId?: string;
+      message?: string;
+      customerName?: string;
+      host?: string;
+    };
+
+    // 2) Then compute host
     const host =
-      embedHostFromReq(req) ||
-      originHost(req) ||
-      "";
-    const { token, conversationId: inputConvId, message, customerName } =
-      (await req.json()) as {
-        token?: string;
-        conversationId?: string;
-        message?: string;
-        customerName?: string;
-      };
+      ((bodyHost || "").trim().toLowerCase().replace(/:\d+$/, "")) ||
+      originHost(req);
 
     if (!message) {
-      return NextResponse.json({ error: "Missing message" }, { status: 400, headers: corsHeadersFor(req) });
+      return NextResponse.json(
+        { error: "Missing message" },
+        { status: 400, headers: corsHeadersFor(req) }
+      );
     }
 
     // token + domain gate
