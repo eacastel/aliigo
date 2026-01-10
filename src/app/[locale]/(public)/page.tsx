@@ -229,7 +229,7 @@ export default function HomePage() {
               <p className="text-zinc-400 mb-6">{t('pricing.desc')}</p>
               <ul className="space-y-3 text-sm text-zinc-300 text-left mx-auto max-w-xs md:mx-0">
                 <li className="flex items-center gap-2"><span className="text-[#84c9ad]">✓</span> 1 User Included</li>
-                <li className="flex items-center gap-2"><span className="text-[#84c9ad]">✓</span> AI Chatbot (Unlimited)</li>
+                <li className="flex items-center gap-2"><span className="text-[#84c9ad]">✓</span> AI Chatbot (ample allowance)</li>
                 <li className="flex items-center gap-2"><span className="text-[#84c9ad]">✓</span> Google Review Sync</li>
               </ul>
             </div>
