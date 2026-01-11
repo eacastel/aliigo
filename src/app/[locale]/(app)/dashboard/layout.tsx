@@ -19,7 +19,8 @@ export default function DashboardLayout({
 
   const nav = [
     { href: "/dashboard", label: t('links.dashboard') },
-    { href: "/dashboard/settings", label: t('links.settings') },
+    { href: "/dashboard/settings/business", label: t('links.business') },
+    { href: "/dashboard/settings/assistant", label: t('links.assistant') },
     { href: "/dashboard/widget", label: t('links.widget') },
     { href: "/dashboard/billing", label: t('links.billing') },
   ];

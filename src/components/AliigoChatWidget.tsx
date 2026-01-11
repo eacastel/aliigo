@@ -15,6 +15,9 @@ type Theme = {
   sendText?: string;
 };
 
+const isHex = (v?: string) => typeof v === "string" && /^#([0-9a-fA-F]{3}){1,2}$/.test(v);
+
+
   type UILang = "en" | "es";
 
   function uiLang(locale?: string): UILang {
@@ -88,6 +91,8 @@ type Theme = {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  
+
   const th = {
     headerBg: theme.headerBg ?? "bg-gray-900",
     headerText: theme.headerText ?? "text-white",
@@ -96,6 +101,33 @@ type Theme = {
     sendBg: theme.sendBg ?? "bg-blue-600",
     sendText: theme.sendText ?? "text-white",
   };
+
+    // If theme values are hex colors, use inline styles.
+  // If they are Tailwind classes, keep using className.
+  const headerStyle: React.CSSProperties = {
+    ...(isHex(th.headerBg) ? { backgroundColor: th.headerBg } : {}),
+    ...(isHex(th.headerText) ? { color: th.headerText } : {}),
+  };
+  const headerBgClass = isHex(th.headerBg) ? "" : th.headerBg;
+  const headerTextClass = isHex(th.headerText) ? "" : th.headerText;
+
+  const bubbleUserStyle = isHex(th.bubbleUser)
+    ? ({ backgroundColor: th.bubbleUser } as React.CSSProperties)
+    : undefined;
+  const bubbleUserClass = isHex(th.bubbleUser) ? "" : th.bubbleUser;
+
+  const bubbleBotStyle = isHex(th.bubbleBot)
+    ? ({ backgroundColor: th.bubbleBot } as React.CSSProperties)
+    : undefined;
+  const bubbleBotClass = isHex(th.bubbleBot) ? "" : th.bubbleBot;
+
+  const sendStyle: React.CSSProperties = {
+    ...(isHex(th.sendBg) ? { backgroundColor: th.sendBg } : {}),
+    ...(isHex(th.sendText) ? { color: th.sendText } : {}),
+  };
+  const sendBgClass = isHex(th.sendBg) ? "" : th.sendBg;
+  const sendTextClass = isHex(th.sendText) ? "" : th.sendText;
+
 
   const wrapClass = preview
   ? "absolute bottom-4 right-4 z-50"
@@ -239,7 +271,8 @@ type Theme = {
         <div className={wrapClass}>
           <div className="w-80 h-96 bg-white shadow-2xl rounded-2xl border border-gray-200 flex flex-col overflow-hidden">
             <div
-              className={`px-4 py-3 border-b text-sm font-medium flex items-center justify-between ${th.headerBg} ${th.headerText}`}
+              style={headerStyle}
+              className={`px-4 py-3 border-b text-sm font-medium flex items-center justify-between ${headerBgClass} ${headerTextClass}`}
             >
               <span>{t.header(brand, businessSlug)}</span>
               <button
@@ -261,8 +294,9 @@ type Theme = {
               {msgs.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
                   <div
+                    style={m.role === "user" ? bubbleUserStyle : bubbleBotStyle}
                     className={`inline-block px-3 py-2 rounded-xl text-sm ${
-                      m.role === "user" ? th.bubbleUser : th.bubbleBot
+                      m.role === "user" ? bubbleUserClass : bubbleBotClass
                     }`}
                   >
                     {m.content}
@@ -282,7 +316,8 @@ type Theme = {
               <button
                 type="submit"
                 disabled={busy || !token}
-                className={`px-3 py-2 text-sm rounded-lg disabled:opacity-50 ${th.sendBg} ${th.sendText}`}
+                style={sendStyle}
+                className={`px-3 py-2 text-sm rounded-lg disabled:opacity-50 ${sendBgClass} ${sendTextClass}`}
               >
                 {t.send}
               </button>
@@ -293,7 +328,8 @@ type Theme = {
         <div className={wrapClass}>
           <button
             onClick={() => setOpen(true)}
-            className={`rounded-full shadow-xl px-4 py-3 text-sm ${th.sendBg} ${th.sendText}`}
+            style={sendStyle}
+            className={`rounded-full shadow-xl px-4 py-3 text-sm ${sendBgClass} ${sendTextClass}`}
             type="button"
           >
             {t.button(brand)}

@@ -3,9 +3,10 @@
         "brand": "Aliigo",
         "links": {
             "dashboard": "Overview",
-            "settings": "Business",
+            "business": "Empresa",
+            "assistant": "Asistente",
             "widget": "Widget",
-            "billing": "Billing"
+            "billing": "Pagos"
         },
         "publicLinks": {
             "features": "Cómo funciona",

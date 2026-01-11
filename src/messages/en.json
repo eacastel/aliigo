@@ -3,7 +3,8 @@
         "brand": "Aliigo",
         "links": {
             "dashboard": "Overview",
-            "settings": "Business",
+            "business": "Business",
+            "assistant": "Assistant",
             "widget": "Widget",
             "billing": "Billing"
         },
