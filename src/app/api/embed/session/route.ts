@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const locale = (bizRes.data.default_locale || "en").toLowerCase().trim();
+    const locale = (bizRes.data.default_locale || "en").toLowerCase().startsWith("es") ? "es" : "en";
 
     const allowed = bizRes.data.allowed_domains ?? [];
 

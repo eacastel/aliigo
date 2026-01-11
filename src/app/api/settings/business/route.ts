@@ -1,4 +1,5 @@
 // src/app/api/settings/business/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -17,6 +18,7 @@ type BusinessPayload = {
   system_prompt?: string | null;
   knowledge?: string | null;
   allowed_domains?: string[] | null;
+  default_locale?: "en" | "es" | string | null;
 };
 
 const nonEmpty = (v: unknown) =>
@@ -110,11 +112,18 @@ export async function POST(req: NextRequest) {
       const knowledge = body.business.knowledge ?? undefined;
       const domains = normalizeDomains(body.business.allowed_domains);
 
+      const dlRaw = body.business.default_locale;
+      const defaultLocale =
+        typeof dlRaw === "string" && dlRaw.toLowerCase().startsWith("es") ? "es" : "en";
+
+
       if (name !== null && name !== undefined) nextBiz.name = name;
       if (tz !== null && tz !== undefined) nextBiz.timezone = tz;
       if (sp !== undefined) nextBiz.system_prompt = nonEmpty(sp);
       if (knowledge !== undefined) nextBiz.knowledge = nonEmpty(knowledge);
       if (domains !== null) nextBiz.allowed_domains = domains;
+      if (dlRaw !== undefined) nextBiz.default_locale = defaultLocale;
+
 
       if (Object.keys(nextBiz).length > 0) {
         const { error } = await admin
@@ -129,7 +138,7 @@ export async function POST(req: NextRequest) {
     // 6) Return current business row
     const { data: currentBiz, error: readErr } = await admin
       .from("businesses")
-      .select("id, slug, name, timezone, system_prompt, knowledge, allowed_domains, public_embed_key")
+      .select("id, slug, name, timezone, system_prompt, knowledge, allowed_domains, public_embed_key, default_locale")
       .eq("id", businessId)
       .single();
 

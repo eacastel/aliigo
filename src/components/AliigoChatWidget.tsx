@@ -116,15 +116,7 @@ type Theme = {
     }
 
     //  trust the value from ClientEmbed (or empty string)
-    const host =
-      (parentHost || "").trim().toLowerCase() ||
-      (() => {
-        try {
-          return new URL(document.referrer || "").host.replace(/:\d+$/, "").toLowerCase();
-        } catch {
-          return "";
-        }
-      })();
+    const host = (parentHost || "").trim().toLowerCase();
 
     setBusy(true);
     setMsgs((m) => [...m, { role: "user", content }]);

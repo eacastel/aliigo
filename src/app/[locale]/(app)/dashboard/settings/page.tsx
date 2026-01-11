@@ -17,7 +17,8 @@ type BusinessState = {
   timezone: string;
   system_prompt: string;
   knowledge: string;
-  allowed_domains: string; // textarea, one per line
+  allowed_domains: string; 
+  default_locale: "en" | "es";
 };
 
 type JoinedBusiness = {
@@ -28,6 +29,7 @@ type JoinedBusiness = {
   system_prompt?: string | null;
   knowledge?: string | null;
   allowed_domains?: string[] | null;
+  default_locale?: string | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -82,6 +84,7 @@ export default function SettingsBusinessPage() {
     system_prompt: "",
     knowledge: "",
     allowed_domains: "",
+    default_locale: "en",
   });
 
   // snapshots for dirty detection
@@ -119,7 +122,8 @@ export default function SettingsBusinessPage() {
             slug,
             system_prompt,
             knowledge,
-            allowed_domains
+            allowed_domains,
+            default_locale
           )
         `
         )
@@ -161,6 +165,7 @@ export default function SettingsBusinessPage() {
           system_prompt: biz.system_prompt ?? "",
           knowledge: biz.knowledge ?? "",
           allowed_domains: domainsToText(biz.allowed_domains),
+          default_locale: (biz.default_locale === "es" ? "es" : "en"),
         };
         setBusiness(nextBusiness);
         initialBusiness.current = nextBusiness;
@@ -172,6 +177,7 @@ export default function SettingsBusinessPage() {
           system_prompt: "",
           knowledge: "",
           allowed_domains: "",
+          default_locale: "en",
         };
         initialBusiness.current = empty;
         setBusiness(empty);
@@ -199,7 +205,8 @@ export default function SettingsBusinessPage() {
       business.timezone.trim() !== ib.timezone.trim() ||
       business.system_prompt.trim() !== ib.system_prompt.trim() ||
       business.knowledge.trim() !== ib.knowledge.trim() ||
-      business.allowed_domains.trim() !== ib.allowed_domains.trim()
+      business.allowed_domains.trim() !== ib.allowed_domains.trim() ||
+      business.default_locale !== ib.default_locale
     );
   }, [profile, business]);
 
@@ -228,6 +235,7 @@ export default function SettingsBusinessPage() {
           system_prompt: business.system_prompt,
           knowledge: business.knowledge,
           allowed_domains: textToDomains(business.allowed_domains),
+          default_locale: business.default_locale,
         },
       };
 
@@ -248,6 +256,7 @@ export default function SettingsBusinessPage() {
           system_prompt?: string | null;
           knowledge?: string | null;
           allowed_domains?: string[] | null;
+          default_locale?: string | null;
         };
       } = await res.json().catch(() => ({}));
 
@@ -267,6 +276,7 @@ export default function SettingsBusinessPage() {
           system_prompt: j.business.system_prompt ?? business.system_prompt,
           knowledge: j.business.knowledge ?? business.knowledge,
           allowed_domains: domainsToText(j.business.allowed_domains),
+          default_locale: (j.business.default_locale === "es" ? "es" : business.default_locale),
         };
         initialBusiness.current = nextBusiness;
         setBusiness(nextBusiness);
@@ -414,6 +424,22 @@ export default function SettingsBusinessPage() {
                   setBusiness((b) => ({ ...b, timezone: e.target.value }))
                 }
               />
+            </div>
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">Default language</label>
+              <select
+                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                value={business.default_locale}
+                onChange={(e) =>
+                  setBusiness((b) => ({
+                    ...b,
+                    default_locale: e.target.value === "es" ? "es" : "en",
+                  }))
+                }
+              >
+                <option value="en">English</option>
+                <option value="es">Español</option>
+              </select>
             </div>
 
             <div>
