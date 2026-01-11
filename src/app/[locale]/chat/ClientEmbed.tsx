@@ -37,6 +37,9 @@ function getReferrerHost(): string | null {
 export default function ClientEmbed() {
   const params = useSearchParams();
 
+  const localeParam = (params.get("locale") || params.get("lang") || "").trim().toLowerCase();
+
+
   const slug = params.get("slug") ?? "default";
   const brand = params.get("brand") ?? "Aliigo";
   const key = params.get("key") ?? "";
@@ -79,6 +82,10 @@ export default function ClientEmbed() {
         setLoading(false);
         return;
       }
+
+      // If locale is explicitly passed in the embed URL, it wins.
+      if (localeParam) setLocale(normalizeLocale(localeParam));
+
 
       const refHost = (getReferrerHost() || "").toLowerCase();
       const host = hostFromQuery || refHost;
@@ -130,8 +137,8 @@ export default function ClientEmbed() {
 
       if (cancelled) return;
 
-      // set locale as soon as we have it (even if token fails later)
-      setLocale(normalizeLocale(data?.locale));
+      // If URL doesn’t specify locale, fall back to server-provided locale.
+      if (!localeParam) setLocale(normalizeLocale(data?.locale));
 
       if (res.status === 403 && (data?.error || "").toLowerCase().includes("domain")) {
         setBlocked(true);
@@ -160,7 +167,7 @@ export default function ClientEmbed() {
     return () => {
       cancelled = true;
     };
-  }, [key, hostFromQuery]);
+  }, [key, hostFromQuery, localeParam]);
 
   if (blocked) {
     return (

@@ -6,6 +6,7 @@ import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { AliigoChatWidget } from "@/components/AliigoChatWidget";
+import { useParams } from "next/navigation";
 
 // Types
 type BusinessProfile = {
@@ -27,7 +28,10 @@ type PendingSignup = {
 };
 
 export default function DashboardPage() {
+  
   // 1. Initialize Translations
+  const params = useParams<{ locale: string }>();
+  const locale = params?.locale ?? "en";
   const t = useTranslations('Dashboard');
   const router = useRouter();
 
@@ -213,7 +217,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <AliigoChatWidget businessSlug={bizSlug} brand="Aliigo" channel="web" />
+      <AliigoChatWidget businessSlug={bizSlug} brand="Aliigo" channel="web" locale={locale} />
     </div>
   );
 }
