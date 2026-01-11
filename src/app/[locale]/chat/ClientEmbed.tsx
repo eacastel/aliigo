@@ -14,6 +14,7 @@ type Theme = {
   sendText?: string;
 };
 
+
 type Locale = "en" | "es" | "fr" | "it" | "de";
 type SessionResp = { token: string | null; locale?: string; error?: string };
 
@@ -31,6 +32,38 @@ function getReferrerHost(): string | null {
     return new URL(ref).host.replace(/:\d+$/, "");
   } catch {
     return null;
+  }
+}
+
+function loadingText(locale: Locale, brand: string) {
+  const b = (brand || "Aliigo").trim();
+
+  switch (locale) {
+    case "es":
+      return `Cargando ${b}…`;
+    case "fr":
+      return `Chargement de ${b}…`;
+    case "it":
+      return `Caricamento di ${b}…`;
+    case "de":
+      return `Lade ${b}…`;
+    default:
+      return `Loading ${b}…`;
+  }
+}
+
+function blockedText(locale: Locale) {
+  switch (locale) {
+    case "es":
+      return "Embed bloqueado: este dominio no está permitido para esta clave.";
+    case "fr":
+      return "Intégration bloquée : ce domaine n’est pas autorisé pour cette clé.";
+    case "it":
+      return "Embed bloccato: questo dominio non è consentito per questa chiave.";
+    case "de":
+      return "Embed blockiert: Diese Domain ist für diesen Schlüssel nicht erlaubt.";
+    default:
+      return "Embed blocked: domain not allowlisted for this key.";
   }
 }
 
@@ -173,7 +206,7 @@ export default function ClientEmbed() {
     return (
       <div className="w-full h-dvh flex items-center justify-center bg-transparent">
         <div className="text-xs px-3 py-2 rounded-xl border border-white/20 bg-black/40 text-white">
-          Embed blocked: domain not allowlisted for this key.
+          {blockedText(locale)}
         </div>
       </div>
     );
@@ -184,7 +217,7 @@ export default function ClientEmbed() {
       {loading && (
         <div className="w-full h-dvh flex items-center justify-center">
           <div className="text-xs px-3 py-2 rounded-xl border border-white/20 bg-black/40 text-white">
-            Loading Aliigo widget…
+            {loadingText(locale, brand)}
           </div>
         </div>
       )}

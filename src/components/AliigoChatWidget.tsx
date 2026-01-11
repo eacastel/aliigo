@@ -24,30 +24,30 @@ type Theme = {
 
   const UI = {
     en: {
-      button: "Chat with us",
+      button: "Ask Aliigo",
       header: (brand: string, slug?: string) =>
-        `${brand} Support — Chat${slug ? ` (${slug})` : ""}`,
-      welcome: "Ask us anything. We’ll reply right away.",
-      placeholder: "Type your message…",
+        `${brand} Assistant${slug ? ` (${slug})` : ""}`,
+      welcome: "Ask a question and we’ll help right away.",
+      placeholder: "Type your question…",
       send: "Send",
-      missingToken: "To activate chat, generate a token in Settings → Widget and try again.",
+      missingToken: "To activate the assistant, generate a token in Settings → Widget and try again.",
       err: "Error. Please try again.",
       net: "Network error. Please try again.",
-      fallback: "Thanks. We’ll reply right away.",
-      previewHint: "This is a preview. Generate a token in Settings → Widget to enable chat.",
+      fallback: "Thanks. We’ll help right away.",
+      previewHint: "This is a preview. Generate a token in Settings → Widget to enable the assistant.",
     },
     es: {
-      button: "Chatea con nosotros",
+      button: "Pregunta a Aliigo",
       header: (brand: string, slug?: string) =>
-        `${brand} Soporte — Chat${slug ? ` (${slug})` : ""}`,
-      welcome: "Pregúntanos lo que quieras. Te respondemos al momento.",
-      placeholder: "Escribe tu mensaje…",
+        `Asistente de ${brand}${slug ? ` (${slug})` : ""}`,
+      welcome: "Haz tu consulta y te ayudamos al momento.",
+      placeholder: "Escribe tu consulta…",
       send: "Enviar",
-      missingToken: "Para activar el chat, genera un token en Ajustes → Widget y vuelve a intentarlo.",
-      err: "Error. Intenta de nuevo.",
-      net: "Error de red. Intenta de nuevo.",
-      fallback: "Gracias. Te respondemos enseguida.",
-      previewHint: "Este es un preview. Genera un token en Ajustes → Widget para activar el chat.",
+      missingToken: "Para activar el asistente, genera un token en Ajustes → Widget y vuelve a intentarlo.",
+      err: "Error. Inténtalo de nuevo.",
+      net: "Error de red. Inténtalo de nuevo.",
+      fallback: "Gracias. Te ayudamos al momento.",
+      previewHint: "Esto es una vista previa. Genera un token en Ajustes → Widget para activar el asistente.",
     },
   } as const;
 
