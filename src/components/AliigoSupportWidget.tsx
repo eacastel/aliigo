@@ -3,10 +3,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AliigoChatWidget } from "@/components/AliigoChatWidget";
+
+function pathLocale(pathname: string): "en" | "es" {
+  const seg = (pathname.split("/")[1] || "").toLowerCase();
+  return seg === "es" ? "es" : "en";
+}
+
 
 export function AliigoSupportWidget() {
   const [token, setToken] = useState<string | null>(null);
+  const pathname = usePathname();
+  const locale = pathLocale(pathname);
 
   useEffect(() => {
     (async () => {
@@ -25,9 +34,10 @@ export function AliigoSupportWidget() {
   return (
     <AliigoChatWidget
       businessSlug="aliigo"
-      brand="Aliigo Soporte"
+      brand="Aliigo"
       token={token}
       parentHost=""
+      locale={locale}
       channel="web"
       theme={{
         headerBg: "bg-emerald-600",
