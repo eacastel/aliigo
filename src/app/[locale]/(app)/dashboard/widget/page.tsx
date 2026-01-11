@@ -57,7 +57,7 @@ export default function WidgetSettingsPage() {
   const [token, setToken] = useState<string | null>(null);
 
   const [brand, setBrand] = useState("Aliigo");
-  const [locale, setLocale] = useState<"es" | "en">("es");
+  const [locale, setLocale] = useState<"en" | "es" | "fr" | "it" | "de">("es");
 
   const [theme, setTheme] = useState<Theme>({
     headerBg: "bg-gray-900",
@@ -189,8 +189,8 @@ export default function WidgetSettingsPage() {
       "<!-- Aliigo Chat Widget -->",
       "<script>",
       "(function(){",
-      "  var iframe=document.createElement('iframe');",
-      `  iframe.src='${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}';`,
+      "  var parentHost = window.location.hostname;",
+      `  iframe.src='${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(parentHost);`,
       "  iframe.style.position='fixed';",
       "  iframe.style.bottom='24px';",
       "  iframe.style.right='24px';",
@@ -293,10 +293,13 @@ export default function WidgetSettingsPage() {
               <select
                 className="w-full border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
                 value={locale}
-                onChange={(e) => setLocale(e.target.value as "es" | "en")}
+                onChange={(e) => setLocale(e.target.value as "en" | "es" | "fr" | "it" | "de")}
               >
-                <option value="es">es</option>
                 <option value="en">en</option>
+                <option value="es">es</option>
+                <option value="fr">fr</option>
+                <option value="it">it</option>
+                <option value="de">de</option>
               </select>
             </div>
 
@@ -321,6 +324,8 @@ export default function WidgetSettingsPage() {
               brand={brand}
               token={token ?? undefined}
               theme={theme}
+              parentHost=""
+              channel="web"
             />
           </div>
 

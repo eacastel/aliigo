@@ -1,3 +1,5 @@
+// src/app/api/conversation/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
@@ -13,6 +15,13 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   { auth: { persistSession: false } }
 );
+
+const ALLOWED_CHANNELS = ["web", "whatsapp", "sms", "email", "telegram"] as const;
+type Channel = (typeof ALLOWED_CHANNELS)[number];
+
+function isChannel(v: unknown): v is Channel {
+  return typeof v === "string" && (ALLOWED_CHANNELS as readonly string[]).includes(v);
+}
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -99,9 +108,9 @@ async function validateEmbedAccess(token: string, host: string) {
     .select("id,allowed_domains").eq("id", tok.data.business_id).single();
   if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
 
-if (!hostAllowed(host, biz.data.allowed_domains)) {
-  return { ok: false as const, reason: "Domain not allowed" };
-}
+  if (!hostAllowed(host, biz.data.allowed_domains)) {
+    return { ok: false as const, reason: "Domain not allowed" };
+  }
 
 
   return { ok: true as const, businessId: biz.data.id };
@@ -135,13 +144,19 @@ export async function POST(req: NextRequest) {
       message,
       customerName,
       host: bodyHost,
+      channel: bodyChannel,
+      locale: bodyLocale,
     } = (await req.json()) as {
       token?: string;
       conversationId?: string;
       message?: string;
       customerName?: string;
       host?: string;
+      channel?: unknown;
+      locale?: unknown;
     };
+
+    const ch: Channel = isChannel(bodyChannel) ? bodyChannel : "web";
 
     // 2) Then compute host
     const host =
@@ -165,40 +180,90 @@ export async function POST(req: NextRequest) {
     await rateLimit(businessId, ip);
 
     // If client provides a conversationId, verify it belongs to this business
+
+    let conversationLocale: string | null = null;
+
     if (inputConvId) {
       const own = await supabase
         .from("conversations")
-        .select("id")
+        .select("id, locale")
         .eq("id", inputConvId)
         .eq("business_id", businessId)
-        .maybeSingle();
+        .maybeSingle<{ id: string; locale: string | null }>();
 
       if (own.error) throw own.error;
+
       if (!own.data?.id) {
         return NextResponse.json(
           { error: "Forbidden: conversation not found" },
           { status: 403, headers: corsHeadersFor(req) }
         );
       }
+
+      conversationLocale = own.data.locale ?? null;
     }
 
+    // business prompt (also gives us default_locale)
+    const bizRes = await supabase
+      .from("businesses")
+      .select("name, timezone, system_prompt, slug, knowledge, default_locale")
+      .eq("id", businessId)
+      .single<{
+        name: string;
+        timezone: string;
+        system_prompt: string | null;
+        slug: string;
+        knowledge: string | null;
+        default_locale: string | null;
+      }>();
+
+    if (bizRes.error) throw bizRes.error;
+    if (!bizRes.data) throw new Error("Business not found");
+
+    const supported = new Set(["en", "es", "fr", "it", "de"]);
+
+    const requestedLocale =
+      typeof bodyLocale === "string" ? bodyLocale.toLowerCase().trim() : "";
+
+    const localeRaw =
+      requestedLocale ||
+      (conversationLocale || "").toLowerCase().trim() ||
+      (bizRes.data.default_locale || "en").toLowerCase().trim();
+
+    const locale = supported.has(localeRaw) ? localeRaw : "en";
 
     // ensure conversation
     let conversationId = inputConvId ?? null;
     if (!conversationId) {
       const convRes = await supabase
         .from("conversations")
-        .insert({ business_id: businessId, channel: "web", customer_name: customerName ?? null })
+        .insert({
+          business_id: businessId,
+          channel: ch,
+          customer_name: customerName ?? null,
+          locale,
+        })
         .select("id")
         .single<{ id: string }>();
-      if (convRes.error || !convRes.data) throw convRes.error ?? new Error("Conversation create failed");
+
+      if (convRes.error || !convRes.data) {
+        throw convRes.error ?? new Error("Conversation create failed");
+      }
       conversationId = convRes.data.id;
+    }
+
+    if (inputConvId && requestedLocale && requestedLocale !== conversationLocale) {
+      await supabase
+        .from("conversations")
+        .update({ locale })
+        .eq("id", inputConvId)
+        .eq("business_id", businessId);
     }
 
     // persist user message
     const m1 = await supabase.from("messages").insert({
       conversation_id: conversationId,
-      channel: "web",
+      channel: ch,
       role: "user",
       content: message,
       meta: {},
@@ -214,18 +279,24 @@ export async function POST(req: NextRequest) {
       .limit(20);
     const history = (historyRes.data as MessagesRow[]) ?? [];
 
-    // business prompt
-    const bizRes = await supabase
-      .from("businesses")
-      .select("name, timezone, system_prompt, slug, knowledge")
-      .eq("id", businessId)
-      .single<{ name: string; timezone: string; system_prompt: string | null; slug: string; knowledge: string | null; }>();
 
-    const defaultSys =
-      `You are the AI concierge for ${bizRes.data?.name ?? "the business"} (${bizRes.data?.slug ?? ""}).
-Be concise, friendly, and professional. Default language: Spanish (Castilian) unless the user writes in another language.
-Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.
-If you are unsure of a fact, say so briefly.`;
+
+    const langName =
+      locale === "es" ? "Spanish (Castilian)" :
+        locale === "fr" ? "French" :
+          locale === "it" ? "Italian" :
+            locale === "de" ? "German" :
+              "English";
+
+    const defaultSys = `You are the AI concierge for ${bizRes.data?.name ?? "the business"} (${bizRes.data?.slug ?? ""}).
+
+    IMPORTANT:
+    - Always reply in ${langName}.
+    - Do NOT switch languages unless the user explicitly asks.
+    - Be concise, friendly, and professional.
+
+    Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.
+    If you are unsure of a fact, say so briefly.`;
 
     let sys = (bizRes.data?.system_prompt ?? "").trim() || defaultSys;
 
@@ -233,25 +304,35 @@ If you are unsure of a fact, say so briefly.`;
     if (knowledge) {
       sys += `
 
-Business knowledge (authoritative):
-${knowledge}
+    Business knowledge (authoritative): 
+    ${knowledge}
 
-Rules:
-- Prefer the business knowledge when answering.
-- If the knowledge does not cover it, say so briefly and ask 1 follow-up question.`;
+    Rules:
+    - Prefer the business knowledge when answering.
+    - If the knowledge does not cover it, say so briefly and ask 1 follow-up question.`;
     }
     // lead intent → collect contact details
     if (wantsLead(message)) {
       sys += `
 
-Lead intent detected.
-- Ask for full name, email, and phone in ONE short message.
-- After collecting, confirm we'll contact them soon and offer to keep answering questions.
-- Keep it under ~4 sentences. Do not invent prices or guarantees.`;
+    Lead intent detected.
+    - Ask for full name, email, and phone in ONE short message.
+    - After collecting, confirm we'll contact them soon and offer to keep answering questions.
+    - Keep it under ~4 sentences. Do not invent prices or guarantees.`;
     }
 
     // reply
-    let reply = "Gracias por tu mensaje. Te respondemos enseguida.";
+    let reply =
+      locale === "es"
+        ? "Gracias por tu mensaje. Te respondemos enseguida."
+        : locale === "fr"
+          ? "Merci pour votre message. Nous vous répondons tout de suite."
+          : locale === "it"
+            ? "Grazie per il messaggio. Ti rispondiamo subito."
+            : locale === "de"
+              ? "Danke für deine Nachricht. Wir antworten gleich."
+              : "Thanks for your message. We'll reply right away.";
+
 
     if (openai) {
       try {
@@ -283,10 +364,26 @@ Lead intent detected.
 
         if (status === 429 || status === 401 || status === 403) {
           reply =
-            "Gracias por tu mensaje. Ahora mismo no puedo responder automáticamente, pero te contactaremos en breve. Si quieres, déjame tu nombre y un teléfono o email.";
+            locale === "es"
+              ? "Gracias por tu mensaje. Ahora mismo no puedo responder automáticamente. Déjanos tu nombre y un teléfono o email y te contactamos enseguida."
+              : locale === "fr"
+                ? "Merci pour votre message. Je ne peux pas répondre automatiquement pour le moment. Laissez votre nom et un téléphone ou email et nous vous contacterons rapidement."
+                : locale === "it"
+                  ? "Grazie per il messaggio. In questo momento non posso rispondere automaticamente. Lascia nome e telefono o email e ti contatteremo a breve."
+                  : locale === "de"
+                    ? "Danke für deine Nachricht. Ich kann gerade nicht automatisch antworten. Bitte nenne deinen Namen und eine Telefonnummer oder E-Mail, dann melden wir uns kurzfristig."
+                    : "Thanks for your message. I can’t reply automatically right now. Share your name and a phone or email and we’ll reach out shortly.";
         } else {
           reply =
-            "Gracias por tu mensaje. Hemos tenido un problema temporal y te responderemos en breve.";
+            locale === "es"
+              ? "Gracias por tu mensaje. Hemos tenido un problema temporal y te responderemos en breve."
+              : locale === "fr"
+                ? "Merci pour votre message. Nous avons eu un problème temporaire et nous vous répondrons bientôt."
+                : locale === "it"
+                  ? "Grazie per il messaggio. Abbiamo avuto un problema temporaneo e ti risponderemo a breve."
+                  : locale === "de"
+                    ? "Danke für deine Nachricht. Es gab ein temporäres Problem. Wir melden uns in Kürze."
+                    : "Thanks for your message. We had a temporary issue and we’ll reply shortly.";
         }
       }
     }
@@ -295,14 +392,14 @@ Lead intent detected.
     // persist assistant reply
     const m2 = await supabase.from("messages").insert({
       conversation_id: conversationId,
-      channel: "web",
+      channel: ch,
       role: "assistant",
       content: reply,
       meta: {},
     });
     if (m2.error) throw m2.error;
 
-    return NextResponse.json({ conversationId, reply }, { status: 200, headers: corsHeadersFor(req) });
+    return NextResponse.json({ conversationId, reply, locale }, { status: 200, headers: corsHeadersFor(req) });
   } catch (e: unknown) {
     const status = e instanceof RateLimitError ? e.status : 500;
     const message = e instanceof Error ? e.message : "Server error";

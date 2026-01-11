@@ -1,3 +1,5 @@
+// src/app/[locale]/(public)/page.tsx
+
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import HeroRotator from "@/components/HeroRotator";

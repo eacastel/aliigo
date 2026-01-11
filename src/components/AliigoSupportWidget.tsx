@@ -1,3 +1,5 @@
+// src/components/AliigoSupportWidget.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -25,6 +27,8 @@ export function AliigoSupportWidget() {
       businessSlug="aliigo"
       brand="Aliigo Soporte"
       token={token}
+      parentHost=""
+      channel="web"
       theme={{
         headerBg: "bg-emerald-600",
         headerText: "text-white",

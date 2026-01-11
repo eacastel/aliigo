@@ -1,3 +1,5 @@
+// src/components/AliigoChatWidget.tsx
+
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -13,22 +15,30 @@ type Theme = {
   sendText?: string;
 };
 
-export function AliigoChatWidget({
-  token,
-  brand = "Aliigo",
-  businessSlug,
-  theme = {},
-}: {
-  token?: string;
-  brand?: string;
-  businessSlug?: string;
-  theme?: Theme;
-}) {
+  type Channel = "web" | "whatsapp" | "sms" | "email" | "telegram";
+
+  export function AliigoChatWidget({
+    token,
+    brand = "Aliigo",
+    businessSlug,
+    theme = {},
+    locale,
+    parentHost, 
+    channel = "web",   
+  }: {
+    token?: string;
+    brand?: string;
+    businessSlug?: string;
+    theme?: Theme;
+    locale?: string;
+    parentHost?: string; 
+    channel?: Channel;  
+  }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
-  const [disabled, setDisabled] = useState<null | "domain" | "token">(null);
+  const [disabled, setDisabled] = useState<null | "domain">(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -42,6 +52,23 @@ export function AliigoChatWidget({
     sendText: theme.sendText ?? "text-white",
   };
 
+  function missingTokenMsg(locale?: string) {
+    const l = (locale || "en").toLowerCase();
+    if (l.startsWith("es")) {
+      return "Para activar el chat, genera un token en Ajustes → Widget y vuelve a intentarlo.";
+    }
+    if (l.startsWith("fr")) {
+      return "Pour activer le chat, générez un jeton dans Paramètres → Widget puis réessayez.";
+    }
+    if (l.startsWith("it")) {
+      return "Per attivare la chat, genera un token in Impostazioni → Widget e riprova.";
+    }
+    if (l.startsWith("de")) {
+      return "Um den Chat zu aktivieren, erstelle ein Token unter Einstellungen → Widget und versuche es erneut.";
+    }
+    return "To activate chat, generate a token in Settings → Widget and try again.";
+  }
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 1e9, behavior: "smooth" });
   }, [msgs, open]);
@@ -52,14 +79,6 @@ export function AliigoChatWidget({
   //   if (!token) setDisabled("token");
   // }, [token]);
 
-  function getParentHost(): string {
-    try {
-      return new URL(document.referrer).host.replace(/:\d+$/, "").toLowerCase();
-    } catch {
-      return "";
-    }
-  }
-
   async function send(content: string) {
     if (!content.trim()) return;
 
@@ -68,14 +87,14 @@ export function AliigoChatWidget({
         ...m,
         {
           role: "assistant",
-          content:
-            "Para activar el chat, genera un token en Ajustes → Widget y vuelve a intentarlo.",
+          content: missingTokenMsg(locale),
         },
       ]);
       return;
     }
 
-    const parentHost = getParentHost();
+    //  trust the value from ClientEmbed (or empty string)
+    const host = (parentHost || "").trim().toLowerCase();
 
     setBusy(true);
     setMsgs((m) => [...m, { role: "user", content }]);
@@ -88,7 +107,9 @@ export function AliigoChatWidget({
           token,
           conversationId,
           message: content,
-          host: parentHost, // ✅ this is the key
+          host,          
+          locale,
+          channel,       
         }),
       });
 
@@ -100,7 +121,7 @@ export function AliigoChatWidget({
       const errText = typeof payload.error === "string" ? payload.error : "";
 
       if (!res.ok) {
-        // ✅ Hide widget entirely if host is not allowlisted
+        //  Hide widget entirely if host is not allowlisted
         if (res.status === 403 && /domain not allowed/i.test(errText)) {
           setDisabled("domain");
           setOpen(false);

@@ -14,7 +14,25 @@ type Theme = {
   sendText?: string;
 };
 
-type SessionResp = { token: string | null; error?: string };
+type Locale = "en" | "es" | "fr" | "it" | "de";
+type SessionResp = { token: string | null; locale?: string; error?: string };
+
+const SUPPORTED_LOCALES = new Set<Locale>(["en", "es", "fr", "it", "de"]);
+function normalizeLocale(v: unknown): Locale {
+  if (typeof v !== "string") return "en";
+  const s = v.toLowerCase().trim() as Locale;
+  return SUPPORTED_LOCALES.has(s) ? s : "en";
+}
+
+function getReferrerHost(): string | null {
+  const ref = document.referrer;
+  if (!ref) return null;
+  try {
+    return new URL(ref).host.replace(/:\d+$/, "");
+  } catch {
+    return null;
+  }
+}
 
 export default function ClientEmbed() {
   const params = useSearchParams();
@@ -23,10 +41,16 @@ export default function ClientEmbed() {
   const brand = params.get("brand") ?? "Aliigo";
   const key = params.get("key") ?? "";
 
+  // read once per render (safe for deps)
+  const hostFromQuery = (params.get("host") || "").trim().toLowerCase();
+
   const [token, setToken] = useState<string | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [locale, setLocale] = useState<Locale>("en");
+  const [parentHost, setParentHost] = useState<string>("");
 
   const theme: Theme | undefined = useMemo(() => {
     const themeParam = params.get("theme");
@@ -41,52 +65,46 @@ export default function ClientEmbed() {
     }
   }, [params]);
 
-  function getReferrerHost(): string | null {
-    const ref = document.referrer;
-    if (!ref) return null;
-    try { return new URL(ref).host.replace(/:\d+$/, ""); } catch { return null; }
-  }
-
   useEffect(() => {
-  let cancelled = false;
+    let cancelled = false;
 
-  async function run() {
-    setErr(null);
-    setBlocked(false);
-    setToken(null);
-    setLoading(true);
+    async function run() {
+      setErr(null);
+      setBlocked(false);
+      setToken(null);
+      setLoading(true);
 
-    if (!key) {
-      setErr("Missing key");
-      setLoading(false);
-      return;
-    }
-
-    const hostFromQuery = (params.get("host") || "").trim().toLowerCase();
-    const refHost = (getReferrerHost() || "").toLowerCase();
-    const host = hostFromQuery || refHost;
-
-    const url =
-      `/api/embed/session?key=${encodeURIComponent(key)}` +
-      (host ? `&host=${encodeURIComponent(host)}` : "");
-
-    let res: Response;
-    try {
-      res = await fetch(url, {
-        method: "GET",
-        cache: "no-store",
-        credentials: "omit",
-        headers: { Accept: "application/json" },
-      });
-    } catch {
-      if (!cancelled) {
-        setErr("Network error calling /api/embed/session");
+      if (!key) {
+        setErr("Missing key");
         setLoading(false);
+        return;
       }
-      return;
-    }
 
-      // If API returns HTML (like a redirect or error page), res.json() will fail.
+      const refHost = (getReferrerHost() || "").toLowerCase();
+      const host = hostFromQuery || refHost;
+
+      setParentHost(host || "");
+
+      const url =
+        `/api/embed/session?key=${encodeURIComponent(key)}` +
+        (host ? `&host=${encodeURIComponent(host)}` : "");
+
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: "GET",
+          cache: "no-store",
+          credentials: "omit",
+          headers: { Accept: "application/json" },
+        });
+      } catch {
+        if (!cancelled) {
+          setErr("Network error calling /api/embed/session");
+          setLoading(false);
+        }
+        return;
+      }
+
       const ct = res.headers.get("content-type") || "";
       let data: SessionResp | null = null;
 
@@ -97,10 +115,14 @@ export default function ClientEmbed() {
           data = null;
         }
       } else {
-        // capture a small snippet so you can see what's coming back
         const text = await res.text().catch(() => "");
         if (!cancelled) {
-          setErr(`Unexpected response (${res.status}) from /api/embed/session: ${text.slice(0, 120)}`);
+          setErr(
+            `Unexpected response (${res.status}) from /api/embed/session: ${text.slice(
+              0,
+              120
+            )}`
+          );
           setLoading(false);
         }
         return;
@@ -108,7 +130,9 @@ export default function ClientEmbed() {
 
       if (cancelled) return;
 
-      // Domain block: show a visible message (no more silent blank)
+      // set locale as soon as we have it (even if token fails later)
+      setLocale(normalizeLocale(data?.locale));
+
       if (res.status === 403 && (data?.error || "").toLowerCase().includes("domain")) {
         setBlocked(true);
         setLoading(false);
@@ -136,9 +160,8 @@ export default function ClientEmbed() {
     return () => {
       cancelled = true;
     };
-  }, [key, params]);
+  }, [key, hostFromQuery]);
 
-  // Always show something so debugging isn't “black box”
   if (blocked) {
     return (
       <div className="w-full h-dvh flex items-center justify-center bg-transparent">
@@ -168,7 +191,15 @@ export default function ClientEmbed() {
       )}
 
       {!loading && token && !err ? (
-        <AliigoChatWidget businessSlug={slug} brand={brand} token={token} theme={theme} />
+        <AliigoChatWidget
+          businessSlug={slug}
+          brand={brand}
+          token={token}
+          theme={theme}
+          locale={locale}
+          parentHost={parentHost}
+          channel="web"
+        />
       ) : null}
     </div>
   );

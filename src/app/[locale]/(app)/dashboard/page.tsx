@@ -213,7 +213,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <AliigoChatWidget businessSlug={bizSlug} brand="Aliigo" />
+      <AliigoChatWidget businessSlug={bizSlug} brand="Aliigo" channel="web" />
     </div>
   );
 }

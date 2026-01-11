@@ -1,3 +1,5 @@
+// src/app/api/embed/session/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { originHost, hostAllowed } from "@/lib/embedGate";
@@ -30,37 +32,54 @@ export async function GET(req: NextRequest) {
     if (!host) return NextResponse.json({ error: "Missing host" }, { status: 400 });
 
     const bizRes = await supabase
-        .from("businesses")
-        .select("id, allowed_domains")
-        .eq("public_embed_key", key)
-        .maybeSingle();
+      .from("businesses")
+      .select("id, allowed_domains, default_locale")
+      .eq("public_embed_key", key)
+      .maybeSingle();
 
-      if (bizRes.error) {
-  const extra = errExtras(bizRes.error);
-  return NextResponse.json(
-    {
-      error: "Supabase error",
-      debug: {
-        keyReceived: key,
-        hostReceived: host,
-        hostParam,
-        hostFromReq,
-        supabaseError: {
-          message: bizRes.error.message,
-          ...extra,
+    if (bizRes.error) {
+      const extra = errExtras(bizRes.error);
+      return NextResponse.json(
+        {
+          error: "Supabase error",
+          debug: {
+            keyReceived: key,
+            hostReceived: host,
+            hostParam,
+            hostFromReq,
+            supabaseError: {
+              message: bizRes.error.message,
+              ...extra,
+            },
+          },
         },
-      },
-    },
-    { status: 500 }
-  );
-}
+        { status: 500 }
+      );
+    }
 
-      if (!bizRes.data) {
-        return NextResponse.json(
-          { error: "Invalid key", debug: { keyReceived: key, hostReceived: host, hostParam, hostFromReq } },
-          { status: 403 }
-        );
-      }
+    if (!bizRes.data) {
+      return NextResponse.json(
+        { error: "Invalid key", debug: { keyReceived: key, hostReceived: host, hostParam, hostFromReq } },
+        { status: 403 }
+      );
+    }
+
+    const locale = (bizRes.data.default_locale || "en").toLowerCase().trim();
+
+    const allowed = bizRes.data.allowed_domains ?? [];
+
+    if (!hostAllowed(host, allowed)) {
+      return NextResponse.json(
+        {
+          error: "Domain not allowed",
+          debug: {
+            hostReceived: host,
+            allowedDomains: allowed,
+          },
+        },
+        { status: 403 }
+      );
+    }
 
     const tokRes = await supabase
       .from("embed_tokens")
@@ -86,13 +105,13 @@ export async function GET(req: NextRequest) {
       }
 
       return NextResponse.json(
-        { token: ins.data.token, debug: { keyReceived: key, hostReceived: host } },
+        { token: ins.data.token, locale, debug: { keyReceived: key, hostReceived: host } },
         { status: 200 }
       );
     }
 
     return NextResponse.json(
-      { token: tokRes.data.token, debug: { keyReceived: key, hostReceived: host } },
+      { token: tokRes.data.token, locale, debug: { keyReceived: key, hostReceived: host } },
       { status: 200 }
     );
   } catch (e: unknown) {
