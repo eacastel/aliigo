@@ -1,5 +1,4 @@
 // src/components/AliigoSupportWidget.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +10,6 @@ function pathLocale(pathname: string): "en" | "es" {
   return seg === "es" ? "es" : "en";
 }
 
-
 export function AliigoSupportWidget() {
   const [token, setToken] = useState<string | null>(null);
   const pathname = usePathname();
@@ -21,7 +19,7 @@ export function AliigoSupportWidget() {
     (async () => {
       try {
         const res = await fetch("/api/support-token");
-        const j = await res.json();
+        const j = await res.json().catch(() => ({}));
         if (res.ok) setToken(j.token || null);
       } catch {
         // noop
@@ -31,12 +29,17 @@ export function AliigoSupportWidget() {
 
   if (!token) return null;
 
+  const parentHost =
+    typeof window !== "undefined"
+      ? window.location.host.replace(/:\d+$/, "").toLowerCase()
+      : "";
+
   return (
     <AliigoChatWidget
       businessSlug="aliigo"
       brand="Aliigo"
       token={token}
-      parentHost=""
+      parentHost={parentHost}
       locale={locale}
       channel="web"
       theme={{

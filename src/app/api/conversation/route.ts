@@ -179,17 +179,13 @@ export async function POST(req: NextRequest) {
 
     await rateLimit(businessId, ip);
 
-    // If client provides a conversationId, verify it belongs to this business
-
-    let conversationLocale: string | null = null;
-
     if (inputConvId) {
       const own = await supabase
         .from("conversations")
-        .select("id, locale")
+        .select("id")
         .eq("id", inputConvId)
         .eq("business_id", businessId)
-        .maybeSingle<{ id: string; locale: string | null }>();
+        .maybeSingle<{ id: string }>();
 
       if (own.error) throw own.error;
 
@@ -199,8 +195,6 @@ export async function POST(req: NextRequest) {
           { status: 403, headers: corsHeadersFor(req) }
         );
       }
-
-      conversationLocale = own.data.locale ?? null;
     }
 
     // business prompt (also gives us default_locale)
@@ -225,11 +219,7 @@ export async function POST(req: NextRequest) {
     const requestedLocale =
       typeof bodyLocale === "string" ? bodyLocale.toLowerCase().trim() : "";
 
-    const localeRaw =
-      requestedLocale ||
-      (conversationLocale || "").toLowerCase().trim() ||
-      (bizRes.data.default_locale || "en").toLowerCase().trim();
-
+    const localeRaw = requestedLocale || (bizRes.data.default_locale || "en").toLowerCase().trim();
     const locale = supported.has(localeRaw) ? localeRaw : "en";
 
     // ensure conversation
@@ -241,7 +231,6 @@ export async function POST(req: NextRequest) {
           business_id: businessId,
           channel: ch,
           customer_name: customerName ?? null,
-          locale,
         })
         .select("id")
         .single<{ id: string }>();
@@ -250,14 +239,6 @@ export async function POST(req: NextRequest) {
         throw convRes.error ?? new Error("Conversation create failed");
       }
       conversationId = convRes.data.id;
-    }
-
-    if (inputConvId && requestedLocale && requestedLocale !== conversationLocale) {
-      await supabase
-        .from("conversations")
-        .update({ locale })
-        .eq("id", inputConvId)
-        .eq("business_id", businessId);
     }
 
     // persist user message
@@ -400,9 +381,21 @@ export async function POST(req: NextRequest) {
     if (m2.error) throw m2.error;
 
     return NextResponse.json({ conversationId, reply, locale }, { status: 200, headers: corsHeadersFor(req) });
-  } catch (e: unknown) {
-    const status = e instanceof RateLimitError ? e.status : 500;
-    const message = e instanceof Error ? e.message : "Server error";
-    return NextResponse.json({ error: message }, { status, headers: corsHeadersFor(req) });
+    } catch (e: unknown) {
+      console.error("Conversation API error:", e);
+
+      const status = e instanceof RateLimitError ? e.status : 500;
+
+      const message =
+        e instanceof Error
+          ? e.message
+          : typeof e === "object" && e !== null && "message" in e
+            ? String((e as { message?: unknown }).message)
+            : JSON.stringify(e);
+
+      return NextResponse.json(
+        { error: message || "Server error" },
+        { status, headers: corsHeadersFor(req) }
+      );
+    }
   }
-}
