@@ -15,6 +15,43 @@ type Theme = {
   sendText?: string;
 };
 
+  type UILang = "en" | "es";
+
+  function uiLang(locale?: string): UILang {
+    const l = (locale || "").toLowerCase();
+    return l.startsWith("es") ? "es" : "en";
+  }
+
+  const UI = {
+    en: {
+      button: "Chat with us",
+      header: (brand: string, slug?: string) =>
+        `${brand} Support — Chat${slug ? ` (${slug})` : ""}`,
+      welcome: "Ask us anything. We’ll reply right away.",
+      placeholder: "Type your message…",
+      send: "Send",
+      missingToken: "To activate chat, generate a token in Settings → Widget and try again.",
+      err: "Error. Please try again.",
+      net: "Network error. Please try again.",
+      fallback: "Thanks. We’ll reply right away.",
+      previewHint: "This is a preview. Generate a token in Settings → Widget to enable chat.",
+    },
+    es: {
+      button: "Chatea con nosotros",
+      header: (brand: string, slug?: string) =>
+        `${brand} Soporte — Chat${slug ? ` (${slug})` : ""}`,
+      welcome: "Pregúntanos lo que quieras. Te respondemos al momento.",
+      placeholder: "Escribe tu mensaje…",
+      send: "Enviar",
+      missingToken: "Para activar el chat, genera un token en Ajustes → Widget y vuelve a intentarlo.",
+      err: "Error. Intenta de nuevo.",
+      net: "Error de red. Intenta de nuevo.",
+      fallback: "Gracias. Te respondemos enseguida.",
+      previewHint: "Este es un preview. Genera un token en Ajustes → Widget para activar el chat.",
+    },
+  } as const;
+
+
   type Channel = "web" | "whatsapp" | "sms" | "email" | "telegram";
 
   export function AliigoChatWidget({
@@ -34,6 +71,8 @@ type Theme = {
     parentHost?: string; 
     channel?: Channel;  
   }) {
+  const lang = uiLang(locale);
+  const t = UI[lang];
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -51,23 +90,6 @@ type Theme = {
     sendBg: theme.sendBg ?? "bg-blue-600",
     sendText: theme.sendText ?? "text-white",
   };
-
-  function missingTokenMsg(locale?: string) {
-    const l = (locale || "en").toLowerCase();
-    if (l.startsWith("es")) {
-      return "Para activar el chat, genera un token en Ajustes → Widget y vuelve a intentarlo.";
-    }
-    if (l.startsWith("fr")) {
-      return "Pour activer le chat, générez un jeton dans Paramètres → Widget puis réessayez.";
-    }
-    if (l.startsWith("it")) {
-      return "Per attivare la chat, genera un token in Impostazioni → Widget e riprova.";
-    }
-    if (l.startsWith("de")) {
-      return "Um den Chat zu aktivieren, erstelle ein Token unter Einstellungen → Widget und versuche es erneut.";
-    }
-    return "To activate chat, generate a token in Settings → Widget and try again.";
-  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 1e9, behavior: "smooth" });
@@ -87,7 +109,7 @@ type Theme = {
         ...m,
         {
           role: "assistant",
-          content: missingTokenMsg(locale),
+          content: t.missingToken,
         },
       ]);
       return;
@@ -131,7 +153,7 @@ type Theme = {
 
         setMsgs((m) => [
           ...m,
-          { role: "assistant", content: errText || "Error. Intenta de nuevo." },
+          { role: "assistant", content: errText || t.err },
         ]);
         setBusy(false);
         return;
@@ -147,16 +169,13 @@ type Theme = {
 
       setMsgs((m) => [
         ...m,
-        {
-          role: "assistant",
-          content: reply || "Gracias. Te respondemos enseguida.",
-        },
+        { role: "assistant", content: reply || t.fallback },
       ]);
       setBusy(false);
     } catch {
       setMsgs((m) => [
         ...m,
-        { role: "assistant", content: "Error de red. Intenta de nuevo." },
+        { role: "assistant", content: t.net },
       ]);
       setBusy(false);
     }
@@ -186,9 +205,7 @@ type Theme = {
           <div
             className={`px-4 py-3 border-b text-sm font-medium flex items-center justify-between ${th.headerBg} ${th.headerText}`}
           >
-            <span>
-              {brand} — Chat{businessSlug ? ` (${businessSlug})` : ""}
-            </span>
+            <span>{t.header(brand, businessSlug)}</span>
             <button
               onClick={() => setOpen(false)}
               className="opacity-80 hover:opacity-100"
@@ -201,9 +218,7 @@ type Theme = {
           <div ref={scrollRef} className="flex-1 p-3 space-y-2 overflow-y-auto">
             {msgs.length === 0 && (
               <div className="text-xs text-gray-500">
-                {token
-                  ? "Pregúntanos lo que quieras. Te respondemos al momento."
-                  : "Este es un preview. Genera un token en Ajustes → Widget para activar el chat."}
+                {token ? t.welcome : t.previewHint}
               </div>
             )}
 
@@ -227,11 +242,7 @@ type Theme = {
             <input
               ref={inputRef}
               className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={
-                token
-                  ? "Escribe tu mensaje…"
-                  : "Genera un token para activar el chat"
-              }
+              placeholder={token ? t.placeholder : t.missingToken}
               onKeyDown={handleKeyDown}
               disabled={busy || !token}
             />
@@ -240,7 +251,7 @@ type Theme = {
               disabled={busy || !token}
               className={`px-3 py-2 text-sm rounded-lg disabled:opacity-50 ${th.sendBg} ${th.sendText}`}
             >
-              Enviar
+              {t.send}
             </button>
           </form>
         </div>
@@ -252,7 +263,8 @@ type Theme = {
           className={`rounded-full shadow-xl px-4 py-3 text-sm ${th.sendBg} ${th.sendText}`}
           type="button"
         >
-          Chat with us
+          {t.button}
+
         </button>
       )}
     </div>
