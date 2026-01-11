@@ -183,24 +183,36 @@ export default function WidgetSettingsPage() {
     const key = biz?.public_embed_key || "PUBLIC_KEY";
     const brandParam = encodeURIComponent(brand);
 
-    // Option A: use a PUBLIC key in the URL, server mints short-lived token.
-    // Your /[locale]/chat page will need to accept `key=` and exchange it for a session token.
+ 
     return [
       "<!-- Aliigo Chat Widget -->",
       "<script>",
       "(function(){",
       "  var parentHost = window.location.hostname;",
+      "  var iframe = document.createElement('iframe');",
       `  iframe.src='${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(parentHost);`,
       "  iframe.style.position='fixed';",
       "  iframe.style.bottom='24px';",
       "  iframe.style.right='24px';",
-      "  iframe.style.width='360px';",
-      "  iframe.style.height='420px';",
+      "  iframe.style.width='180px';",          
+      "  iframe.style.height='56px';",           
       "  iframe.style.border='0';",
-      "  iframe.style.borderRadius='12px';",
+      "  iframe.style.borderRadius='9999px';",   
       "  iframe.style.overflow='hidden';",
+      "  iframe.style.background='transparent';",
       "  iframe.style.zIndex='999999';",
+      "  iframe.setAttribute('title','Aliigo Widget');",
       "  document.body.appendChild(iframe);",
+      "",
+      "  window.addEventListener('message', function(ev){",
+      "    try {",
+      "      var d = ev.data;",
+      "      if (!d || d.type !== 'ALIIGO_WIDGET_SIZE') return;",
+      "      if (typeof d.w === 'number') iframe.style.width = d.w + 'px';",
+      "      if (typeof d.h === 'number') iframe.style.height = d.h + 'px';",
+      "      if (typeof d.radius === 'string') iframe.style.borderRadius = d.radius;",
+      "    } catch(e) {}",
+      "  });",
       "})();",
       "</script>",
     ].join("\n");
@@ -320,12 +332,14 @@ export default function WidgetSettingsPage() {
 
           <div className="relative h-[420px] border border-zinc-800 rounded bg-zinc-950 overflow-hidden">
             <AliigoChatWidget
+              preview  
               businessSlug={biz.slug}
               brand={brand}
               token={token ?? undefined}
               theme={theme}
               parentHost=""
               channel="web"
+              locale={locale} 
             />
           </div>
 

@@ -24,30 +24,34 @@ type Theme = {
 
   const UI = {
     en: {
-      button: "Ask Aliigo",
+      button: (brand: string) => `Ask ${brand}`,
       header: (brand: string, slug?: string) =>
         `${brand} Assistant${slug ? ` (${slug})` : ""}`,
       welcome: "Ask a question and we’ll help right away.",
       placeholder: "Type your question…",
       send: "Send",
-      missingToken: "To activate the assistant, generate a token in Settings → Widget and try again.",
+      missingToken:
+        "To activate the assistant, generate a token in Settings → Widget and try again.",
       err: "Error. Please try again.",
       net: "Network error. Please try again.",
       fallback: "Thanks. We’ll help right away.",
-      previewHint: "This is a preview. Generate a token in Settings → Widget to enable the assistant.",
+      previewHint:
+        "This is a preview. Generate a token in Settings → Widget to enable the assistant.",
     },
     es: {
-      button: "Pregunta a Aliigo",
+      button: (brand: string) => `Pregunta a ${brand}`,
       header: (brand: string, slug?: string) =>
         `Asistente de ${brand}${slug ? ` (${slug})` : ""}`,
       welcome: "Haz tu consulta y te ayudamos al momento.",
       placeholder: "Escribe tu consulta…",
       send: "Enviar",
-      missingToken: "Para activar el asistente, genera un token en Ajustes → Widget y vuelve a intentarlo.",
+      missingToken:
+        "Para activar el asistente, genera un token en Ajustes → Widget y vuelve a intentarlo.",
       err: "Error. Inténtalo de nuevo.",
       net: "Error de red. Inténtalo de nuevo.",
       fallback: "Gracias. Te ayudamos al momento.",
-      previewHint: "Esto es una vista previa. Genera un token en Ajustes → Widget para activar el asistente.",
+      previewHint:
+        "Esto es una vista previa. Genera un token en Ajustes → Widget para activar el asistente.",
     },
   } as const;
 
@@ -61,7 +65,8 @@ type Theme = {
     theme = {},
     locale,
     parentHost, 
-    channel = "web",   
+    channel = "web", 
+    preview = false,   
   }: {
     token?: string;
     brand?: string;
@@ -70,6 +75,7 @@ type Theme = {
     locale?: string;
     parentHost?: string; 
     channel?: Channel;  
+    preview?: boolean; 
   }) {
   const lang = uiLang(locale);
   const t = UI[lang];
@@ -91,9 +97,25 @@ type Theme = {
     sendText: theme.sendText ?? "text-white",
   };
 
+  const wrapClass = preview
+  ? "absolute bottom-4 right-4 z-50"
+  : "fixed bottom-6 right-6 z-50";
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 1e9, behavior: "smooth" });
   }, [msgs, open]);
+
+  useEffect(() => {
+    const msg = open
+      ? { type: "ALIIGO_WIDGET_SIZE", w: 360, h: 420, radius: "12px" }
+      : { type: "ALIIGO_WIDGET_SIZE", w: 180, h: 56, radius: "9999px" };
+
+    try {
+      window.parent?.postMessage(msg, "*");
+    } catch {
+      // noop
+    }
+  }, [open]);
 
   // If you want the widget to not appear at all when token is missing,
   // flip this on. For now it matches your current behavior (preview UI).
@@ -212,74 +234,72 @@ type Theme = {
   if (disabled === "domain") return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {open && (
-        <div className="w-80 h-96 bg-white shadow-2xl rounded-2xl border border-gray-200 flex flex-col overflow-hidden">
-          <div
-            className={`px-4 py-3 border-b text-sm font-medium flex items-center justify-between ${th.headerBg} ${th.headerText}`}
-          >
-            <span>{t.header(brand, businessSlug)}</span>
-            <button
-              onClick={() => setOpen(false)}
-              className="opacity-80 hover:opacity-100"
-              type="button"
+    <>
+      {open ? (
+        <div className={wrapClass}>
+          <div className="w-80 h-96 bg-white shadow-2xl rounded-2xl border border-gray-200 flex flex-col overflow-hidden">
+            <div
+              className={`px-4 py-3 border-b text-sm font-medium flex items-center justify-between ${th.headerBg} ${th.headerText}`}
             >
-              ×
-            </button>
-          </div>
-
-          <div ref={scrollRef} className="flex-1 p-3 space-y-2 overflow-y-auto">
-            {msgs.length === 0 && (
-              <div className="text-xs text-gray-500">
-                {token ? t.welcome : t.previewHint}
-              </div>
-            )}
-
-            {msgs.map((m, i) => (
-              <div
-                key={i}
-                className={m.role === "user" ? "text-right" : "text-left"}
+              <span>{t.header(brand, businessSlug)}</span>
+              <button
+                onClick={() => setOpen(false)}
+                className="opacity-80 hover:opacity-100"
+                type="button"
               >
-                <div
-                  className={`inline-block px-3 py-2 rounded-xl text-sm ${
-                    m.role === "user" ? th.bubbleUser : th.bubbleBot
-                  }`}
-                >
-                  {m.content}
-                </div>
-              </div>
-            ))}
-          </div>
+                ×
+              </button>
+            </div>
 
-          <form className="p-2 border-t flex gap-2" onSubmit={handleSubmit}>
-            <input
-              ref={inputRef}
-              className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={token ? t.placeholder : t.missingToken}
-              onKeyDown={handleKeyDown}
-              disabled={busy || !token}
-            />
-            <button
-              type="submit"
-              disabled={busy || !token}
-              className={`px-3 py-2 text-sm rounded-lg disabled:opacity-50 ${th.sendBg} ${th.sendText}`}
-            >
-              {t.send}
-            </button>
-          </form>
+            <div ref={scrollRef} className="flex-1 p-3 space-y-2 overflow-y-auto">
+              {msgs.length === 0 && (
+                <div className="text-xs text-gray-500">
+                  {token ? t.welcome : t.previewHint}
+                </div>
+              )}
+
+              {msgs.map((m, i) => (
+                <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
+                  <div
+                    className={`inline-block px-3 py-2 rounded-xl text-sm ${
+                      m.role === "user" ? th.bubbleUser : th.bubbleBot
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <form className="p-2 border-t flex gap-2" onSubmit={handleSubmit}>
+              <input
+                ref={inputRef}
+                className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder={token ? t.placeholder : t.missingToken}
+                onKeyDown={handleKeyDown}
+                disabled={busy || !token}
+              />
+              <button
+                type="submit"
+                disabled={busy || !token}
+                className={`px-3 py-2 text-sm rounded-lg disabled:opacity-50 ${th.sendBg} ${th.sendText}`}
+              >
+                {t.send}
+              </button>
+            </form>
+          </div>
+        </div>
+      ) : (
+        <div className={wrapClass}>
+          <button
+            onClick={() => setOpen(true)}
+            className={`rounded-full shadow-xl px-4 py-3 text-sm ${th.sendBg} ${th.sendText}`}
+            type="button"
+          >
+            {t.button(brand)}
+          </button>
         </div>
       )}
-
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className={`rounded-full shadow-xl px-4 py-3 text-sm ${th.sendBg} ${th.sendText}`}
-          type="button"
-        >
-          {t.button}
-
-        </button>
-      )}
-    </div>
+    </>
   );
 }

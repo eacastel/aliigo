@@ -36,19 +36,18 @@ function getReferrerHost(): string | null {
 }
 
 function loadingText(locale: Locale, brand: string) {
-  const b = (brand || "Aliigo").trim();
-
+  const b = brand || "Aliigo";
   switch (locale) {
     case "es":
-      return `Cargando ${b}…`;
+      return `Cargando el asistente de ${b}…`;
     case "fr":
-      return `Chargement de ${b}…`;
+      return `Chargement de l’assistant ${b}…`;
     case "it":
-      return `Caricamento di ${b}…`;
+      return `Caricamento dell’assistente ${b}…`;
     case "de":
-      return `Lade ${b}…`;
+      return `Assistent ${b} wird geladen…`;
     default:
-      return `Loading ${b}…`;
+      return `Loading ${b} assistant…`;
   }
 }
 
