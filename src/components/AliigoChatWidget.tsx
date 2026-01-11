@@ -111,14 +111,19 @@ const isHex = (v?: string) => typeof v === "string" && /^#([0-9a-fA-F]{3}){1,2}$
   const headerBgClass = isHex(th.headerBg) ? "" : th.headerBg;
   const headerTextClass = isHex(th.headerText) ? "" : th.headerText;
 
-  const bubbleUserStyle = isHex(th.bubbleUser)
-    ? ({ backgroundColor: th.bubbleUser } as React.CSSProperties)
-    : undefined;
-  const bubbleUserClass = isHex(th.bubbleUser) ? "" : th.bubbleUser;
+  // --- Bubble styles (hex vs Tailwind-safe) ---
 
-  const bubbleBotStyle = isHex(th.bubbleBot)
-    ? ({ backgroundColor: th.bubbleBot } as React.CSSProperties)
-    : undefined;
+  const bubbleUserStyle: React.CSSProperties = {
+    ...(isHex(th.bubbleUser) ? { backgroundColor: th.bubbleUser } : {}),
+    ...(isHex(th.bubbleUser) ? { color: "#fff" } : {}),
+  };
+
+  const bubbleBotStyle: React.CSSProperties = {
+    ...(isHex(th.bubbleBot) ? { backgroundColor: th.bubbleBot } : {}),
+    ...(isHex(th.bubbleBot) ? { color: "#111" } : {}),
+  };
+
+  const bubbleUserClass = isHex(th.bubbleUser) ? "" : th.bubbleUser;
   const bubbleBotClass = isHex(th.bubbleBot) ? "" : th.bubbleBot;
 
   const sendStyle: React.CSSProperties = {
@@ -128,6 +133,16 @@ const isHex = (v?: string) => typeof v === "string" && /^#([0-9a-fA-F]{3}){1,2}$
   const sendBgClass = isHex(th.sendBg) ? "" : th.sendBg;
   const sendTextClass = isHex(th.sendText) ? "" : th.sendText;
 
+  const textStyleFromTheme = (v?: string): React.CSSProperties | undefined => {
+  if (!v) return undefined;
+
+  // If the value itself is a hex, assume dark text on light bg
+  if (isHex(v)) {
+    return { color: "#111" };
+  }
+
+  return undefined;
+};
 
   const wrapClass = preview
   ? "absolute bottom-4 right-4 z-50"

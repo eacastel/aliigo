@@ -40,3 +40,24 @@ body {
   outline: 2px solid rgba(var(--ring) / 0.75);
   outline-offset: 2px;
 }
+/* Aliigo iframe isolation */
+.aliigo-reset,
+.aliigo-reset * {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+}
+
+.aliigo-reset button,
+.aliigo-reset input {
+  all: unset;
+  box-sizing: border-box;
+}
+
+.aliigo-reset button {
+  cursor: pointer;
+}
+
+.aliigo-reset input {
+  background: white;
+}
