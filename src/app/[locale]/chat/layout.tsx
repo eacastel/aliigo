@@ -5,3 +5,5 @@ export default function ChatEmbedLayout({ children }: { children: React.ReactNod
     </html>
   );
 }
+
+
