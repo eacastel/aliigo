@@ -133,14 +133,14 @@ export default function HomePage() {
                     <div className="text-sm font-semibold text-white flex items-center gap-2">
                       
 
-                      <span>{t("demo.badge")}</span>
+                      
                     </div>
 
                     {/* RIGHT: tag */}
                     <div className="text-xs text-zinc-500 flex items-center gap-4">
 
                       
-                      {t("demo.liveTag")}
+                       → {t("demo.liveTag")}
                       <span
                         className="relative inline-flex h-2.5 w-2.5"
                         aria-hidden="true"

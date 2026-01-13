@@ -60,10 +60,10 @@
             "ctaSecondary": "See it in action"
         },
         "demo": {
-            "badge": "Live assistant demo",
+            "badge": "Live assistant demo →",
             "titleLine1": "This is Aliigo.",
-            "titleLine2": "Ask it anything.",
-            "subtitle": "A real AI assistant for your website. It answers instantly, qualifies visitors, and captures leads naturally — 24/7.",
+            "titleLine2": "Your AI assistant for converting visitors into leads.",
+            "subtitle": "Aliigo lives on your website. It answers questions instantly, understands visitor intent, and helps businesses capture qualified leads — automatically, 24/7.",
             "pricingPrefix": "Base plan from",
             "price": "€99/month",
             "pricingSuffix": ". Pricing scales with message volume and customization.",

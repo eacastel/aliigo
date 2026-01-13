@@ -323,131 +323,136 @@ export function AliigoChatWidget({
       {/* Scoped CSS reset + component styles (no Tailwind dependency) */}
       <style>{`
   .aliigo-root, .aliigo-root * {
-    box-sizing: border-box;
-    font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  }
+  box-sizing: border-box;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+}
 
-  .aliigo-card {
-    width: 320px;
-    height: 384px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
-    display:flex;
-    flex-direction:column;
-  }
-
-  .aliigo-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(0,0,0,.06);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .aliigo-body {
-  flex: 1;
-  padding: 12px;
+.aliigo-card {
+  width: 320px;
+  height: 384px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
+  display: flex;
+  flex-direction: column;
+}
+
+/* header (hidden in inline via JSX, so keep normal) */
+.aliigo-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* IMPORTANT: body is a wrapper, NOT the scroller */
+.aliigo-body {
+  flex: 1;
+  min-height: 0;     /* critical for nested scrolling */
+  padding: 12px;
+  overflow: hidden;  /* do not scroll here */
   display: flex;
 }
-  .aliigo-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 6px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.22) transparent;
-  }
 
-  .aliigo-messages::-webkit-scrollbar { width: 8px; }
-  .aliigo-messages::-webkit-scrollbar-track { background: transparent; }
-  .aliigo-messages::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.14);
-    border-radius: 999px;
-  }
-  .aliigo-card:hover .aliigo-messages::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.26);
-  }
+/* THIS is the scroller */
+.aliigo-messages {
+  flex: 1;
+  min-height: 0;     /* critical */
+  overflow-y: auto;
+  padding-right: 6px;
+}
 
-  /* Inline: keep clean, but do NOT kill scrolling */
-  .aliigo-inline .aliigo-body { padding: 0; }
-  .aliigo-inline .aliigo-messages { padding: 0; }
+/* Hide scrollbar until hover (WebKit) */
+.aliigo-messages::-webkit-scrollbar { width: 10px; }
+.aliigo-messages::-webkit-scrollbar-track { background: transparent; }
+.aliigo-messages::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+.aliigo-card:hover .aliigo-messages::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.18);
+}
 
-  .aliigo-hint { font-size: 12px; color:#6b7280; }
+/* Hide scrollbar until hover (Firefox) */
+.aliigo-messages { scrollbar-width: none; }
+.aliigo-card:hover .aliigo-messages {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.18) transparent;
+}
 
-  .aliigo-msgwrap { margin-top: 8px; }
+.aliigo-hint { font-size: 12px; color: #6b7280; }
 
-  .aliigo-msg {
-    display:inline-block;
-    padding: 8px 12px;
-    border-radius: 12px;
-    font-size: 14px;
-    max-width: 85%;
-    word-break: break-word;
-  }
+.aliigo-msgwrap { margin-top: 8px; }
 
-  .aliigo-form {
-    padding: 10px;
-    border-top: 1px solid rgba(0,0,0,.08);
-    display:flex;
-    gap: 8px;
-    align-items: center;
-    background: #fff;
-  }
+.aliigo-msg {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  max-width: 85%;
+  word-break: break-word;
+}
 
-  /* IMPORTANT: explicitly set color + caret + appearance */
-  .aliigo-input {
-    flex:1;
-    height: 38px;
-    border:1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 0 12px;
-    font-size: 14px;
-    outline: none;
-    background: #fff;
-    color: #111827;
-    caret-color: #111827;
-    -webkit-appearance: none;
-    appearance: none;
-  }
+.aliigo-form {
+  padding: 10px;
+  border-top: 1px solid rgba(0,0,0,.08);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #fff;
+  flex: 0 0 auto; /* keep it pinned at bottom */
+}
 
-  .aliigo-input::placeholder {
-    color: #9ca3af;
-    opacity: 1;
-  }
+.aliigo-input {
+  flex: 1;
+  height: 38px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+  color: #111827;
+  caret-color: #111827;
+  -webkit-appearance: none;
+  appearance: none;
+}
 
-  .aliigo-input:focus {
-    border-color: rgba(59,130,246,.6);
-    box-shadow: 0 0 0 3px rgba(59,130,246,.25);
-  }
+.aliigo-input::placeholder { color: #9ca3af; opacity: 1; }
 
-  .aliigo-btn {
-    height: 38px;
-    border:0;
-    border-radius: 10px;
-    padding: 0 14px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor:pointer;
-  }
+.aliigo-input:focus {
+  border-color: rgba(59,130,246,.6);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.25);
+}
 
-  .aliigo-btn:disabled { opacity: .55; cursor: not-allowed; }
+.aliigo-btn {
+  height: 38px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-  .aliigo-pill {
-    border-radius: 9999px;
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight: 700;
-    border: 0;
-    cursor:pointer;
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,.18);
-  }
+.aliigo-btn:disabled { opacity: .55; cursor: not-allowed; }
 
-  /* ===== Dark skin overrides (only when .aliigo-skin-dark is on the card) ===== */
+.aliigo-pill {
+  border-radius: 9999px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,.18);
+}
+
+/* ===== Dark skin overrides ===== */
 .aliigo-skin-dark.aliigo-card {
   width: 360px;
   background: rgba(9, 9, 11, 0.72);
@@ -457,15 +462,17 @@ export function AliigoChatWidget({
   backdrop-filter: blur(10px);
 }
 
+/* Frame is the internal flex column container */
 .aliigo-skin-dark .aliigo-frame {
-  margin: 16px;
+  margin: 4px;
   border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.10);
+  border: 0px solid rgba(255,255,255,0.10);
   background: rgba(9, 9, 11, 0.55);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0; /* critical */
 }
 
 .aliigo-skin-dark .aliigo-header {
@@ -508,51 +515,24 @@ export function AliigoChatWidget({
   color: #0a0a0a;
   box-shadow: 0 0 18px rgba(132,201,173,0.18);
 }
-  /* ===== Inline variant: no extra frames, no “widget card” chrome ===== */
-.aliigo-inline.aliigo-card {
-  display: flex;
-  flex-direction: column;
 
-  /* remove widget chrome */
+/* ===== Inline variant: remove widget chrome but keep layout ===== */
+.aliigo-inline.aliigo-card {
   background: transparent;
   border: 0;
   box-shadow: none;
   backdrop-filter: none;
   border-radius: 0;
-
   width: 100%;
 }
 
+.aliigo-inline .aliigo-body { padding: 0; }
+.aliigo-inline .aliigo-messages { padding-right: 0; }
 .aliigo-inline .aliigo-form {
-  flex: 0 0 auto;
   padding: 0;
   margin-top: 12px;
   border-top: 0;
   background: transparent;
-}
-
-  .aliigo-inline .aliigo-hint {
-  margin-bottom: 12px;
-}
-  /* Hide scrollbar unless hovered (WebKit) */
-.aliigo-inline .aliigo-body::-webkit-scrollbar {
-  width: 10px;
-}
-.aliigo-inline .aliigo-body::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 9999px;
-}
-.aliigo-inline .aliigo-body:hover::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.14);
-}
-
-/* Firefox */
-.aliigo-inline .aliigo-body {
-  scrollbar-width: none;              /* hidden */
-}
-.aliigo-inline .aliigo-body:hover {
-  scrollbar-width: thin;              /* show on hover */
-  scrollbar-color: rgba(255,255,255,0.18) transparent;
 }
 
 `}</style>

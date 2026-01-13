@@ -60,10 +60,10 @@
             "ctaSecondary": "Ver cómo funciona"
         },
         "demo": {
-            "badge": "Demo en vivo del asistente",
-            "titleLine1": "Esto es Aliigo.",
-            "titleLine2": "Pregúntale lo que quieras.",
-            "subtitle": "Un asistente de IA real para tu sitio web. Responde al instante, detecta intención y capta oportunidades de forma natural — 24/7.",
+            "badge": "Demo en vivo del asistente →",
+            "titleLine1": "Conoce Aliigo.",
+            "titleLine2": "Un asistente de IA diseñado para convertir visitas en clientes potenciales.",
+            "subtitle": "Aliigo vive en tu sitio web. Responde al instante, detecta la intención del visitante y ayuda a los negocios a captar oportunidades reales — de forma automática, 24/7.",
             "pricingPrefix": "Plan base desde",
             "price": "99€/mes",
             "pricingSuffix": ". El precio escala según el volumen de mensajes y el nivel de personalización.",
