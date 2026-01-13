@@ -53,7 +53,10 @@ export function HomepageAssistantDemo({
       : "";
 
   return (
-    <div className="relative h-[380px] border-0 bg-zinc-950/60 overflow-hidden">
+      <div
+        id="homepage-assistant-demo"
+        className="relative h-[380px] border-0 bg-zinc-950/60 overflow-hidden"
+      >
       <AliigoChatWidget
         preview
         alwaysOpen

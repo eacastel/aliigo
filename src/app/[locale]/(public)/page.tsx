@@ -1,5 +1,8 @@
 // src/app/[locale]/(public)/page.tsx
 
+"use client";
+
+import { useEffect, useState } from "react";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import HeroRotator from "@/components/HeroRotator";
@@ -13,6 +16,45 @@ import {
   Compass,
   MousePointerClick,
 } from "lucide-react";
+
+function HomeWidgetGate() {
+  const [show, setShow] = useState(false); // start hidden
+
+  useEffect(() => {
+    const el = document.getElementById("homepage-assistant-demo");
+    if (!el) {
+      // if the demo isn't found, fail open so widget still works
+      setShow(true);
+      return;
+    }
+
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      // only show AFTER we've scrolled past the demo box
+      const passedDemo = rect.bottom <= 0;
+      setShow(passedDemo);
+    };
+
+    update(); // run once on mount
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  if (!show) return null;
+
+  return (
+    <div id="aliigo-widget">
+      <AliigoSupportWidget />
+    </div>
+  );
+}
+
+
 
 export default function HomePage() {
   const t = useTranslations("Landing");
@@ -439,9 +481,7 @@ export default function HomePage() {
         </Link>
       </section>
 
-      <div id="aliigo-widget">
-        <AliigoSupportWidget />
-      </div>
+      <HomeWidgetGate />
     </div>
   );
 }
