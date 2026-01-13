@@ -52,88 +52,103 @@
     },
     "Landing": {
         "hero": {
-            "betaNote": "Private Beta Live 🚀",
-            "title": "Your local reputation,",
-            "titleHighlight": "automated.",
-            "subtitle": "Turn Google reviews into loyal customers and automate WhatsApp. All in one dashboard designed for local businesses.",
+            "betaNote": "Private Beta Live",
+            "title": "Give your website",
+            "titleHighlight": "your voice.",
+            "subtitle": "Aliigo is an AI assistant that lives on your website. It answers questions, understands intent, and turns real conversations into qualified leads — automatically.",
             "ctaPrimary": "Request Invite",
-            "ctaSecondary": "See how it works"
+            "ctaSecondary": "See it in action"
+        },
+        "demo": {
+            "badge": "Live assistant demo",
+            "titleLine1": "This is Aliigo.",
+            "titleLine2": "Ask it anything.",
+            "subtitle": "A real AI assistant for your website. It answers instantly, qualifies visitors, and captures leads naturally — 24/7.",
+            "pricingPrefix": "Base plan from",
+            "price": "€99/month",
+            "pricingSuffix": ". Pricing scales with message volume and customization.",
+            "prompts": {
+                "p1": "How does Aliigo capture leads?",
+                "p2": "How long does setup take?",
+                "p3": "How does pricing work?"
+            },
+            "liveTag": "Live demo"
         },
         "socialProof": {
-            "title": "BUILT FOR INDUSTRIES WHERE TRUST IS EVERYTHING",
+            "title": "WHERE A CONVERSATION CHANGES EVERYTHING",
             "industries": {
-                "clinics": "Medical Clinics",
-                "schools": "Education",
-                "aesthetics": "Aesthetics",
-                "physio": "Physiotherapy",
-                "legal": "Legal Services",
-                "dental": "Dental Clinics"
+                "preContact": "Answer questions before they reach out",
+                "complexServices": "Explain complex services clearly",
+                "qualifyIntent": "Qualify real intent automatically",
+                "reduceNoise": "Reduce unnecessary calls and emails",
+                "highValue": "Guide high-value decisions",
+                "nextStep": "Drive the next step: call, book, or contact"
             }
         },
         "features": {
-            "title": "All the essentials, zero clutter",
-            "subtitle": "We focus on what actually moves the needle: getting messages, replying fast, and keeping your Google reputation under control.",
+            "title": "What the assistant does",
+            "subtitle": "No dashboards. No complexity. Just clear answers and better conversations.",
             "f1": {
-                "title": "AI Web Chat",
-                "desc": "An assistant that replies 24/7 using your business's real info. Train it with your services and hours in minutes."
+                "title": "Answers instantly",
+                "desc": "Aliigo replies 24/7 using your real business information: services, hours, location, policies, and next steps."
             },
             "f2": {
-                "title": "Unified Inbox",
-                "desc": "Manage web and WhatsApp messages in one place. Customer history, internal notes, and custom tags."
+                "title": "Understands intent",
+                "desc": "It doesn’t just answer questions — it detects when someone is ready to book, call, or request more information."
             },
             "f3": {
-                "title": "Google Reviews",
-                "desc": "See your reviews at a glance, spot issues before they grow, and reply directly from the dashboard."
+                "title": "Captures leads naturally",
+                "desc": "When there’s real interest, Aliigo asks for contact details as part of the conversation. No forms. No friction."
             },
             "f4": {
-                "title": "Review Requests",
-                "desc": "Send direct links via SMS or Email to encourage happy customers to leave you 5 stars."
+                "title": "Guides the next step",
+                "desc": "Calls, bookings, forms, or follow-ups — the assistant knows what to suggest based on your business."
             }
         },
         "pricing": {
-            "title": "Launch Pricing",
-            "desc": "We are finalizing pricing. Businesses joining the beta get preferential terms and locked-in rates.",
-            "price": "$129",
-            "period": "/mo",
-            "cta": "Join Beta"
+            "title": "Simple pricing",
+            "desc": "One assistant, tuned to your business. Pricing scales with usage and customization.",
+            "price": "€99",
+            "period": "/month",
+            "cta": "Request Access"
         },
         "howItWorks": {
             "title": "How it works",
-            "subtitle": "No complex technical setup. You are live in 3 steps.",
+            "subtitle": "You don’t manage the assistant. You define the knowledge — it does the rest.",
             "step1": {
-                "title": "Request Invite",
-                "desc": "Leave your details. We verify your business fits our private beta criteria."
+                "title": "Request access",
+                "desc": "We onboard a limited number of businesses during the private beta."
             },
             "step2": {
-                "title": "Connect Profile",
-                "desc": "We sync your Google Business Profile and train the AI assistant with your info."
+                "title": "Upload business information",
+                "desc": "Services, hours, location, tone, and what a qualified lead looks like for you."
             },
             "step3": {
-                "title": "Autopilot Mode",
-                "desc": "Receive your activation code and start replying to customers and reviews instantly."
+                "title": "Go live",
+                "desc": "Add a small snippet to your site and the assistant is live immediately."
             }
         },
         "faq": {
-            "title": "Frequently Asked Questions",
+            "title": "Questions",
             "q1": {
-                "q": "What does Aliigo actually do?",
-                "a": "It combines an AI web chat, a unified inbox, and Google Review management in one dashboard."
+                "q": "What exactly is Aliigo?",
+                "a": "Aliigo is an AI assistant that lives on your website. It answers visitor questions and turns conversations into qualified leads."
             },
             "q2": {
-                "q": "What features are in Beta?",
-                "a": "AI Web Chat, Unified Inbox, and Review Management. WhatsApp Business is coming in the next update."
+                "q": "Is this a chatbot?",
+                "a": "It’s an assistant, not a script. It uses your real business knowledge and adapts to each conversation."
             },
             "q3": {
-                "q": "Is there a contract?",
-                "a": "No. We want you to stay for the results, not a contract. Cancel anytime."
+                "q": "Does it replace my staff?",
+                "a": "No. It handles first contact and qualification, so your team only deals with real, high-intent conversations."
             },
             "q4": {
-                "q": "Do I need technical skills?",
-                "a": "Zero. We give you a small snippet for your website (or send it to your webmaster) and that's it."
+                "q": "How hard is setup?",
+                "a": "Very simple. We provide a small snippet for your website. Most businesses are live the same day."
             }
         },
         "finalCta": {
-            "title": "Give your reputation the place it deserves",
+            "title": "Let your website answer for itself",
             "button": "Request Invite"
         }
     },

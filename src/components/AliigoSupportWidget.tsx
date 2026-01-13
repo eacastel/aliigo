@@ -42,13 +42,12 @@ export function AliigoSupportWidget() {
       parentHost={parentHost}
       locale={locale}
       channel="web"
+      skin="dark"
       theme={{
-        headerBg: "bg-emerald-600",
-        headerText: "text-white",
-        bubbleUser: "bg-emerald-600 text-white",
-        bubbleBot: "bg-emerald-50 text-emerald-950",
-        sendBg: "bg-emerald-600",
-        sendText: "text-white",
+        headerBg: "#0b1220 #ffffff",
+        bubbleUser: "#84c9ad #0a0a0a",
+        bubbleBot: "#f3f4f6 #111827",
+        sendBg: "#84c9ad #0a0a0a",
       }}
     />
   );

@@ -1,3 +1,5 @@
+// src/app/[locale]/(public)/reset-password/page.tsx
+
 "use client";
 
 import { useState } from "react";

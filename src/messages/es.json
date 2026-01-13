@@ -53,87 +53,102 @@
     "Landing": {
         "hero": {
             "betaNote": "Beta Privada Activa 🚀",
-            "title": "Tu reputación local,",
-            "titleHighlight": "automatizada.",
-            "subtitle": "Convierte reseñas de Google en clientes fieles y automatiza tu WhatsApp. Todo en un solo panel diseñado para negocios locales.",
+            "title": "Inteligencia",
+            "titleHighlight": "para tu sitio web.",
+            "subtitle": "Aliigo es un asistente de IA integrado en tu sitio web. Responde a preguntas, entiende la intención y convierte conversaciones reales en oportunidades cualificadas, de forma automática.",
             "ctaPrimary": "Solicitar Invitación",
             "ctaSecondary": "Ver cómo funciona"
         },
+        "demo": {
+            "badge": "Demo en vivo del asistente",
+            "titleLine1": "Esto es Aliigo.",
+            "titleLine2": "Pregúntale lo que quieras.",
+            "subtitle": "Un asistente de IA real para tu sitio web. Responde al instante, detecta intención y capta oportunidades de forma natural — 24/7.",
+            "pricingPrefix": "Plan base desde",
+            "price": "99€/mes",
+            "pricingSuffix": ". El precio escala según el volumen de mensajes y el nivel de personalización.",
+            "prompts": {
+                "p1": "¿Cómo capta oportunidades Aliigo?",
+                "p2": "¿Cuánto tarda la instalación?",
+                "p3": "¿Cómo funciona el precio?"
+            },
+            "liveTag": "En vivo"
+        },
         "socialProof": {
-            "title": "DISEÑADO PARA SECTORES DONDE LA CONFIANZA LO ES TODO",
+            "title": "CASOS DONDE UNA CONVERSACIÓN MARCA LA DIFERENCIA",
             "industries": {
-                "clinics": "Clínicas Médicas",
-                "schools": "Educación",
-                "aesthetics": "Estética Avanzada",
-                "physio": "Fisioterapia",
-                "legal": "Servicios Legales",
-                "dental": "Clínicas Dentales"
+                "preContact": "Resolver dudas antes del contacto",
+                "complexServices": "Explicar servicios complejos",
+                "qualifyIntent": "Cualificar interés real",
+                "reduceNoise": "Reducir correos y llamadas innecesarias",
+                "highValue": "Acompañar decisiones de alto valor",
+                "nextStep": "Guiar al siguiente paso: llamar, reservar o contactar"
             }
         },
         "features": {
-            "title": "Todo lo clave, sin complicaciones",
-            "subtitle": "Empezamos por lo que de verdad mueve la aguja: que te escriban, que puedas responder rápido y que tu reputación en Google esté bajo control.",
+            "title": "Qué hace el asistente",
+            "subtitle": "Sin paneles. Sin complejidad. Solo respuestas claras y mejores conversaciones.",
             "f1": {
-                "title": "Chat IA para tu web",
-                "desc": "Un asistente que responde 24/7 usando la información real de tu negocio. Entrénalo con tus servicios y horarios en minutos."
+                "title": "Responde al instante",
+                "desc": "Aliigo responde 24/7 usando la información real de tu negocio: servicios, horarios, ubicación, condiciones y siguientes pasos."
             },
             "f2": {
-                "title": "Buzón Unificado",
-                "desc": "Gestiona mensajes de web y WhatsApp en un solo lugar. Historial por cliente, notas internas y etiquetas."
+                "title": "Entiende la intención",
+                "desc": "No se limita a responder: detecta cuándo una persona está lista para contactar, reservar o pedir más información."
             },
             "f3": {
-                "title": "Reseñas de Google",
-                "desc": "Consulta tus reseñas de un vistazo, detecta problemas antes de que crezcan y responde directamente desde el panel."
+                "title": "Capta oportunidades de forma natural",
+                "desc": "Cuando hay interés real, Aliigo solicita los datos de contacto dentro de la conversación. Sin formularios. Sin fricción."
             },
             "f4": {
-                "title": "Solicitudes de Reseñas",
-                "desc": "Envía enlaces directos por SMS o Email para que tus clientes felices te dejen 5 estrellas."
+                "title": "Guía el siguiente paso",
+                "desc": "Llamadas, reservas, formularios o seguimiento: el asistente sugiere el paso adecuado según tu negocio."
             }
         },
         "pricing": {
-            "title": "Precios de lanzamiento",
-            "desc": "Estamos definiendo la estructura final. Los negocios que entren en la beta tendrán condiciones preferentes y precio congelado.",
-            "price": "129€",
+            "title": "Un precio simple",
+            "desc": "Un asistente ajustado a tu negocio. El precio escala según uso y nivel de personalización.",
+            "price": "99€",
             "period": "/mes",
-            "cta": "Quiero ser parte"
+            "cta": "Solicitar acceso"
         },
         "howItWorks": {
             "title": "Cómo funciona",
-            "subtitle": "Sin configuraciones técnicas complejas. En 3 pasos estás dentro.",
+            "subtitle": "No gestionas el asistente. Defines el conocimiento y los objetivos — él hace el resto.",
             "step1": {
-                "title": "Solicita invitación",
-                "desc": "Déjanos tus datos básicos. Revisamos que tu negocio encaje con la beta privada."
+                "title": "Solicita acceso",
+                "desc": "Durante la beta privada damos acceso a un número limitado de negocios."
             },
             "step2": {
-                "title": "Conectamos tu ficha",
-                "desc": "Sincronizamos tu Google Business Profile y configuramos el asistente IA con tu info."
+                "title": "Cumplimenta información de tu negocio",
+                "desc": "Servicios, horarios, tono y qué significa una oportunidad cualificada para ti."
             },
             "step3": {
-                "title": "Piloto Automático",
-                "desc": "Recibe un código de activación y empieza a responder clientes y reseñas al instante."
+                "title": "Publícalo en tu página web",
+                "desc": "Añade un pequeño snippet y el asistente estará activo al instante."
             }
         },
         "faq": {
-            "title": "Preguntas Frecuentes",
+            "title": "Preguntas",
             "q1": {
-                "q": "¿Qué hace exactamente Aliigo?",
-                "a": "Combina un chat IA para tu web, un buzón unificado y gestión de reseñas de Google en un solo panel."
+                "q": "¿Qué es exactamente Aliigo?",
+                "a": "Aliigo es un asistente de IA integrado en tu sitio web que responde a las preguntas de los visitantes y convierte conversaciones en oportunidades cualificadas."
             },
             "q2": {
-                "q": "¿Qué funciones incluye la beta?",
-                "a": "Chat web con IA, buzón de entrada y gestión de reseñas. WhatsApp Business llegará en la siguiente actualización."
+                "q": "¿Es un chatbot?",
+                "a": "No es un script ni un bot genérico. Usa el conocimiento real de tu negocio y se adapta a cada conversación."
             },
             "q3": {
-                "q": "¿Hay permanencia?",
-                "a": "No. Queremos que te quedes por los resultados, no por un contrato. Cancela cuando quieras."
+                "q": "¿Sustituye a mi equipo?",
+                "a": "No. Se encarga del primer contacto y la cualificación para que tu equipo trate solo con personas con intención real."
             },
             "q4": {
-                "q": "¿Necesito conocimientos técnicos?",
-                "a": "Cero. Nosotros te damos un pequeño código para tu web (o se lo pasamos a tu webmaster) y listo."
+                "q": "¿La instalación es complicada?",
+                "a": "No. Solo hay que añadir un pequeño código a tu web. La mayoría de negocios están activos el mismo día."
             }
         },
         "finalCta": {
-            "title": "Da a tu reputación el sitio que merece",
+            "title": "Deja que tu web responda por sí misma",
             "button": "Solicitar invitación"
         }
     },
