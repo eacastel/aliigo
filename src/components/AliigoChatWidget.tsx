@@ -125,13 +125,38 @@ export function AliigoChatWidget({
   const [disabled, setDisabled] = useState<null | "domain">(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null); // scroll container
+  const bottomRef = useRef<HTMLDivElement>(null); // anchor at end
 
   const inline = variant === "inline";
   const isOpen = inline || alwaysOpen || open;
 
   const minH = inline ? 260 : 320;
   const cardH = Math.max(minH, Math.min(height ?? 420, 640));
+
+  function renderText(s: string) {
+    // Minimal formatting:
+    // - converts **bold** to <strong>
+    // - preserves newlines
+    const lines = (s || "").split("\n");
+    const out: React.ReactNode[] = [];
+
+    for (let li = 0; li < lines.length; li++) {
+      const line = lines[li];
+      const segs = line.split(/\*\*(.*?)\*\*/g);
+
+      for (let i = 0; i < segs.length; i++) {
+        const seg = segs[i];
+        if (!seg) continue;
+        if (i % 2 === 1) out.push(<strong key={`${li}-${i}`}>{seg}</strong>);
+        else out.push(<span key={`${li}-${i}`}>{seg}</span>);
+      }
+
+      if (li < lines.length - 1) out.push(<br key={`br-${li}`} />);
+    }
+
+    return out;
+  }
 
   useEffect(() => {
     if (alwaysOpen) setOpen(true);
@@ -165,8 +190,15 @@ export function AliigoChatWidget({
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: 1e9, behavior: "smooth" });
-  }, [msgs, isOpen]);
+    const el = scrollRef.current?.querySelector(".aliigo-messages") as HTMLDivElement | null;
+    if (!el) return;
+
+    const id = window.requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    return () => window.cancelAnimationFrame(id);
+  }, [msgs.length, isOpen]);
 
   useEffect(() => {
     // Inline version is not inside an iframe, no sizing messages needed
@@ -270,6 +302,7 @@ export function AliigoChatWidget({
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      e.stopPropagation();
       handleSubmit();
     }
   }
@@ -317,10 +350,32 @@ export function AliigoChatWidget({
   }
 
   .aliigo-body {
-    flex:1;
-    padding: 12px;
+  flex: 1;
+  padding: 12px;
+  overflow: hidden;
+  display: flex;
+}
+  .aliigo-messages {
+    flex: 1;
     overflow-y: auto;
+    padding-right: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.22) transparent;
   }
+
+  .aliigo-messages::-webkit-scrollbar { width: 8px; }
+  .aliigo-messages::-webkit-scrollbar-track { background: transparent; }
+  .aliigo-messages::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.14);
+    border-radius: 999px;
+  }
+  .aliigo-card:hover .aliigo-messages::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.26);
+  }
+
+  /* Inline: keep clean, but do NOT kill scrolling */
+  .aliigo-inline .aliigo-body { padding: 0; }
+  .aliigo-inline .aliigo-messages { padding: 0; }
 
   .aliigo-hint { font-size: 12px; color:#6b7280; }
 
@@ -455,30 +510,49 @@ export function AliigoChatWidget({
 }
   /* ===== Inline variant: no extra frames, no “widget card” chrome ===== */
 .aliigo-inline.aliigo-card {
-  /* kill the widget “floating card” look */
+  display: flex;
+  flex-direction: column;
+
+  /* remove widget chrome */
   background: transparent;
   border: 0;
   box-shadow: none;
   backdrop-filter: none;
   border-radius: 0;
 
-  /* keep sizing controlled by parent */
   width: 100%;
 }
 
-/* In inline, let the body + form sit nicely without looking embedded */
-.aliigo-inline .aliigo-body {
-  padding: 0;
-}
-
 .aliigo-inline .aliigo-form {
+  flex: 0 0 auto;
   padding: 0;
   margin-top: 12px;
   border-top: 0;
   background: transparent;
 }
+
   .aliigo-inline .aliigo-hint {
   margin-bottom: 12px;
+}
+  /* Hide scrollbar unless hovered (WebKit) */
+.aliigo-inline .aliigo-body::-webkit-scrollbar {
+  width: 10px;
+}
+.aliigo-inline .aliigo-body::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+}
+.aliigo-inline .aliigo-body:hover::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.14);
+}
+
+/* Firefox */
+.aliigo-inline .aliigo-body {
+  scrollbar-width: none;              /* hidden */
+}
+.aliigo-inline .aliigo-body:hover {
+  scrollbar-width: thin;              /* show on hover */
+  scrollbar-color: rgba(255,255,255,0.18) transparent;
 }
 
 `}</style>
@@ -491,11 +565,7 @@ export function AliigoChatWidget({
             }`}
             style={{ height: cardH, width: inline ? "100%" : undefined }}
           >
-            <div
-              className={
-                skin === "dark" && !inline ? "aliigo-frame" : undefined
-              }
-            >
+            <div className={skin === "dark" ? "aliigo-frame" : undefined}>
               {!inline && (
                 <div
                   className="aliigo-header"
@@ -532,66 +602,82 @@ export function AliigoChatWidget({
               )}
 
               <div ref={scrollRef} className="aliigo-body">
-                {msgs.length === 0 && (
-                  <div className="aliigo-msgwrap" style={{ textAlign: "left" }}>
+                <div className="aliigo-messages">
+                  {msgs.length === 0 && (
                     <div
-                      className={
-                        skin === "dark"
-                          ? "aliigo-msg aliigo-msg-bot"
-                          : "aliigo-msg"
-                      }
-                      style={
-                        skin === "dark"
-                          ? undefined
-                          : {
-                              backgroundColor: botBubble.bg,
-                              color: botBubble.text,
-                            }
-                      }
+                      className="aliigo-msgwrap"
+                      style={{ textAlign: "left" }}
                     >
-                      {token ? t.welcome : t.previewHint}
+                      <div
+                        className={
+                          skin === "dark"
+                            ? "aliigo-msg aliigo-msg-bot"
+                            : "aliigo-msg"
+                        }
+                        style={
+                          skin === "dark"
+                            ? undefined
+                            : {
+                                backgroundColor: botBubble.bg,
+                                color: botBubble.text,
+                              }
+                        }
+                      >
+                        {token ? t.welcome : t.previewHint}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {msgs.map((m, i) => (
-                  <div
-                    key={i}
-                    className="aliigo-msgwrap"
-                    style={{ textAlign: m.role === "user" ? "right" : "left" }}
-                  >
+                  {msgs.map((m, i) => (
                     <div
-                      className={
-                        skin === "dark"
-                          ? `aliigo-msg ${
-                              m.role === "user"
-                                ? "aliigo-msg-user"
-                                : "aliigo-msg-bot"
-                            }`
-                          : "aliigo-msg"
-                      }
-                      style={
-                        skin === "dark"
-                          ? undefined
-                          : {
-                              backgroundColor:
-                                m.role === "user"
-                                  ? userBubble.bg
-                                  : botBubble.bg,
-                              color:
-                                m.role === "user"
-                                  ? userBubble.text
-                                  : botBubble.text,
-                            }
-                      }
+                      key={i}
+                      className="aliigo-msgwrap"
+                      style={{
+                        textAlign: m.role === "user" ? "right" : "left",
+                      }}
                     >
-                      {m.content}
+                      <div
+                        className={
+                          skin === "dark"
+                            ? `aliigo-msg ${
+                                m.role === "user"
+                                  ? "aliigo-msg-user"
+                                  : "aliigo-msg-bot"
+                              }`
+                            : "aliigo-msg"
+                        }
+                        style={
+                          skin === "dark"
+                            ? undefined
+                            : {
+                                backgroundColor:
+                                  m.role === "user"
+                                    ? userBubble.bg
+                                    : botBubble.bg,
+                                color:
+                                  m.role === "user"
+                                    ? userBubble.text
+                                    : botBubble.text,
+                              }
+                        }
+                      >
+                        {renderText(m.content)}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+
+                  <div ref={bottomRef} />
+                </div>
               </div>
 
-              <form className="aliigo-form" onSubmit={handleSubmit}>
+              <form
+                className="aliigo-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation(); // ✅ prevents page jump
+                  handleSubmit();
+                }}
+              >
                 <input
                   ref={inputRef}
                   className="aliigo-input"
