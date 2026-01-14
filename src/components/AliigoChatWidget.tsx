@@ -132,7 +132,9 @@ export function AliigoChatWidget({
   const isOpen = inline || alwaysOpen || open;
 
   const minH = inline ? 260 : 320;
-  const cardH = Math.max(minH, Math.min(height ?? 420, 640));
+  const defaultH = preview ? 360 : 420;
+
+  const cardH = Math.max(minH, Math.min(height ?? defaultH, 640));
 
   function renderText(s: string) {
     // Minimal formatting:
@@ -186,7 +188,15 @@ export function AliigoChatWidget({
   const wrapStyle: React.CSSProperties = inline
     ? { position: "relative", width: "100%" }
     : preview
-    ? { position: "absolute", bottom: 16, right: 16, zIndex: 50 }
+    ? {
+        position: "absolute",
+        inset: 0,
+        zIndex: 50,
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
+        padding: 16,
+      }
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
 
   useEffect(() => {
