@@ -329,7 +329,7 @@ export function AliigoChatWidget({
 
 .aliigo-card {
   width: 320px;
-  height: 384px;
+  height: 330px;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;

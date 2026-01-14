@@ -18,31 +18,23 @@ import {
 } from "lucide-react";
 
 function HomeWidgetGate() {
-  const [show, setShow] = useState(false); // start hidden
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
     const el = document.getElementById("homepage-assistant-demo");
-    if (!el) {
-      // if the demo isn't found, fail open so widget still works
-      setShow(true);
-      return;
-    }
+    if (!el) return;
 
-    const update = () => {
-      const rect = el.getBoundingClientRect();
-      // only show AFTER we've scrolled past the demo box
-      const passedDemo = rect.bottom <= 0;
-      setShow(passedDemo);
-    };
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        // hide floating widget while demo is on screen
+        const demoVisible = entry.isIntersecting && entry.intersectionRatio > 0.25;
+        setShow(!demoVisible);
+      },
+      { threshold: [0, 0.25, 0.5, 1] }
+    );
 
-    update(); // run once on mount
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   if (!show) return null;
@@ -53,7 +45,6 @@ function HomeWidgetGate() {
     </div>
   );
 }
-
 
 
 export default function HomePage() {
