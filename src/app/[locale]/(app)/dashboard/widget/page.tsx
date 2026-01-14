@@ -245,9 +245,18 @@ export default function WidgetSettingsPage() {
   }, [theme, initialTheme]);
 
   // ✅ split values for the new UI (no DB change)
-  const headerSplit = useMemo(() => splitTwoHex(theme.headerBg), [theme.headerBg]);
-  const userSplit = useMemo(() => splitTwoHex(theme.bubbleUser), [theme.bubbleUser]);
-  const botSplit = useMemo(() => splitTwoHex(theme.bubbleBot), [theme.bubbleBot]);
+  const headerSplit = useMemo(
+    () => splitTwoHex(theme.headerBg),
+    [theme.headerBg]
+  );
+  const userSplit = useMemo(
+    () => splitTwoHex(theme.bubbleUser),
+    [theme.bubbleUser]
+  );
+  const botSplit = useMemo(
+    () => splitTwoHex(theme.bubbleBot),
+    [theme.bubbleBot]
+  );
   const sendSplit = useMemo(() => splitTwoHex(theme.sendBg), [theme.sendBg]);
 
   const saveTheme = async () => {
@@ -312,7 +321,9 @@ export default function WidgetSettingsPage() {
     const base = getBaseUrl();
     const slug = biz?.slug || "your-business";
     const key = biz?.public_embed_key || "PUBLIC_KEY";
-    const brandParam = encodeURIComponent((brand || biz?.slug || "Aliigo").trim());
+    const brandParam = encodeURIComponent(
+      (brand || biz?.slug || "Aliigo").trim()
+    );
     const locale = biz?.default_locale || "en";
     const themeParam = encodeURIComponent(JSON.stringify(theme));
 
@@ -320,32 +331,58 @@ export default function WidgetSettingsPage() {
       "<!-- Aliigo Widget -->",
       "<script>",
       "(function(){",
-      "  var parentHost = window.location.hostname;",
-      "  var iframe = document.createElement('iframe');",
-      `  iframe.src='${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(parentHost);`,
-      "  iframe.style.position='fixed';",
-      "  iframe.style.bottom='24px';",
-      "  iframe.style.right='24px';",
-      "  iframe.style.width='180px';",
-      "  iframe.style.height='56px';",
-      "  iframe.style.border='0';",
-      "  iframe.style.borderRadius='9999px';",
-      "  iframe.style.overflow='hidden';",
-      "  iframe.style.background='transparent';",
-      "  iframe.style.zIndex='999999';",
-      "  iframe.setAttribute('title','Aliigo Widget');",
-      "  iframe.setAttribute('scrolling','no');",
-      "  document.body.appendChild(iframe);",
+      "  try {",
+      "    var parentHost = window.location.hostname;",
+      "    var iframe = document.createElement('iframe');",
+      `    iframe.src='${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(parentHost);`,
       "",
-      "  window.addEventListener('message', function(ev){",
-      "    try {",
-      "      var d = ev.data;",
-      "      if (!d || d.type !== 'ALIIGO_WIDGET_SIZE') return;",
-      "      if (typeof d.w === 'number') iframe.style.width = d.w + 'px';",
-      "      if (typeof d.h === 'number') iframe.style.height = d.h + 'px';",
-      "      if (typeof d.radius === 'string') iframe.style.borderRadius = d.radius;",
-      "    } catch(e) {}",
-      "  });",
+      "    // --- HARDENED POSITIONING (works around transforms / weird stacking contexts) ---",
+      "    var mount = document.documentElement; // safer than body on some CMS themes",
+      "    iframe.style.position = 'fixed';",
+      "    iframe.style.bottom = '24px';",
+      "    iframe.style.right = '24px';",
+      "    iframe.style.width = '180px';",
+      "    iframe.style.height = '56px';",
+      "    iframe.style.border = '0';",
+      "    iframe.style.borderRadius = '9999px';",
+      "    iframe.style.overflow = 'hidden';",
+      "    iframe.style.background = 'transparent';",
+      "    iframe.style.zIndex = '2147483647'; // max-ish z-index to beat sticky headers",
+      "    iframe.style.pointerEvents = 'auto';",
+      "    iframe.style.display = 'block';",
+      "",
+      "    // iOS safe-area support (prevents bottom UI overlap)",
+      "    iframe.style.bottom = 'calc(24px + env(safe-area-inset-bottom, 0px))';",
+      "    iframe.style.right  = 'calc(24px + env(safe-area-inset-right,  0px))';",
+      "",
+      "    iframe.setAttribute('title','Aliigo Widget');",
+      "    iframe.setAttribute('scrolling','no');",
+      "    iframe.setAttribute('allow','clipboard-write');",
+      "",
+      "    // Create a fixed-position wrapper to avoid parent CSS quirks on some sites",
+      "    var wrap = document.createElement('div');",
+      "    wrap.style.position = 'fixed';",
+      "    wrap.style.bottom = '0';",
+      "    wrap.style.right = '0';",
+      "    wrap.style.zIndex = '2147483647';",
+      "    wrap.style.pointerEvents = 'none'; // iframe will re-enable pointer events",
+      "    wrap.appendChild(iframe);",
+      "",
+      "    // ensure iframe can be clicked",
+      "    iframe.style.pointerEvents = 'auto';",
+      "",
+      "    mount.appendChild(wrap);",
+      "",
+      "    window.addEventListener('message', function(ev){",
+      "      try {",
+      "        var d = ev.data;",
+      "        if (!d || d.type !== 'ALIIGO_WIDGET_SIZE') return;",
+      "        if (typeof d.w === 'number') iframe.style.width = d.w + 'px';",
+      "        if (typeof d.h === 'number') iframe.style.height = d.h + 'px';",
+      "        if (typeof d.radius === 'string') iframe.style.borderRadius = d.radius;",
+      "      } catch(e) {}",
+      "    });",
+      "  } catch(e) {}",
       "})();",
       "</script>",
     ].join("\n");
@@ -401,7 +438,9 @@ export default function WidgetSettingsPage() {
             {/* Header */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="text-sm text-zinc-300 font-medium">Header</div>
-              <div className="text-xs text-zinc-500 sm:text-right">bg / text</div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
 
               <input
                 className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
@@ -431,8 +470,12 @@ export default function WidgetSettingsPage() {
 
             {/* User bubble */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="text-sm text-zinc-300 font-medium">User bubble</div>
-              <div className="text-xs text-zinc-500 sm:text-right">bg / text</div>
+              <div className="text-sm text-zinc-300 font-medium">
+                User bubble
+              </div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
 
               <input
                 className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
@@ -462,8 +505,12 @@ export default function WidgetSettingsPage() {
 
             {/* Bot bubble */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="text-sm text-zinc-300 font-medium">Bot bubble</div>
-              <div className="text-xs text-zinc-500 sm:text-right">bg / text</div>
+              <div className="text-sm text-zinc-300 font-medium">
+                Bot bubble
+              </div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
 
               <input
                 className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
@@ -493,8 +540,12 @@ export default function WidgetSettingsPage() {
 
             {/* Send button */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="text-sm text-zinc-300 font-medium">Send button</div>
-              <div className="text-xs text-zinc-500 sm:text-right">bg / text</div>
+              <div className="text-sm text-zinc-300 font-medium">
+                Send button
+              </div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
 
               <input
                 className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
@@ -536,7 +587,9 @@ export default function WidgetSettingsPage() {
             </div>
             <div>
               Public embed key:{" "}
-              <code className="text-zinc-200">{biz.public_embed_key || "—"}</code>
+              <code className="text-zinc-200">
+                {biz.public_embed_key || "—"}
+              </code>
             </div>
             <div>
               Preview token (dev):{" "}

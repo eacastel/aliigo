@@ -35,6 +35,7 @@ export function AliigoSupportWidget() {
       : "";
 
   return (
+    <div id="aliigo-widget">
     <AliigoChatWidget
       businessSlug="aliigo"
       brand="Aliigo"
@@ -50,5 +51,6 @@ export function AliigoSupportWidget() {
         sendBg: "#84c9ad #0a0a0a",
       }}
     />
+    </div>
   );
 }
