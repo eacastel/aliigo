@@ -185,6 +185,9 @@ export function AliigoChatWidget({
     text: "#ffffff",
   });
 
+  const inIframe =
+  typeof window !== "undefined" && window.self !== window.top;
+
   const wrapStyle: React.CSSProperties = inline
     ? { position: "relative", width: "100%" }
     : preview
@@ -197,7 +200,11 @@ export function AliigoChatWidget({
         justifyContent: "flex-end",
         padding: 16,
       }
+    : inIframe
+    ? { position: "relative", width: "100%", height: "100%" }
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
+
+  const embed = !inline && !preview && inIframe;
 
   useEffect(() => {
     const el = scrollRef.current?.querySelector(".aliigo-messages") as HTMLDivElement | null;
@@ -553,7 +560,10 @@ export function AliigoChatWidget({
             className={`aliigo-card ${inline ? "aliigo-inline" : ""} ${
               skin === "dark" ? "aliigo-skin-dark" : "aliigo-skin-classic"
             }`}
-            style={{ height: cardH, width: inline ? "100%" : undefined }}
+            style={{
+              height: embed ? "100%" : cardH,
+              width: inline || embed ? "100%" : undefined,
+            }}
           >
             <div className={skin === "dark" ? "aliigo-frame" : undefined}>
               {!inline && (
