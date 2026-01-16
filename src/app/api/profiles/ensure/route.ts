@@ -63,7 +63,6 @@ export async function POST(req: Request) {
     const email = (body.email ?? null) as string | null;
 
     // Optional extras
-    const google_url = (body.google_url ?? null) as string | null;
     const source = (body.source ?? null) as string | null;
 
     if (!looksLikeUUID(idRaw) || typeof nombre_negocio !== "string" || !nombre_negocio.trim()) {
@@ -152,7 +151,6 @@ export async function POST(req: Request) {
             nombre_contacto,
             telefono,
             email,
-            google_url, // remove if column doesn't exist
             source, // remove if column doesn't exist
             business_id: biz.id,
             updated_at: new Date().toISOString(),

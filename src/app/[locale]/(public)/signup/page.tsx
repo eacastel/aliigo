@@ -75,7 +75,6 @@ export default function SignupPage() {
         nombre_negocio: input.businessName, // REQUIRED
         nombre_contacto: input.name || null,
         telefono: input.phone || null,
-        google_url: input.googleUrl || null,
         source: "signup",
       }),
     });
