@@ -367,75 +367,55 @@ export default function WidgetSettingsPage() {
   };
 
   const embedCode = useMemo(() => {
-    const base = getBaseUrl();
-    const slug = biz?.slug || "your-business";
-    const key = biz?.public_embed_key || "PUBLIC_KEY";
-    const brandParam = encodeURIComponent(
-      (brand || biz?.slug || "Aliigo").trim()
-    );
-    const locale = biz?.default_locale || "en";
-    const themeParam = encodeURIComponent(JSON.stringify(theme));
+  const base = getBaseUrl();
+  const slug = biz?.slug || "your-business";
+  const key = biz?.public_embed_key || "PUBLIC_KEY";
+  const brandParam = encodeURIComponent((brand || biz?.slug || "Aliigo").trim());
+  const locale = biz?.default_locale || "en";
+  const themeParam = encodeURIComponent(JSON.stringify(theme));
 
-    return [
-      "<!-- Aliigo Widget -->",
-      "<script>",
-      "(function(){",
-      "  try {",
-      "    var parentHost = window.location.hostname;",
-      "    var iframe = document.createElement('iframe');",
-      `    iframe.src='${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(parentHost);`,
-      "",
-      "    // --- HARDENED POSITIONING (works around transforms / weird stacking contexts) ---",
-      "    var mount = document.documentElement; // safer than body on some CMS themes",
-      "    iframe.style.position = 'fixed';",
-      "    iframe.style.bottom = '24px';",
-      "    iframe.style.right = '24px';",
-      "    iframe.style.width = '180px';",
-      "    iframe.style.height = '56px';",
-      "    iframe.style.border = '0';",
-      "    iframe.style.borderRadius = '9999px';",
-      "    iframe.style.overflow = 'hidden';",
-      "    iframe.style.background = 'transparent';",
-      "    iframe.style.zIndex = '2147483647'; // max-ish z-index to beat sticky headers",
-      "    iframe.style.pointerEvents = 'auto';",
-      "    iframe.style.display = 'block';",
-      "",
-      "    // iOS safe-area support (prevents bottom UI overlap)",
-      "    iframe.style.bottom = 'calc(24px + env(safe-area-inset-bottom, 0px))';",
-      "    iframe.style.right  = 'calc(24px + env(safe-area-inset-right,  0px))';",
-      "",
-      "    iframe.setAttribute('title','Aliigo Widget');",
-      "    iframe.setAttribute('scrolling','no');",
-      "    iframe.setAttribute('allow','clipboard-write');",
-      "",
-      "    // Create a fixed-position wrapper to avoid parent CSS quirks on some sites",
-      "    var wrap = document.createElement('div');",
-      "    wrap.style.position = 'fixed';",
-      "    wrap.style.bottom = '0';",
-      "    wrap.style.right = '0';",
-      "    wrap.style.zIndex = '2147483647';",
-      "    wrap.style.pointerEvents = 'none'; // iframe will re-enable pointer events",
-      "    wrap.appendChild(iframe);",
-      "",
-      "    // ensure iframe can be clicked",
-      "    iframe.style.pointerEvents = 'auto';",
-      "",
-      "    mount.appendChild(wrap);",
-      "",
-      "    window.addEventListener('message', function(ev){",
-      "      try {",
-      "        var d = ev.data;",
-      "        if (!d || d.type !== 'ALIIGO_WIDGET_SIZE') return;",
-      "        if (typeof d.w === 'number') iframe.style.width = d.w + 'px';",
-      "        if (typeof d.h === 'number') iframe.style.height = d.h + 'px';",
-      "        if (typeof d.radius === 'string') iframe.style.borderRadius = d.radius;",
-      "      } catch(e) {}",
-      "    });",
-      "  } catch(e) {}",
-      "})();",
-      "</script>",
-    ].join("\n");
-  }, [biz?.slug, biz?.public_embed_key, biz?.default_locale, brand, theme]);
+  // We use a cleaner JS structure for the client
+  return `<script>
+(function() {
+  var d = document, w = window;
+  var h = '${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(w.location.hostname);
+  var i = d.createElement('iframe');
+  
+  // Styles: Cleaner object assignment
+  Object.assign(i.style, {
+    position: 'fixed', bottom: '24px', right: '24px',
+    width: '180px', height: '56px', border: '0',
+    borderRadius: '9999px', overflow: 'hidden', zIndex: '2147483647',
+    boxShadow: 'none', background: 'transparent', colorScheme: 'normal'
+  });
+  
+  // Attributes
+  i.src = h;
+  i.title = 'Aliigo Widget';
+  i.setAttribute('allow', 'clipboard-write');
+  i.setAttribute('scrolling', 'no');
+  
+  // iOS Safari Safe Areas
+  try {
+    i.style.bottom = 'calc(24px + env(safe-area-inset-bottom, 0px))';
+    i.style.right  = 'calc(24px + env(safe-area-inset-right, 0px))';
+  } catch(e) {}
+
+  // Message Listener for Resize
+  w.addEventListener('message', function(e) {
+    var dt = e.data;
+    if (!dt || dt.type !== 'ALIIGO_WIDGET_SIZE') return;
+    if (dt.w) i.style.width = dt.w + 'px';
+    if (dt.h) i.style.height = dt.h + 'px';
+    if (dt.radius) i.style.borderRadius = dt.radius;
+    // Add shadow only when open to avoid "black box" artifacts on the pill
+    i.style.boxShadow = dt.shadow || 'none'; 
+  });
+
+  d.documentElement.appendChild(i);
+})();
+</script>`;
+}, [biz?.slug, biz?.public_embed_key, biz?.default_locale, brand, theme]);
 
   if (!biz) {
     return (

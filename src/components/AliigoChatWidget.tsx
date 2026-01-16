@@ -186,28 +186,33 @@ export function AliigoChatWidget({
     text: "#ffffff",
   });
 
-
-
   const wrapStyle: React.CSSProperties = inline
     ? { position: "relative", width: "100%" }
     : preview
     ? {
-        position: "absolute",
-        inset: 0,
-        zIndex: 50,
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "flex-end",
-        padding: 16,
+        /* ... keep existing preview styles ... */
       }
     : inIframe
-    ? { position: "relative", width: "100%" }
+    ? {
+        // FIX: Ensure the container fills the iframe but aligns content to bottom-right
+        position: "fixed",
+        bottom: 0,
+        right: 0,
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end", // Push widget to right
+        justifyContent: "flex-end", // Push widget to bottom
+        padding: "20px", // Breathing room for shadow inside the iframe
+        boxSizing: "border-box",
+      }
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
 
-
-
   useEffect(() => {
-    const el = scrollRef.current?.querySelector(".aliigo-messages") as HTMLDivElement | null;
+    const el = scrollRef.current?.querySelector(
+      ".aliigo-messages"
+    ) as HTMLDivElement | null;
     if (!el) return;
 
     const id = window.requestAnimationFrame(() => {
@@ -221,9 +226,27 @@ export function AliigoChatWidget({
     // Inline version is not inside an iframe, no sizing messages needed
     if (inline) return;
 
+    // FIX: We request a slightly larger iframe width/height than the card
+    // to allow the CSS drop-shadow to render without being clipped.
+    const SHADOW_PAD_X = 50;
+    const SHADOW_PAD_Y = 50;
+
     const msg = isOpen
-      ? { type: "ALIIGO_WIDGET_SIZE", w: 360, h: cardH, radius: "12px" }
-      : { type: "ALIIGO_WIDGET_SIZE", w: 240, h: 56, radius: "9999px" }
+      ? {
+          type: "ALIIGO_WIDGET_SIZE",
+          // Request wider frame for shadow breathing room
+          w: 360 + SHADOW_PAD_X,
+          h: cardH + SHADOW_PAD_Y,
+          radius: "18px", // Match card radius usually
+          shadow: "none", // Let the internal CSS handle the shadow, iframe has none
+        }
+      : {
+          type: "ALIIGO_WIDGET_SIZE",
+          w: 180 + 20, // Small buffer
+          h: 56 + 20,
+          radius: "9999px",
+          shadow: "none",
+        };
 
     try {
       window.parent?.postMessage(msg, "*");
@@ -354,6 +377,7 @@ export function AliigoChatWidget({
   box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
   display: flex;
   flex-direction: column;
+  margin: 0;
 }
 
 /* header (hidden in inline via JSX, so keep normal) */
@@ -476,7 +500,7 @@ export function AliigoChatWidget({
   background: rgba(9, 9, 11, 0.72);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 18px;
-  box-shadow: 0 25px 60px rgba(0,0,0,.45);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
   backdrop-filter: blur(10px);
 }
 
@@ -566,11 +590,15 @@ export function AliigoChatWidget({
               skin === "dark" ? "aliigo-skin-dark" : "aliigo-skin-classic"
             }`}
             style={{
-              height: inline ? undefined : cardH, 
-              width: inline ? "100%" : undefined, 
+              height: inline ? undefined : cardH,
+              width: inline ? "100%" : undefined,
             }}
           >
-            <div className={`aliigo-frame ${skin === "dark" ? "aliigo-frame-dark" : ""}`}>
+            <div
+              className={`aliigo-frame ${
+                skin === "dark" ? "aliigo-frame-dark" : ""
+              }`}
+            >
               {!inline && (
                 <div
                   className="aliigo-header"

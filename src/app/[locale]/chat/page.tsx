@@ -16,10 +16,14 @@ export default function EmbeddedChatPage() {
   return (
     <>
       <style>{`
-        html, body { background: transparent !important; }
+        /* Force transparency on everything up to the widget */
+        :root, html, body, #__next {
+          background-color: transparent !important;
+          background: transparent !important;
+        }
       `}</style>
 
-      <Suspense fallback={<div style={{ width: "100%", height: "100%", background: "transparent" }} />}>
+      <Suspense fallback={<div />}>
         <ClientEmbed />
       </Suspense>
     </>
