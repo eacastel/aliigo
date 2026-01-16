@@ -133,14 +133,7 @@ export function AliigoChatWidget({
 
   const minH = inline ? 260 : 320;
   const defaultH = preview ? 360 : 420;
-
   const cardH = Math.max(minH, Math.min(height ?? defaultH, 640));
-
-  const embed = !inline && !preview && inIframe;
-
-  // In iframe embed we still want a fixed widget size.
-  // The iframe itself will be resized by postMessage.
-  const cardHeight = inline ? undefined : cardH;
 
   function renderText(s: string) {
     // Minimal formatting:
