@@ -17,7 +17,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 
-function HomeWidgetGate() {
+function HomeFloatingWidgetGate() {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
@@ -472,7 +472,7 @@ export default function HomePage() {
         </Link>
       </section>
 
-      <HomeWidgetGate />
+      <HomeFloatingWidgetGate />
     </div>
   );
 }
