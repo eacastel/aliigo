@@ -1,3 +1,5 @@
+// src/app/api/widget/rotate-token/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { adminFromTable } from "@/lib/supabaseAdmin";

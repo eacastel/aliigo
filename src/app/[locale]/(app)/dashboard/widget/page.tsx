@@ -65,6 +65,11 @@ const splitTwoHex = (v?: string) => {
   };
 };
 
+
+const [brand, setBrand] = useState("Aliigo");
+const [initialBrand, setInitialBrand] = useState("Aliigo");
+
+
 const joinTwoHex = (bg: string, text: string) =>
   `${normalizeHex(bg)} ${normalizeHex(text)}`.trim();
 
@@ -175,6 +180,8 @@ export default function WidgetSettingsPage() {
       let data: JoinRow | null = r1.data ?? null;
       let error: PostgrestErrLike = r1.error;
 
+      
+
       if (/widget_theme.*does not exist/i.test(errMsg(error))) {
         const r2 = await supabase
           .from("business_profiles")
@@ -213,6 +220,7 @@ export default function WidgetSettingsPage() {
 
       const effectiveBrand = (b.brand_name || b.name || "Aliigo").trim();
       setBrand(effectiveBrand);
+      setInitialBrand(effectiveBrand);
 
       const dbTheme = toThemeDb(b.widget_theme);
       const merged = mergeTheme(dbTheme);
@@ -241,8 +249,10 @@ export default function WidgetSettingsPage() {
   }, []);
 
   const dirty = useMemo(() => {
-    return JSON.stringify(theme) !== JSON.stringify(initialTheme);
-  }, [theme, initialTheme]);
+    const themeDirty = JSON.stringify(theme) !== JSON.stringify(initialTheme);
+    const brandDirty = brand.trim() !== initialBrand.trim();
+    return themeDirty || brandDirty;
+  }, [theme, initialTheme, brand, initialBrand]);
 
   // ✅ split values for the new UI (no DB change)
   const headerSplit = useMemo(
@@ -296,7 +306,12 @@ export default function WidgetSettingsPage() {
       }
 
       if (typeof j.brand_name === "string" && j.brand_name.trim()) {
-        setBrand(j.brand_name.trim());
+        const bn = j.brand_name.trim();
+        setBrand(bn);
+        setInitialBrand(bn);
+      } else {
+        // If API didn’t echo, still lock in what we saved
+        setInitialBrand(brand.trim());
       }
 
       const merged = mergeTheme(j.theme ?? theme);
@@ -310,6 +325,40 @@ export default function WidgetSettingsPage() {
       setSaving(false);
     }
   };
+
+    const rotateToken = async () => {
+      setMsg(null);
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        const accessToken = sess.session?.access_token;
+        if (!accessToken) {
+          setMsg("Login required.");
+          return;
+        }
+
+        const res = await fetch("/api/widget/rotate-token", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const j: { token?: string; error?: string } = await res.json().catch(() => ({}));
+        if (!res.ok || !j.token) {
+          setMsg(j.error || "Could not generate token.");
+          return;
+        }
+
+        setToken(j.token);
+        setMsg("Token generated.");
+      } catch (e) {
+        console.error(e);
+        setMsg("Could not generate token.");
+      }
+    };
+
+
+
 
   const rotatePublicKey = async () => {
     setMsg(
@@ -619,11 +668,19 @@ export default function WidgetSettingsPage() {
               className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900 disabled:opacity-50"
               onClick={() => {
                 setTheme(initialTheme);
+                setBrand(initialBrand);
                 setMsg(null);
               }}
               disabled={!dirty || saving}
             >
               Reset
+            </button>
+            
+            <button
+              className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
+              onClick={rotateToken}
+            >
+              Generate token
             </button>
 
             <button
