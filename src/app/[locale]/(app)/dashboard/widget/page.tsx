@@ -66,8 +66,6 @@ const splitTwoHex = (v?: string) => {
 };
 
 
-const [brand, setBrand] = useState("Aliigo");
-const [initialBrand, setInitialBrand] = useState("Aliigo");
 
 
 const joinTwoHex = (bg: string, text: string) =>
@@ -128,6 +126,8 @@ export default function WidgetSettingsPage() {
   const [token, setToken] = useState<string | null>(null);
 
   const [brand, setBrand] = useState("Aliigo");
+
+  const [initialBrand, setInitialBrand] = useState("Aliigo");
 
   const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
   const [initialTheme, setInitialTheme] = useState<Theme>(DEFAULT_THEME);
@@ -675,7 +675,7 @@ export default function WidgetSettingsPage() {
             >
               Reset
             </button>
-            
+
             <button
               className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
               onClick={rotateToken}
