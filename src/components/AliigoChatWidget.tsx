@@ -136,6 +136,12 @@ export function AliigoChatWidget({
 
   const cardH = Math.max(minH, Math.min(height ?? defaultH, 640));
 
+  const embed = !inline && !preview && inIframe;
+
+  // In iframe embed we still want a fixed widget size.
+  // The iframe itself will be resized by postMessage.
+  const cardHeight = inline ? undefined : cardH;
+
   function renderText(s: string) {
     // Minimal formatting:
     // - converts **bold** to <strong>
@@ -201,10 +207,10 @@ export function AliigoChatWidget({
         padding: 16,
       }
     : inIframe
-    ? { position: "relative", width: "100%", height: "100%" }
+    ? { position: "relative", width: "100%" }
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
 
-  const embed = !inline && !preview && inIframe;
+
 
   useEffect(() => {
     const el = scrollRef.current?.querySelector(".aliigo-messages") as HTMLDivElement | null;
@@ -561,8 +567,8 @@ export function AliigoChatWidget({
               skin === "dark" ? "aliigo-skin-dark" : "aliigo-skin-classic"
             }`}
             style={{
-              height: embed ? "100%" : cardH,
-              width: inline || embed ? "100%" : undefined,
+              height: inline ? undefined : cardH, 
+              width: inline ? "100%" : undefined, 
             }}
           >
             <div className={skin === "dark" ? "aliigo-frame" : undefined}>
