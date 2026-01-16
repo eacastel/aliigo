@@ -25,7 +25,7 @@ const UI = {
   en: {
     button: (brand: string) => `Ask ${brand}`,
     header: (brand: string, slug?: string) =>
-      `${brand} Assistant${slug ? ` (${slug})` : ""}`,
+      `${brand} ${slug ? ` (${slug})` : ""}`,
     welcome: "Ask a question and we’ll help right away.",
     placeholder: "Type your question…",
     send: "Send",
@@ -40,7 +40,7 @@ const UI = {
   es: {
     button: (brand: string) => `Pregunta a ${brand}`,
     header: (brand: string, slug?: string) =>
-      `Asistente de ${brand}${slug ? ` (${slug})` : ""}`,
+      `${brand}${slug ? ` (${slug})` : ""}`,
     welcome: "Haz tu consulta y te ayudamos al momento.",
     placeholder: "Escribe tu consulta…",
     send: "Enviar",
