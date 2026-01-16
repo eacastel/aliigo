@@ -328,7 +328,6 @@ export default function DashboardPage() {
             {displayName
               ? t("welcome", { name: displayName })
               : t("welcomeGeneric")}{" "}
-            👋
           </h1>
 
           {daysLeft !== null && (
