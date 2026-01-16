@@ -120,6 +120,7 @@ export function AliigoChatWidget({
 
   const inIframe = typeof window !== "undefined" && window.self !== window.top;
 
+
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -190,22 +191,22 @@ export function AliigoChatWidget({
     ? { position: "relative", width: "100%" }
     : preview
     ? {
-        /* ... keep existing preview styles ... */
+        position: "absolute",
+        inset: 0,
+        zIndex: 50,
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
+        padding: 16,
       }
     : inIframe
-    ? {
-        // FIX: Ensure the container fills the iframe but aligns content to bottom-right
-        position: "fixed",
-        bottom: 0,
-        right: 0,
-        width: "100%",
+    ? { 
+        position: "relative", 
+        width: "100%", 
         height: "100%",
         display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end", // Push widget to right
-        justifyContent: "flex-end", // Push widget to bottom
-        padding: "20px", // Breathing room for shadow inside the iframe
-        boxSizing: "border-box",
+        alignItems: "flex-end",
+        justifyContent: "flex-end"
       }
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
 
@@ -223,35 +224,30 @@ export function AliigoChatWidget({
   }, [msgs.length, isOpen]);
 
   useEffect(() => {
-    // Inline version is not inside an iframe, no sizing messages needed
     if (inline) return;
 
-    // FIX: We request a slightly larger iframe width/height than the card
-    // to allow the CSS drop-shadow to render without being clipped.
-    const SHADOW_PAD_X = 50;
-    const SHADOW_PAD_Y = 50;
-
     const msg = isOpen
-      ? {
-          type: "ALIIGO_WIDGET_SIZE",
-          // Request wider frame for shadow breathing room
-          w: 360 + SHADOW_PAD_X,
-          h: cardH + SHADOW_PAD_Y,
-          radius: "18px", // Match card radius usually
-          shadow: "none", // Let the internal CSS handle the shadow, iframe has none
+      ? { 
+          type: "ALIIGO_WIDGET_SIZE", 
+          w: 380,
+          h: cardH + 20, 
+          radius: "18px",
+          shadow: "0 25px 50px -12px rgba(0,0,0,0.25)" 
         }
-      : {
-          type: "ALIIGO_WIDGET_SIZE",
-          w: 180 + 20, // Small buffer
-          h: 56 + 20,
+      : { 
+          type: "ALIIGO_WIDGET_SIZE", 
+          w: 180, 
+          h: 60,  
           radius: "9999px",
-          shadow: "none",
+          shadow: "0 20px 25px -5px rgba(0,0,0,0.1)" 
         };
 
     try {
       window.parent?.postMessage(msg, "*");
     } catch {}
   }, [inline, isOpen, cardH]);
+
+  const cardShadowStyle = (!inline && inIframe) ? { boxShadow: "none" } : {};
 
   async function send(content: string) {
     if (!content.trim()) return;
@@ -592,6 +588,7 @@ export function AliigoChatWidget({
             style={{
               height: inline ? undefined : cardH,
               width: inline ? "100%" : undefined,
+              ...cardShadowStyle 
             }}
           >
             <div
@@ -707,7 +704,7 @@ export function AliigoChatWidget({
                 className="aliigo-form"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  e.stopPropagation(); // ✅ prevents page jump
+                  e.stopPropagation(); 
                   handleSubmit();
                 }}
               >
@@ -738,7 +735,10 @@ export function AliigoChatWidget({
             type="button"
             className="aliigo-pill"
             onClick={() => setOpen(true)}
-            style={{ backgroundColor: sendBtn.bg, color: sendBtn.text }}
+            style={{ backgroundColor: sendBtn.bg, 
+              color: sendBtn.text,
+            ...cardShadowStyle 
+             }}
           >
             {t.button(brand)}
           </button>
