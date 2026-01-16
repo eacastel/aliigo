@@ -33,7 +33,6 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [businessName, setBusinessName] = useState("");
-  const [googleUrl, setGoogleUrl] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 
@@ -118,7 +117,6 @@ export default function SignupPage() {
           data: {
             full_name: name,
             business_name: businessName,
-            google_url: googleUrl,
             phone,
           },
         },
@@ -142,7 +140,6 @@ export default function SignupPage() {
         name,
         businessName,
         phone,
-        googleUrl,
       });
 
       // Analytics
@@ -233,19 +230,6 @@ export default function SignupPage() {
             onChange={(e) => setBusinessName(e.target.value)}
             className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
             required
-          />
-        </div>
-
-        {/* Google URL */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
-            {t("googleUrlPlaceholder")}
-          </label>
-          <input
-            type="text"
-            value={googleUrl}
-            onChange={(e) => setGoogleUrl(e.target.value)}
-            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
           />
         </div>
 

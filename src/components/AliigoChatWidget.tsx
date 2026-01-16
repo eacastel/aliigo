@@ -118,6 +118,8 @@ export function AliigoChatWidget({
   const lang = uiLang(locale);
   const t = UI[lang];
 
+  const inIframe = typeof window !== "undefined" && window.self !== window.top;
+
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -184,8 +186,7 @@ export function AliigoChatWidget({
     text: "#ffffff",
   });
 
-  const inIframe =
-  typeof window !== "undefined" && window.self !== window.top;
+
 
   const wrapStyle: React.CSSProperties = inline
     ? { position: "relative", width: "100%" }
@@ -222,7 +223,7 @@ export function AliigoChatWidget({
 
     const msg = isOpen
       ? { type: "ALIIGO_WIDGET_SIZE", w: 360, h: cardH, radius: "12px" }
-      : { type: "ALIIGO_WIDGET_SIZE", w: 180, h: 56, radius: "9999px" };
+      : { type: "ALIIGO_WIDGET_SIZE", w: 240, h: 56, radius: "9999px" }
 
     try {
       window.parent?.postMessage(msg, "*");
@@ -466,6 +467,7 @@ export function AliigoChatWidget({
   border: 0;
   cursor: pointer;
   box-shadow: 0 20px 25px -5px rgba(0,0,0,.18);
+  white-space: nowrap;
 }
 
 /* ===== Dark skin overrides ===== */
@@ -478,17 +480,21 @@ export function AliigoChatWidget({
   backdrop-filter: blur(10px);
 }
 
+/* Base frame: REQUIRED for classic + dark so body can flex and input pins bottom */
+.aliigo-frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Frame is the internal flex column container */
-.aliigo-skin-dark .aliigo-frame {
+.aliigo-frame-dark { 
   margin: 4px;
   border-radius: 14px;
   border: 0px solid rgba(255,255,255,0.10);
   background: rgba(9, 9, 11, 0.55);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0; /* critical */
 }
 
 .aliigo-skin-dark .aliigo-header {
@@ -564,7 +570,7 @@ export function AliigoChatWidget({
               width: inline ? "100%" : undefined, 
             }}
           >
-            <div className={skin === "dark" ? "aliigo-frame" : undefined}>
+            <div className={`aliigo-frame ${skin === "dark" ? "aliigo-frame-dark" : ""}`}>
               {!inline && (
                 <div
                   className="aliigo-header"
