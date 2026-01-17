@@ -192,25 +192,31 @@ export function AliigoChatWidget({
     ? { position: "relative", width: "100%" }
     : preview
     ? {
-        position: "absolute", bottom: 0, right: 0, zIndex: 50,
-        padding: 16, display: "flex", justifyContent: "flex-end", alignItems: "flex-end",
+        // Dashboard Preview Box
+        position: "absolute",
+        inset: 0,
+        zIndex: 50,
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
+        padding: 16,
         pointerEvents: "none"
       }
     : inIframe
     ? {
-        // FIX: Fixed position 0,0 inside the iframe window.
-        position: "fixed", 
-        bottom: 0, 
+        // Live Embed: Fill the iframe, align bottom-right
+        position: "fixed",
+        bottom: 0,
         right: 0,
         width: "100%",
         height: "100%",
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "flex-end",
-        // PADDING IS KEY: It gives space for the CARD'S shadow to render inside the iframe
+        // Padding allows the card's shadow to show without being cut off
         padding: "24px", 
         boxSizing: "border-box",
-        pointerEvents: "none" // Let clicks pass through empty space
+        pointerEvents: "none"
       }
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50, pointerEvents: "none" };
 
@@ -230,10 +236,9 @@ export function AliigoChatWidget({
   useEffect(() => {
     if (inline) return;
 
-    // We Request a larger size (width + padding) so our internal shadow isn't cut off.
-    // We do NOT send a 'shadow' property anymore.
+    // We request a size LARGER than the card to fit the shadow/padding
     const msg = isOpen
-      ? { type: "ALIIGO_WIDGET_SIZE", w: 380, h: cardH + 48 } // +48 for the 24px padding
+      ? { type: "ALIIGO_WIDGET_SIZE", w: 380, h: cardH + 50 } 
       : { type: "ALIIGO_WIDGET_SIZE", w: 180, h: 80 };
 
     try {
@@ -573,8 +578,9 @@ export function AliigoChatWidget({
 
 .aliigo-card, .aliigo-pill {
   pointer-events: auto;
-  /* Ensure the CARD has the shadow, not the iframe */
-  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  /* The shadow now lives here, on the rounded element */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35) !important;
+}
 
 `}</style>
 
