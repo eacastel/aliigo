@@ -123,10 +123,10 @@ export function AliigoChatWidget({
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [disabled, setDisabled] = useState<null | "domain">(null);
-
+  
   const inputRef = useRef<HTMLInputElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null); // scroll container
-  const bottomRef = useRef<HTMLDivElement>(null); // anchor at end
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const inline = variant === "inline";
   const isOpen = inline || alwaysOpen || open;
@@ -185,14 +185,11 @@ export function AliigoChatWidget({
   });
 
   const inIframe = typeof window !== "undefined" && window.self !== window.top;
-
-  // ... inside AliigoChatWidget ...
   
   const wrapStyle: React.CSSProperties = inline
     ? { position: "relative", width: "100%" }
     : preview
     ? {
-        // Dashboard Preview Box
         position: "absolute",
         inset: 0,
         zIndex: 50,
@@ -204,7 +201,6 @@ export function AliigoChatWidget({
       }
     : inIframe
     ? {
-        // Live Embed: Fill the iframe, align bottom-right
         position: "fixed",
         bottom: 0,
         right: 0,
@@ -213,7 +209,6 @@ export function AliigoChatWidget({
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "flex-end",
-        // Padding allows the card's shadow to show without being cut off
         padding: "24px", 
         boxSizing: "border-box",
         pointerEvents: "none"
@@ -236,10 +231,9 @@ export function AliigoChatWidget({
   useEffect(() => {
     if (inline) return;
 
-    // We request a size LARGER than the card to fit the shadow/padding
     const msg = isOpen
-      ? { type: "ALIIGO_WIDGET_SIZE", w: 380, h: cardH + 50 } 
-      : { type: "ALIIGO_WIDGET_SIZE", w: 180, h: 80 };
+      ? { type: "ALIIGO_WIDGET_SIZE", w: 380 + 40, h: cardH + 50 } 
+      : { type: "ALIIGO_WIDGET_SIZE", w: 220, h: 90 };
 
     try {
       window.parent?.postMessage(msg, "*");
@@ -578,8 +572,10 @@ export function AliigoChatWidget({
 
 .aliigo-card, .aliigo-pill {
   pointer-events: auto;
-  /* The shadow now lives here, on the rounded element */
-  box-shadow: 0 20px 40px rgba(0,0,0,0.35) !important;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.30) !important;
+}
+.aliigo-card {
+  margin: 0;
 }
 
 `}</style>

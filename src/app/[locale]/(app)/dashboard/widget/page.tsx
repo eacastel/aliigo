@@ -380,14 +380,15 @@ export default function WidgetSettingsPage() {
   var url = '${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(w.location.hostname);
   var i = d.createElement('iframe');
   
-  // Clean Iframe: No Shadow, No Border, Transparent
+  // Style: Transparent, Fixed, initially hidden.
+  // NO boxShadow on the iframe itself.
   Object.assign(i.style, {
     position: 'fixed', bottom: '0px', right: '0px',
     width: '0px', height: '0px', border: '0',
     zIndex: '2147483647',
     background: 'transparent',
     colorScheme: 'normal',
-    boxShadow: 'none' // CRITICAL: No shadow on the rectangular iframe
+    boxShadow: 'none' 
   });
   
   i.src = url;
@@ -399,15 +400,14 @@ export default function WidgetSettingsPage() {
     var dt = e.data;
     if (!dt || dt.type !== 'ALIIGO_WIDGET_SIZE') return;
     
-    // Only resize. Do not touch shadow/border-radius.
+    // Resize the iframe window
     if (dt.w) i.style.width = dt.w + 'px';
     if (dt.h) i.style.height = dt.h + 'px';
     
-    // Position
+    // Position the iframe 24px from the screen edge
     i.style.bottom = '24px';
     i.style.right = '24px';
     
-    // iOS Safe Area
     try {
       if (CSS.supports('bottom: env(safe-area-inset-bottom)')) {
         i.style.bottom = 'calc(24px + env(safe-area-inset-bottom))';
