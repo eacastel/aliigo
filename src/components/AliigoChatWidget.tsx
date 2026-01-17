@@ -186,33 +186,33 @@ export function AliigoChatWidget({
 
   const inIframe = typeof window !== "undefined" && window.self !== window.top;
 
+  // ... inside AliigoChatWidget ...
+  
   const wrapStyle: React.CSSProperties = inline
     ? { position: "relative", width: "100%" }
     : preview
     ? {
-        position: "absolute",
-        inset: 0,
-        zIndex: 50,
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "flex-end",
-        padding: 16, // Padding for the dashboard preview box
+        position: "absolute", bottom: 0, right: 0, zIndex: 50,
+        padding: 16, display: "flex", justifyContent: "flex-end", alignItems: "flex-end",
+        pointerEvents: "none"
       }
     : inIframe
     ? {
-        // FIX: Inside iframe, fill the space and touch the bottom-right corner.
-        // The iframe *itself* is already positioned 24px from the screen edge.
-        position: "fixed",
-        bottom: 0,
+        // FIX: Fixed position 0,0 inside the iframe window.
+        position: "fixed", 
+        bottom: 0, 
         right: 0,
         width: "100%",
         height: "100%",
         display: "flex",
-        alignItems: "flex-end",   // Align content to bottom
-        justifyContent: "flex-end", // Align content to right
-        padding: "5px", // Tiny padding for shadow breathing room
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
+        // PADDING IS KEY: It gives space for the CARD'S shadow to render inside the iframe
+        padding: "24px", 
+        boxSizing: "border-box",
+        pointerEvents: "none" // Let clicks pass through empty space
       }
-    : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
+    : { position: "fixed", bottom: 24, right: 24, zIndex: 50, pointerEvents: "none" };
 
   useEffect(() => {
     const el = scrollRef.current?.querySelector(
@@ -230,21 +230,11 @@ export function AliigoChatWidget({
   useEffect(() => {
     if (inline) return;
 
+    // We Request a larger size (width + padding) so our internal shadow isn't cut off.
+    // We do NOT send a 'shadow' property anymore.
     const msg = isOpen
-      ? { 
-          type: "ALIIGO_WIDGET_SIZE", 
-          w: 380,
-          h: cardH + 20, 
-          radius: "18px",
-          shadow: "0 25px 50px -12px rgba(0,0,0,0.25)" 
-        }
-      : { 
-          type: "ALIIGO_WIDGET_SIZE", 
-          w: 180, 
-          h: 60,  
-          radius: "9999px",
-          shadow: "0 20px 25px -5px rgba(0,0,0,0.1)" 
-        };
+      ? { type: "ALIIGO_WIDGET_SIZE", w: 380, h: cardH + 48 } // +48 for the 24px padding
+      : { type: "ALIIGO_WIDGET_SIZE", w: 180, h: 80 };
 
     try {
       window.parent?.postMessage(msg, "*");
