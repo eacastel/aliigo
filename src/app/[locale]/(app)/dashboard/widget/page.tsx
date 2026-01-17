@@ -380,14 +380,14 @@ export default function WidgetSettingsPage() {
   var url = '${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(w.location.hostname);
   var i = d.createElement('iframe');
   
-  // 1. Reset Styles: Transparent, No Borders, No Shadows
+  // Clean Iframe: No Shadow, No Border, Transparent
   Object.assign(i.style, {
     position: 'fixed', bottom: '0px', right: '0px',
     width: '0px', height: '0px', border: '0',
     zIndex: '2147483647',
     background: 'transparent',
     colorScheme: 'normal',
-    boxShadow: 'none' // <--- CRITICAL: Force no shadow on the iframe
+    boxShadow: 'none' // CRITICAL: No shadow on the rectangular iframe
   });
   
   i.src = url;
@@ -395,25 +395,24 @@ export default function WidgetSettingsPage() {
   i.setAttribute('allow', 'clipboard-write');
   i.setAttribute('scrolling', 'no');
   
-  // 2. Resize Logic
   w.addEventListener('message', function(e) {
     var dt = e.data;
     if (!dt || dt.type !== 'ALIIGO_WIDGET_SIZE') return;
     
-    // Only set Dimensions. NEVER set shadow or radius on the iframe.
+    // Only resize. Do not touch shadow/border-radius.
     if (dt.w) i.style.width = dt.w + 'px';
     if (dt.h) i.style.height = dt.h + 'px';
-
+    
     // Position
     i.style.bottom = '24px';
     i.style.right = '24px';
     
     // iOS Safe Area
     try {
-       if (CSS.supports('bottom: env(safe-area-inset-bottom)')) {
+      if (CSS.supports('bottom: env(safe-area-inset-bottom)')) {
         i.style.bottom = 'calc(24px + env(safe-area-inset-bottom))';
         i.style.right  = 'calc(24px + env(safe-area-inset-right))';
-       }
+      }
     } catch(err) {}
   });
 
