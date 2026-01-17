@@ -571,6 +571,11 @@ export function AliigoChatWidget({
   background: transparent;
 }
 
+.aliigo-card, .aliigo-pill {
+  pointer-events: auto;
+  /* Ensure the CARD has the shadow, not the iframe */
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+
 `}</style>
 
       <div className="aliigo-root" style={rootStyle}>
