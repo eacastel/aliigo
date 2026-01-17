@@ -118,9 +118,6 @@ export function AliigoChatWidget({
   const lang = uiLang(locale);
   const t = UI[lang];
 
-  const inIframe = typeof window !== "undefined" && window.self !== window.top;
-
-
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -187,6 +184,8 @@ export function AliigoChatWidget({
     text: "#ffffff",
   });
 
+  const inIframe = typeof window !== "undefined" && window.self !== window.top;
+
   const wrapStyle: React.CSSProperties = inline
     ? { position: "relative", width: "100%" }
     : preview
@@ -197,16 +196,21 @@ export function AliigoChatWidget({
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "flex-end",
-        padding: 16,
+        padding: 16, // Padding for the dashboard preview box
       }
     : inIframe
-    ? { 
-        position: "relative", 
-        width: "100%", 
+    ? {
+        // FIX: Inside iframe, fill the space and touch the bottom-right corner.
+        // The iframe *itself* is already positioned 24px from the screen edge.
+        position: "fixed",
+        bottom: 0,
+        right: 0,
+        width: "100%",
         height: "100%",
         display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "flex-end"
+        alignItems: "flex-end",   // Align content to bottom
+        justifyContent: "flex-end", // Align content to right
+        padding: "5px", // Tiny padding for shadow breathing room
       }
     : { position: "fixed", bottom: 24, right: 24, zIndex: 50 };
 

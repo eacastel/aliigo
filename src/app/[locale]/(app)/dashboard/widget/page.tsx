@@ -375,44 +375,52 @@ export default function WidgetSettingsPage() {
     const themeParam = encodeURIComponent(JSON.stringify(theme));
 
     return `<script>
-  (function() {
-    var d = document, w = window;
-    var url = '${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(w.location.hostname);
-    var i = d.createElement('iframe');
+(function() {
+  var d = document, w = window;
+  var url = '${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(w.location.hostname);
+  var i = d.createElement('iframe');
+  
+  // 1. Initial Styles: Transparent, Fixed, Bottom Right
+  Object.assign(i.style, {
+    position: 'fixed', bottom: '0px', right: '0px',
+    width: '0px', height: '0px', border: '0',
+    zIndex: '2147483647',
+    background: 'transparent',
+    colorScheme: 'normal' 
+  });
+  
+  i.src = url;
+  i.title = 'Aliigo Widget';
+  i.setAttribute('allow', 'clipboard-write');
+  i.setAttribute('scrolling', 'no');
+  
+  // 2. Handle Resizing from the Child
+  w.addEventListener('message', function(e) {
+    var dt = e.data;
+    if (!dt || dt.type !== 'ALIIGO_WIDGET_SIZE') return;
     
-    // Style: Fixed bottom-right, transparent, initially hidden borders
-    Object.assign(i.style, {
-      position: 'fixed', bottom: '24px', right: '24px',
-      width: '180px', height: '56px', border: '0',
-      borderRadius: '9999px', overflow: 'hidden', zIndex: '2147483647',
-      background: 'transparent', colorScheme: 'normal'
-    });
+    // Apply dimensions sent by the widget
+    if (dt.w) i.style.width = dt.w + 'px';
+    if (dt.h) i.style.height = dt.h + 'px';
     
-    i.src = url;
-    i.title = 'Aliigo Widget';
-    i.setAttribute('allow', 'clipboard-write');
-    i.setAttribute('scrolling', 'no');
+    // Position adjustments (The widget tells us how much space it needs)
+    // We position the iframe 24px from the edge of the screen here.
+    i.style.bottom = '24px';
+    i.style.right = '24px';
     
-    // iOS Safari Safe Areas
+    // iOS Safe Area adjustments
     try {
-      i.style.bottom = 'calc(24px + env(safe-area-inset-bottom, 0px))';
-      i.style.right  = 'calc(24px + env(safe-area-inset-right, 0px))';
-    } catch(e) {}
+      var b = 24, r = 24;
+      if (CSS.supports('bottom: env(safe-area-inset-bottom)')) {
+        i.style.bottom = 'calc(' + b + 'px + env(safe-area-inset-bottom))';
+        i.style.right  = 'calc(' + r + 'px + env(safe-area-inset-right))';
+      }
+    } catch(err) {}
+  });
 
-    // Resize Listener
-    w.addEventListener('message', function(e) {
-      var dt = e.data;
-      if (!dt || dt.type !== 'ALIIGO_WIDGET_SIZE') return;
-      if (dt.w) i.style.width = dt.w + 'px';
-      if (dt.h) i.style.height = dt.h + 'px';
-      if (dt.radius) i.style.borderRadius = dt.radius;
-      // Apply shadow to iframe if sent (prevents clipping)
-      if (dt.shadow) i.style.boxShadow = dt.shadow;
-    });
-
-    d.documentElement.appendChild(i);
-  })();
-  </script>`;
+  d.documentElement.appendChild(i);
+})();
+</script>`;
   }, [biz?.slug, biz?.public_embed_key, biz?.default_locale, brand, theme]);
 
   if (!biz) {

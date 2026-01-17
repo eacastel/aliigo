@@ -1,5 +1,4 @@
-// /src/app/[locale]/chat/page.tsx
-
+// src/app/[locale]/chat/page.tsx
 import { Suspense } from "react";
 import ClientEmbed from "./ClientEmbed";
 
@@ -13,18 +12,24 @@ export const metadata = {
 export default function EmbeddedChatPage() {
   return (
     <>
-      <style>{`
-        /* 1. Force transparency on the root */
-        :root, html, body {
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* 1. Nuke all backgrounds on the root elements */
+        html, body {
           background-color: transparent !important;
+          background-image: none !important;
           background: transparent !important;
-          min-height: 0 !important; /* Prevent full height forcing */
         }
-        /* 2. Fix Next.js default layout wrapper if present */
+        
+        /* 2. Override Tailwind 'bg-background' specifically if it exists */
+        body.bg-background {
+          background-color: transparent !important;
+        }
+
+        /* 3. Ensure the Next.js root div is also transparent */
         #__next, main {
           background: transparent !important;
         }
-      `}</style>
+      `}} />
 
       <Suspense fallback={<div style={{ background: "transparent" }} />}>
         <ClientEmbed />
