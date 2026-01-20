@@ -78,9 +78,16 @@ class AliigoWidget extends HTMLElement {
 
 
   connectedCallback() {
-    this.root = this.attachShadow({ mode: "open" });
+    // IMPORTANT: don't call attachShadow here directly anymore
+    // because attributeChangedCallback may have already created it.
+    this.ensureRoot();
 
-    // allow preview mode to start open (only matters for floating)
+    // If client embed: ensure we're attached to <html> to avoid transformed ancestors
+    if (this.getVariant() === "floating" && this.getFloatingMode() === "fixed") {
+      const host = document.documentElement;
+      if (this.parentElement !== host) host.appendChild(this);
+    }
+
     if (this.getVariant() === "floating" && this.getStartOpen()) {
       this.state.open = true;
     }
@@ -257,6 +264,10 @@ class AliigoWidget extends HTMLElement {
       align-items: flex-end;
       padding: 16px;
     }
+    .floating.absolute .panel{
+      max-width: calc(100% - 32px);
+      max-height: calc(100% - 32px);
+    }
 
     .inline{ width: 100%; height:auto; }
     .hero{ width: 100%; height:100%; max-width: 100%; margin: 0 auto; }
@@ -278,6 +289,8 @@ class AliigoWidget extends HTMLElement {
       box-shadow: 0 25px 60px rgba(0,0,0,0.28);
       display:flex;
       flex-direction:column;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .panel.inline{ width:100%; max-width:100%; }
@@ -358,10 +371,14 @@ class AliigoWidget extends HTMLElement {
     }
     .send:disabled{ opacity:0.55; cursor:not-allowed; }
 
+    
+
     @media (max-width: 520px){
       .floating.fixed{ left: 12px; right: 12px; bottom: 12px; }
       .panel{ width: 100%; height: 70vh; }
     }
+
+    .floating.fixed{ top:auto !important; left:auto !important; }
   `;
 }
 
