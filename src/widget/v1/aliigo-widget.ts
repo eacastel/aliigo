@@ -47,13 +47,9 @@ function splitPair(v?: string, defaults?: { bg: string; text: string }) {
   return { bg, text };
 }
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
-
 class AliigoWidget extends HTMLElement {
 
-  private pendingScroll: "bottom" | "assistantStart" | "lastAssistantStart" | null = null;
+  private pendingScroll: "bottom" | "lastAssistantStart" | null = null;
 
   private applyPendingScroll() {
     const messages = this.root.querySelector(".messages") as HTMLDivElement | null;
@@ -72,18 +68,7 @@ class AliigoWidget extends HTMLElement {
       for (let i = this.state.msgs.length - 1; i >= 0; i--) {
         if (this.state.msgs[i]?.role === "assistant") {
           const el = this.root.querySelector(`#msg-${i}`) as HTMLElement | null;
-          if (!el) return;
-
-          const maxTop = Math.max(0, messages.scrollHeight - messages.clientHeight);
-          const top = clamp(el.offsetTop - 8, 0, maxTop);
-          messages.scrollTop = top;
-
-          // one more frame helps if fonts/layout settle after render
-          requestAnimationFrame(() => {
-            const maxTop2 = Math.max(0, messages.scrollHeight - messages.clientHeight);
-            messages.scrollTop = clamp(el.offsetTop - 8, 0, maxTop2);
-          });
-
+          if (el) el.scrollIntoView({ block: "start", inline: "nearest" });
           return;
         }
       }
@@ -110,10 +95,13 @@ class AliigoWidget extends HTMLElement {
     locale: "en" as "en" | "es",
   };
 
- static get observedAttributes() {
-  return ["variant","embed-key","api-base","locale","session-token","floating-mode","theme","brand"];
-
-}
+  static get observedAttributes() {
+    return [
+      "variant","embed-key","api-base","locale","session-token",
+      "floating-mode","theme","brand",
+      "start-open"
+    ];
+  }
 
 
   connectedCallback() {
@@ -373,12 +361,13 @@ class AliigoWidget extends HTMLElement {
       padding-right: 6px;
     }
 
-    .row{ margin-top: 8px; }
+    .row{ margin-top: 8px; scroll-margin-top: 12px; }
     .row.user{ text-align:right; }
     .row.bot{ text-align:left; }
 
     .bubble{
       display:inline-block;
+      position: relative;
       max-width: 85%;
       padding: 8px 12px;
       border-radius: 12px;
@@ -388,16 +377,20 @@ class AliigoWidget extends HTMLElement {
       white-space: pre-wrap;
       transition: background-color .18s ease, color .18s ease;
     }
+
     .bubble strong{ font-weight: 700; }
+
     .bubble .list{
-      margin: 0;
+      margin: 6px 0 0 0;
       padding-left: 18px;
     }
+
     .bubble .list li{
       margin: 2px 0;
     }
-    .bubble .tail{ margin-top: 8px; }
+
     .bubble .lead{ margin: 0 0 8px 0; }
+    .bubble .tail{ margin-top: 8px; }
     .form{
       flex: 0 0 auto;
       display:flex;
@@ -405,6 +398,30 @@ class AliigoWidget extends HTMLElement {
       padding: 10px;
       border-top: 1px solid rgba(0,0,0,0.08);
       background:#fff;
+    }
+
+    .bubble.user::after{
+      content:"";
+      position:absolute;
+      right: 10px;
+      bottom: -6px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 0 solid transparent;
+      border-top: 8px solid var(--bg);
+    }
+
+    .bubble.bot::after{
+      content:"";
+      position:absolute;
+      left: 10px;
+      bottom: -6px;
+      width: 0;
+      height: 0;
+      border-right: 8px solid transparent;
+      border-left: 0 solid transparent;
+      border-top: 8px solid var(--bg);
     }
 
     .input{
@@ -451,7 +468,7 @@ class AliigoWidget extends HTMLElement {
     const bot = splitPair(theme.bubbleBot, { bg: "#f3f4f6", text: "#111827" });
     const send = splitPair(theme.sendBg, { bg: "#2563eb", text: "#ffffff" });
 
-    const brand = (session?.brand || "").trim();
+    const brand = (this.getBrandOverride() || session?.brand || "").trim();
 
     const open = variant !== "floating" ? true : this.state.open;
 
@@ -468,13 +485,19 @@ class AliigoWidget extends HTMLElement {
     const msgs = this.state.msgs;
     const messagesHtml =
       msgs.length === 0
-        ? `<div class="row bot" id="msg-0"><div class="bubble bot" style="background:${bot.bg};color:${bot.text};">${t.welcome}</div></div>`
+        ? `<div class="row bot" id="msg-0">
+              <div class="bubble bot" style="--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);">
+                ${t.welcome}
+              </div>
+            </div>`
+
         : msgs
             .map((m, i) => {
               const isUser = m.role === "user";
               const bubbleStyle = isUser
-                ? `background:${user.bg};color:${user.text};`
-                : `background:${bot.bg};color:${bot.text};`;
+                ? `--bg:${user.bg};--fg:${user.text};background:var(--bg);color:var(--fg);`
+                : `--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);`;
+
 
               return `
                 <div class="row ${isUser ? "user" : "bot"}" id="msg-${i}">
@@ -488,9 +511,8 @@ class AliigoWidget extends HTMLElement {
 
     // floating closed => pill only
     if (variant === "floating" && !open) {
-      
-      const themeOverride = this.getThemeOverride();
-      if ((!session?.token || !brand) && !themeOverride) {
+      const hasToken = !!session?.token || !!this.getSessionTokenOverride();
+      if (!hasToken) {
         this.root.innerHTML = `<style>${this.css()}</style>`;
         return;
       }
