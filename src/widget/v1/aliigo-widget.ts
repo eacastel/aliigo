@@ -59,21 +59,27 @@ class AliigoWidget extends HTMLElement {
     this.pendingScroll = null;
 
     requestAnimationFrame(() => {
+      const max = Math.max(0, messages.scrollHeight - messages.clientHeight);
+
       if (mode === "bottom") {
-        messages.scrollTop = messages.scrollHeight;
+        messages.scrollTop = max;
         return;
       }
 
-      // assistantStart / lastAssistantStart (both mean: jump to last assistant msg)
+      // lastAssistantStart => jump to last assistant message top (with a little offset)
       for (let i = this.state.msgs.length - 1; i >= 0; i--) {
         if (this.state.msgs[i]?.role === "assistant") {
           const el = this.root.querySelector(`#msg-${i}`) as HTMLElement | null;
-          if (el) el.scrollIntoView({ block: "start", inline: "nearest" });
+          if (!el) return;
+
+          const desired = el.offsetTop - 12;
+          messages.scrollTop = Math.max(0, Math.min(desired, max));
           return;
         }
       }
     });
   }
+
 
 
   private root!: ShadowRoot;
@@ -355,14 +361,15 @@ class AliigoWidget extends HTMLElement {
     }
 
     .messages{
-      flex:1;
-      min-height:0;
-      overflow-y:auto;
-      padding-right: 4px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;      /* critical */
+      padding: 12px;           /* consistent inset so bubbles don't touch edges */
     }
 
     .row{
-      margin-top: 4px;
+      margin-top: 8px;
       display: flex;
     }
     .row.user{ justify-content: flex-end; }
@@ -406,22 +413,25 @@ class AliigoWidget extends HTMLElement {
     .bubble.user::after{
       content:"";
       position:absolute;
-      right:-6px;
-      top:14px;
-      width:0; height:0;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      border-left: 8px solid var(--bg);
+      right:-4px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg);
+      transform: rotate(45deg);
+      border-radius: 2px;
     }
+
     .bubble.bot::after{
       content:"";
       position:absolute;
-      left:-6px;
-      top:14px;
-      width:0; height:0;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      border-right: 8px solid var(--bg);
+      left:-4px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg);
+      transform: rotate(45deg);
+      border-radius: 2px;
     }
 
     .input{
