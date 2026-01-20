@@ -12,14 +12,11 @@ declare module "react" {
         "api-base"?: string;
         locale?: string;
         "session-token"?: string;
-
-        // theme JSON string (you pass previewThemeJson)
         theme?: string;
-
-        // new: dashboard preview positioning
         "floating-mode"?: "fixed" | "absolute";
+        "start-open"?: "true" | "false"; 
+        brand?: string;                  
 
-        // allow data-* attrs
         [key: `data-${string}`]: string | undefined;
       };
     }

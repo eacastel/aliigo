@@ -72,7 +72,8 @@ class AliigoWidget extends HTMLElement {
   };
 
  static get observedAttributes() {
-  return ["variant", "embed-key", "api-base", "locale", "session-token", "floating-mode", "theme"];
+  return ["variant","embed-key","api-base","locale","session-token","floating-mode","theme","brand"];
+
 }
 
 
@@ -102,6 +103,11 @@ class AliigoWidget extends HTMLElement {
       this.state.session = null; // force refresh
       void this.ensureSession();
     }
+  }
+
+  private getBrandOverride(): string | null {
+    const b = (this.getAttribute("brand") || "").trim();
+    return b || null;
   }
 
   private getVariant(): "floating" | "inline" | "hero" {
@@ -173,13 +179,14 @@ class AliigoWidget extends HTMLElement {
       if (overrideToken) {
         const localeOverride = this.getLocaleOverride();
         const themeOverride = this.getThemeOverride();
+        const brandOverride = this.getBrandOverride();
 
         this.state.session = {
           token: overrideToken,
           locale: localeOverride || this.state.locale,
-          brand: "Aliigo",
+          brand: (brandOverride || "Aliigo").trim(),
           slug: "",
-          theme: themeOverride, 
+          theme: themeOverride,
         };
 
         this.state.locale = localeOverride || this.state.locale;
@@ -240,9 +247,16 @@ class AliigoWidget extends HTMLElement {
     .wrap{ font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; box-sizing:border-box; height:100%; }
     .wrap, .wrap *{ box-sizing:border-box; }
 
-    /* floating can be fixed (client sites) or absolute (dashboard preview container) */
     .floating.fixed{ position: fixed; right: 24px; bottom: 24px; z-index: 2147483647; }
-    .floating.absolute{ position: absolute; right: 16px; bottom: 16px; z-index: 2147483647; }
+    .floating.absolute{
+      position: absolute;
+      inset: 0;
+      z-index: 2147483647;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      padding: 16px;
+    }
 
     .inline{ width: 100%; height:auto; }
     .hero{ width: 100%; height:100%; max-width: 100%; margin: 0 auto; }
@@ -365,7 +379,7 @@ class AliigoWidget extends HTMLElement {
     const bot = splitPair(theme.bubbleBot, { bg: "#f3f4f6", text: "#111827" });
     const send = splitPair(theme.sendBg, { bg: "#2563eb", text: "#ffffff" });
 
-    const brand = session?.brand || "Aliigo";
+    const brand = (session?.brand || "").trim();
 
     const open = variant !== "floating" ? true : this.state.open;
 
@@ -399,10 +413,9 @@ class AliigoWidget extends HTMLElement {
 
     // floating closed => pill only
     if (variant === "floating" && !open) {
-      // Prevent the "Ask Aliigo" flash before we know the real brand/theme.
-      // If theme override is present (dashboard live preview), allow rendering immediately.
+      
       const themeOverride = this.getThemeOverride();
-      if (!session?.token && !themeOverride) {
+      if ((!session?.token || !brand) && !themeOverride) {
         this.root.innerHTML = `<style>${this.css()}</style>`;
         return;
       }
