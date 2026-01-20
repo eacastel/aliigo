@@ -78,13 +78,11 @@ class AliigoWidget extends HTMLElement {
 
 
   connectedCallback() {
-    // IMPORTANT: don't call attachShadow here directly anymore
-    // because attributeChangedCallback may have already created it.
     this.ensureRoot();
 
-    // If client embed: ensure we're attached to <html> to avoid transformed ancestors
+    // If client embed (fixed mode), move to <body> so it's truly viewport-fixed.
     if (this.getVariant() === "floating" && this.getFloatingMode() === "fixed") {
-      const host = document.documentElement;
+      const host = document.body;
       if (this.parentElement !== host) host.appendChild(this);
     }
 
@@ -248,13 +246,25 @@ class AliigoWidget extends HTMLElement {
 
   private css() {
   return `
-    :host{ all: initial; display:block; height:100%; }
-    :host([floating-mode="absolute"]){ position:relative; width:100%; height:100%; }
+    :host{ all: initial; display:block; }
+    /* Only the dashboard preview uses absolute positioning, and it MUST have a height */
+    :host([floating-mode="absolute"]){ position:relative; width:100%; height:100%; display:block; }
 
-    .wrap{ font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; box-sizing:border-box; height:100%; }
+    .wrap{
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      box-sizing:border-box;
+    }
     .wrap, .wrap *{ box-sizing:border-box; }
 
-    .floating.fixed{ position: fixed; right: 24px; bottom: 24px; z-index: 2147483647; }
+    /* floating can be fixed (client sites) or absolute (dashboard preview container) */
+    .floating.fixed{
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 2147483647;
+    }
+
+    /* Dashboard preview: fill container and pin to bottom-right with padding */
     .floating.absolute{
       position: absolute;
       inset: 0;
@@ -264,13 +274,14 @@ class AliigoWidget extends HTMLElement {
       align-items: flex-end;
       padding: 16px;
     }
+
     .floating.absolute .panel{
       max-width: calc(100% - 32px);
       max-height: calc(100% - 32px);
     }
 
-    .inline{ width: 100%; height:auto; }
-    .hero{ width: 100%; height:100%; max-width: 100%; margin: 0 auto; }
+    .inline{ width:100%; }
+    .hero{ width:100%; height:100%; max-width:100%; margin:0 auto; }
 
     .pill{
       border:0; cursor:pointer; font-weight:700;
@@ -289,12 +300,10 @@ class AliigoWidget extends HTMLElement {
       box-shadow: 0 25px 60px rgba(0,0,0,0.28);
       display:flex;
       flex-direction:column;
-      max-width: 100%;
-      max-height: 100%;
     }
 
     .panel.inline{ width:100%; max-width:100%; }
-    .panel.hero{ width:100%; max-width:100%; height:100%; } /* ✅ key fix */
+    .panel.hero{ width:100%; max-width:100%; height:100%; }
 
     .header{
       padding: 12px 14px;
@@ -371,16 +380,13 @@ class AliigoWidget extends HTMLElement {
     }
     .send:disabled{ opacity:0.55; cursor:not-allowed; }
 
-    
-
     @media (max-width: 520px){
       .floating.fixed{ left: 12px; right: 12px; bottom: 12px; }
       .panel{ width: 100%; height: 70vh; }
     }
-
-    .floating.fixed{ top:auto !important; left:auto !important; }
   `;
 }
+
 
 
   private render() {
