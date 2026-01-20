@@ -68,18 +68,28 @@ class AliigoWidget extends HTMLElement {
         return;
       }
 
-      // lastAssistantStart
+      // assistantStart / lastAssistantStart (both mean: jump to last assistant msg)
       for (let i = this.state.msgs.length - 1; i >= 0; i--) {
         if (this.state.msgs[i]?.role === "assistant") {
           const el = this.root.querySelector(`#msg-${i}`) as HTMLElement | null;
-          if (el) {
-            messages.scrollTop = clamp(el.offsetTop - 12, 0, messages.scrollHeight);
-          }
+          if (!el) return;
+
+          const maxTop = Math.max(0, messages.scrollHeight - messages.clientHeight);
+          const top = clamp(el.offsetTop - 8, 0, maxTop);
+          messages.scrollTop = top;
+
+          // one more frame helps if fonts/layout settle after render
+          requestAnimationFrame(() => {
+            const maxTop2 = Math.max(0, messages.scrollHeight - messages.clientHeight);
+            messages.scrollTop = clamp(el.offsetTop - 8, 0, maxTop2);
+          });
+
           return;
         }
       }
     });
   }
+
 
   private root!: ShadowRoot;
 
@@ -369,16 +379,16 @@ class AliigoWidget extends HTMLElement {
 
     .bubble{
       display:inline-block;
-      strong{ font-weight: 700; 
       max-width: 85%;
       padding: 8px 12px;
       border-radius: 12px;
       font-size: 14px;
-      line-height:1.35;
+      line-height: 1.35;
       word-break: break-word;
       white-space: pre-wrap;
       transition: background-color .18s ease, color .18s ease;
     }
+    .bubble strong{ font-weight: 700; }
     .bubble .list{
       margin: 0;
       padding-left: 18px;
