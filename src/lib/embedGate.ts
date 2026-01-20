@@ -1,3 +1,5 @@
+// src/lib/embedGate.ts
+
 import type { NextRequest } from "next/server";
 
 export function originHost(req: NextRequest) {
