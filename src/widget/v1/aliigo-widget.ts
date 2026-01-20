@@ -350,7 +350,7 @@ class AliigoWidget extends HTMLElement {
       flex: 1;
       min-height: 0;
       overflow: hidden;
-      padding: 12px;
+      padding: 0px;
       display:flex;
     }
 
@@ -358,12 +358,15 @@ class AliigoWidget extends HTMLElement {
       flex:1;
       min-height:0;
       overflow-y:auto;
-      padding-right: 6px;
+      padding-right: 4px;
     }
 
-    .row{ margin-top: 8px; scroll-margin-top: 12px; }
-    .row.user{ text-align:right; }
-    .row.bot{ text-align:left; }
+    .row{
+      margin-top: 4px;
+      display: flex;
+    }
+    .row.user{ justify-content: flex-end; }
+    .row.bot{ justify-content: flex-start; }
 
     .bubble{
       display:inline-block;
@@ -382,7 +385,7 @@ class AliigoWidget extends HTMLElement {
 
     .bubble .list{
       margin: 6px 0 0 0;
-      padding-left: 18px;
+      padding-left: 12px;
     }
 
     .bubble .list li{
@@ -403,25 +406,22 @@ class AliigoWidget extends HTMLElement {
     .bubble.user::after{
       content:"";
       position:absolute;
-      right: 10px;
-      bottom: -6px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 0 solid transparent;
-      border-top: 8px solid var(--bg);
+      right:-6px;
+      top:14px;
+      width:0; height:0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 8px solid var(--bg);
     }
-
     .bubble.bot::after{
       content:"";
       position:absolute;
-      left: 10px;
-      bottom: -6px;
-      width: 0;
-      height: 0;
-      border-right: 8px solid transparent;
-      border-left: 0 solid transparent;
-      border-top: 8px solid var(--bg);
+      left:-6px;
+      top:14px;
+      width:0; height:0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 8px solid var(--bg);
     }
 
     .input{
