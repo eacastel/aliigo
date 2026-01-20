@@ -1,9 +1,9 @@
 // src/app/(app)/dashboard/widget/page.tsx
 "use client";
 
+import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { AliigoChatWidget } from "@/components/AliigoChatWidget";
 
 type Theme = {
   headerBg: string;
@@ -135,6 +135,9 @@ export default function WidgetSettingsPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const [previewSessionToken, setPreviewSessionToken] = useState<string | null>(null);
+  const [previewLocale, setPreviewLocale] = useState<"en" | "es">("en");
+
   type BizRow = {
     id: string;
     slug: string;
@@ -218,6 +221,28 @@ export default function WidgetSettingsPage() {
 
       const b = data.businesses;
 
+      const accessToken = sess.session?.access_token;
+      if (accessToken && b.public_embed_key) {
+        const r = await fetch(
+          `/api/embed/preview-session?key=${encodeURIComponent(b.public_embed_key)}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
+
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.token) {
+          setPreviewSessionToken(String(j.token));
+          setPreviewLocale(
+            (String(j.locale || "en").toLowerCase().startsWith("es") ? "es" : "en") as
+              | "en"
+              | "es"
+          );
+        }
+      }
+
+
       const effectiveBrand = (b.brand_name || b.name || "Aliigo").trim();
       setBrand(effectiveBrand);
       setInitialBrand(effectiveBrand);
@@ -268,6 +293,16 @@ export default function WidgetSettingsPage() {
     [theme.bubbleBot]
   );
   const sendSplit = useMemo(() => splitTwoHex(theme.sendBg), [theme.sendBg]);
+
+  const previewThemeJson = useMemo(() => {
+    return JSON.stringify({
+      headerBg: theme.headerBg,
+      bubbleUser: theme.bubbleUser,
+      bubbleBot: theme.bubbleBot,
+      sendBg: theme.sendBg,
+    });
+  }, [theme.headerBg, theme.bubbleUser, theme.bubbleBot, theme.sendBg]);
+
 
   const saveTheme = async () => {
     setMsg(null);
@@ -367,59 +402,29 @@ export default function WidgetSettingsPage() {
   };
 
   const embedCode = useMemo(() => {
-    const base = getBaseUrl();
-    const slug = biz?.slug || "your-business";
     const key = biz?.public_embed_key || "PUBLIC_KEY";
-    const brandParam = encodeURIComponent((brand || biz?.slug || "Aliigo").trim());
-    const locale = biz?.default_locale || "en";
-    const themeParam = encodeURIComponent(JSON.stringify(theme));
 
-    return `<script>
-(function() {
-  var d = document, w = window;
-  var url = '${base}/${locale}/chat?slug=${slug}&brand=${brandParam}&key=${key}&theme=${themeParam}&host=' + encodeURIComponent(w.location.hostname);
-  var i = d.createElement('iframe');
-  
-  // Style: Transparent, Fixed, initially hidden.
-  // NO boxShadow on the iframe itself.
-  Object.assign(i.style, {
-    position: 'fixed', bottom: '0px', right: '0px',
-    width: '0px', height: '0px', border: '0',
-    zIndex: '2147483647',
-    background: 'transparent',
-    colorScheme: 'normal',
-    boxShadow: 'none' 
-  });
-  
-  i.src = url;
-  i.title = 'Aliigo Widget';
-  i.setAttribute('allow', 'clipboard-write');
-  i.setAttribute('scrolling', 'no');
-  
-  w.addEventListener('message', function(e) {
-    var dt = e.data;
-    if (!dt || dt.type !== 'ALIIGO_WIDGET_SIZE') return;
-    
-    // Resize the iframe window
-    if (dt.w) i.style.width = dt.w + 'px';
-    if (dt.h) i.style.height = dt.h + 'px';
-    
-    // Position the iframe 24px from the screen edge
-    i.style.bottom = '24px';
-    i.style.right = '24px';
-    
-    try {
-      if (CSS.supports('bottom: env(safe-area-inset-bottom)')) {
-        i.style.bottom = 'calc(24px + env(safe-area-inset-bottom))';
-        i.style.right  = 'calc(24px + env(safe-area-inset-right))';
-      }
-    } catch(err) {}
-  });
+    // IMPORTANT: client sites always load from aliigo.com
+    const script = `<script src="https://aliigo.com/widget/v1/aliigo-widget.js" defer></script>`;
 
-  d.documentElement.appendChild(i);
-})();
-</script>`;
-  }, [biz?.slug, biz?.public_embed_key, biz?.default_locale, brand, theme]);
+    const floating = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="floating"></aliigo-widget>`;
+    const inline = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="inline"></aliigo-widget>`;
+    const hero = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="hero"></aliigo-widget>`;
+
+
+    return [
+      script,
+      "",
+      "<!-- Floating (bottom-right pill) -->",
+      floating,
+      "",
+      "<!-- Inline (embed in a section) -->",
+      inline,
+      "",
+      "<!-- Hero (component-style) -->",
+      hero,
+    ].join("\n");
+  }, [biz?.public_embed_key]);
 
   if (!biz) {
     return (
@@ -433,7 +438,6 @@ export default function WidgetSettingsPage() {
       </div>
     );
   }
-
   return (
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">Widget</h1>
@@ -453,17 +457,26 @@ export default function WidgetSettingsPage() {
         <section className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/40 space-y-4">
           <h2 className="font-semibold">Live preview</h2>
 
+          <Script src="/widget/v1/aliigo-widget.js" strategy="afterInteractive" />
+
           <div className="relative h-[420px] border border-zinc-800 rounded bg-zinc-950 overflow-hidden">
-            <AliigoChatWidget
-              preview
-              businessSlug={biz.slug}
-              brand={brand}
-              token={token ?? undefined}
-              theme={theme}
-              parentHost=""
-              channel="web"
-              locale={biz.default_locale}
-            />
+            {previewSessionToken ? (
+              <div className="absolute inset-0">
+                {/* hero variant for dashboard preview: always open and looks like a component */}
+                <aliigo-widget
+                  style={{ display: "block", width: "100%", height: "100%" }}
+                  embed-key={biz.public_embed_key}
+                  variant="hero"
+                  api-base={getBaseUrl()}
+                  locale={previewLocale}
+                  session-token={previewSessionToken}
+                  theme={previewThemeJson}
+                />
+
+              </div>
+            ) : (
+              <div className="p-4 text-sm text-zinc-400">Loading preview…</div>
+            )}
           </div>
 
           {/* HEX inputs (bg + text) */}

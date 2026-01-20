@@ -35,6 +35,10 @@ class RateLimitError extends Error {
   constructor(m = "Rate limited") { super(m); }
 }
 
+function sanitizeHost(v: string) {
+  return (v || "").trim().toLowerCase().replace(/:\d+$/, "");
+}
+
 function corsHeadersFor(req: NextRequest): HeadersInit {
   const origin = req.headers.get("origin") || "";
 
@@ -96,28 +100,78 @@ async function rateLimit(businessId: string, ip: string) {
   if ((countRes.count ?? 0) > LIMIT) throw new RateLimitError();
 }
 
+function aliigoHost() {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com";
+  try {
+    return new URL(base).hostname.toLowerCase();
+  } catch {
+    return "aliigo.com";
+  }
+}
+
 async function validateEmbedAccess(token: string, host: string) {
   if (!token) return { ok: false as const, reason: "Missing token" };
   if (!host) return { ok: false as const, reason: "Missing host" };
 
-  const tok = await supabase.from("embed_tokens")
-    .select("business_id").eq("token", token).single();
+  // 1) short-lived session tokens (enterprise path)
+  const sess = await supabase
+    .from("embed_sessions")
+    .select("business_id, host, is_preview, expires_at")
+    .eq("token", token)
+    .maybeSingle<{
+      business_id: string;
+      host: string;
+      is_preview: boolean;
+      expires_at: string;
+    }>();
+
+  if (sess.error) return { ok: false as const, reason: "Invalid token" };
+
+  if (sess.data?.business_id) {
+    const exp = Date.parse(sess.data.expires_at);
+    if (!Number.isFinite(exp) || exp <= Date.now()) {
+      return { ok: false as const, reason: "Session expired" };
+    }
+
+    const tokenHost = (sess.data.host || "").toLowerCase().trim().replace(/:\d+$/, "");
+    if (tokenHost !== host) {
+      return { ok: false as const, reason: "Host mismatch" };
+    }
+
+    // Preview sessions must only be usable from aliigo.com
+    if (sess.data.is_preview) {
+      if (host !== aliigoHost()) return { ok: false as const, reason: "Preview token forbidden" };
+    }
+
+    return { ok: true as const, businessId: sess.data.business_id };
+  }
+
+  // 2) legacy fallback (keep temporarily; remove later)
+  const tok = await supabase
+    .from("embed_tokens")
+    .select("business_id")
+    .eq("token", token)
+    .single();
+
   if (tok.error || !tok.data) return { ok: false as const, reason: "Invalid token" };
 
-  const biz = await supabase.from("businesses")
-    .select("id,allowed_domains").eq("id", tok.data.business_id).single();
-  if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
+  const biz = await supabase
+    .from("businesses")
+    .select("id,allowed_domains")
+    .eq("id", tok.data.business_id)
+    .single();
 
+  if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
   if (!hostAllowed(host, biz.data.allowed_domains)) {
     return { ok: false as const, reason: "Domain not allowed" };
   }
 
-
   return { ok: true as const, businessId: biz.data.id };
 }
 
+
 export async function OPTIONS(req: NextRequest) {
-  return new NextResponse(null, { status: 204, headers: corsHeadersFor(req) });
+  return new NextResponse(null, { status: 200, headers: corsHeadersFor(req) });
 }
 
 export async function POST(req: NextRequest) {
@@ -143,7 +197,6 @@ export async function POST(req: NextRequest) {
       conversationId: inputConvId,
       message,
       customerName,
-      host: bodyHost,
       channel: bodyChannel,
       locale: bodyLocale,
     } = (await req.json()) as {
@@ -159,9 +212,17 @@ export async function POST(req: NextRequest) {
     const ch: Channel = isChannel(bodyChannel) ? bodyChannel : "web";
 
     // 2) Then compute host
-    const host =
-      ((bodyHost || "").trim().toLowerCase().replace(/:\d+$/, "")) ||
-      originHost(req);
+    const origin = req.headers.get("origin") || "";
+    const host = sanitizeHost(originHost(req));
+
+    // Enterprise hardening: for embed session tokens, we expect an Origin.
+    // If origin is missing, we allow only same-site requests from aliigo.com.
+    if (!origin && host !== aliigoHost()) {
+      return NextResponse.json(
+        { error: "Forbidden: missing origin" },
+        { status: 403, headers: corsHeadersFor(req) }
+      );
+    }
 
     if (!message) {
       return NextResponse.json(

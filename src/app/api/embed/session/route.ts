@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 import { originHost, hostAllowed } from "@/lib/embedGate";
 
 export const runtime = "nodejs";
@@ -13,109 +14,89 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-function errExtras(err: unknown): { details?: unknown; hint?: unknown; code?: unknown } {
-  if (!err || typeof err !== "object") return {};
-  const rec = err as Record<string, unknown>;
-  return { details: rec.details, hint: rec.hint, code: rec.code };
+function corsHeadersFor(req: NextRequest): HeadersInit {
+  const origin = req.headers.get("origin") || "";
+  const base: Record<string, string> = {
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+  if (!origin) return base;
+  return { ...base, "Access-Control-Allow-Origin": origin, Vary: "Origin" };
 }
+
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeadersFor(req) });
+}
+
+function json(req: NextRequest, body: unknown, status = 200) {
+  return NextResponse.json(body, { status, headers: corsHeadersFor(req) });
+}
+
+function sanitizeHost(v: string) {
+  return (v || "").trim().toLowerCase().replace(/:\d+$/, "");
+}
+
+type ThemeDb = Record<string, unknown> | null;
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const key = searchParams.get("key")?.trim() || "";
-    const hostParam = (searchParams.get("host") || "").trim().toLowerCase();
+    const key = (searchParams.get("key") || "").trim();
+    if (!key) return json(req, { error: "Missing key" }, 400);
 
-    if (!key) return NextResponse.json({ error: "Missing key" }, { status: 400 });
+    // Authoritative host from headers (Origin/Referer) or Host fallback
+    const host = sanitizeHost(originHost(req));
+    if (!host) return json(req, { error: "Missing host" }, 400);
 
-    const hostFromReq = originHost(req);
-    const host = (hostParam || hostFromReq || "").replace(/:\d+$/, "");
-    if (!host) return NextResponse.json({ error: "Missing host" }, { status: 400 });
-
+    // Pull only what we need for widget config
     const bizRes = await supabase
       .from("businesses")
-      .select("id, allowed_domains, default_locale")
+      .select("id, slug, name, brand_name, allowed_domains, default_locale, widget_theme")
       .eq("public_embed_key", key)
-      .maybeSingle();
+      .maybeSingle<{
+        id: string;
+        slug: string;
+        name: string | null;
+        brand_name: string | null;
+        allowed_domains: string[] | null;
+        default_locale: string | null;
+        widget_theme: ThemeDb;
+      }>();
 
     if (bizRes.error) {
-      const extra = errExtras(bizRes.error);
-      return NextResponse.json(
-        {
-          error: "Supabase error",
-          debug: {
-            keyReceived: key,
-            hostReceived: host,
-            hostParam,
-            hostFromReq,
-            supabaseError: {
-              message: bizRes.error.message,
-              ...extra,
-            },
-          },
-        },
-        { status: 500 }
-      );
+      return json(req, { error: "Supabase error", details: bizRes.error.message }, 500);
     }
+    if (!bizRes.data) return json(req, { error: "Invalid key" }, 403);
 
-    if (!bizRes.data) {
-      return NextResponse.json(
-        { error: "Invalid key", debug: { keyReceived: key, hostReceived: host, hostParam, hostFromReq } },
-        { status: 403 }
-      );
+    const allowed = bizRes.data.allowed_domains ?? [];
+    if (!hostAllowed(host, allowed)) {
+      return json(req, { error: "Domain not allowed" }, 403);
     }
 
     const locale = (bizRes.data.default_locale || "en").toLowerCase().startsWith("es") ? "es" : "en";
+    const brand = (bizRes.data.brand_name || bizRes.data.name || "Aliigo").trim();
+    const slug = bizRes.data.slug;
+    const theme = bizRes.data.widget_theme ?? null;
 
-    const allowed = bizRes.data.allowed_domains ?? [];
+    // Mint short-lived session token bound to this host
+    const token = crypto.randomBytes(24).toString("hex");
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
 
-    if (!hostAllowed(host, allowed)) {
-      return NextResponse.json(
-        {
-          error: "Domain not allowed",
-          debug: {
-            hostReceived: host,
-            allowedDomains: allowed,
-          },
-        },
-        { status: 403 }
-      );
+    const ins = await supabase.from("embed_sessions").insert({
+      token,
+      business_id: bizRes.data.id,
+      host,
+      is_preview: false,
+      expires_at: expiresAt,
+    });
+
+    if (ins.error) {
+      return json(req, { error: "Failed to create session", details: ins.error.message }, 500);
     }
 
-    const tokRes = await supabase
-      .from("embed_tokens")
-      .select("token")
-      .eq("business_id", bizRes.data.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle<{ token: string }>();
-
-    if (!tokRes.data?.token) {
-      const token = crypto.randomUUID().replace(/-/g, "");
-      const ins = await supabase
-        .from("embed_tokens")
-        .insert({ business_id: bizRes.data.id, token })
-        .select("token")
-        .single<{ token: string }>();
-
-      if (ins.error || !ins.data?.token) {
-        return NextResponse.json(
-          { error: "Failed to create embed token", details: ins.error?.message },
-          { status: 500 }
-        );
-      }
-
-      return NextResponse.json(
-        { token: ins.data.token, locale, debug: { keyReceived: key, hostReceived: host } },
-        { status: 200 }
-      );
-    }
-
-    return NextResponse.json(
-      { token: tokRes.data.token, locale, debug: { keyReceived: key, hostReceived: host } },
-      { status: 200 }
-    );
+    return json(req, { token, locale, brand, slug, theme }, 200);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return json(req, { error: message }, 500);
   }
 }
