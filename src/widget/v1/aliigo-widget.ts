@@ -399,6 +399,14 @@ class AliigoWidget extends HTMLElement {
 
     // floating closed => pill only
     if (variant === "floating" && !open) {
+      // Prevent the "Ask Aliigo" flash before we know the real brand/theme.
+      // If theme override is present (dashboard live preview), allow rendering immediately.
+      const themeOverride = this.getThemeOverride();
+      if (!session?.token && !themeOverride) {
+        this.root.innerHTML = `<style>${this.css()}</style>`;
+        return;
+      }
+
       this.root.innerHTML = `
         <style>${this.css()}</style>
         <div class="${wrapperClass}">
