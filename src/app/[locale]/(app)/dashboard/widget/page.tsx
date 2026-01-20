@@ -463,6 +463,7 @@ export default function WidgetSettingsPage() {
             {previewSessionToken ? (
               <div className="absolute inset-0">
                 <aliigo-widget
+                  style={{ display: "block", width: "100%", height: "100%" }}
                   embed-key={biz.public_embed_key}
                   variant="floating"
                   floating-mode="absolute"

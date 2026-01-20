@@ -71,9 +71,10 @@ class AliigoWidget extends HTMLElement {
     locale: "en" as "en" | "es",
   };
 
-  static get observedAttributes() {
-    return ["variant", "embed-key", "api-base", "locale", "session-token", "theme", "start-open", "floating-mode"];
-  }
+ static get observedAttributes() {
+  return ["variant", "embed-key", "api-base", "locale", "session-token", "floating-mode", "theme"];
+}
+
 
   connectedCallback() {
     this.root = this.attachShadow({ mode: "open" });
@@ -156,7 +157,7 @@ class AliigoWidget extends HTMLElement {
     return v === "absolute" ? "absolute" : "fixed";
   }
 
-
+  
   private async ensureSession() {
     // If dashboard preview already minted a token, skip session endpoint
     const overrideToken = this.getSessionTokenOverride();
@@ -234,6 +235,7 @@ class AliigoWidget extends HTMLElement {
   private css() {
   return `
     :host{ all: initial; display:block; height:100%; }
+    :host([floating-mode="absolute"]){ position:relative; width:100%; height:100%; }
 
     .wrap{ font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; box-sizing:border-box; height:100%; }
     .wrap, .wrap *{ box-sizing:border-box; }
