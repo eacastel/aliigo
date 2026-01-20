@@ -73,7 +73,7 @@ class AliigoWidget extends HTMLElement {
         if (this.state.msgs[i]?.role === "assistant") {
           const el = this.root.querySelector(`#msg-${i}`) as HTMLElement | null;
           if (el) {
-            messages.scrollTop = el.offsetTop - 8;
+            messages.scrollTop = clamp(el.offsetTop - 12, 0, messages.scrollHeight);
           }
           return;
         }
@@ -369,6 +369,7 @@ class AliigoWidget extends HTMLElement {
 
     .bubble{
       display:inline-block;
+      strong{ font-weight: 700; 
       max-width: 85%;
       padding: 8px 12px;
       border-radius: 12px;
@@ -386,7 +387,7 @@ class AliigoWidget extends HTMLElement {
       margin: 2px 0;
     }
     .bubble .tail{ margin-top: 8px; }
-
+    .bubble .lead{ margin: 0 0 8px 0; }
     .form{
       flex: 0 0 auto;
       display:flex;
@@ -597,51 +598,80 @@ function escapeHtml(s: string) {
 }
 
 function formatMessageHtml(raw: string) {
-  const text = escapeHtml(raw || "");
+  const escaped = escapeHtml(raw || "");
+  const lines = escaped.split(/\r?\n/);
 
-  const lines = text.split(/\r?\n/);
+  const inline = (s: string) =>
+    s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
 
-  // detect simple numbered list block
-  const isNumbered = lines.filter(Boolean).every((l) => /^\s*\d+\.\s+/.test(l) || l.trim() === "");
-  if (isNumbered) {
-    const items = lines
-      .filter((l) => /^\s*\d+\.\s+/.test(l))
-      .map((l) => l.replace(/^\s*\d+\.\s+/, "").trim());
-    const tail = lines
-      .filter((l) => !/^\s*\d+\.\s+/.test(l) && l.trim() !== "")
-      .join("<br/>");
+  const joinLines = (arr: string[]) => inline(arr.join("<br/>"));
+
+  // ---------- Numbered list ----------
+  const firstNumIdx = lines.findIndex((l) => /^\s*\d+\.\s+/.test(l));
+  if (firstNumIdx !== -1) {
+    const leadLines = lines.slice(0, firstNumIdx).filter((l) => l.trim() !== "");
+
+    const items: string[] = [];
+    const tailLines: string[] = [];
+
+    let inList = true;
+    for (let i = firstNumIdx; i < lines.length; i++) {
+      const l = lines[i] ?? "";
+      if (/^\s*\d+\.\s+/.test(l)) {
+        items.push(l.replace(/^\s*\d+\.\s+/, "").trim());
+        continue;
+      }
+      if (l.trim() === "") continue;
+
+      // once we hit real text that's not a numbered item, treat it as tail
+      inList = false;
+      if (!inList) tailLines.push(l);
+    }
+
+    // If it wasn't really a list, fall back
+    if (items.length === 0) return joinLines(lines);
 
     return `
+      ${leadLines.length ? `<div class="lead">${joinLines(leadLines)}</div>` : ""}
       <ol class="list">
-        ${items.map((it) => `<li>${it}</li>`).join("")}
+        ${items.map((it) => `<li>${inline(it)}</li>`).join("")}
       </ol>
-      ${tail ? `<div class="tail">${tail}</div>` : ""}
+      ${tailLines.length ? `<div class="tail">${joinLines(tailLines)}</div>` : ""}
     `;
   }
 
-  // detect simple bullet list block
-    const isBulleted = lines.filter(Boolean).every((l) => /^\s*[-•]\s+/.test(l) || l.trim() === "");
-      if (isBulleted) {
-        const items = lines
-          .filter((l) => /^\s*[-•]\s+/.test(l))
-          .map((l) => l.replace(/^\s*[-•]\s+/, "").trim());
-        const tail = lines
-          .filter((l) => !/^\s*[-•]\s+/.test(l) && l.trim() !== "")
-          .join("<br/>");
+  // ---------- Bulleted list ----------
+  const firstBulIdx = lines.findIndex((l) => /^\s*[-•]\s+/.test(l));
+  if (firstBulIdx !== -1) {
+    const leadLines = lines.slice(0, firstBulIdx).filter((l) => l.trim() !== "");
 
-        return `
-          <ul class="list">
-            ${items.map((it) => `<li>${it}</li>`).join("")}
-          </ul>
-          ${tail ? `<div class="tail">${tail}</div>` : ""}
-        `;
+    const items: string[] = [];
+    const tailLines: string[] = [];
+
+    let inList = true;
+    for (let i = firstBulIdx; i < lines.length; i++) {
+      const l = lines[i] ?? "";
+      if (/^\s*[-•]\s+/.test(l)) {
+        items.push(l.replace(/^\s*[-•]\s+/, "").trim());
+        continue;
       }
+      if (l.trim() === "") continue;
 
-      // fallback: paragraphs + line breaks
-      return text.replace(/\n/g, "<br/>");
+      inList = false;
+      if (!inList) tailLines.push(l);
     }
 
+    if (items.length === 0) return joinLines(lines);
 
-  if (!customElements.get("aliigo-widget")) {
-    customElements.define("aliigo-widget", AliigoWidget);
+    return `
+      ${leadLines.length ? `<div class="lead">${joinLines(leadLines)}</div>` : ""}
+      <ul class="list">
+        ${items.map((it) => `<li>${inline(it)}</li>`).join("")}
+      </ul>
+      ${tailLines.length ? `<div class="tail">${joinLines(tailLines)}</div>` : ""}
+    `;
   }
+
+  // ---------- Fallback ----------
+  return joinLines(lines);
+}
