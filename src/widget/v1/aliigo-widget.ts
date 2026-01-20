@@ -52,6 +52,31 @@ function clamp(n: number, min: number, max: number) {
 }
 
 class AliigoWidget extends HTMLElement {
+
+  private pendingScroll: "bottom" | "assistantStart" | null = null;
+
+  private applyPendingScroll() {
+    const messages = this.root.querySelector(".messages") as HTMLDivElement | null;
+    if (!messages || !this.pendingScroll) return;
+
+    const mode = this.pendingScroll;
+    this.pendingScroll = null;
+
+    requestAnimationFrame(() => {
+      if (mode === "bottom") {
+        messages.scrollTop = messages.scrollHeight;
+        return;
+      }
+
+      // assistantStart
+      const rows = Array.from(this.root.querySelectorAll(".row.bot"));
+      const lastBotRow = rows[rows.length - 1] as HTMLElement | undefined;
+      if (!lastBotRow) return;
+
+      // Put the start of the assistant bubble at the top of the scroller
+      messages.scrollTop = Math.max(0, lastBotRow.offsetTop - messages.offsetTop);
+    });
+  }
   private root!: ShadowRoot;
 
   private ensureRoot() {
@@ -452,8 +477,8 @@ class AliigoWidget extends HTMLElement {
       const btn = this.root.querySelector(".pill") as HTMLButtonElement | null;
       btn?.addEventListener("click", () => {
         this.state.open = true;
+        this.pendingScroll = "bottom";
         this.render();
-        this.scrollToBottomSoon();
       });
       return;
     }
@@ -513,6 +538,7 @@ class AliigoWidget extends HTMLElement {
 
     this.state.busy = true;
     this.state.msgs = [...this.state.msgs, { role: "user", content }];
+    this.pendingScroll = "bottom";
     this.render();
 
     try {
@@ -533,6 +559,7 @@ class AliigoWidget extends HTMLElement {
 
       if (!res.ok) {
         this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.error || "Error" }];
+        this.pendingScroll = "assistantStart";
         this.state.busy = false;
         this.render();
         return;
@@ -541,9 +568,11 @@ class AliigoWidget extends HTMLElement {
       if (raw.conversationId) this.state.conversationId = raw.conversationId;
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.reply || "" }];
       this.state.busy = false;
+      this.pendingScroll = "assistantStart";
       this.render();
     } catch {
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: "Network error" }];
+      this.pendingScroll = "assistantStart";
       this.state.busy = false;
       this.render();
     }
