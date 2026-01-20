@@ -72,11 +72,17 @@ class AliigoWidget extends HTMLElement {
   };
 
   static get observedAttributes() {
-  return ["variant", "embed-key", "api-base", "locale", "session-token", "theme"];
-}
+    return ["variant", "embed-key", "api-base", "locale", "session-token", "theme", "start-open", "floating-mode"];
+  }
 
   connectedCallback() {
-    this.ensureRoot();
+    this.root = this.attachShadow({ mode: "open" });
+
+    // allow preview mode to start open (only matters for floating)
+    if (this.getVariant() === "floating" && this.getStartOpen()) {
+      this.state.open = true;
+    }
+
     this.render();
     void this.ensureSession();
   }
@@ -111,19 +117,6 @@ class AliigoWidget extends HTMLElement {
     return (this.getAttribute("api-base") || "https://aliigo.com").trim().replace(/\/$/, "");
   }
 
-  private getThemeOverride(): Theme | null {
-    const raw = (this.getAttribute("theme") || "").trim();
-    if (!raw) return null;
-
-    try {
-      const obj = JSON.parse(raw) as Theme;
-      return obj && typeof obj === "object" ? obj : null;
-    } catch {
-      return null;
-    }
-  }
-
-
   private getLocaleOverride(): "en" | "es" | null {
     const v = (this.getAttribute("locale") || "").trim().toLowerCase();
     if (!v) return null;
@@ -134,6 +127,35 @@ class AliigoWidget extends HTMLElement {
     const t = (this.getAttribute("session-token") || "").trim();
     return t || null;
   }
+
+  private getThemeOverride(): Theme | null {
+    const raw = (this.getAttribute("theme") || "").trim();
+    if (!raw) return null;
+
+    try {
+      const o = JSON.parse(raw) as Partial<Theme>;
+      const out: Theme = {};
+
+      if (typeof o.headerBg === "string") out.headerBg = o.headerBg;
+      if (typeof o.bubbleUser === "string") out.bubbleUser = o.bubbleUser;
+      if (typeof o.bubbleBot === "string") out.bubbleBot = o.bubbleBot;
+      if (typeof o.sendBg === "string") out.sendBg = o.sendBg;
+
+      return out;
+    } catch {
+      return null;
+    }
+  }
+
+  private getStartOpen(): boolean {
+    return (this.getAttribute("start-open") || "").toLowerCase() === "true";
+  }
+
+  private getFloatingMode(): "fixed" | "absolute" {
+    const v = (this.getAttribute("floating-mode") || "").toLowerCase();
+    return v === "absolute" ? "absolute" : "fixed";
+  }
+
 
   private async ensureSession() {
     // If dashboard preview already minted a token, skip session endpoint
@@ -148,15 +170,17 @@ class AliigoWidget extends HTMLElement {
       const apiBase = this.getApiBase();
 
       if (overrideToken) {
-        // When token is injected (dashboard preview), locale may also be overridden via attribute
         const localeOverride = this.getLocaleOverride();
+        const themeOverride = this.getThemeOverride();
+
         this.state.session = {
           token: overrideToken,
           locale: localeOverride || this.state.locale,
           brand: "Aliigo",
           slug: "",
-          theme: null,
+          theme: themeOverride, 
         };
+
         this.state.locale = localeOverride || this.state.locale;
         this.render();
         return;
@@ -208,116 +232,123 @@ class AliigoWidget extends HTMLElement {
   }
 
   private css() {
-    return `
-      :host{ all: initial; display: block; height: 100%; }
-      .wrap{ font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; box-sizing:border-box; }
-      .wrap, .wrap *{ box-sizing:border-box; }
+  return `
+    :host{ all: initial; display:block; height:100%; }
 
-      .floating{ position: fixed; right: 24px; bottom: 24px; z-index: 2147483647; }
-      .inline{ width: 100%; height: 100%; }
-      .hero{ width: 100%; height: 100%; max-width: 980px; margin: 0 auto; }
+    .wrap{ font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; box-sizing:border-box; height:100%; }
+    .wrap, .wrap *{ box-sizing:border-box; }
 
+    /* floating can be fixed (client sites) or absolute (dashboard preview container) */
+    .floating.fixed{ position: fixed; right: 24px; bottom: 24px; z-index: 2147483647; }
+    .floating.absolute{ position: absolute; right: 16px; bottom: 16px; z-index: 2147483647; }
 
-      .pill{
-        border:0; cursor:pointer; font-weight:700;
-        border-radius:999px; padding:12px 16px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-      }
+    .inline{ width: 100%; height:auto; }
+    .hero{ width: 100%; height:100%; max-width: 100%; margin: 0 auto; }
 
-      .panel{
-        width: 360px;
-        height: 420px;
-        background:#fff;
-        border: 1px solid rgba(0,0,0,0.10);
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 25px 60px rgba(0,0,0,0.28);
-        display:flex;
-        flex-direction:column;
-      }
+    .pill{
+      border:0; cursor:pointer; font-weight:700;
+      border-radius:999px; padding:12px 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      transition: background-color .18s ease, color .18s ease;
+    }
 
-      .panel.inline, .panel.hero{
-        width: 100%;
-        max-width: 100%;
-        height: 100%;
-      }
-      .panel.hero{ height: 100%; }
+    .panel{
+      width: 360px;
+      height: 420px;
+      background:#fff;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.28);
+      display:flex;
+      flex-direction:column;
+    }
 
-      .header{
-        padding: 12px 14px;
-        display:flex; align-items:center; justify-content:space-between;
-        border-bottom: 1px solid rgba(0,0,0,0.08);
-        font-weight: 700;
-        font-size: 14px;
-      }
-      .close{
-        border:0; background:transparent; cursor:pointer;
-        font-size:18px; line-height:18px; opacity:0.8;
-      }
+    .panel.inline{ width:100%; max-width:100%; }
+    .panel.hero{ width:100%; max-width:100%; height:100%; } /* ✅ key fix */
 
-      .body{
-        flex: 1;
-        min-height: 0;
-        overflow: hidden;
-        padding: 12px;
-        display:flex;
-      }
-      .messages{
-        flex:1;
-        min-height:0;
-        overflow-y:auto;
-        padding-right: 6px;
-      }
+    .header{
+      padding: 12px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      font-weight: 700;
+      font-size: 14px;
+      transition: background-color .18s ease, color .18s ease;
+    }
 
-      .row{ margin-top: 8px; }
-      .row.user{ text-align:right; }
-      .row.bot{ text-align:left; }
+    .close{
+      border:0; background:transparent; cursor:pointer;
+      font-size:18px; line-height:18px; opacity:0.8;
+    }
 
-      .bubble{
-        display:inline-block;
-        max-width: 85%;
-        padding: 8px 12px;
-        border-radius: 12px;
-        font-size: 14px;
-        word-break: break-word;
-        white-space: pre-wrap;
-      }
+    .body{
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      padding: 12px;
+      display:flex;
+    }
 
-      .form{
-        flex: 0 0 auto;
-        display:flex;
-        gap: 8px;
-        padding: 10px;
-        border-top: 1px solid rgba(0,0,0,0.08);
-        background:#fff;
-      }
-      .input{
-        flex:1;
-        height: 38px;
-        border: 1px solid rgba(0,0,0,0.12);
-        border-radius: 10px;
-        padding: 0 12px;
-        font-size: 14px;
-        outline: none;
-      }
-      .send{
-        height: 38px;
-        border:0;
-        border-radius: 10px;
-        padding: 0 14px;
-        font-size: 14px;
-        font-weight: 700;
-        cursor:pointer;
-      }
-      .send:disabled{ opacity:0.55; cursor:not-allowed; }
+    .messages{
+      flex:1;
+      min-height:0;
+      overflow-y:auto;
+      padding-right: 6px;
+    }
 
-      /* Responsive: fill width on small screens */
-      @media (max-width: 520px){
-        .floating{ left: 12px; right: 12px; bottom: 12px; }
-        .panel{ width: 100%; height: 70vh; }
-      }
-    `;
-  }
+    .row{ margin-top: 8px; }
+    .row.user{ text-align:right; }
+    .row.bot{ text-align:left; }
+
+    .bubble{
+      display:inline-block;
+      max-width: 85%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      word-break: break-word;
+      white-space: pre-wrap;
+      transition: background-color .18s ease, color .18s ease;
+    }
+
+    .form{
+      flex: 0 0 auto;
+      display:flex;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      background:#fff;
+    }
+
+    .input{
+      flex:1;
+      height: 38px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      padding: 0 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .send{
+      height: 38px;
+      border:0;
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor:pointer;
+      transition: background-color .18s ease, color .18s ease;
+    }
+    .send:disabled{ opacity:0.55; cursor:not-allowed; }
+
+    @media (max-width: 520px){
+      .floating.fixed{ left: 12px; right: 12px; bottom: 12px; }
+      .panel{ width: 100%; height: 70vh; }
+    }
+  `;
+}
+
 
   private render() {
     this.ensureRoot();
@@ -326,7 +357,7 @@ class AliigoWidget extends HTMLElement {
     const locale = this.getLocaleOverride() || this.state.locale;
     const t = UI[locale];
 
-    const theme = { ...(session?.theme || {}), ...(this.getThemeOverride() || {}) };
+    const theme = this.getThemeOverride() || session?.theme || {};
     const header = splitPair(theme.headerBg, { bg: "#111827", text: "#ffffff" });
     const user = splitPair(theme.bubbleUser, { bg: "#2563eb", text: "#ffffff" });
     const bot = splitPair(theme.bubbleBot, { bg: "#f3f4f6", text: "#111827" });
@@ -336,7 +367,13 @@ class AliigoWidget extends HTMLElement {
 
     const open = variant !== "floating" ? true : this.state.open;
 
-    const wrapperClass = variant === "floating" ? "wrap floating" : variant === "hero" ? "wrap hero" : "wrap inline";
+    const floatingMode = this.getFloatingMode(); 
+    const wrapperClass =
+      variant === "floating"
+        ? `wrap floating ${floatingMode}`
+        : variant === "hero"
+          ? "wrap hero"
+          : "wrap inline";
     const panelClass = variant === "hero" ? "panel hero" : variant === "inline" ? "panel inline" : "panel";
 
     // Build messages html

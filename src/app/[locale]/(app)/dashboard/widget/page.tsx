@@ -295,13 +295,13 @@ export default function WidgetSettingsPage() {
   const sendSplit = useMemo(() => splitTwoHex(theme.sendBg), [theme.sendBg]);
 
   const previewThemeJson = useMemo(() => {
-    return JSON.stringify({
-      headerBg: theme.headerBg,
-      bubbleUser: theme.bubbleUser,
-      bubbleBot: theme.bubbleBot,
-      sendBg: theme.sendBg,
-    });
-  }, [theme.headerBg, theme.bubbleUser, theme.bubbleBot, theme.sendBg]);
+  return JSON.stringify({
+    headerBg: theme.headerBg,
+    bubbleUser: theme.bubbleUser,
+    bubbleBot: theme.bubbleBot,
+    sendBg: theme.sendBg,
+  });
+}, [theme]);
 
 
   const saveTheme = async () => {
@@ -462,11 +462,11 @@ export default function WidgetSettingsPage() {
           <div className="relative h-[420px] border border-zinc-800 rounded bg-zinc-950 overflow-hidden">
             {previewSessionToken ? (
               <div className="absolute inset-0">
-                {/* hero variant for dashboard preview: always open and looks like a component */}
                 <aliigo-widget
-                  style={{ display: "block", width: "100%", height: "100%" }}
                   embed-key={biz.public_embed_key}
-                  variant="hero"
+                  variant="floating"
+                  floating-mode="absolute"
+                  start-open="true"
                   api-base={getBaseUrl()}
                   locale={previewLocale}
                   session-token={previewSessionToken}
