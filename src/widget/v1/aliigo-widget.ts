@@ -20,15 +20,15 @@ type SessionPayload = {
 
 const UI = {
   en: {
-    pill: (brand: string) => `Ask ${brand}`,
-    title: (brand: string) => `${brand} Assistant`,
+  pill: (brand: string) => (brand ? `Ask ${brand}` : "Chat"),
+  title: (brand: string) => (brand ? `${brand} Assistant` : "Assistant"),
     welcome: "Ask a question and we’ll help right away.",
     placeholder: "Type your question…",
     send: "Send",
   },
   es: {
-    pill: (brand: string) => `Pregunta a ${brand}`,
-    title: (brand: string) => `Asistente de ${brand}`,
+  pill: (brand: string) => (brand ? `Pregunta a ${brand}` : "Chat"),
+  title: (brand: string) => (brand ? `Asistente de ${brand}` : "Asistente"),
     welcome: "Haz tu consulta y te ayudamos al momento.",
     placeholder: "Escribe tu consulta…",
     send: "Enviar",
