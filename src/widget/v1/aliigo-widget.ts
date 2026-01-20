@@ -53,7 +53,7 @@ function clamp(n: number, min: number, max: number) {
 
 class AliigoWidget extends HTMLElement {
 
-  private pendingScroll: "bottom" | "assistantStart" | null = null;
+  private pendingScroll: "bottom" | "assistantStart" | "lastAssistantStart" | null = null;
 
   private applyPendingScroll() {
     const messages = this.root.querySelector(".messages") as HTMLDivElement | null;
@@ -68,15 +68,19 @@ class AliigoWidget extends HTMLElement {
         return;
       }
 
-      // assistantStart
-      const rows = Array.from(this.root.querySelectorAll(".row.bot"));
-      const lastBotRow = rows[rows.length - 1] as HTMLElement | undefined;
-      if (!lastBotRow) return;
-
-      // Put the start of the assistant bubble at the top of the scroller
-      messages.scrollTop = Math.max(0, lastBotRow.offsetTop - messages.offsetTop);
+      // lastAssistantStart
+      for (let i = this.state.msgs.length - 1; i >= 0; i--) {
+        if (this.state.msgs[i]?.role === "assistant") {
+          const el = this.root.querySelector(`#msg-${i}`) as HTMLElement | null;
+          if (el) {
+            messages.scrollTop = el.offsetTop - 8;
+          }
+          return;
+        }
+      }
     });
   }
+
   private root!: ShadowRoot;
 
   private ensureRoot() {
@@ -369,10 +373,19 @@ class AliigoWidget extends HTMLElement {
       padding: 8px 12px;
       border-radius: 12px;
       font-size: 14px;
+      line-height:1.35;
       word-break: break-word;
       white-space: pre-wrap;
       transition: background-color .18s ease, color .18s ease;
     }
+    .bubble .list{
+      margin: 0;
+      padding-left: 18px;
+    }
+    .bubble .list li{
+      margin: 2px 0;
+    }
+    .bubble .tail{ margin-top: 8px; }
 
     .form{
       flex: 0 0 auto;
@@ -444,16 +457,19 @@ class AliigoWidget extends HTMLElement {
     const msgs = this.state.msgs;
     const messagesHtml =
       msgs.length === 0
-        ? `<div class="row bot"><div class="bubble bot" style="background:${bot.bg};color:${bot.text};">${t.welcome}</div></div>`
+        ? `<div class="row bot" id="msg-0"><div class="bubble bot" style="background:${bot.bg};color:${bot.text};">${t.welcome}</div></div>`
         : msgs
-            .map((m) => {
+            .map((m, i) => {
               const isUser = m.role === "user";
               const bubbleStyle = isUser
                 ? `background:${user.bg};color:${user.text};`
                 : `background:${bot.bg};color:${bot.text};`;
+
               return `
-                <div class="row ${isUser ? "user" : "bot"}">
-                  <div class="bubble ${isUser ? "user" : "bot"}" style="${bubbleStyle}">${escapeHtml(m.content)}</div>
+                <div class="row ${isUser ? "user" : "bot"}" id="msg-${i}">
+                  <div class="bubble ${isUser ? "user" : "bot"}" style="${bubbleStyle}">
+                    ${formatMessageHtml(m.content)}
+                  </div>
                 </div>
               `;
             })
@@ -521,15 +537,7 @@ class AliigoWidget extends HTMLElement {
       void this.send(v);
     });
 
-    this.scrollToBottomSoon();
-  }
-
-  private scrollToBottomSoon() {
-    const messages = this.root.querySelector(".messages") as HTMLDivElement | null;
-    if (!messages) return;
-    requestAnimationFrame(() => {
-      messages.scrollTop = messages.scrollHeight;
-    });
+    this.applyPendingScroll();
   }
 
   private async send(content: string) {
@@ -559,7 +567,7 @@ class AliigoWidget extends HTMLElement {
 
       if (!res.ok) {
         this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.error || "Error" }];
-        this.pendingScroll = "assistantStart";
+        this.pendingScroll = "lastAssistantStart";
         this.state.busy = false;
         this.render();
         return;
@@ -568,11 +576,11 @@ class AliigoWidget extends HTMLElement {
       if (raw.conversationId) this.state.conversationId = raw.conversationId;
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.reply || "" }];
       this.state.busy = false;
-      this.pendingScroll = "assistantStart";
+      this.pendingScroll = "lastAssistantStart";
       this.render();
     } catch {
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: "Network error" }];
-      this.pendingScroll = "assistantStart";
+      this.pendingScroll = "lastAssistantStart";
       this.state.busy = false;
       this.render();
     }
@@ -588,6 +596,52 @@ function escapeHtml(s: string) {
     .replaceAll("'", "&#039;");
 }
 
-if (!customElements.get("aliigo-widget")) {
-  customElements.define("aliigo-widget", AliigoWidget);
-}
+function formatMessageHtml(raw: string) {
+  const text = escapeHtml(raw || "");
+
+  const lines = text.split(/\r?\n/);
+
+  // detect simple numbered list block
+  const isNumbered = lines.filter(Boolean).every((l) => /^\s*\d+\.\s+/.test(l) || l.trim() === "");
+  if (isNumbered) {
+    const items = lines
+      .filter((l) => /^\s*\d+\.\s+/.test(l))
+      .map((l) => l.replace(/^\s*\d+\.\s+/, "").trim());
+    const tail = lines
+      .filter((l) => !/^\s*\d+\.\s+/.test(l) && l.trim() !== "")
+      .join("<br/>");
+
+    return `
+      <ol class="list">
+        ${items.map((it) => `<li>${it}</li>`).join("")}
+      </ol>
+      ${tail ? `<div class="tail">${tail}</div>` : ""}
+    `;
+  }
+
+  // detect simple bullet list block
+    const isBulleted = lines.filter(Boolean).every((l) => /^\s*[-•]\s+/.test(l) || l.trim() === "");
+      if (isBulleted) {
+        const items = lines
+          .filter((l) => /^\s*[-•]\s+/.test(l))
+          .map((l) => l.replace(/^\s*[-•]\s+/, "").trim());
+        const tail = lines
+          .filter((l) => !/^\s*[-•]\s+/.test(l) && l.trim() !== "")
+          .join("<br/>");
+
+        return `
+          <ul class="list">
+            ${items.map((it) => `<li>${it}</li>`).join("")}
+          </ul>
+          ${tail ? `<div class="tail">${tail}</div>` : ""}
+        `;
+      }
+
+      // fallback: paragraphs + line breaks
+      return text.replace(/\n/g, "<br/>");
+    }
+
+
+  if (!customElements.get("aliigo-widget")) {
+    customElements.define("aliigo-widget", AliigoWidget);
+  }
