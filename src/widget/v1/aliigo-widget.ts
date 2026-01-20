@@ -614,7 +614,6 @@ function formatMessageHtml(raw: string) {
     const items: string[] = [];
     const tailLines: string[] = [];
 
-    let inList = true;
     for (let i = firstNumIdx; i < lines.length; i++) {
       const l = lines[i] ?? "";
       if (/^\s*\d+\.\s+/.test(l)) {
@@ -622,13 +621,9 @@ function formatMessageHtml(raw: string) {
         continue;
       }
       if (l.trim() === "") continue;
-
-      // once we hit real text that's not a numbered item, treat it as tail
-      inList = false;
-      if (!inList) tailLines.push(l);
+      tailLines.push(l);
     }
 
-    // If it wasn't really a list, fall back
     if (items.length === 0) return joinLines(lines);
 
     return `
@@ -648,7 +643,6 @@ function formatMessageHtml(raw: string) {
     const items: string[] = [];
     const tailLines: string[] = [];
 
-    let inList = true;
     for (let i = firstBulIdx; i < lines.length; i++) {
       const l = lines[i] ?? "";
       if (/^\s*[-•]\s+/.test(l)) {
@@ -656,9 +650,7 @@ function formatMessageHtml(raw: string) {
         continue;
       }
       if (l.trim() === "") continue;
-
-      inList = false;
-      if (!inList) tailLines.push(l);
+      tailLines.push(l);
     }
 
     if (items.length === 0) return joinLines(lines);
@@ -675,3 +667,8 @@ function formatMessageHtml(raw: string) {
   // ---------- Fallback ----------
   return joinLines(lines);
 }
+
+if (!customElements.get("aliigo-widget")) {
+  customElements.define("aliigo-widget", AliigoWidget);
+}
+
