@@ -222,7 +222,7 @@ class AliigoWidget extends HTMLElement {
         this.state.session = {
           token: overrideToken,
           locale: localeOverride || this.state.locale,
-          brand: (brandOverride || "Aliigo").trim(),
+          brand: (brandOverride || "").trim(),
           slug: "",
           theme: themeOverride,
         };
@@ -253,7 +253,7 @@ class AliigoWidget extends HTMLElement {
       this.state.session = {
         token: data.token,
         locale,
-        brand: (data.brand || "Aliigo").trim(),
+        brand: (data.brand || "").trim(),
         slug: (data.slug || "").trim(),
         theme: (data.theme as Theme | null) || null,
       };
@@ -391,8 +391,8 @@ class AliigoWidget extends HTMLElement {
         border-radius: 18px; /* High radius for round look */
         font-size: 15px;
         line-height: 1.5;
-        word-break: break-word;
-        white-space: pre-wrap;
+        word-wrap: break-word;
+        white-space: normal;
         box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         animation: message-enter 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         transform-origin: bottom center;
@@ -524,14 +524,8 @@ class AliigoWidget extends HTMLElement {
                 : `--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);`;
 
 
-              return `
-                <div class="row ${isUser ? "user" : "bot"}" id="msg-${i}">
-                  <div class="bubble ${isUser ? "user" : "bot"}" style="${bubbleStyle}">
-                    ${formatMessageHtml(m.content)}
-                  </div>
-                </div>
-              `;
-            })
+              return `<div class="row ${isUser ? "user" : "bot"}" id="msg-${i}"><div class="bubble ${isUser ? "user" : "bot"}" style="${bubbleStyle}">${formatMessageHtml(m.content)}</div></div>`;
+                })
             .join("");
 
     // floating closed => pill only
