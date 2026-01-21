@@ -216,6 +216,9 @@
             "submitButton": "Update Password",
             "success": "Password updated! Redirecting...",
             "errorLength": "Password must be at least 6 characters."
+        },
+        "callback": {
+            "loading": "Confirming your access…"
         }
     },
     "Legal": {

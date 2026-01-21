@@ -1,3 +1,5 @@
+// src/app/[locale]/(public)/check-email/page.tsx
+
 "use client";
 
 import { useTranslations } from "next-intl";

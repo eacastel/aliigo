@@ -1,3 +1,5 @@
+// src/app/[locale]/(public)/login/page.tsx
+
 "use client";
 
 import React, { Suspense, useState } from "react";

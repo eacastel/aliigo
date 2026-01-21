@@ -472,6 +472,7 @@ export default function WidgetSettingsPage() {
                   locale={previewLocale}
                   session-token={previewSessionToken}
                   theme={previewThemeJson}
+                  brand={brand}
                 />
 
               </div>

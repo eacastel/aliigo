@@ -1,3 +1,5 @@
+// src/app/[locale]/(public)/signup/page.tsx
+
 "use client";
 
 import { useState } from "react";

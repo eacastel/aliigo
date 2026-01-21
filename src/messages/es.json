@@ -218,6 +218,9 @@
             "submitButton": "Actualizar contraseña",
             "success": "¡Contraseña actualizada! Redirigiendo...",
             "errorLength": "La contraseña debe tener al menos 6 caracteres."
+        },
+        "callback": {
+            "loading": "Confirmando tu acceso…"
         }
     },
     "Legal": {
