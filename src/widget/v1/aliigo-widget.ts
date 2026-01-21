@@ -364,35 +364,34 @@ class AliigoWidget extends HTMLElement {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
-      overflow-x: hidden;      /* critical */
-      padding: 12px;           /* consistent inset so bubbles don't touch edges */
+      overflow-x: hidden;          /* KEY: prevents tail overflow from causing horizontal scroll */
+      padding: 12px;               /* KEY: gives consistent “nice” inset like your dark-mode example */
+      display: flex;               /* KEY: spacing becomes clean + predictable */
+      flex-direction: column;
+      gap: 10px;                   /* replaces row margin hacks */
     }
 
     .row{
-      margin-top: 8px;
+      margin-top: 0;               /* stop stacking random top margins */
       display: flex;
     }
+
     .row.user{ justify-content: flex-end; }
-    .row.bot{ justify-content: flex-start; }
+    .row.bot{  justify-content: flex-start; }
 
     .bubble{
-      display:inline-block;
       position: relative;
       max-width: 85%;
-      padding: 8px 12px;
-      border-radius: 12px;
-      font-size: 14px;
+      padding: 10px 12px;
+      border-radius: 14px;
       line-height: 1.35;
-      word-break: break-word;
-      white-space: pre-wrap;
-      transition: background-color .18s ease, color .18s ease;
     }
 
     .bubble strong{ font-weight: 700; }
 
     .bubble .list{
       margin: 6px 0 0 0;
-      padding-left: 12px;
+      padding-left: 18px;          /* keep this reasonable (18 looks normal) */
     }
 
     .bubble .list li{
@@ -413,7 +412,7 @@ class AliigoWidget extends HTMLElement {
     .bubble.user::after{
       content:"";
       position:absolute;
-      right:-4px;
+      right: 6px;                  /* was -6px */
       top: 14px;
       width: 10px;
       height: 10px;
@@ -425,7 +424,7 @@ class AliigoWidget extends HTMLElement {
     .bubble.bot::after{
       content:"";
       position:absolute;
-      left:-4px;
+      left: 6px;                   /* was -6px */
       top: 14px;
       width: 10px;
       height: 10px;
