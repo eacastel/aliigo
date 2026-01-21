@@ -5,36 +5,38 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const params = useParams<{ locale: string }>();
+  const locale = params?.locale ?? "en";
+  const t = useTranslations("Auth.callback");
 
   useEffect(() => {
     (async () => {
       try {
-        // Exchange the code in the URL for a session cookie
         const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-
-        // (Optional) verify we really have a session now
         const { data: s } = await supabase.auth.getSession();
 
         if (error || !s.session) {
           console.error("Auth callback error:", error?.message);
-          router.replace("/login");
+          router.replace(`/${locale}/login`);
           return;
         }
 
-        router.replace("/dashboard");
+        router.replace(`/${locale}/dashboard/billing`);
       } catch (e) {
         console.error("Auth callback unexpected error:", e);
-        router.replace("/login");
+        router.replace(`/${locale}/login`);
       }
     })();
-  }, [router]);
+  }, [router, locale]);
 
   return (
     <div className="min-h-dvh flex items-center justify-center">
-      <p className="text-sm text-gray-400">Confirmando tu acceso…</p>
+      <p className="text-sm text-gray-400">{t("loading")}</p>
     </div>
   );
 }
