@@ -278,205 +278,189 @@ class AliigoWidget extends HTMLElement {
   }
 
   private css() {
-    return `
-      :host { all: initial; display: block; }
-      :host([floating-mode="absolute"]) { position: relative; width: 100%; height: 100%; display: block; }
+  return `
+    :host{ all: initial; display:block; }
+    /* Only the dashboard preview uses absolute positioning, and it MUST have a height */
+    :host([floating-mode="absolute"]){ position:relative; width:100%; height:100%; display:block; }
 
-      .wrap {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-        box-sizing: border-box;
-        -webkit-font-smoothing: antialiased;
-      }
-      .wrap * { box-sizing: border-box; }
+    .wrap{
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      box-sizing:border-box;
+    }
+    .wrap, .wrap *{ box-sizing:border-box; }
 
-      /* --- Positioning --- */
-      .floating.fixed {
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        z-index: 99999;
-      }
-      .floating.absolute {
-        position: absolute;
-        inset: 0;
-        z-index: 99999;
-        display: flex;
-        justify-content: flex-end;
-        align-items: flex-end;
-        padding: 20px;
-      }
-      .floating.absolute .panel {
-        max-width: 100%;
-        max-height: 100%;
-      }
-      .inline { width: 100%; }
-      .hero { width: 100%; height: 100%; max-width: 100%; margin: 0 auto; }
+    /* floating can be fixed (client sites) or absolute (dashboard preview container) */
+    .floating.fixed{
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 2147483647;
+    }
 
-      /* --- Pill (Launcher) --- */
-      .pill {
-        border: 0; cursor: pointer; font-weight: 600;
-        border-radius: 99px; padding: 14px 24px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        font-size: 15px;
-        display: flex; align-items: center; gap: 8px;
-      }
-      .pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
-      .pill:active { transform: translateY(0); }
+    /* Dashboard preview: fill container and pin to bottom-right with padding */
+    .floating.absolute{
+      position: absolute;
+      inset: 0;
+      z-index: 2147483647;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      padding: 16px;
+    }
 
-      /* --- Main Panel --- */
-      .panel {
-        width: 380px;
-        height: 600px;
-        max-height: 80vh;
-        background: #ffffff;
-        border: 1px solid rgba(0,0,0,0.06);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-        display: flex;
-        flex-direction: column;
-        animation: panel-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      
-      .panel.inline { width: 100%; max-width: 100%; height: 500px; box-shadow: none; border: 1px solid #e5e7eb; }
-      .panel.hero { width: 100%; max-width: 100%; height: 100%; box-shadow: none; border: none; border-radius: 0; }
+    .floating.absolute .panel{
+      max-width: calc(100% - 32px);
+      max-height: calc(100% - 32px);
+    }
 
-      /* --- Header --- */
-      .header {
-        padding: 16px 20px;
-        display: flex; align-items: center; justify-content: space-between;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        font-weight: 600;
-        font-size: 16px;
-        letter-spacing: -0.01em;
-      }
-      .close {
-        border: 0; background: transparent; cursor: pointer;
-        font-size: 24px; line-height: 1; opacity: 0.6;
-        padding: 4px; margin: -4px;
-        transition: opacity 0.2s;
-      }
-      .close:hover { opacity: 1; }
+    .inline{ width:100%; }
+    .hero{ width:100%; height:100%; max-width:100%; margin:0 auto; }
 
-      /* --- Body & Messages --- */
-      .body {
-        flex: 1;
-        min-height: 0;
-        position: relative;
-        background-color: #ffffff;
-      }
-      .messages {
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 20px;
-        scroll-behavior: smooth;
-      }
-      
-      .row {
-        margin-top: 12px;
-        display: flex;
-        width: 100%;
-      }
-      .row.user { justify-content: flex-end; }
-      .row.bot { justify-content: flex-start; }
+    .pill{
+      border:0; cursor:pointer; font-weight:700;
+      border-radius:999px; padding:12px 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      transition: background-color .18s ease, color .18s ease;
+    }
 
-      /* --- Bubbles (Best-in-Class Look) --- */
-      .bubble {
-        display: block;
-        position: relative;
-        max-width: 85%;
-        padding: 10px 16px;
-        border-radius: 18px; /* High radius for round look */
-        font-size: 15px;
-        line-height: 1.5;
-        word-break: break-word;
-        white-space: pre-wrap;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        animation: message-enter 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        transform-origin: bottom center;
-      }
+    .panel{
+      width: 360px;
+      height: 420px;
+      background:#fff;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.28);
+      display:flex;
+      flex-direction:column;
+    }
 
-      /* User: Sharp bottom-right corner */
-      .bubble.user {
-        border-bottom-right-radius: 4px;
-        margin-left: 40px;
-      }
+    .panel.inline{ width:100%; max-width:100%; }
+    .panel.hero{ width:100%; max-width:100%; height:100%; }
 
-      /* Bot: Sharp bottom-left corner */
-      .bubble.bot {
-        border-bottom-left-radius: 4px;
-        margin-right: 40px;
-        border: 1px solid rgba(0,0,0,0.04); /* Subtle border for gray bubbles */
-      }
+    .header{
+      padding: 12px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      font-weight: 700;
+      font-size: 14px;
+      transition: background-color .18s ease, color .18s ease;
+    }
 
-      .bubble strong { font-weight: 600; }
-      .bubble .list { margin: 8px 0 0 0; padding-left: 18px; }
-      .bubble .list li { margin: 4px 0; }
+    .close{
+      border:0; background:transparent; cursor:pointer;
+      font-size:18px; line-height:18px; opacity:0.8;
+    }
 
-      /* --- Input Area --- */
-      .form {
-        flex: 0 0 auto;
-        display: flex;
-        gap: 10px;
-        padding: 16px;
-        border-top: 1px solid rgba(0,0,0,0.06);
-        background: #ffffff;
-      }
+    .body{
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      padding: 0px;
+      display:flex;
+    }
 
-      .input {
-        flex: 1;
-        height: 44px;
-        border: 1px solid #e5e7eb;
-        background: #f9fafb;
-        border-radius: 22px; /* Pill shape input */
-        padding: 0 16px;
-        font-size: 15px;
-        outline: none;
-        transition: all 0.2s ease;
-        color: #111827;
-      }
-      .input:focus {
-        background: #ffffff;
-        border-color: #d1d5db;
-        box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-      }
-      .input::placeholder { color: #9ca3af; }
+    .messages{
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;          /* KEY: prevents tail overflow from causing horizontal scroll */
+      padding: 12px;               /* KEY: gives consistent “nice” inset like your dark-mode example */
+      display: flex;               /* KEY: spacing becomes clean + predictable */
+      flex-direction: column;
+      gap: 10px;                   /* replaces row margin hacks */
+    }
 
-      .send {
-        height: 44px;
-        padding: 0 20px;
-        border: 0;
-        border-radius: 22px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        flex-shrink: 0;
-        transition: transform 0.1s ease, opacity 0.2s;
-      }
-      .send:active { transform: scale(0.96); }
-      .send:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+    .row{
+      margin-top: 0;               /* stop stacking random top margins */
+      display: flex;
+    }
 
-      /* --- Animations --- */
-      @keyframes message-enter {
-        0% { opacity: 0; transform: translateY(10px) scale(0.98); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-      }
-      @keyframes panel-enter {
-        0% { opacity: 0; transform: translateY(20px) scale(0.96); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-      }
+    .row.user{ justify-content: flex-end; }
+    .row.bot{  justify-content: flex-start; }
 
-      /* --- Mobile --- */
-      @media (max-width: 480px) {
-        .floating.fixed { left: 0; right: 0; bottom: 0; }
-        .panel { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
-        .header { padding: 12px 16px; }
-        .pill { bottom: 20px; right: 20px; }
-      }
-    `;
-  }
+    .bubble{
+      position: relative;
+      max-width: 85%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      line-height: 1.35;
+    }
+
+    .bubble strong{ font-weight: 700; }
+
+    .bubble .list{
+      margin: 6px 0 0 0;
+      padding-left: 18px;          /* keep this reasonable (18 looks normal) */
+    }
+
+    .bubble .list li{
+      margin: 2px 0;
+    }
+
+    .bubble .lead{ margin: 0 0 8px 0; }
+    .bubble .tail{ margin-top: 8px; }
+    .form{
+      flex: 0 0 auto;
+      display:flex;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      background:#fff;
+    }
+
+    .bubble.user::after{
+      content:"";
+      position:absolute;
+      right: 6px;                  /* was -6px */
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg);
+      transform: rotate(45deg);
+      border-radius: 2px;
+    }
+
+    .bubble.bot::after{
+      content:"";
+      position:absolute;
+      left: 6px;                   /* was -6px */
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg);
+      transform: rotate(45deg);
+      border-radius: 2px;
+    }
+
+    .input{
+      flex:1;
+      height: 38px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      padding: 0 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .send{
+      height: 38px;
+      border:0;
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor:pointer;
+      transition: background-color .18s ease, color .18s ease;
+    }
+    .send:disabled{ opacity:0.55; cursor:not-allowed; }
+
+    @media (max-width: 520px){
+      .floating.fixed{ left: 12px; right: 12px; bottom: 12px; }
+      .panel{ width: 100%; height: 70vh; }
+    }
+  `;
+}
 
 
 
