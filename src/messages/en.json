@@ -18,7 +18,7 @@
             "login": "Log in",
             "logout": "Log out",
             "sidebarTitle": "Dashboard",
-            "getStarted": "Get Invite"
+            "getStarted": "Get Started"
         },
         "footer": "All rights reserved.",
         "footerLinks": {
@@ -65,7 +65,7 @@
             "title": "Give your website",
             "titleHighlight": "your voice.",
             "subtitle": "Aliigo is an AI assistant that lives on your website. It answers questions, understands intent, and turns real conversations into qualified leads — automatically.",
-            "ctaPrimary": "Request Invite",
+            "ctaPrimary": "Get started",
             "ctaSecondary": "See it in action"
         },
         "demo": {
@@ -119,13 +119,13 @@
             "desc": "One assistant, tuned to your business. Pricing scales with usage and customization.",
             "price": "€99",
             "period": "/month",
-            "cta": "Request Access"
+            "cta": "Get Started"
         },
         "howItWorks": {
             "title": "How it works",
             "subtitle": "You don’t manage the assistant. You define the knowledge — it does the rest.",
             "step1": {
-                "title": "Request access",
+                "title": "Get started",
                 "desc": "We onboard a limited number of businesses during the private beta."
             },
             "step2": {
@@ -158,7 +158,7 @@
         },
         "finalCta": {
             "title": "Let your website answer for itself",
-            "button": "Request Invite"
+            "button": "Get Started"
         }
     },
     "Auth": {

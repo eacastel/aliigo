@@ -18,7 +18,7 @@
             "login": "Log in",
             "logout": "Log out",
             "sidebarTitle": "Dashboard",
-            "getStarted": "Solicitar Invitación"
+            "getStarted": "Empezar"
         },
         "footer": "All rights reserved.",
         "footerLinks": {
@@ -65,7 +65,7 @@
             "title": "Inteligencia",
             "titleHighlight": "para tu sitio web.",
             "subtitle": "Aliigo es un asistente de IA integrado en tu sitio web. Responde a preguntas, entiende la intención y convierte conversaciones reales en oportunidades cualificadas, de forma automática.",
-            "ctaPrimary": "Solicitar Invitación",
+            "ctaPrimary": "Empieza ahora",
             "ctaSecondary": "Ver cómo funciona"
         },
         "demo": {
@@ -158,14 +158,14 @@
         },
         "finalCta": {
             "title": "Deja que tu web responda por sí misma",
-            "button": "Solicitar invitación"
+            "button": "Empieza ahora"
         }
     },
     "Auth": {
         "login": {
             "title": "Inicia sesión",
             "subtitle": "¿No tienes cuenta?",
-            "ctaLink": "Solicita invitación",
+            "ctaLink": "Regístrate",
             "emailLabel": "Correo electrónico",
             "passwordLabel": "Contraseña",
             "submitButton": "Entrar",
