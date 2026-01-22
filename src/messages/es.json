@@ -30,7 +30,12 @@
     },
     "Billing": {
         "title": "Facturación",
-        "pending": "Contenido pendiente."
+        "pending": "Tu cuenta está lista, pero la facturación todavía no está activa.",
+        "step1": "1) Confirma tu email (obligatorio).",
+        "step2": "2) La activación de facturación viene después (Stripe aún no está habilitado en esta versión).",
+        "step3": "3) Mientras tanto, te quedarás en esta pantalla en lugar de acceder al panel.",
+        "contact": "Contactar soporte",
+        "logout": "Cerrar sesión"
         },
     "Dashboard": {
         "welcome": "Bienvenido, {name}",
@@ -178,16 +183,16 @@
             "msgResendError": "Error al reenviar. Inténtalo más tarde."
         },
         "signup": {
-            "introTitle": "Solicitar invitación a Aliigo",
-            "introText": "Durante el lanzamiento, Aliigo está disponible solo por invitación. Crea tu cuenta y cuéntanos un poco sobre tu negocio. Revisaremos tu solicitud y, si encaja con el programa, activaremos tu acceso.",
+            "introTitle": "Crea tu cuenta de Aliigo",
+            "introText": "Confirma tu email para continuar. Después pasarás a facturación para iniciar tu prueba.",
             "emailPlaceholder": "Email de contacto *",
             "namePlaceholder": "Tu nombre",
             "businessPlaceholder": "Nombre del negocio *",
             "googleUrlPlaceholder": "Web o ficha de Google",
             "phonePlaceholder": "Teléfono",
             "passwordPlaceholder": "Contraseña *",
-            "submitButton": "Crear cuenta y solicitar invitación",
-            "disclaimer": "Usaremos tus datos solo para ponernos en contacto sobre Aliigo y la activación de tu cuenta.",
+            "submitButton": "Crear cuenta",
+            "disclaimer": "Usaremos esta información para configurar tu panel y contactarte sobre la activación.",
             "alreadyAccount": "¿Ya tienes cuenta?",
             "signInLink": "Inicia sesión",
             "errorValidation": "Por favor, completa todos los campos requeridos.",
@@ -195,15 +200,15 @@
             "loading": "Enviando solicitud..."
         },
         "checkEmail": {
-            "title": "Gracias por solicitar tu invitación",
-            "subtitle": "Hemos recibido tu solicitud correctamente.",
-            "desc1": "Durante esta fase de beta privada, revisamos cada negocio de forma manual para asegurar el mejor servicio.",
-            "desc2": "Si tu negocio encaja con el programa, recibirás un email en breve con:",
+            "title": "Gracias por registrarte",
+            "subtitle": "Revisa tu email para confirmar tu cuenta",
+            "desc1": "Hemos recibido tu solicitud correctamente.",
+            "desc2": "Durante esta fase de beta privada, revisamos cada negocio de forma manual para asegurar el mejor servicio.",
             "list1": "Tu código de activación exclusivo",
-            "list2": "Acceso inmediato al panel",
+            "list2": "Acceso al panel",
             "list3": "Condiciones especiales de por vida",
-            "footer": "¿Te has equivocado de email?",
-            "backLink": "Volver al inicio"
+            "footer": "Si no ves el email, revisa spam o promociones.",
+            "backLink": "Volver al login"
         },
         "reset": {
             "title": "Restablecer contraseña",

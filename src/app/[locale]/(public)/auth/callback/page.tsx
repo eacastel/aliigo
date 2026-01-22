@@ -26,7 +26,7 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        router.replace(`/${locale}/dashboard/billing`);
+        router.replace(`/${locale}/login?from=confirm`);
       } catch (e) {
         console.error("Auth callback unexpected error:", e);
         router.replace(`/${locale}/login`);

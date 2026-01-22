@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { Link, useRouter } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { getMetaBrowserIDs } from "@/lib/metaHelpers";
 
@@ -30,6 +30,7 @@ async function readJsonObject(res: Response): Promise<Record<string, unknown>> {
 export default function SignupPage() {
   const t = useTranslations("Auth.signup");
   const router = useRouter();
+  const locale = useLocale();
 
   // State
   const [email, setEmail] = useState("");
@@ -37,6 +38,7 @@ export default function SignupPage() {
   const [businessName, setBusinessName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [company, setCompany] = useState(""); // honeypot
 
   // UI State
   const [loading, setLoading] = useState(false);
@@ -93,6 +95,12 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Honeypot: if filled, silently pretend success (do not create account)
+    if (company.trim().length > 0) {
+      router.push("/check-email");
+      return;
+    }
     setError(null);
 
     // Validation
@@ -114,7 +122,7 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
           data: {
             full_name: name,
             business_name: businessName,
@@ -205,6 +213,21 @@ export default function SignupPage() {
             className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
             required
           />
+        </div>
+
+        {/* HP */}
+        <div aria-hidden="true" className="hidden">
+          <label>
+            Company
+            <input
+              type="text"
+              name="company"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </label>
         </div>
 
         {/* Name */}

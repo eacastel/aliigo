@@ -30,8 +30,13 @@
     },
     "Billing": {
         "title": "Billing",
-        "pending": "Content pending."
-        },
+        "pending": "Your account is ready, but billing is not active yet.",
+        "step1": "1) Confirm your email (required).",
+        "step2": "2) Billing activation is coming next (Stripe not enabled yet in this build).",
+        "step3": "3) Until then, you will stay on this page instead of accessing the dashboard.",
+        "contact": "Contact support",
+        "logout": "Log out"
+    },
     "Dashboard": {
         "welcome": "Welcome, {name}",
         "welcomeGeneric": "Welcome",
@@ -176,16 +181,16 @@
             "msgResendError": "Error resending. Try again later."
         },
         "signup": {
-            "introTitle": "Request invitation to Aliigo",
-            "introText": "During launch, Aliigo is available by invitation only. Create your account and tell us a bit about your business. We will review your application and, if it fits the program, activate your access.",
+            "introTitle": "Create your Aliigo account",
+            "introText": "Confirm your email to continue. After that, you’ll be taken to billing to start your trial.",
             "emailPlaceholder": "Contact Email *",
             "namePlaceholder": "Your Name",
             "businessPlaceholder": "Business Name *",
             "googleUrlPlaceholder": "Website or Google Profile",
             "phonePlaceholder": "Phone",
             "passwordPlaceholder": "Password *",
-            "submitButton": "Create account and request invitation",
-            "disclaimer": "We will use your data only to contact you about Aliigo and your account activation.",
+            "submitButton": "Create account",
+            "disclaimer": "We’ll use this information to set up your workspace and contact you about onboarding.",
             "alreadyAccount": "Already have an account?",
             "signInLink": "Log in",
             "errorValidation": "Please complete all required fields.",
@@ -193,15 +198,15 @@
             "loading": "Sending request..."
         },
         "checkEmail": {
-            "title": "Thanks for requesting an invite",
-            "subtitle": "We have received your application successfully.",
-            "desc1": "During this private beta phase, we review each business manually to ensure the best service.",
-            "desc2": "If your business fits the program, you will receive an email shortly with:",
+            "title": "Thanks for signing up",
+            "subtitle": "Check your email to confirm your account",
+            "desc1": "We received your request successfully.",
+            "desc2": "During private beta, we review each business manually to ensure the best experience.",
             "list1": "Your exclusive activation code",
-            "list2": "Immediate dashboard access",
-            "list3": "Special lifetime conditions",
-            "footer": "Did you enter the wrong email?",
-            "backLink": "Go back home"
+            "list2": "Access to the dashboard",
+            "list3": "Special lifetime terms",
+            "footer": "If you don’t see the email, check spam or promotions.",
+            "backLink": "Back to login"
         },
         "reset": {
             "title": "Reset password",

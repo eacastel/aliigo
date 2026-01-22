@@ -52,7 +52,7 @@ export default function CheckEmailPage() {
           <p className="text-xs text-zinc-500 mb-3">
             {t('footer')}
           </p>
-          <Link href="/" className="text-sm font-semibold text-white hover:text-[#84c9ad] transition-colors">
+          <Link href="/login" className="text-sm font-semibold text-white hover:text-[#84c9ad] transition-colors">
             ← {t('backLink')}
           </Link>
         </div>
