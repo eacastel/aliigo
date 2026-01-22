@@ -28,6 +28,10 @@
             "terminos": "Términos de Uso"
         }
     },
+    "Billing": {
+        "title": "Facturación",
+        "pending": "Contenido pendiente."
+        },
     "Dashboard": {
         "welcome": "Bienvenido, {name}",
         "welcomeGeneric": "Bienvenido",

@@ -5,7 +5,10 @@ import {createNavigation} from 'next-intl/navigation';
 
 export const routing = defineRouting({
   locales: ['en', 'es'],
-  defaultLocale: 'es'
+  defaultLocale: 'es',
+
+  localeDetection: true,
+  localeCookie: { name: 'NEXT_LOCALE' }
 });
 
 export const {Link, redirect, usePathname, useRouter, getPathname} =

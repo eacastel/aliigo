@@ -84,8 +84,29 @@ function LoginWithSearchParams() {
 
       // Success
       void fireLoginEvent(normalizedEmail);
-      const redirect = searchParams.get("redirect");
-      router.push(redirect || "/dashboard");
+      const redirect = searchParams.get("redirect") || "/dashboard";
+
+      // 1) Get access token from the session (client must send it)
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      
+      if (!token) {
+        // Should be rare after successful sign-in, but fail closed
+        router.push("/login");
+        return;
+      }
+
+      // 2) Ask server if user is already trialing/active
+      const res = await fetch("/api/billing/status", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const j = await res.json().catch(() => ({}));
+      const ok = res.ok && (j.status === "trialing" || j.status === "active");
+
+      // 3) Route based on billing gate
+      router.push(ok ? redirect : "/dashboard/billing");
     } finally {
       setLoading(false);
     }

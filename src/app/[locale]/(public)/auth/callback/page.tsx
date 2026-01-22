@@ -3,7 +3,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";

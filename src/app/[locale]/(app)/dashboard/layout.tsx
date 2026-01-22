@@ -29,11 +29,40 @@ export default function DashboardLayout({
   ];
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       const { data } = await supabase.auth.getSession();
-      setEmail(data.session?.user?.email ?? null);
+      const s = data.session;
+
+      if (!s?.user) {
+        router.replace("/login?redirect=/dashboard");
+        return;
+      }
+
+      setEmail(s.user.email ?? null);
+
+      const token = s.access_token;
+
+      const res = await fetch("/api/billing/status", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const j = await res.json().catch(() => ({}));
+
+      const ok = res.ok && (j.status === "trialing" || j.status === "active");
+
+      if (!ok && !cancelled) {
+        router.replace("/dashboard/billing");
+      }
     })();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
