@@ -1,354 +1,364 @@
 {
-    "Navigation": {
-        "brand": "Aliigo",
-        "links": {
-            "dashboard": "Overview",
-            "business": "Empresa",
-            "assistant": "Asistente",
-            "widget": "Widget",
-            "billing": "Pagos"
-        },
-        "publicLinks": {
-            "features": "Cómo funciona",
-            "pricing": "Precios",
-            "blog": "Recursos"
-        },
-        "actions": {
-            "panel": "Panel",
-            "login": "Log in",
-            "logout": "Log out",
-            "sidebarTitle": "Dashboard",
-            "getStarted": "Empezar"
-        },
-        "footer": "All rights reserved.",
-        "footerLinks": {
-            "avisoLegal": "Aviso Legal",
-            "privacidad": "Privacidad",
-            "cookies": "Cookies",
-            "terminos": "Términos de Uso"
-        }
+  "Navigation": {
+    "brand": "Aliigo",
+    "links": {
+      "dashboard": "Resumen",
+      "business": "Empresa",
+      "assistant": "Asistente",
+      "widget": "Widget",
+      "billing": "Facturación"
     },
-    "Billing": {
-        "title": "Facturación",
-        "pending": "Tu cuenta está lista, pero la facturación todavía no está activa.",
-        "step1": "1) Confirma tu email (obligatorio).",
-        "step2": "2) La activación de facturación viene después (Stripe aún no está habilitado en esta versión).",
-        "step3": "3) Mientras tanto, te quedarás en esta pantalla en lugar de acceder al panel.",
-        "contact": "Contactar soporte",
-        "logout": "Cerrar sesión"
-        },
-    "Dashboard": {
-        "welcome": "Bienvenido, {name}",
-        "welcomeGeneric": "Bienvenido",
-        "trialDays": "{days} días de prueba",
-        "verifyTitle": "Verifica tu correo electrónico",
-        "verifyMessage": "Hemos enviado un enlace a {email}. Debes confirmarlo para acceder a todas las funciones.",
-        "resendButton": "Reenviar correo",
-        "resendSuccess": "Correo enviado. Revisa tu bandeja de spam.",
-        "resendError": "Error al enviar: {error}",
-        "businessInfo": {
-            "defaultName": "Tu Negocio",
-            "contactLabel": "Contacto:",
-            "phoneLabel": "Teléfono:"
-        },
-        "cards": {
-            "reviewsTitle": "Solicitar reseñas",
-            "reviewsDesc": "Envía SMS o Email a tus clientes.",
-            "campaignsTitle": "Campañas",
-            "campaignsDesc": "Automatiza mensajes masivos."
-        },
-        "loading": "Cargando..."
+    "publicLinks": {
+      "features": "Cómo funciona",
+      "pricing": "Precios",
+      "blog": "Recursos"
     },
-    "Landing": {
-        "hero": {
-            "betaNote": "Beta Privada Activa 🚀",
-            "title": "Inteligencia",
-            "titleHighlight": "para tu sitio web.",
-            "subtitle": "Aliigo es un asistente de IA integrado en tu sitio web. Responde a preguntas, entiende la intención y convierte conversaciones reales en oportunidades cualificadas, de forma automática.",
-            "ctaPrimary": "Empieza ahora",
-            "ctaSecondary": "Ver cómo funciona"
-        },
-        "demo": {
-            "badge": "Demo en vivo del asistente →",
-            "titleLine1": "Conoce Aliigo.",
-            "titleLine2": "Un asistente de IA diseñado para convertir visitas en clientes potenciales.",
-            "subtitle": "Aliigo vive en tu sitio web. Responde al instante, detecta la intención del visitante y ayuda a los negocios a captar oportunidades reales — de forma automática, 24/7.",
-            "pricingPrefix": "Plan base desde",
-            "price": "99€/mes",
-            "pricingSuffix": ". El precio escala según el volumen de mensajes y el nivel de personalización.",
-            "prompts": {
-                "p1": "¿Cómo capta oportunidades Aliigo?",
-                "p2": "¿Cuánto tarda la instalación?",
-                "p3": "¿Cómo funciona el precio?"
-            },
-            "liveTag": "En vivo"
-        },
-        "socialProof": {
-            "title": "CASOS DONDE UNA CONVERSACIÓN MARCA LA DIFERENCIA",
-            "industries": {
-                "preContact": "Resolver dudas antes del contacto",
-                "complexServices": "Explicar servicios complejos",
-                "qualifyIntent": "Cualificar interés real",
-                "reduceNoise": "Reducir correos y llamadas innecesarias",
-                "highValue": "Acompañar decisiones de alto valor",
-                "nextStep": "Guiar al siguiente paso: llamar, reservar o contactar"
-            }
-        },
-        "features": {
-            "title": "Qué hace el asistente",
-            "subtitle": "Sin paneles. Sin complejidad. Solo respuestas claras y mejores conversaciones.",
-            "f1": {
-                "title": "Responde al instante",
-                "desc": "Aliigo responde 24/7 usando la información real de tu negocio: servicios, horarios, ubicación, condiciones y siguientes pasos."
-            },
-            "f2": {
-                "title": "Entiende la intención",
-                "desc": "No se limita a responder: detecta cuándo una persona está lista para contactar, reservar o pedir más información."
-            },
-            "f3": {
-                "title": "Capta oportunidades de forma natural",
-                "desc": "Cuando hay interés real, Aliigo solicita los datos de contacto dentro de la conversación. Sin formularios. Sin fricción."
-            },
-            "f4": {
-                "title": "Guía el siguiente paso",
-                "desc": "Llamadas, reservas, formularios o seguimiento: el asistente sugiere el paso adecuado según tu negocio."
-            }
-        },
-        "pricing": {
-            "title": "Un precio simple",
-            "desc": "Un asistente ajustado a tu negocio. El precio escala según uso y nivel de personalización.",
-            "price": "99€",
-            "period": "/mes",
-            "cta": "Empieza ahora"
-        },
-        "howItWorks": {
-            "title": "Cómo funciona",
-            "subtitle": "No gestionas el asistente. Defines el conocimiento y los objetivos — él hace el resto.",
-            "step1": {
-                "title": "Solicita acceso",
-                "desc": "Durante la beta privada damos acceso a un número limitado de negocios."
-            },
-            "step2": {
-                "title": "Cumplimenta información de tu negocio",
-                "desc": "Servicios, horarios, tono y qué significa una oportunidad cualificada para ti."
-            },
-            "step3": {
-                "title": "Publícalo en tu página web",
-                "desc": "Añade un pequeño snippet y el asistente estará activo al instante."
-            }
-        },
-        "faq": {
-            "title": "Preguntas",
-            "q1": {
-                "q": "¿Qué es exactamente Aliigo?",
-                "a": "Aliigo es un asistente de IA integrado en tu sitio web que responde a las preguntas de los visitantes y convierte conversaciones en oportunidades cualificadas."
-            },
-            "q2": {
-                "q": "¿Es un chatbot?",
-                "a": "No es un script ni un bot genérico. Usa el conocimiento real de tu negocio y se adapta a cada conversación."
-            },
-            "q3": {
-                "q": "¿Sustituye a mi equipo?",
-                "a": "No. Se encarga del primer contacto y la cualificación para que tu equipo trate solo con personas con intención real."
-            },
-            "q4": {
-                "q": "¿La instalación es complicada?",
-                "a": "No. Solo hay que añadir un pequeño código a tu web. La mayoría de negocios están activos el mismo día."
-            }
-        },
-        "finalCta": {
-            "title": "Deja que tu web responda por sí misma",
-            "button": "Empieza ahora"
-        }
+    "actions": {
+      "panel": "Panel",
+      "login": "Iniciar sesión",
+      "logout": "Cerrar sesión",
+      "sidebarTitle": "Panel",
+      "getStarted": "Empezar"
     },
-    "Auth": {
-        "login": {
-            "title": "Inicia sesión",
-            "subtitle": "¿No tienes cuenta?",
-            "ctaLink": "Regístrate",
-            "emailLabel": "Correo electrónico",
-            "passwordLabel": "Contraseña",
-            "submitButton": "Entrar",
-            "loading": "Entrando...",
-            "forgotPassword": "¿Olvidaste tu contraseña?",
-            "resetLink": "Restablécela",
-            "okVerified": "✅ Tu correo ha sido verificado. Ahora puedes iniciar sesión.",
-            "msgValidation": "Por favor, introduce tu correo y contraseña.",
-            "msgUnconfirmed": "Debes confirmar tu correo antes de iniciar sesión.",
-            "msgTooManyRequests": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
-            "msgInvalidCreds": "Credenciales no válidas.",
-            "resendButton": "Reenviar confirmación",
-            "resending": "Reenviando...",
-            "msgResendSuccess": "Correo de confirmación reenviado.",
-            "msgResendError": "Error al reenviar. Inténtalo más tarde."
-        },
-        "signup": {
-            "introTitle": "Crea tu cuenta de Aliigo",
-            "introText": "Confirma tu email para continuar. Después pasarás a facturación para iniciar tu prueba.",
-            "emailPlaceholder": "Email de contacto *",
-            "namePlaceholder": "Tu nombre",
-            "businessPlaceholder": "Nombre del negocio *",
-            "googleUrlPlaceholder": "Web o ficha de Google",
-            "phonePlaceholder": "Teléfono",
-            "passwordPlaceholder": "Contraseña *",
-            "submitButton": "Crear cuenta",
-            "disclaimer": "Usaremos esta información para configurar tu panel y contactarte sobre la activación.",
-            "alreadyAccount": "¿Ya tienes cuenta?",
-            "signInLink": "Inicia sesión",
-            "errorValidation": "Por favor, completa todos los campos requeridos.",
-            "errorPassword": "La contraseña debe tener al menos 6 caracteres.",
-            "loading": "Enviando solicitud..."
-        },
-        "checkEmail": {
-            "title": "Gracias por registrarte",
-            "subtitle": "Revisa tu email para confirmar tu cuenta",
-            "desc1": "Hemos recibido tu solicitud correctamente.",
-            "desc2": "Durante esta fase de beta privada, revisamos cada negocio de forma manual para asegurar el mejor servicio.",
-            "list1": "Tu código de activación exclusivo",
-            "list2": "Acceso al panel",
-            "list3": "Condiciones especiales de por vida",
-            "footer": "Si no ves el email, revisa spam o promociones.",
-            "backLink": "Volver al login"
-        },
-        "reset": {
-            "title": "Restablecer contraseña",
-            "desc": "Introduce tu correo y te enviaremos un enlace para recuperar el acceso.",
-            "emailPlaceholder": "tu@email.com",
-            "submitButton": "Enviar enlace",
-            "loading": "Enviando...",
-            "success": "✉️ Enlace enviado. Revisa tu correo (y spam).",
-            "errorEmail": "Por favor, introduce un correo válido.",
-            "backToLogin": "Volver a iniciar sesión"
-        },
-        "update": {
-            "title": "Nueva contraseña",
-            "desc": "Introduce tu nueva contraseña para asegurar tu cuenta.",
-            "passwordLabel": "Nueva contraseña",
-            "submitButton": "Actualizar contraseña",
-            "success": "¡Contraseña actualizada! Redirigiendo...",
-            "errorLength": "La contraseña debe tener al menos 6 caracteres."
-        },
-        "callback": {
-            "loading": "Confirmando tu acceso…"
-        }
-    },
-    "Legal": {
-        "avisoLegal": {
-            "title": "Aviso Legal",
-            "lastUpdated": "Última actualización: {date}",
-            "intro": "En cumplimiento con el deber de información recogido en el artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSI-CE), a continuación se declaran los datos de información general del sitio web:",
-            "section1": {
-                "title": "1. Datos Identificativos",
-                "owner": "Titular:",
-                "brand": "Nombre Comercial:",
-                "nif": "NIF/CIF:",
-                "address": "Domicilio:",
-                "email": "Email:"
-            },
-            "section2": {
-                "title": "2. Objeto",
-                "content": "El presente Aviso Legal regula el acceso, navegación y uso del sitio web, así como las responsabilidades derivadas de la utilización de sus contenidos (entendiendo por 'contenidos' los textos, gráficos, dibujos, diseños, códigos, software, fotografías, música, vídeos, sonidos, bases de datos, imágenes, expresiones e informaciones, así como cualquier otra creación protegida por las leyes nacionales y los tratados internacionales sobre propiedad intelectual e industrial)."
-            },
-            "section3": {
-                "title": "3. Usuarios",
-                "content": "El acceso y/o uso de este portal atribuye la condición de USUARIO, que acepta, desde dicho acceso y/o uso, las Condiciones Generales de Uso aquí reflejadas. Las citadas Condiciones serán de aplicación independientemente de las Condiciones Generales de Contratación que en su caso resulten de obligado cumplimiento."
-            },
-            "section4": {
-                "title": "4. Uso del Portal",
-                "content": "Aliigo proporciona el acceso a multitud de informaciones, servicios, programas o datos en Internet pertenecientes al Titular o a sus licenciantes a los que el USUARIO pueda tener acceso. El USUARIO asume la responsabilidad del uso del portal. Dicha responsabilidad se extiende al registro que fuese necesario para acceder a determinados servicios o contenidos. En dicho registro el USUARIO será responsable de aportar información veraz y lícita."
-            },
-            "section5": {
-                "title": "5. Propiedad Intelectual e Industrial",
-                "content": "El Titular, por sí o como cesionaria, es titular de todos los derechos de propiedad intelectual e industrial de su página web, así como de los elementos contenidos en la misma (a título enunciativo: imágenes, sonido, audio, vídeo, software o textos; marcas o logotipos, combinaciones de colores, estructura y diseño, selección de materiales usados, programas de ordenador necesarios para su funcionamiento, acceso y uso, etc.), titularidad del Titular o bien de sus licenciantes."
-            },
-            "section6": {
-                "title": "6. Exclusión de Garantías y Responsabilidad",
-                "content": "El Titular no se hace responsable, en ningún caso, de los daños y perjuicios de cualquier naturaleza que pudieran ocasionar, a título enunciativo: errores u omisiones en los contenidos, falta de disponibilidad del portal o la transmisión de virus o programas maliciosos o lesivos en los contenidos, a pesar de haber adoptado todas las medidas tecnológicas necesarias para evitarlo."
-            }
-        },
-        "cookies": {
-            "title": "Política de Cookies",
-            "lastUpdated": "Última actualización: {date}",
-            "intro": "Esta política explica qué son las cookies, cómo las utilizamos en Aliigo y cómo puedes gestionarlas.",
-            "section1": {
-                "title": "1. ¿Qué son las cookies?",
-                "content": "Una cookie es un pequeño archivo de texto que se almacena en su navegador cuando visita casi cualquier página web. Su utilidad es que la web sea capaz de recordar su visita cuando vuelva a navegar por esa página. Las cookies suelen almacenar información de carácter técnico, preferencias personales, personalización de contenidos, estadísticas de uso, enlaces a redes sociales, acceso a cuentas de usuario, etc."
-            },
-            "section2": {
-                "title": "2. Cookies utilizadas en este sitio web",
-                "technical": "Cookies Técnicas (Necesarias):",
-                "technicalDesc": "Son aquellas que permiten al usuario la navegación a través de la página web y la utilización de las diferentes opciones o servicios que en ella existan, como identificar la sesión, acceder a partes de acceso restringido (Dashboard), o realizar el proceso de compra.",
-                "analytical": "Cookies de Análisis:",
-                "analyticalDesc": "Son aquellas que, tratadas por nosotros o por terceros (como Google Analytics), nos permiten cuantificar el número de usuarios y así realizar la medición y análisis estadístico de la utilización que hacen los usuarios del servicio ofertado."
-            },
-            "section3": {
-                "title": "3. Terceros",
-                "content": "Esta web puede utilizar servicios de terceros que recopilarán información con fines estadísticos, de uso del Site por parte del usuario y para la prestación de otros servicios relacionados con la actividad del Website y otros servicios de Internet. En particular, este sitio web utiliza Google Analytics y Supabase (para gestión de sesión)."
-            },
-            "section4": {
-                "title": "4. Gestión y desactivación de cookies",
-                "content": "En cualquier momento podrá ejercer su derecho de desactivación o eliminación de cookies de este sitio web. Estas acciones se realizan de forma diferente en función del navegador que esté usando (Chrome, Safari, Firefox, Edge)."
-            }
-        },
-        "privacidad": {
-            "title": "Política de Privacidad",
-            "lastUpdated": "Última actualización: {date}",
-            "intro": "En Aliigo nos tomamos muy en serio su privacidad. Esta política describe cómo recogemos, usamos y protegemos sus datos personales conforme al RGPD y la LOPDGDD.",
-            "section1": {
-                "title": "1. Responsable del Tratamiento",
-                "label": "Identidad:",
-                "address": "Domicilio:",
-                "email": "Email:"
-            },
-            "section2": {
-                "title": "2. Finalidad del tratamiento",
-                "content": "Tratamos la información que nos facilitan las personas interesadas con el fin de:",
-                "point1": "Gestionar el registro y la prestación del servicio SaaS (Software as a Service).",
-                "point2": "Gestionar la facturación y cobro de los servicios contratados.",
-                "point3": "Enviar comunicaciones comerciales sobre nuestros productos o servicios (solo si ha dado su consentimiento).",
-                "dataRetention": "Los datos personales proporcionados se conservarán mientras se mantenga la relación comercial o no se solicite su supresión por el interesado."
-            },
-            "section3": {
-                "title": "3. Legitimación",
-                "content": "La base legal para el tratamiento de sus datos es la ejecución del contrato de suscripción a Aliigo (Términos y Condiciones) y, para el envío de comunicaciones comerciales, el consentimiento del interesado."
-            },
-            "section4": {
-                "title": "4. Destinatarios",
-                "content": "Los datos no se comunicarán a terceros salvo obligación legal o a proveedores necesarios para la prestación del servicio (Encargados del Tratamiento) como proveedores de hosting (Vercel), base de datos (Supabase) o pasarelas de pago (Stripe)."
-            },
-            "section5": {
-                "title": "5. Derechos",
-                "content": "Cualquier persona tiene derecho a obtener confirmación sobre si en Aliigo estamos tratando datos personales que les conciernan, o no. Las personas interesadas tienen derecho a acceder a sus datos personales, así como a solicitar la rectificación de los datos inexactos o solicitar su supresión cuando, entre otros motivos, los datos ya no sean necesarios para los fines que fueron recogidos."
-            }
-        },
-        "terminos": {
-            "title": "Términos y Condiciones de Uso",
-            "lastUpdated": "Última actualización: {date}",
-            "intro": "Estas Condiciones Generales regulan el uso de los servicios ofrecidos por Aliigo a través del sitio web.",
-            "section1": {
-                "title": "1. El Servicio",
-                "content": "Aliigo es una plataforma SaaS que permite a negocios locales gestionar su reputación online, reseñas y comunicaciones. El servicio se ofrece actualmente en modalidad 'Beta Privada', lo que implica que puede haber cambios, interrupciones o nuevas funcionalidades que se añaden progresivamente."
-            },
-            "section2": {
-                "title": "2. Cuenta de Usuario",
-                "content": "Para utilizar el servicio, debe registrarse y crear una cuenta. Usted es responsable de mantener la confidencialidad de su contraseña y de todas las actividades que ocurran bajo su cuenta. Debe notificarnos inmediatamente cualquier uso no autorizado."
-            },
-            "section3": {
-                "title": "3. Precios y Pagos",
-                "content": "Durante la fase Beta, el servicio puede ofrecerse bajo condiciones especiales de precios. Aliigo se reserva el derecho de modificar las tarifas con un preaviso razonable. Los pagos son recurrentes (mensuales) y pueden cancelarse en cualquier momento antes del siguiente ciclo de facturación."
-            },
-            "section4": {
-                "title": "4. Cancelación",
-                "content": "El usuario puede cancelar su suscripción en cualquier momento desde su panel de control. El servicio permanecerá activo hasta el final del periodo de facturación pagado."
-            },
-            "section5": {
-                "title": "5. Limitación de Responsabilidad",
-                "content": "Aliigo no garantiza que el servicio sea ininterrumpido o libre de errores. En la máxima medida permitida por la ley, Aliigo no será responsable de daños indirectos, incidentales o consecuentes derivados del uso del servicio."
-            },
-            "section6": {
-                "title": "6. Legislación Aplicable",
-                "content": "Estas condiciones se regirán e interpretarán de acuerdo con las leyes de España. Para cualquier controversia, las partes se someten a los juzgados y tribunales del domicilio del Titular."
-            }
-        }
+    "footer": "Todos los derechos reservados.",
+    "footerLinks": {
+      "avisoLegal": "Aviso Legal",
+      "privacidad": "Privacidad",
+      "cookies": "Cookies",
+      "terminos": "Términos de Uso"
     }
+  },
+  "Billing": {
+    "title": "Facturación",
+    "pending": "Tu panel está creado, pero la facturación todavía no está activa.",
+    "step1": "1) Confirma tu email (obligatorio).",
+    "step2": "2) Activa la facturación para acceder al panel (Stripe aún no está habilitado en esta versión).",
+    "step3": "3) Hasta que la facturación esté activa, permanecerás en esta pantalla.",
+    "contact": "Contactar soporte",
+    "logout": "Cerrar sesión"
+  },
+  "Dashboard": {
+    "welcome": "Bienvenido, {name}",
+    "welcomeGeneric": "Bienvenido",
+    "trialDays": "{days} días restantes",
+    "verifyTitle": "Verifica tu correo electrónico",
+    "verifyMessage": "Hemos enviado un enlace a {email}. Debes confirmarlo para acceder a todas las funciones.",
+    "resendButton": "Reenviar correo",
+    "resendSuccess": "Correo enviado. Revisa spam si no lo ves.",
+    "resendError": "Error al enviar: {error}",
+    "businessInfo": {
+      "defaultName": "Tu negocio",
+      "contactLabel": "Contacto:",
+      "phoneLabel": "Teléfono:"
+    },
+    "cards": {
+      "reviewsTitle": "Solicitar reseñas",
+      "reviewsDesc": "Envía SMS o email a tus clientes.",
+      "campaignsTitle": "Campañas",
+      "campaignsDesc": "Automatiza mensajes masivos."
+    },
+    "loading": "Cargando..."
+  },
+  "Landing": {
+    "hero": {
+      "betaNote": "Ya disponible",
+      "title": "Dale a tu web",
+      "titleHighlight": "una voz.",
+      "subtitle": "Aliigo es un asistente de IA integrado en tu sitio web. Responde preguntas, entiende la intención y convierte conversaciones en oportunidades cualificadas de forma automática.",
+      "ctaPrimary": "Empezar",
+      "ctaSecondary": "Ver en acción"
+    },
+    "demo": {
+      "badge": "Demo en vivo del asistente",
+      "titleLine1": "Conoce Aliigo.",
+      "titleLine2": "Tu asistente de IA para convertir visitas en oportunidades.",
+      "subtitle": "Aliigo vive en tu web. Responde al instante, detecta la intención del visitante y ayuda a captar oportunidades cualificadas, 24/7.",
+      "pricingPrefix": "Planes desde",
+      "price": "99€/mes",
+      "pricingSuffix": ". El precio escala según el volumen de mensajes y el nivel de personalización.",
+      "prompts": {
+        "p1": "¿Cómo capta oportunidades Aliigo?",
+        "p2": "¿Cuánto tarda la instalación?",
+        "p3": "¿Cómo funciona el precio?"
+      },
+      "liveTag": "En vivo"
+    },
+    "socialProof": {
+      "title": "CASOS DONDE UNA CONVERSACIÓN MARCA LA DIFERENCIA",
+      "industries": {
+        "preContact": "Resolver dudas antes del contacto",
+        "complexServices": "Explicar servicios complejos con claridad",
+        "qualifyIntent": "Cualificar interés real automáticamente",
+        "reduceNoise": "Reducir llamadas y correos innecesarios",
+        "highValue": "Acompañar decisiones de alto valor",
+        "nextStep": "Guiar al siguiente paso: llamar, reservar o contactar"
+      }
+    },
+    "features": {
+      "title": "Qué hace el asistente",
+      "subtitle": "Sin complejidad. Solo respuestas claras y mejores conversaciones.",
+      "f1": {
+        "title": "Responde al instante",
+        "desc": "Aliigo responde 24/7 usando la información real de tu negocio: servicios, horarios, ubicación, políticas y siguientes pasos."
+      },
+      "f2": {
+        "title": "Entiende la intención",
+        "desc": "No se limita a responder. Detecta cuándo una persona está lista para contactar, reservar o pedir más información."
+      },
+      "f3": {
+        "title": "Capta oportunidades de forma natural",
+        "desc": "Cuando hay interés real, Aliigo solicita datos de contacto dentro de la conversación. Sin formularios. Sin fricción."
+      },
+      "f4": {
+        "title": "Guía el siguiente paso",
+        "desc": "Llamadas, reservas, formularios o seguimiento. El asistente sugiere la acción adecuada según tu negocio."
+      }
+    },
+    "pricing": {
+      "title": "Un precio simple",
+      "desc": "Un asistente ajustado a tu negocio. El precio escala según uso y personalización.",
+      "price": "99€",
+      "period": "/mes",
+      "cta": "Empezar"
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "subtitle": "Tú defines el conocimiento y los objetivos. Aliigo hace el resto.",
+      "step1": {
+        "title": "Crea tu cuenta",
+        "desc": "Regístrate, confirma tu email y activa la facturación para acceder a tu panel."
+      },
+      "step2": {
+        "title": "Añade información del negocio",
+        "desc": "Servicios, horarios, ubicación, tono y qué significa una oportunidad cualificada para ti."
+      },
+      "step3": {
+        "title": "Publícalo en tu web",
+        "desc": "Añade un pequeño snippet y el asistente estará activo al instante."
+      }
+    },
+    "faq": {
+      "title": "Preguntas",
+      "q1": {
+        "q": "¿Qué es exactamente Aliigo?",
+        "a": "Aliigo es un asistente de IA integrado en tu web. Responde preguntas y convierte conversaciones en oportunidades cualificadas."
+      },
+      "q2": {
+        "q": "¿Es un chatbot?",
+        "a": "Es un asistente, no un guion. Usa el conocimiento de tu negocio y se adapta a cada conversación."
+      },
+      "q3": {
+        "q": "¿Sustituye a mi equipo?",
+        "a": "No. Se encarga del primer contacto y la cualificación para que tu equipo trate solo con personas con intención real."
+      },
+      "q4": {
+        "q": "¿La instalación es complicada?",
+        "a": "No. Te damos un pequeño snippet para tu web. La mayoría de negocios pueden estar activos el mismo día."
+      }
+    },
+    "finalCta": {
+      "title": "Deja que tu web responda por sí misma",
+      "button": "Empezar"
+    }
+  },
+  "Auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "emailLabel": "Correo electrónico",
+      "passwordLabel": "Contraseña",
+      "submitButton": "Entrar",
+      "loading": "Entrando...",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "resetLink": "Restablécela",
+      "okVerified": "Email verificado. Ya puedes iniciar sesión.",
+      "msgValidation": "Introduce tu correo y contraseña.",
+      "msgUnconfirmed": "Debes confirmar tu correo antes de iniciar sesión.",
+      "msgTooManyRequests": "Demasiados intentos. Inténtalo más tarde.",
+      "msgInvalidCreds": "Credenciales no válidas.",
+      "resendButton": "Reenviar confirmación",
+      "resending": "Reenviando...",
+      "msgResendSuccess": "Correo de confirmación reenviado.",
+      "msgResendError": "Error al reenviar. Inténtalo más tarde."
+    },
+    "signup": {
+      "introTitle": "Crea tu cuenta de Aliigo",
+      "introText": "Confirma tu email para continuar. Después inicia sesión para activar la facturación y acceder a tu panel.",
+      "emailPlaceholder": "Email de contacto *",
+      "namePlaceholder": "Tu nombre",
+      "businessPlaceholder": "Nombre del negocio *",
+      "googleUrlPlaceholder": "Web o ficha de Google",
+      "phonePlaceholder": "Teléfono",
+      "passwordPlaceholder": "Contraseña *",
+      "submitButton": "Crear cuenta",
+      "disclaimer": "Usaremos esta información para crear tu panel y ayudarte con el onboarding. Tú decides qué se muestra a los visitantes.",
+      "alreadyAccount": "¿Ya tienes cuenta?",
+      "signInLink": "Inicia sesión",
+      "errorValidation": "Completa los campos obligatorios.",
+      "errorPassword": "La contraseña debe tener al menos 6 caracteres.",
+      "loading": "Creando cuenta..."
+    },
+    "checkEmail": {
+      "title": "Revisa tu email",
+      "subtitle": "Confirma tu cuenta para continuar",
+      "desc1": "Te hemos enviado un enlace de confirmación a tu bandeja de entrada.",
+      "desc2": "Después de confirmar, te redirigiremos al login. Luego podrás activar la facturación y acceder a tu panel.",
+      "list1": "Confirma tu email",
+      "list2": "Inicia sesión en tu cuenta",
+      "list3": "Activa la facturación para publicar",
+      "footer": "Si no ves el email, revisa spam o promociones e inténtalo de nuevo en un minuto.",
+      "backLink": "Volver al login"
+    },
+    "reset": {
+      "title": "Restablecer contraseña",
+      "desc": "Introduce tu correo y te enviaremos un enlace de recuperación.",
+      "emailPlaceholder": "tu@email.com",
+      "submitButton": "Enviar enlace",
+      "loading": "Enviando...",
+      "success": "Enlace enviado. Revisa tu correo y spam.",
+      "errorEmail": "Introduce un correo válido.",
+      "backToLogin": "Volver a iniciar sesión"
+    },
+    "update": {
+      "title": "Nueva contraseña",
+      "desc": "Introduce tu nueva contraseña para asegurar tu cuenta.",
+      "passwordLabel": "Nueva contraseña",
+      "submitButton": "Actualizar contraseña",
+      "success": "Contraseña actualizada. Redirigiendo...",
+      "errorLength": "La contraseña debe tener al menos 6 caracteres."
+    },
+    "callback": {
+      "loading": "Confirmando tu acceso..."
+    }
+  },
+  "Legal": {
+    "avisoLegal": {
+      "title": "Aviso Legal",
+      "lastUpdated": "Última actualización: {date}",
+      "intro": "En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), se facilita la siguiente información:",
+      "section1": {
+        "title": "1. Datos identificativos",
+        "owner": "Titular:",
+        "brand": "Nombre comercial:",
+        "nif": "NIF/CIF:",
+        "address": "Domicilio:",
+        "email": "Email:"
+      },
+      "section2": {
+        "title": "2. Objeto",
+        "content": "El presente Aviso Legal regula el acceso, navegación y uso del sitio web, así como las responsabilidades derivadas de la utilización de sus contenidos."
+      },
+      "section3": {
+        "title": "3. Usuarios",
+        "content": "El acceso y/o uso del sitio atribuye la condición de USUARIO e implica la aceptación de estas condiciones."
+      },
+      "section4": {
+        "title": "4. Uso del portal",
+        "content": "Aliigo proporciona acceso a información y servicios. El USUARIO asume la responsabilidad del uso del portal y de aportar información veraz en el registro."
+      },
+      "section5": {
+        "title": "5. Propiedad intelectual e industrial",
+        "content": "Aliigo y/o sus licenciantes son titulares de los derechos de propiedad intelectual e industrial del sitio y sus elementos. Queda prohibida su reproducción, distribución o modificación no autorizadas."
+      },
+      "section6": {
+        "title": "6. Exclusión de garantías y responsabilidad",
+        "content": "Aliigo no se hace responsable de daños derivados de errores u omisiones en los contenidos, falta de disponibilidad o programas maliciosos, pese a adoptar medidas razonables para prevenirlos."
+      }
+    },
+    "cookies": {
+      "title": "Política de Cookies",
+      "lastUpdated": "Última actualización: {date}",
+      "intro": "Esta política explica qué son las cookies, cómo las utiliza Aliigo y cómo puedes gestionarlas.",
+      "section1": {
+        "title": "1. ¿Qué son las cookies?",
+        "content": "Una cookie es un pequeño archivo de texto que se almacena en el navegador y permite recordar la visita y preferencias."
+      },
+      "section2": {
+        "title": "2. Cookies utilizadas en este sitio web",
+        "technical": "Cookies técnicas (necesarias):",
+        "technicalDesc": "Cookies necesarias para la navegación, autenticación y acceso a zonas restringidas como el panel.",
+        "analytical": "Cookies de análisis:",
+        "analyticalDesc": "Cookies que ayudan a medir el uso y mejorar el servicio (por ejemplo, proveedores de analítica)."
+      },
+      "section3": {
+        "title": "3. Terceros",
+        "content": "Este sitio puede usar servicios de terceros para analítica, hosting, autenticación y prestación del servicio."
+      },
+      "section4": {
+        "title": "4. Gestión de cookies",
+        "content": "Puedes desactivar o eliminar cookies desde la configuración del navegador (Chrome, Safari, Firefox, Edge)."
+      }
+    },
+    "privacidad": {
+      "title": "Política de Privacidad",
+      "lastUpdated": "Última actualización: {date}",
+      "intro": "En Aliigo nos tomamos muy en serio la privacidad. Esta política describe cómo recogemos, usamos y protegemos datos personales conforme a la normativa aplicable.",
+      "section1": {
+        "title": "1. Responsable del tratamiento",
+        "label": "Identidad:",
+        "address": "Domicilio:",
+        "email": "Email:"
+      },
+      "section2": {
+        "title": "2. Finalidades",
+        "content": "Tratamos los datos personales para:",
+        "point1": "Crear y gestionar cuentas y prestar el servicio SaaS.",
+        "point2": "Gestionar la facturación y pagos de los servicios contratados.",
+        "point3": "Ofrecer soporte y comunicaciones relacionadas con el servicio.",
+        "dataRetention": "Los datos se conservarán mientras exista relación o según obligaciones legales, o hasta que se solicite su supresión cuando corresponda."
+      },
+      "section3": {
+        "title": "3. Base jurídica",
+        "content": "La base jurídica es la ejecución del contrato y, cuando proceda, el consentimiento del usuario para comunicaciones opcionales."
+      },
+      "section4": {
+        "title": "4. Destinatarios",
+        "content": "Los datos podrán compartirse con proveedores necesarios para prestar el servicio (encargados del tratamiento) como hosting, base de datos, autenticación, analítica, comunicaciones y pagos, bajo las garantías adecuadas."
+      },
+      "section5": {
+        "title": "5. Derechos",
+        "content": "Puedes solicitar acceso, rectificación, supresión, limitación, oposición y portabilidad, conforme a la normativa aplicable."
+      }
+    },
+    "terminos": {
+      "title": "Términos de Uso",
+      "lastUpdated": "Última actualización: {date}",
+      "intro": "Estas condiciones regulan el acceso y uso de Aliigo y de sus servicios.",
+      "section1": {
+        "title": "1. El servicio",
+        "content": "Aliigo es una plataforma SaaS que permite a los negocios usar un asistente de IA en su web y gestionar su configuración, contenidos e integraciones. Las funcionalidades pueden evolucionar con el tiempo."
+      },
+      "section2": {
+        "title": "2. Cuenta de usuario",
+        "content": "Eres responsable de mantener la confidencialidad de tus credenciales y de toda actividad realizada bajo tu cuenta. Debes notificarnos cualquier uso no autorizado."
+      },
+      "section3": {
+        "title": "3. Precios y pagos",
+        "content": "Las funciones de pago requieren una suscripción activa. Los precios, ciclos de facturación e impuestos aplicables se informan durante el proceso de compra. La suscripción se renueva automáticamente salvo cancelación antes de la renovación."
+      },
+      "section4": {
+        "title": "4. Cancelación",
+        "content": "Puedes cancelar tu suscripción en cualquier momento desde tu panel. El acceso se mantendrá hasta el final del periodo pagado en curso, salvo que la ley disponga lo contrario."
+      },
+      "section5": {
+        "title": "5. Contenidos de la plataforma, mensajería y salidas de IA",
+        "content": "Eres el único responsable de todos los contenidos, prompts, instrucciones, configuraciones, mensajes y materiales que tú o tus usuarios finales envíen, recopilen, transmitan o muestren mediante Aliigo, incluidas las comunicaciones a clientes (SMS, email, chat u otras). Debes asegurar el cumplimiento de la normativa aplicable, incluida protección de datos y normas anti-spam, y obtener los consentimientos necesarios. Aliigo puede generar salidas asistidas por IA en base a la información e instrucciones que proporciones. Las salidas de IA pueden ser inexactas o inapropiadas y deben revisarse; su uso es bajo tu propio riesgo. Eres responsable de implementar guardrails adecuados, revisar resultados y decidir si y cómo utilizarlos o enviarlos."
+      },
+      "section6": {
+        "title": "6. Limitación de responsabilidad",
+        "content": "Aliigo no garantiza un funcionamiento ininterrumpido o libre de errores. En la máxima medida permitida por la ley, Aliigo no será responsable de daños indirectos, incidentales, especiales, consecuentes o punitivos, ni de pérdida de beneficios, ingresos, datos o reputación derivados del uso del servicio."
+      },
+      "section7": {
+        "title": "7. Indemnidad",
+        "content": "Te comprometes a defender, indemnizar y mantener indemne a Aliigo frente a reclamaciones, daños, responsabilidades, costes y gastos derivados de tu uso del servicio, tus contenidos, tus comunicaciones, tu configuración de IA o el incumplimiento de la ley o de derechos de terceros."
+      },
+      "section8": {
+        "title": "8. Uso aceptable",
+        "content": "No debes usar Aliigo para transmitir contenido ilícito, dañino, engañoso, infractor, acosador o abusivo, ni para enviar spam o marketing no autorizado. Podemos suspender o cancelar cuentas que incumplan estas condiciones o supongan riesgo para la plataforma o terceros."
+      },
+      "section9": {
+        "title": "9. Legislación aplicable",
+        "content": "Estas condiciones se rigen por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales del domicilio del Titular, salvo que la normativa imperativa disponga otra cosa."
+      }
+    }
+  }
 }

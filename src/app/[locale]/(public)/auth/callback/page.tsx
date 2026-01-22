@@ -22,14 +22,14 @@ export default function AuthCallbackPage() {
 
         if (error || !s.session) {
           console.error("Auth callback error:", error?.message);
-          router.replace(`/${locale}/login`);
+          router.replace(`/login`);
           return;
         }
 
-        router.replace(`/${locale}/login?from=confirm`);
+        router.replace(`/login?from=confirm`);
       } catch (e) {
         console.error("Auth callback unexpected error:", e);
-        router.replace(`/${locale}/login`);
+        router.replace(`/login`);
       }
     })();
   }, [router, locale]);
