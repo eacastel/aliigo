@@ -40,6 +40,63 @@ async function getAuthUserWithRetry(supabaseAdmin: SupabaseClient, id: string) {
   return null;
 }
 
+function getClientIp(req: Request) {
+  const xf = req.headers.get("x-forwarded-for");
+  if (xf) return xf.split(",")[0]!.trim();
+  return (
+    req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("x-client-ip") ||
+    "unknown"
+  ).trim();
+}
+
+async function enforceRateLimit(
+  supabaseAdmin: SupabaseClient,
+  req: Request,
+  opts?: { bucket?: string; max?: number; windowMs?: number }
+) {
+  const bucket = opts?.bucket ?? "profiles_ensure";
+  const max = opts?.max ?? 8; // tune this
+  const windowMs = opts?.windowMs ?? 10 * 60 * 1000;
+
+  const ip = getClientIp(req);
+  const since = new Date(Date.now() - windowMs).toISOString();
+
+  // 1) Record event (fail-open if table not present / schema mismatch)
+  try {
+    await supabaseAdmin.from("rate_events").insert({
+      bucket,
+      ip,
+      created_at: new Date().toISOString(),
+    });
+  } catch {
+    // ignore
+  }
+
+  // 2) Count recent events
+  try {
+    const { count } = await supabaseAdmin
+      .from("rate_events")
+      .select("id", { head: true, count: "exact" })
+      .eq("bucket", bucket)
+      .eq("ip", ip)
+      .gte("created_at", since);
+
+    if ((count ?? 0) > max) {
+      return {
+        limited: true,
+        ip,
+      };
+    }
+  } catch {
+    // fail-open
+  }
+
+  return { limited: false, ip };
+}
+
+
 async function readJson(req: Request): Promise<Record<string, unknown>> {
   try {
     const j = await req.json();
@@ -93,6 +150,20 @@ export async function POST(req: Request) {
     const supabaseAdmin = createClient(url, serviceRoleKey, {
       auth: { persistSession: false },
     });
+
+    // Rate limit (by IP)
+    const rl = await enforceRateLimit(supabaseAdmin, req, {
+      bucket: "profiles_ensure",
+      max: 8,
+      windowMs: 10 * 60 * 1000,
+    });
+
+    if (rl.limited) {
+      return NextResponse.json(
+        { ok: false, where: "rate_limit", error: "Too many requests. Try again later." },
+        { status: 429, headers: CORS }
+      );
+    }
 
     // 0) Verify auth user exists (retry handles occasional propagation delay)
     const authUser = await getAuthUserWithRetry(supabaseAdmin, id);

@@ -6,12 +6,9 @@ import { useEffect } from "react";
 import { useRouter } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const params = useParams<{ locale: string }>();
-  const locale = params?.locale ?? "en";
   const t = useTranslations("Auth.callback");
 
   useEffect(() => {
@@ -22,17 +19,17 @@ export default function AuthCallbackPage() {
 
         if (error || !s.session) {
           console.error("Auth callback error:", error?.message);
-          router.replace(`/login`);
+          router.replace({ pathname: "/login", query: { } });
           return;
         }
 
-        router.replace(`/login?from=confirm`);
+        router.replace({ pathname: "/login", query: { } });
       } catch (e) {
         console.error("Auth callback unexpected error:", e);
-        router.replace(`/login`);
+        router.replace({ pathname: "/login" });
       }
     })();
-  }, [router, locale]);
+  }, [router]);
 
   return (
     <div className="min-h-dvh flex items-center justify-center">

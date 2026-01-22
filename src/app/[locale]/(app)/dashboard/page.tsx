@@ -5,9 +5,11 @@
 import { useEffect, useState, useMemo } from "react";
 // IMPORTANT: Import router from your i18n routing file, not next/navigation
 import { useRouter } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
-import { useParams } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
+import { Link } from "@/i18n/routing";
+
+
 
 // Types
 type BusinessRow = {
@@ -74,8 +76,7 @@ function pct(done: number, total: number) {
 
 export default function DashboardPage() {
   // 1. Initialize Translations
-  const params = useParams<{ locale: string }>();
-  const locale = params?.locale ?? "en";
+  const locale = useLocale();
   const t = useTranslations("Dashboard");
   const router = useRouter();
 
@@ -200,7 +201,7 @@ export default function DashboardPage() {
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
       },
     });
 
@@ -243,28 +244,28 @@ export default function DashboardPage() {
           label: "Allowed domains configured",
           done: hasNonAliigoDomain(biz?.allowed_domains),
           required: true,
-          href: `/${locale}/dashboard/settings/business`,
+          href: `/dashboard/settings/business`,
         },
         {
           id: "default_locale",
           label: "Default language selected",
           done: biz?.default_locale === "en" || biz?.default_locale === "es",
           required: true,
-          href: `/${locale}/dashboard/settings/business`,
+          href: `/dashboard/settings/business`,
         },
         {
           id: "contact_name",
           label: "Contact name added",
           done: nonEmpty(business?.nombre_contacto),
           required: false,
-          href: `/${locale}/dashboard/settings/business`,
+          href: `/dashboard/settings/business`,
         },
         {
           id: "phone",
           label: "Phone added",
           done: nonEmpty(business?.telefono),
           required: false,
-          href: `/${locale}/dashboard/settings/business`,
+          href: `/dashboard/settings/business`,
         },
       ],
     },
@@ -276,14 +277,14 @@ export default function DashboardPage() {
           label: "System prompt filled",
           done: nonEmpty(biz?.system_prompt),
           required: true,
-          href: `/${locale}/dashboard/settings/assistant`,
+          href: `/dashboard/settings/assistant`,
         },
         {
           id: "knowledge",
           label: "Knowledge filled",
           done: nonEmpty(biz?.knowledge),
           required: true,
-          href: `/${locale}/dashboard/settings/assistant`,
+          href: `/dashboard/settings/assistant`,
         },
       ],
     },
@@ -295,7 +296,7 @@ export default function DashboardPage() {
           label: "Token generated",
           done: nonEmpty(embedToken),
           required: true,
-          href: `/${locale}/dashboard/widget`,
+          href: `/dashboard/widget`,
         },
       ],
     },
@@ -358,13 +359,9 @@ export default function DashboardPage() {
                   Email: {displayEmail || "—"}
                 </p>
               </div>
-
-              <a
-                href={`/${locale}/dashboard/settings/business`}
-                className="shrink-0 text-sm font-medium text-brand-400 hover:text-brand-300"
-              >
-                Edit
-              </a>
+                <Link href="/dashboard/settings/business" className="shrink-0 text-sm font-medium text-brand-400 hover:text-brand-300">
+                  Edit
+              </Link>
             </div>
           </div>
         </div>
@@ -447,12 +444,12 @@ export default function DashboardPage() {
               <ul className="mt-1 list-disc pl-5 text-sm text-zinc-400">
                 {blockers.map((b) => (
                   <li key={b.id}>
-                    <a
+                    <Link
                       className="text-brand-400 hover:text-brand-300 underline"
                       href={b.href}
                     >
                       {b.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -470,12 +467,12 @@ export default function DashboardPage() {
                   <div className="text-sm font-medium text-zinc-200">
                     {g.group}
                   </div>
-                  <a
+                  <Link
                     href={g.items[0]?.href}
                     className="text-sm font-medium text-brand-400 hover:text-brand-300"
                   >
                     Open
-                  </a>
+                  </Link>
                 </div>
 
                 <ul className="divide-y divide-zinc-800">
@@ -527,7 +524,7 @@ export default function DashboardPage() {
 
                       {/* Action */}
                       {!it.done ? (
-                        <a
+                        <Link
                           href={it.href}
                           className={[
                             "text-sm font-medium shrink-0",
@@ -537,7 +534,7 @@ export default function DashboardPage() {
                           ].join(" ")}
                         >
                           Fix
-                        </a>
+                        </Link>
                       ) : (
                         <span className="text-xs text-zinc-500 shrink-0">
                           Done

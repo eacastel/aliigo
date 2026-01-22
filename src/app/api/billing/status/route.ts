@@ -51,7 +51,11 @@ export async function GET(req: NextRequest) {
 
     if (prof.error) return json({ error: "Supabase error", details: prof.error.message }, 500);
     const businessId = prof.data?.business_id ?? null;
-    if (!businessId) return json({ status: "incomplete" satisfies BillingStatus }, 200);
+
+      if (!businessId) {
+        const status: BillingStatus = "incomplete";
+        return json({ status }, 200);
+      }
 
     // Read billing status from businesses (placeholder logic)
     const biz = await supabaseAdmin

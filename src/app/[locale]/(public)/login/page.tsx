@@ -7,7 +7,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import type { AuthError } from "@supabase/supabase-js";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { getMetaBrowserIDs } from '@/lib/metaHelpers'; 
 
 export default function LoginPage() {
@@ -23,6 +23,7 @@ function LoginWithSearchParams() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from"); 
+  const locale = useLocale();
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -119,7 +120,7 @@ function LoginWithSearchParams() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: email.trim(),
-        options: { emailRedirectTo: `${origin}/auth/callback` }, 
+        options: { emailRedirectTo: `${origin}/${locale}/auth/callback` }, 
       });
 
       if (error) {

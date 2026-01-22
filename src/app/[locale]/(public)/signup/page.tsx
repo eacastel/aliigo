@@ -94,7 +94,20 @@ export default function SignupPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
+
+    // Normalize once
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedName = name.trim();
+    const normalizedBiz = businessName.trim();
+    const normalizedPhone = phone.trim();
+
+    // Honeypot: if filled, silently pretend success (do not create account)
+    if (company.trim().length > 0) {
+      router.push("/check-email");
+      return;
+    }
+    setError(null);
 
     // Honeypot: if filled, silently pretend success (do not create account)
     if (company.trim().length > 0) {
@@ -104,7 +117,7 @@ export default function SignupPage() {
     setError(null);
 
     // Validation
-    if (!email.trim() || !businessName.trim() || !password) {
+    if (!normalizedEmail || !normalizedBiz || !password) {
       setError(t("errorValidation"));
       return;
     }
@@ -119,14 +132,14 @@ export default function SignupPage() {
         data: { user },
         error: authError,
       } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
           data: {
-            full_name: name,
-            business_name: businessName,
-            phone,
+            full_name: normalizedName,
+            business_name: normalizedBiz,
+            phone: normalizedPhone,
           },
         },
       });
@@ -145,20 +158,21 @@ export default function SignupPage() {
       // Create/link business + profile (server)
       await ensureBusinessProfile({
         id: userId,
-        email,
-        name,
-        businessName,
-        phone,
+        email: normalizedEmail,
+        name: normalizedName,
+        businessName: normalizedBiz,
+        phone: normalizedPhone,
       });
 
+
       // Analytics
-      void fireLeadCAPIEvent(email);
-      pushToGTM("generate_lead", { email, source: "signup_form" });
+      void fireLeadCAPIEvent(normalizedEmail);
+      pushToGTM("generate_lead", { email: normalizedEmail, source: "signup_form" });
 
       // Local marker
       localStorage.setItem(
         "aliigo_pending_signup",
-        JSON.stringify({ email, businessName })
+      JSON.stringify({ email: normalizedEmail, businessName: normalizedBiz })
       );
 
       router.push("/check-email");
@@ -216,7 +230,10 @@ export default function SignupPage() {
         </div>
 
         {/* HP */}
-        <div aria-hidden="true" className="hidden">
+        <div
+          aria-hidden="true"
+          className="absolute -left-[10000px] top-auto w-px h-px overflow-hidden"
+        >
           <label>
             Company
             <input
