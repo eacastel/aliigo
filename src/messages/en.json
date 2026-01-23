@@ -6,6 +6,7 @@
       "business": "Business",
       "assistant": "Assistant",
       "widget": "Widget",
+      "messages": "Messages",
       "billing": "Billing"
     },
     "publicLinks": {
