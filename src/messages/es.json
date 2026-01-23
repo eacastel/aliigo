@@ -58,7 +58,23 @@
       "campaignsTitle": "Campañas",
       "campaignsDesc": "Automatiza mensajes masivos."
     },
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "messages": {
+      "title": "Mensajes",
+      "subtitle": "Revisa conversaciones y mensajes recientes de tu asistente web.",
+      "searchPlaceholder": "Buscar mensajes / IDs de conversación…",
+      "verifyTitle": "Confirma tu email",
+      "verifyBody": "Algunas funciones pueden estar limitadas hasta que confirmes tu email. Si ya lo confirmaste, cierra sesión y vuelve a iniciar para refrescar la sesión.",
+      "tabRecent": "Mensajes recientes",
+      "tabConversations": "Conversaciones",
+      "loading": "Cargando…",
+      "emptyRecent": "Aún no hay mensajes.",
+      "emptyConversations": "Aún no hay conversaciones.",
+      "open": "Abrir",
+      "footerNote": "Tip: Esta página carga datos del tenant usando tu business_id derivado de business_profiles.",
+      "openStatus": "Abierta",
+      "closedStatus": "Cerrada"
+    }
   },
   "Landing": {
     "hero": {

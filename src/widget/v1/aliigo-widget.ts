@@ -80,6 +80,80 @@ class AliigoWidget extends HTMLElement {
     });
   }
 
+  private getOrCreateVisitorSessionId() {
+    const k = "aliigo_visitor_session_v1";
+    try {
+      const existing = localStorage.getItem(k);
+      if (existing && existing.length >= 24) return existing;
+
+      const rnd = crypto.getRandomValues(new Uint8Array(16));
+      const id = Array.from(rnd).map((b) => b.toString(16).padStart(2, "0")).join("");
+      localStorage.setItem(k, id);
+      return id;
+    } catch {
+      // last resort (no storage): per-page random
+      return `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    }
+  }
+
+  private STORAGE_TTL_MS = 30 * 60 * 1000;
+  private STORAGE_PREFIX = "aliigo_widget_v1";
+
+  private storageKey() {
+    // embed-key is stable for real embeds; session-token covers dashboard preview
+    const embedKey = this.getEmbedKey();
+    const overrideToken = this.getSessionTokenOverride();
+    const host = (window.location.hostname || "").toLowerCase();
+    const key = embedKey || overrideToken || "no-key";
+    return `${this.STORAGE_PREFIX}:${key}:${host}`;
+  }
+
+  private loadPersisted() {
+    try {
+      const raw = localStorage.getItem(this.storageKey());
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw) as {
+        savedAt?: number;
+        conversationId?: string | null;
+        msgs?: Msg[];
+        locale?: "en" | "es";
+      };
+
+      const savedAt = typeof parsed.savedAt === "number" ? parsed.savedAt : 0;
+      if (!savedAt || Date.now() - savedAt > this.STORAGE_TTL_MS) {
+        localStorage.removeItem(this.storageKey());
+        return;
+      }
+
+      if (Array.isArray(parsed.msgs)) this.state.msgs = parsed.msgs;
+      if (typeof parsed.conversationId === "string") this.state.conversationId = parsed.conversationId;
+      if (parsed.locale === "en" || parsed.locale === "es") this.state.locale = parsed.locale;
+    } catch {
+      // fail open; do nothing
+    }
+  }
+
+  private savePersisted() {
+    try {
+      const payload = {
+        savedAt: Date.now(),
+        conversationId: this.state.conversationId,
+        msgs: this.state.msgs,
+        locale: this.state.locale,
+        open: this.state.open,
+      };
+      localStorage.setItem(this.storageKey(), JSON.stringify(payload));
+    } catch {
+      // ignore storage failures
+    }
+  }
+
+  private clearPersisted() {
+    try {
+      localStorage.removeItem(this.storageKey());
+    } catch {}
+  }
 
 
   private root!: ShadowRoot;
@@ -99,6 +173,7 @@ class AliigoWidget extends HTMLElement {
     msgs: [] as Msg[],
     session: null as SessionPayload | null,
     locale: "en" as "en" | "es",
+    visitorSessionId: null as string | null,
   };
 
   static get observedAttributes() {
@@ -112,6 +187,11 @@ class AliigoWidget extends HTMLElement {
 
   connectedCallback() {
     this.ensureRoot();
+    this.state.visitorSessionId = this.getOrCreateVisitorSessionId();
+
+
+    // restore transcript + conversationId (if within TTL)
+    this.loadPersisted();
 
     // If client embed (fixed mode), move to <body> so it's truly viewport-fixed.
     if (this.getVariant() === "floating" && this.getFloatingMode() === "fixed") {
@@ -121,11 +201,13 @@ class AliigoWidget extends HTMLElement {
 
     if (this.getVariant() === "floating" && this.getStartOpen()) {
       this.state.open = true;
+      this.pendingScroll = "bottom";
     }
 
     this.render();
     void this.ensureSession();
   }
+
 
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
     if (oldValue === newValue) return;
@@ -225,6 +307,7 @@ class AliigoWidget extends HTMLElement {
           brand: (brandOverride || "").trim(),
           slug: "",
           theme: themeOverride,
+          
         };
 
         this.state.locale = localeOverride || this.state.locale;
@@ -258,6 +341,7 @@ class AliigoWidget extends HTMLElement {
         theme: (data.theme as Theme | null) || null,
       };
       this.state.locale = locale;
+      this.savePersisted();
       this.render();
     } catch {
       this.renderError("Network error");
@@ -545,6 +629,7 @@ class AliigoWidget extends HTMLElement {
       const btn = this.root.querySelector(".pill") as HTMLButtonElement | null;
       btn?.addEventListener("click", () => {
         this.state.open = true;
+        this.savePersisted();
         this.pendingScroll = "bottom";
         this.render();
       });
@@ -575,6 +660,7 @@ class AliigoWidget extends HTMLElement {
     const close = this.root.querySelector(".close") as HTMLButtonElement | null;
     close?.addEventListener("click", () => {
       this.state.open = false;
+      this.savePersisted();
       this.render();
     });
 
@@ -598,6 +684,7 @@ class AliigoWidget extends HTMLElement {
 
     this.state.busy = true;
     this.state.msgs = [...this.state.msgs, { role: "user", content }];
+    this.savePersisted();
     this.pendingScroll = "bottom";
     this.render();
 
@@ -609,6 +696,7 @@ class AliigoWidget extends HTMLElement {
         body: JSON.stringify({
           token: session.token,
           conversationId: this.state.conversationId,
+          externalRef: this.state.visitorSessionId,
           message: content,
           locale: this.state.locale,
           channel: "web",
@@ -619,21 +707,25 @@ class AliigoWidget extends HTMLElement {
 
       if (!res.ok) {
         this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.error || "Error" }];
-        this.pendingScroll = "lastAssistantStart";
         this.state.busy = false;
+        this.savePersisted();
+        this.pendingScroll = "lastAssistantStart";
         this.render();
         return;
       }
 
+
       if (raw.conversationId) this.state.conversationId = raw.conversationId;
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.reply || "" }];
       this.state.busy = false;
+      this.savePersisted();
       this.pendingScroll = "lastAssistantStart";
       this.render();
     } catch {
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: "Network error" }];
       this.pendingScroll = "lastAssistantStart";
       this.state.busy = false;
+      this.savePersisted();
       this.render();
     }
   }

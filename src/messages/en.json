@@ -58,7 +58,23 @@
       "campaignsTitle": "Campaigns",
       "campaignsDesc": "Automate bulk messaging."
     },
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "messages": {
+      "title": "Messages",
+      "subtitle": "Review conversations and recent messages from your website assistant.",
+      "searchPlaceholder": "Search messages / conversation IDs…",
+      "verifyTitle": "Verify your email",
+      "verifyBody": "Some features may be limited until your email is confirmed. If you already confirmed, sign out and sign back in to refresh your session.",
+      "tabRecent": "Recent messages",
+      "tabConversations": "Conversations",
+      "loading": "Loading…",
+      "emptyRecent": "No messages yet.",
+      "emptyConversations": "No conversations yet.",
+      "open": "Open",
+      "footerNote": "Tip: This page loads tenant-scoped data using your business_id derived from business_profiles.",
+      "openStatus": "Open",
+      "closedStatus": "Closed"
+    }
   },
   "Landing": {
     "hero": {

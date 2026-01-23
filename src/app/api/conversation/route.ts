@@ -195,6 +195,7 @@ export async function POST(req: NextRequest) {
     const {
       token,
       conversationId: inputConvId,
+      externalRef: inputExternalRef,
       message,
       customerName,
       channel: bodyChannel,
@@ -202,6 +203,7 @@ export async function POST(req: NextRequest) {
     } = (await req.json()) as {
       token?: string;
       conversationId?: string;
+      externalRef?: string;
       message?: string;
       customerName?: string;
       host?: string;
@@ -210,6 +212,10 @@ export async function POST(req: NextRequest) {
     };
 
     const ch: Channel = isChannel(bodyChannel) ? bodyChannel : "web";
+
+    const externalRef =
+      typeof inputExternalRef === "string" ? inputExternalRef.trim().slice(0, 120) : null;
+
 
     // 2) Then compute host
     const origin = req.headers.get("origin") || "";
@@ -258,6 +264,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    
+
     // business prompt (also gives us default_locale)
     const bizRes = await supabase
       .from("businesses")
@@ -283,23 +291,50 @@ export async function POST(req: NextRequest) {
     const localeRaw = requestedLocale || (bizRes.data.default_locale || "en").toLowerCase().trim();
     const locale = supported.has(localeRaw) ? localeRaw : "en";
 
-    // ensure conversation
+    // ensure conversation (reuse by business_id + external_ref)
     let conversationId = inputConvId ?? null;
-    if (!conversationId) {
-      const convRes = await supabase
-        .from("conversations")
-        .insert({
-          business_id: businessId,
-          channel: ch,
-          customer_name: customerName ?? null,
-        })
-        .select("id")
-        .single<{ id: string }>();
 
-      if (convRes.error || !convRes.data) {
-        throw convRes.error ?? new Error("Conversation create failed");
+    if (!conversationId) {
+      // 1) Reuse latest conversation for this visitor/session (if we have externalRef)
+      // Only if it has recent activity (<= 30 minutes)
+      if (externalRef) {
+        const cutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+
+        const existing = await supabase
+          .from("conversations")
+          .select("id")
+          .eq("business_id", businessId)
+          .eq("external_ref", externalRef)
+          .eq("status", "open")
+          .gte("last_message_at", cutoff)
+          .order("last_message_at", { ascending: false })
+          .limit(1)
+          .maybeSingle<{ id: string }>();
+
+        if (existing.error) throw existing.error;
+        if (existing.data?.id) conversationId = existing.data.id;
       }
-      conversationId = convRes.data.id;
+
+      // 2) Otherwise create a new conversation
+      if (!conversationId) {
+        const convRes = await supabase
+          .from("conversations")
+          .insert({
+            business_id: businessId,
+            channel: ch,
+            customer_name: customerName ?? null,
+            external_ref: externalRef,
+            status: "open",
+            last_message_at: new Date().toISOString(),
+          })
+          .select("id")
+          .single<{ id: string }>();
+
+        if (convRes.error || !convRes.data) {
+          throw convRes.error ?? new Error("Conversation create failed");
+        }
+        conversationId = convRes.data.id;
+      }
     }
 
     // persist user message
@@ -312,6 +347,18 @@ export async function POST(req: NextRequest) {
     });
     if (m1.error) throw m1.error;
 
+    // touch conversation (for reuse-by-external_ref + last_message_at)
+    const now = new Date().toISOString();
+    const convTouch = await supabase
+      .from("conversations")
+      .update(
+        { last_message_at: now, last_seen_at: now },
+      )
+      .eq("id", conversationId)
+      .eq("business_id", businessId);
+
+    if (convTouch.error) throw convTouch.error;
+
     // last 20 for context
     const historyRes = await supabase
       .from("messages")
@@ -319,6 +366,7 @@ export async function POST(req: NextRequest) {
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true })
       .limit(20);
+
     const history = (historyRes.data as MessagesRow[]) ?? [];
 
 
