@@ -25,6 +25,7 @@ export default function DashboardLayout({
     { href: "/dashboard/settings/business", label: t('links.business') },
     { href: "/dashboard/settings/assistant", label: t('links.assistant') },
     { href: "/dashboard/widget", label: t('links.widget') },
+    { href: "/dashboard/messages", label: t('links.messages') },
     { href: "/dashboard/billing", label: t('links.billing') },
   ];
 
