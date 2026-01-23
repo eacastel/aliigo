@@ -2,9 +2,9 @@ import { useTranslations } from "next-intl";
 
 const LEGAL_DATA = {
   owner: "Emilio Castellanos", 
-  brand: "Aliigo", 
+  brand: "Horchata Labs / Aliigo", 
   nif: "55448913F", 
-  address: "Atzucat Porta Coeli #18", 
+  address: "C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València", 
   email: "info@aliigo.com" 
 };
 
