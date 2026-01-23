@@ -13,13 +13,19 @@ type RecentMessageRow = {
   role: string;
   content: string;
   meta: Record<string, unknown> | null;
-  conversation_id: string;
+
+  // RPCs commonly return one of these; we normalize.
+  conversation_id?: string;
+  conversationId?: string;
 };
 
 type ConversationRow = {
-  conversation_id: string;
-  last_message_at: string;
-  message_count: number;
+  // Depending on your RPC, this could be "id" (uuid) or "conversation_id"
+  id?: string;
+  conversation_id?: string;
+
+  last_message_at: string | null;
+  message_count: number | null;
 };
 
 type ViewTab = "recent" | "conversations";
@@ -54,6 +60,14 @@ function badgeForRole(role: string) {
   return "bg-zinc-800/40 border-zinc-700/40 text-zinc-200";
 }
 
+function convIdFromRecent(m: RecentMessageRow) {
+  return safeStr(m.conversation_id ?? m.conversationId);
+}
+
+function convIdFromConvo(c: ConversationRow) {
+  return safeStr(c.conversation_id ?? c.id);
+}
+
 export default function DashboardMessagesPage() {
   const t = useTranslations();
   const locale = useLocale();
@@ -74,12 +88,12 @@ export default function DashboardMessagesPage() {
 
   const filteredRecent = useMemo(() => {
     if (!q) return recent;
-    return recent.filter((m) => m.content.toLowerCase().includes(q));
+    return recent.filter((m) => (m.content || "").toLowerCase().includes(q));
   }, [recent, q]);
 
   const filteredConvos = useMemo(() => {
     if (!q) return convos;
-    return convos.filter((c) => c.conversation_id.toLowerCase().includes(q));
+    return convos.filter((c) => convIdFromConvo(c).toLowerCase().includes(q));
   }, [convos, q]);
 
   useEffect(() => {
@@ -131,16 +145,11 @@ export default function DashboardMessagesPage() {
           p_limit: 60,
         });
 
-        // If the RPCs don't exist yet, fall back to safe errors explaining what to add.
         if (recErr) {
-          throw new Error(
-            `Missing RPC "messages_recent_for_business" or query failed: ${recErr.message}`
-          );
+          throw new Error(`Missing RPC "messages_recent_for_business" or query failed: ${recErr.message}`);
         }
         if (cvErr) {
-          throw new Error(
-            `Missing RPC "conversations_recent_for_business" or query failed: ${cvErr.message}`
-          );
+          throw new Error(`Missing RPC "conversations_recent_for_business" or query failed: ${cvErr.message}`);
         }
 
         const recRows = (Array.isArray(rec) ? rec : []) as RecentMessageRow[];
@@ -166,6 +175,7 @@ export default function DashboardMessagesPage() {
   }, [router]);
 
   const openConversation = (conversationId: string) => {
+    if (!conversationId) return;
     router.push(`/dashboard/messages/${conversationId}`);
   };
 
@@ -232,7 +242,6 @@ export default function DashboardMessagesPage() {
           <div className="font-medium">Error</div>
           <div className="mt-1 text-red-200/90">{error}</div>
 
-          {/* Dev hint */}
           <div className="mt-3 text-xs text-red-200/70">
             Hint: This page expects two Supabase RPCs:{" "}
             <span className="font-mono">messages_recent_for_business</span> and{" "}
@@ -277,68 +286,78 @@ export default function DashboardMessagesPage() {
         {loading ? (
           <div className="flex items-center gap-3 p-6">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300/40 border-t-brand-500/70" />
-            <div className="text-sm text-zinc-300">
-              {t("Dashboard.messages.loading", { default: "Loading…" })}
-            </div>
+            <div className="text-sm text-zinc-300">{t("Dashboard.messages.loading", { default: "Loading…" })}</div>
           </div>
         ) : tab === "recent" ? (
           <ul className="divide-y divide-zinc-800">
             {filteredRecent.length === 0 ? (
-              <li className="p-6 text-sm text-zinc-400">
-                {t("Dashboard.messages.emptyRecent", { default: "No messages yet." })}
-              </li>
+              <li className="p-6 text-sm text-zinc-400">{t("Dashboard.messages.emptyRecent", { default: "No messages yet." })}</li>
             ) : (
-              filteredRecent.map((m) => (
-                <li key={m.message_id} className="p-5 hover:bg-zinc-950/30 transition-colors">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={[
-                            "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                            badgeForRole(m.role),
-                          ].join(" ")}
-                        >
-                          {m.role}
-                        </span>
+              filteredRecent.map((m) => {
+                const cid = convIdFromRecent(m);
+                const cidLabel = cid ? `${cid.slice(0, 8)}…${cid.slice(-6)}` : "—";
+                const canOpen = Boolean(cid);
 
-                        {m.channel && (
-                          <span className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-950/30 px-2 py-0.5 text-xs text-zinc-300">
-                            {m.channel}
+                return (
+                  <li key={m.message_id} className="p-5 hover:bg-zinc-950/30 transition-colors">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={[
+                              "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+                              badgeForRole(m.role),
+                            ].join(" ")}
+                          >
+                            {m.role}
                           </span>
-                        )}
 
-                        <span className="text-xs text-zinc-500">{fmtWhen(m.created_at)}</span>
+                          {m.channel && (
+                            <span className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-950/30 px-2 py-0.5 text-xs text-zinc-300">
+                              {m.channel}
+                            </span>
+                          )}
+
+                          <span className="text-xs text-zinc-500">{fmtWhen(m.created_at)}</span>
+                        </div>
+
+                        <p className="mt-2 text-sm text-zinc-200 whitespace-pre-wrap">{clampText(m.content, 320)}</p>
+
+                        <div className="mt-2 text-xs text-zinc-500">
+                          Conversation:{" "}
+                          <button
+                            type="button"
+                            disabled={!canOpen}
+                            onClick={() => openConversation(cid)}
+                            className={[
+                              "underline underline-offset-2 font-mono",
+                              canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-not-allowed",
+                            ].join(" ")}
+                          >
+                            {cidLabel}
+                          </button>
+                        </div>
                       </div>
 
-                      <p className="mt-2 text-sm text-zinc-200 whitespace-pre-wrap">
-                        {clampText(m.content, 320)}
-                      </p>
-
-                      <div className="mt-2 text-xs text-zinc-500">
-                        Conversation:{" "}
+                      <div className="shrink-0">
                         <button
                           type="button"
-                          onClick={() => openConversation(m.conversation_id)}
-                          className="text-brand-400 hover:text-brand-300 underline underline-offset-2 font-mono"
+                          disabled={!canOpen}
+                          onClick={() => openConversation(cid)}
+                          className={[
+                            "rounded-lg border px-3 py-2 text-xs font-medium",
+                            canOpen
+                              ? "border-zinc-800 bg-zinc-950/30 text-zinc-200 hover:bg-zinc-900/50"
+                              : "border-zinc-800 bg-zinc-950/10 text-zinc-500 cursor-not-allowed",
+                          ].join(" ")}
                         >
-                          {m.conversation_id.slice(0, 8)}…{m.conversation_id.slice(-6)}
+                          {t("Dashboard.messages.open", { default: "Open" })}
                         </button>
                       </div>
                     </div>
-
-                    <div className="shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => openConversation(m.conversation_id)}
-                        className="rounded-lg border border-zinc-800 bg-zinc-950/30 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-900/50"
-                      >
-                        {t("Dashboard.messages.open", { default: "Open" })}
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              ))
+                  </li>
+                );
+              })
             )}
           </ul>
         ) : (
@@ -348,35 +367,51 @@ export default function DashboardMessagesPage() {
                 {t("Dashboard.messages.emptyConversations", { default: "No conversations yet." })}
               </li>
             ) : (
-              filteredConvos.map((c) => (
-                <li key={c.conversation_id} className="p-5 hover:bg-zinc-950/30 transition-colors">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-zinc-200">
-                        <button
-                          type="button"
-                          onClick={() => openConversation(c.conversation_id)}
-                          className="font-mono text-brand-400 hover:text-brand-300 underline underline-offset-2"
-                        >
-                          {c.conversation_id.slice(0, 8)}…{c.conversation_id.slice(-6)}
-                        </button>
+              filteredConvos.map((c, idx) => {
+                const cid = convIdFromConvo(c);
+                const cidLabel = cid ? `${cid.slice(0, 8)}…${cid.slice(-6)}` : "—";
+                const canOpen = Boolean(cid);
+
+                return (
+                  <li key={cid || `${c.last_message_at || "no-last"}-${idx}`} className="p-5 hover:bg-zinc-950/30 transition-colors">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-zinc-200">
+                          <button
+                            type="button"
+                            disabled={!canOpen}
+                            onClick={() => openConversation(cid)}
+                            className={[
+                              "font-mono underline underline-offset-2",
+                              canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-not-allowed",
+                            ].join(" ")}
+                          >
+                            {cidLabel}
+                          </button>
+                        </div>
+
+                        <div className="mt-1 text-xs text-zinc-500">
+                          Last message: {c.last_message_at ? fmtWhen(c.last_message_at) : "—"} · Messages: {c.message_count ?? 0}
+                        </div>
                       </div>
 
-                      <div className="mt-1 text-xs text-zinc-500">
-                        Last message: {fmtWhen(c.last_message_at)} · Messages: {c.message_count}
-                      </div>
+                      <button
+                        type="button"
+                        disabled={!canOpen}
+                        onClick={() => openConversation(cid)}
+                        className={[
+                          "rounded-lg border px-3 py-2 text-xs font-medium",
+                          canOpen
+                            ? "border-zinc-800 bg-zinc-950/30 text-zinc-200 hover:bg-zinc-900/50"
+                            : "border-zinc-800 bg-zinc-950/10 text-zinc-500 cursor-not-allowed",
+                        ].join(" ")}
+                      >
+                        {t("Dashboard.messages.open", { default: "Open" })}
+                      </button>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => openConversation(c.conversation_id)}
-                      className="rounded-lg border border-zinc-800 bg-zinc-950/30 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-900/50"
-                    >
-                      {t("Dashboard.messages.open", { default: "Open" })}
-                    </button>
-                  </div>
-                </li>
-              ))
+                  </li>
+                );
+              })
             )}
           </ul>
         )}
@@ -385,12 +420,9 @@ export default function DashboardMessagesPage() {
       {/* Footer note */}
       <div className="mt-4 text-xs text-zinc-500">
         {t("Dashboard.messages.footerNote", {
-          default:
-            "Tip: This page loads tenant-scoped data using your business_id derived from business_profiles.",
+          default: "Tip: This page loads tenant-scoped data using your business_id derived from business_profiles.",
         })}
-        {businessId ? (
-          <span className="ml-2 font-mono text-zinc-600">biz:{safeStr(businessId).slice(0, 8)}…</span>
-        ) : null}
+        {businessId ? <span className="ml-2 font-mono text-zinc-600">biz:{safeStr(businessId).slice(0, 8)}…</span> : null}
       </div>
     </div>
   );
