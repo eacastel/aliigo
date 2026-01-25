@@ -69,6 +69,9 @@ class AliigoWidget extends HTMLElement {
   private expiryTimer: number | null = null;
   private lastActiveAtMs: number | null = null;
 
+  private lastRenderOpen = false;
+  private pendingFocus = false;
+
   private onFocus = () => this.checkExpiryNow();
   private onVis = () => {
     if (!document.hidden) this.checkExpiryNow();
@@ -237,6 +240,17 @@ class AliigoWidget extends HTMLElement {
       }
     });
   }
+
+  private applyPendingFocus() {
+    if (!this.pendingFocus) return;
+    this.pendingFocus = false;
+
+    requestAnimationFrame(() => {
+      const input = this.root.querySelector(".input") as HTMLInputElement | null;
+      input?.focus({ preventScroll: true });
+    });
+  }
+
 
   private getOrCreateVisitorSessionId() {
     const k = "aliigo_visitor_session_v1";
@@ -557,7 +571,9 @@ class AliigoWidget extends HTMLElement {
         box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         display: flex;
         flex-direction: column;
-        animation: panel-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .panel.animate-in {
+      animation: panel-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .panel.inline { width: 100%; max-width: 100%; height: 500px; box-shadow: none; border: 1px solid #e5e7eb; }
@@ -615,8 +631,11 @@ class AliigoWidget extends HTMLElement {
         word-wrap: break-word;
         white-space: normal;
         box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        animation: message-enter 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         transform-origin: bottom center;
+      }
+
+      .bubble.anim {
+        animation: message-enter 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
       }
 
       .bubble.user {
@@ -709,7 +728,12 @@ class AliigoWidget extends HTMLElement {
     const send = splitPair(theme.sendBg, { bg: "#2563eb", text: "#ffffff" });
 
     const brand = (this.getBrandOverride() || session?.brand || "").trim();
+
     const open = variant !== "floating" ? true : this.state.open;
+
+    const openNow = open;
+    const animateIn = openNow && !this.lastRenderOpen;
+    this.lastRenderOpen = openNow;
 
     const floatingMode = this.getFloatingMode();
     const wrapperClass =
@@ -719,25 +743,30 @@ class AliigoWidget extends HTMLElement {
           ? "wrap hero"
           : "wrap inline";
 
-    const panelClass = variant === "hero" ? "panel hero" : variant === "inline" ? "panel inline" : "panel";
+    const basePanelClass =
+      variant === "hero" ? "panel hero" : variant === "inline" ? "panel inline" : "panel";
+
+    const panelClass = animateIn ? `${basePanelClass} animate-in` : basePanelClass;
+
 
     const msgs = this.state.msgs;
     const messagesHtml =
       msgs.length === 0
         ? `<div class="row bot" id="msg-0">
-            <div class="bubble bot" style="--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);">
+            <div class="bubble bot anim" style="--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);">
               ${t.welcome}
             </div>
           </div>`
         : msgs
             .map((m, i) => {
               const isUser = m.role === "user";
+              const isLast = i === msgs.length - 1;
               const bubbleStyle = isUser
                 ? `--bg:${user.bg};--fg:${user.text};background:var(--bg);color:var(--fg);`
                 : `--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);`;
 
               return `<div class="row ${isUser ? "user" : "bot"}" id="msg-${i}">
-                <div class="bubble ${isUser ? "user" : "bot"}" style="${bubbleStyle}">
+                <div class="bubble ${isUser ? "user" : "bot"} ${isLast ? "anim" : ""}" style="${bubbleStyle}">
                   ${formatMessageHtml(m.content)}
                 </div>
               </div>`;
@@ -746,6 +775,7 @@ class AliigoWidget extends HTMLElement {
 
     // floating closed => pill only
     if (variant === "floating" && !open) {
+      this.lastRenderOpen = false;
       const hasToken = !!session?.token || !!this.getSessionTokenOverride();
       if (!hasToken) {
         this.root.innerHTML = `<style>${this.css()}</style>`;
@@ -762,6 +792,7 @@ class AliigoWidget extends HTMLElement {
       const btn = this.root.querySelector(".pill") as HTMLButtonElement | null;
       btn?.addEventListener("click", () => {
         this.state.open = true;
+        this.pendingFocus = true;
         this.savePersisted(false);
         this.pendingScroll = "bottom";
         this.render();
@@ -806,10 +837,12 @@ class AliigoWidget extends HTMLElement {
       const v = (input?.value || "").trim();
       if (!v) return;
       if (input) input.value = "";
+      this.pendingFocus = true;
       void this.send(v);
     });
 
     this.applyPendingScroll();
+    this.applyPendingFocus();
   }
 
   private async send(content: string) {
@@ -818,6 +851,7 @@ class AliigoWidget extends HTMLElement {
 
     this.state.busy = true;
     this.state.msgs = [...this.state.msgs, { role: "user", content }];
+    this.pendingFocus = true;
     this.savePersisted(true);
     this.pendingScroll = "bottom";
     this.render();
@@ -875,6 +909,7 @@ class AliigoWidget extends HTMLElement {
             if (retry.ok) {
               if (raw2.conversationId) this.state.conversationId = raw2.conversationId;
               this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw2.reply || "" }];
+              this.pendingFocus = true;
               this.state.busy = false;
               this.savePersisted(true);
               this.pendingScroll = "lastAssistantStart";
@@ -884,6 +919,7 @@ class AliigoWidget extends HTMLElement {
 
             // retry failed
             this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw2.error || "Error" }];
+            this.pendingFocus = true;
             this.state.busy = false;
             this.savePersisted(true);
             this.pendingScroll = "lastAssistantStart";
@@ -894,6 +930,7 @@ class AliigoWidget extends HTMLElement {
 
         // default error path
         this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.error || "Error" }];
+        this.pendingFocus = true;
         this.state.busy = false;
         this.savePersisted(true);
         this.pendingScroll = "lastAssistantStart";
@@ -903,12 +940,14 @@ class AliigoWidget extends HTMLElement {
 
       if (raw.conversationId) this.state.conversationId = raw.conversationId;
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.reply || "" }];
+      this.pendingFocus = true;
       this.state.busy = false;
       this.savePersisted(true);
       this.pendingScroll = "lastAssistantStart";
       this.render();
     } catch {
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: "Network error" }];
+      this.pendingFocus = true;
       this.pendingScroll = "lastAssistantStart";
       this.state.busy = false;
       this.savePersisted(true);
