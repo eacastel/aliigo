@@ -114,6 +114,7 @@ class AliigoWidget extends HTMLElement {
     if (this.getVariant() === "floating" && this.state.msgs.length > 0) {
       this.state.open = true;
       this.pendingScroll = "bottom";
+      this.pendingFocus = true;
     }
 
     // If client embed (fixed mode), move to <body> so it's truly viewport-fixed.
@@ -125,6 +126,7 @@ class AliigoWidget extends HTMLElement {
     if (this.getVariant() === "floating" && this.getStartOpen()) {
       this.state.open = true;
       this.pendingScroll = "bottom";
+      this.pendingFocus = true;
     }
 
     // Enforce TTL even when the tab stays open
