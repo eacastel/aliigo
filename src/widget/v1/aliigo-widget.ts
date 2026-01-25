@@ -72,6 +72,10 @@ class AliigoWidget extends HTMLElement {
   private lastRenderOpen = false;
   private pendingFocus = false;
 
+  private sessionHydrated = false;
+  private cachedTheme: Theme | null = null;
+  private cachedBrand = "";
+
   private onFocus = () => this.checkExpiryNow();
   private onVis = () => {
     if (!document.hidden) this.checkExpiryNow();
@@ -134,8 +138,14 @@ class AliigoWidget extends HTMLElement {
     document.addEventListener("visibilitychange", this.onVis);
     this.scheduleExpiryTimer();
 
+    this.sessionHydrated = false;
     this.render();
-    void this.ensureSession();
+
+    void this.ensureSession().finally(() => {
+      this.sessionHydrated = true;
+      // If ensureSession already rendered an error (no session), don't overwrite it.
+      if (this.state.session || !this.getEmbedKey()) this.render();
+    });
   }
 
   disconnectedCallback() {
@@ -147,18 +157,27 @@ class AliigoWidget extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
     if (oldValue === newValue) return;
 
-    // attributeChangedCallback can run before connectedCallback
     this.ensureRoot();
-
-    // Always rerender
     this.render();
 
-    // Only refetch session if these change
     if (name === "embed-key" || name === "api-base" || name === "session-token") {
-      this.state.session = null; // force refresh
-      void this.ensureSession();
+      this.state.session = null;
+
+      // If the identity can change, reset cached skin + hydration
+      if (name === "embed-key" || name === "session-token") {
+        this.cachedTheme = null;
+        this.cachedBrand = "";
+        this.sessionHydrated = false;
+      }
+
+      void this.ensureSession().finally(() => {
+        this.sessionHydrated = true;
+        // Same rule: don't overwrite renderError output.
+        if (this.state.session || !this.getEmbedKey()) this.render();
+      });
     }
   }
+
 
   private clearExpiryTimer() {
     if (this.expiryTimer != null) {
@@ -221,6 +240,11 @@ class AliigoWidget extends HTMLElement {
     const mode = this.pendingScroll;
     this.pendingScroll = null;
 
+    // Snap immediately so you never see “top”
+    if (mode === "bottom") {
+      messages.scrollTop = messages.scrollHeight;
+    }
+
     requestAnimationFrame(() => {
       const max = Math.max(0, messages.scrollHeight - messages.clientHeight);
 
@@ -242,6 +266,7 @@ class AliigoWidget extends HTMLElement {
       }
     });
   }
+
 
   private applyPendingFocus() {
     if (!this.pendingFocus) return;
@@ -291,7 +316,12 @@ class AliigoWidget extends HTMLElement {
         conversationId?: string | null;
         msgs?: Msg[];
         locale?: "en" | "es";
+        theme?: Theme | null;
+        brand?: string;
       };
+
+      if (parsed.theme) this.cachedTheme = parsed.theme;
+      if (typeof parsed.brand === "string") this.cachedBrand = parsed.brand;
 
       const lastActive =
         typeof parsed.lastActiveAt === "number"
@@ -350,6 +380,8 @@ class AliigoWidget extends HTMLElement {
         msgs: this.state.msgs,
         locale: this.state.locale,
         open: this.state.open,
+        theme: this.cachedTheme,
+        brand: this.cachedBrand,
       };
 
       localStorage.setItem(k, JSON.stringify(payload));
@@ -455,6 +487,8 @@ class AliigoWidget extends HTMLElement {
           theme: themeOverride,
         };
 
+        this.cachedTheme = this.state.session.theme || null;
+        this.cachedBrand = this.state.session.brand || "";
         this.state.locale = localeOverride || this.state.locale;
         this.savePersisted(false);
         this.render();
@@ -485,6 +519,8 @@ class AliigoWidget extends HTMLElement {
         theme: (data.theme as Theme | null) || null,
       };
 
+      this.cachedTheme = this.state.session.theme || null;
+      this.cachedBrand = this.state.session.brand || "";
       this.state.locale = locale;
       this.savePersisted(false);
       this.render();
@@ -610,7 +646,6 @@ class AliigoWidget extends HTMLElement {
         overflow-y: auto;
         overflow-x: hidden;
         padding: 20px;
-        scroll-behavior: smooth;
       }
 
       .row {
@@ -719,17 +754,47 @@ class AliigoWidget extends HTMLElement {
   private render() {
     this.ensureRoot();
     const variant = this.getVariant();
+
+    const needsRemoteTheme =
+      !!this.getEmbedKey() &&
+      !this.getThemeOverride() &&
+      !this.cachedTheme &&
+      !this.state.session?.theme;
+      if (needsRemoteTheme && !this.sessionHydrated) {
+        // prevent “stock → client” flash on first paint
+        // keep space for inline/hero to avoid layout jump
+        const wrapperClass =
+          variant === "floating"
+            ? `wrap floating ${this.getFloatingMode()}`
+            : variant === "hero"
+              ? "wrap hero"
+              : "wrap inline";
+
+        const placeholderPanel =
+          variant === "hero" ? "panel hero" : variant === "inline" ? "panel inline" : "panel";
+
+        this.root.innerHTML = `
+          <style>${this.css()}</style>
+          <div class="${wrapperClass}">
+            <div class="${placeholderPanel}" style="visibility:hidden"></div>
+          </div>
+        `;
+        return;
+      }
+
+
     const session = this.state.session;
     const locale = this.getLocaleOverride() || this.state.locale;
     const t = UI[locale];
 
-    const theme = this.getThemeOverride() || session?.theme || {};
+    const theme = this.getThemeOverride() || session?.theme || this.cachedTheme || {};
+
+    const brand = (this.getBrandOverride() || session?.brand || this.cachedBrand || "").trim();
+
     const header = splitPair(theme.headerBg, { bg: "#111827", text: "#ffffff" });
     const user = splitPair(theme.bubbleUser, { bg: "#2563eb", text: "#ffffff" });
     const bot = splitPair(theme.bubbleBot, { bg: "#f3f4f6", text: "#111827" });
     const send = splitPair(theme.sendBg, { bg: "#2563eb", text: "#ffffff" });
-
-    const brand = (this.getBrandOverride() || session?.brand || "").trim();
 
     const open = variant !== "floating" ? true : this.state.open;
 
