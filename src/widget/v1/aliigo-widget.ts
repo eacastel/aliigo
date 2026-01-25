@@ -18,17 +18,27 @@ type SessionPayload = {
   theme: Theme | null;
 };
 
+type WidgetState = {
+  open: boolean;
+  busy: boolean;
+  conversationId: string | null;
+  msgs: Msg[];
+  session: SessionPayload | null;
+  locale: "en" | "es";
+  visitorSessionId: string | null;
+};
+
 const UI = {
   en: {
-  pill: (brand: string) => (brand ? `Ask ${brand}` : "Chat"),
-  title: (brand: string) => (brand ? `${brand} Assistant` : "Assistant"),
+    pill: (brand: string) => (brand ? `Ask ${brand}` : "Chat"),
+    title: (brand: string) => (brand ? `${brand} Assistant` : "Assistant"),
     welcome: "Ask a question and we’ll help right away.",
     placeholder: "Type your question…",
     send: "Send",
   },
   es: {
-  pill: (brand: string) => (brand ? `Pregunta a ${brand}` : "Chat"),
-  title: (brand: string) => (brand ? `Asistente de ${brand}` : "Asistente"),
+    pill: (brand: string) => (brand ? `Pregunta a ${brand}` : "Chat"),
+    title: (brand: string) => (brand ? `Asistente de ${brand}` : "Asistente"),
     welcome: "Haz tu consulta y te ayudamos al momento.",
     placeholder: "Escribe tu consulta…",
     send: "Enviar",
@@ -48,8 +58,156 @@ function splitPair(v?: string, defaults?: { bg: string; text: string }) {
 }
 
 class AliigoWidget extends HTMLElement {
+  private root!: ShadowRoot;
+
+  private STORAGE_TTL_MS = 30 * 60 * 1000;
+  private STORAGE_PREFIX = "aliigo_widget_v1";
 
   private pendingScroll: "bottom" | "lastAssistantStart" | null = null;
+
+  // TTL enforcement even without page refresh
+  private expiryTimer: number | null = null;
+  private lastActiveAtMs: number | null = null;
+
+  private onFocus = () => this.checkExpiryNow();
+  private onVis = () => {
+    if (!document.hidden) this.checkExpiryNow();
+  };
+
+  private state: WidgetState = {
+    open: false,
+    busy: false,
+    conversationId: null,
+    msgs: [],
+    session: null,
+    locale: "en",
+    visitorSessionId: null,
+  };
+
+  static get observedAttributes() {
+    return [
+      "variant", "embed-key", "api-base", "locale", "session-token",
+      "floating-mode", "theme", "brand",
+      "start-open",
+    ];
+  }
+
+  private ensureRoot() {
+    if (!this.shadowRoot) {
+      this.root = this.attachShadow({ mode: "open" });
+    } else {
+      this.root = this.shadowRoot;
+    }
+  }
+
+  connectedCallback() {
+    this.ensureRoot();
+    this.state.visitorSessionId = this.getOrCreateVisitorSessionId();
+
+    // restore transcript + conversationId (if within TTL)
+    this.loadPersisted();
+
+    // If we have recent persisted messages, auto-open on refresh (floating only)
+    if (this.getVariant() === "floating" && this.state.msgs.length > 0) {
+      this.state.open = true;
+      this.pendingScroll = "bottom";
+    }
+
+    // If client embed (fixed mode), move to <body> so it's truly viewport-fixed.
+    if (this.getVariant() === "floating" && this.getFloatingMode() === "fixed") {
+      const host = document.body;
+      if (this.parentElement !== host) host.appendChild(this);
+    }
+
+    if (this.getVariant() === "floating" && this.getStartOpen()) {
+      this.state.open = true;
+      this.pendingScroll = "bottom";
+    }
+
+    // Enforce TTL even when the tab stays open
+    window.addEventListener("focus", this.onFocus);
+    document.addEventListener("visibilitychange", this.onVis);
+    this.scheduleExpiryTimer();
+
+    this.render();
+    void this.ensureSession();
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener("focus", this.onFocus);
+    document.removeEventListener("visibilitychange", this.onVis);
+    this.clearExpiryTimer();
+  }
+
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
+    if (oldValue === newValue) return;
+
+    // attributeChangedCallback can run before connectedCallback
+    this.ensureRoot();
+
+    // Always rerender
+    this.render();
+
+    // Only refetch session if these change
+    if (name === "embed-key" || name === "api-base" || name === "session-token") {
+      this.state.session = null; // force refresh
+      void this.ensureSession();
+    }
+  }
+
+  private clearExpiryTimer() {
+    if (this.expiryTimer != null) {
+      window.clearTimeout(this.expiryTimer);
+      this.expiryTimer = null;
+    }
+  }
+
+  private scheduleExpiryTimer() {
+    this.clearExpiryTimer();
+
+    // Only enforce TTL if we have a conversation transcript to expire
+    if (!this.lastActiveAtMs || this.state.msgs.length === 0) return;
+
+    const msLeft = this.lastActiveAtMs + this.STORAGE_TTL_MS - Date.now();
+    if (msLeft <= 0) {
+      this.expireConversation();
+      return;
+    }
+
+    // Add a tiny buffer so we don't race exact millisecond boundaries
+    this.expiryTimer = window.setTimeout(() => {
+      this.checkExpiryNow();
+    }, msLeft + 50);
+  }
+
+  private checkExpiryNow() {
+    if (!this.lastActiveAtMs || this.state.msgs.length === 0) return;
+
+    const idleMs = Date.now() - this.lastActiveAtMs;
+    if (idleMs >= this.STORAGE_TTL_MS) {
+      this.expireConversation();
+    } else {
+      this.scheduleExpiryTimer();
+    }
+  }
+
+  private expireConversation() {
+    // Clear persisted transcript and reset in-memory conversation
+    this.clearPersisted();
+    this.lastActiveAtMs = null;
+    this.clearExpiryTimer();
+
+    this.state.msgs = [];
+    this.state.conversationId = null;
+    this.state.busy = false;
+
+    // For floating widgets, close on expiry
+    if (this.getVariant() === "floating") {
+      this.state.open = false;
+    }
+
+    this.render();
+  }
 
   private applyPendingScroll() {
     const messages = this.root.querySelector(".messages") as HTMLDivElement | null;
@@ -96,9 +254,6 @@ class AliigoWidget extends HTMLElement {
     }
   }
 
-  private STORAGE_TTL_MS = 30 * 60 * 1000;
-  private STORAGE_PREFIX = "aliigo_widget_v1";
-
   private storageKey() {
     // embed-key is stable for real embeds; session-token covers dashboard preview
     const embedKey = this.getEmbedKey();
@@ -115,35 +270,82 @@ class AliigoWidget extends HTMLElement {
 
       const parsed = JSON.parse(raw) as {
         savedAt?: number;
+        lastActiveAt?: number;
+        open?: boolean;
         conversationId?: string | null;
         msgs?: Msg[];
         locale?: "en" | "es";
       };
 
-      const savedAt = typeof parsed.savedAt === "number" ? parsed.savedAt : 0;
-      if (!savedAt || Date.now() - savedAt > this.STORAGE_TTL_MS) {
-        localStorage.removeItem(this.storageKey());
+      const lastActive =
+        typeof parsed.lastActiveAt === "number"
+          ? parsed.lastActiveAt
+          : typeof parsed.savedAt === "number"
+            ? parsed.savedAt
+            : 0;
+
+      if (!lastActive || Date.now() - lastActive > this.STORAGE_TTL_MS) {
+        this.clearPersisted();
         return;
       }
 
+      if (typeof parsed.open === "boolean") this.state.open = parsed.open;
       if (Array.isArray(parsed.msgs)) this.state.msgs = parsed.msgs;
       if (typeof parsed.conversationId === "string") this.state.conversationId = parsed.conversationId;
       if (parsed.locale === "en" || parsed.locale === "es") this.state.locale = parsed.locale;
+
+      // Track last active for live TTL expiry
+      if (this.state.msgs.length > 0) {
+        this.lastActiveAtMs = lastActive || Date.now();
+      }
     } catch {
-      // fail open; do nothing
+      // ignore
     }
   }
 
-  private savePersisted() {
+  private savePersisted(touch: boolean = true) {
     try {
+      const k = this.storageKey();
+      const now = Date.now();
+
+      // Preserve original savedAt if it exists
+      let savedAt = now;
+
+      // Preserve previous lastActiveAt if touch=false
+      let prevLastActiveAt: number | undefined = undefined;
+
+      try {
+        const prevRaw = localStorage.getItem(k);
+        if (prevRaw) {
+          const prev = JSON.parse(prevRaw) as { savedAt?: number; lastActiveAt?: number };
+          if (typeof prev.savedAt === "number") savedAt = prev.savedAt;
+          if (typeof prev.lastActiveAt === "number") prevLastActiveAt = prev.lastActiveAt;
+        }
+      } catch {
+        // ignore parse issues
+      }
+
+      const nextLastActiveAt = touch ? now : prevLastActiveAt;
+
       const payload = {
-        savedAt: Date.now(),
+        savedAt,
+        lastActiveAt: nextLastActiveAt,
         conversationId: this.state.conversationId,
         msgs: this.state.msgs,
         locale: this.state.locale,
         open: this.state.open,
       };
-      localStorage.setItem(this.storageKey(), JSON.stringify(payload));
+
+      localStorage.setItem(k, JSON.stringify(payload));
+
+      // update live TTL tracking
+      if (this.state.msgs.length > 0) {
+        this.lastActiveAtMs = touch ? now : (nextLastActiveAt ?? this.lastActiveAtMs);
+      } else {
+        this.lastActiveAtMs = null;
+      }
+
+      this.scheduleExpiryTimer();
     } catch {
       // ignore storage failures
     }
@@ -153,76 +355,6 @@ class AliigoWidget extends HTMLElement {
     try {
       localStorage.removeItem(this.storageKey());
     } catch {}
-  }
-
-
-  private root!: ShadowRoot;
-
-  private ensureRoot() {
-    if (!this.shadowRoot) {
-      this.root = this.attachShadow({ mode: "open" });
-    } else {
-      this.root = this.shadowRoot;
-    }
-  }
-  
-  private state = {
-    open: false,
-    busy: false,
-    conversationId: null as string | null,
-    msgs: [] as Msg[],
-    session: null as SessionPayload | null,
-    locale: "en" as "en" | "es",
-    visitorSessionId: null as string | null,
-  };
-
-  static get observedAttributes() {
-    return [
-      "variant","embed-key","api-base","locale","session-token",
-      "floating-mode","theme","brand",
-      "start-open"
-    ];
-  }
-
-
-  connectedCallback() {
-    this.ensureRoot();
-    this.state.visitorSessionId = this.getOrCreateVisitorSessionId();
-
-
-    // restore transcript + conversationId (if within TTL)
-    this.loadPersisted();
-
-    // If client embed (fixed mode), move to <body> so it's truly viewport-fixed.
-    if (this.getVariant() === "floating" && this.getFloatingMode() === "fixed") {
-      const host = document.body;
-      if (this.parentElement !== host) host.appendChild(this);
-    }
-
-    if (this.getVariant() === "floating" && this.getStartOpen()) {
-      this.state.open = true;
-      this.pendingScroll = "bottom";
-    }
-
-    this.render();
-    void this.ensureSession();
-  }
-
-
-  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
-    if (oldValue === newValue) return;
-
-    // IMPORTANT: attributeChangedCallback can run before connectedCallback
-    this.ensureRoot();
-
-    // Always rerender
-    this.render();
-
-    // Only refetch session if these change
-    if (name === "embed-key" || name === "api-base" || name === "session-token") {
-      this.state.session = null; // force refresh
-      void this.ensureSession();
-    }
   }
 
   private getBrandOverride(): string | null {
@@ -283,15 +415,13 @@ class AliigoWidget extends HTMLElement {
     return v === "absolute" ? "absolute" : "fixed";
   }
 
-  
-  private async ensureSession() {
-    // If dashboard preview already minted a token, skip session endpoint
+  private async ensureSession(): Promise<SessionPayload | null> {
     const overrideToken = this.getSessionTokenOverride();
     const embedKey = this.getEmbedKey();
-    if (!embedKey && !overrideToken) return;
+    if (!embedKey && !overrideToken) return null;
 
     // If we already have a session and it's still compatible with overrides, don’t thrash
-    if (this.state.session && !overrideToken) return;
+    if (this.state.session && !overrideToken) return this.state.session;
 
     try {
       const apiBase = this.getApiBase();
@@ -307,27 +437,25 @@ class AliigoWidget extends HTMLElement {
           brand: (brandOverride || "").trim(),
           slug: "",
           theme: themeOverride,
-          
         };
 
         this.state.locale = localeOverride || this.state.locale;
+        this.savePersisted(false);
         this.render();
-        return;
+        return this.state.session;
       }
 
       const url = new URL(`${apiBase}/api/embed/session`);
       url.searchParams.set("key", embedKey);
-      // pass host for clarity; server will validate using Origin anyway
       url.searchParams.set("host", window.location.hostname);
 
       const res = await fetch(url.toString(), { method: "GET" });
       const data = (await res.json().catch(() => ({}))) as Partial<SessionPayload> & { error?: string };
 
       if (!res.ok || !data.token) {
-        // fail closed: widget won’t operate
         this.state.session = null;
         this.renderError(data.error || "Session error");
-        return;
+        return null;
       }
 
       const localeOverride = this.getLocaleOverride();
@@ -340,12 +468,21 @@ class AliigoWidget extends HTMLElement {
         slug: (data.slug || "").trim(),
         theme: (data.theme as Theme | null) || null,
       };
+
       this.state.locale = locale;
-      this.savePersisted();
+      this.savePersisted(false);
       this.render();
+      return this.state.session;
     } catch {
       this.renderError("Network error");
+      return null;
     }
+  }
+
+  private async tryRefreshSessionToken(): Promise<string | null> {
+    this.state.session = null;
+    const s = await this.ensureSession();
+    return s?.token ?? null;
   }
 
   private renderError(msg: string) {
@@ -422,7 +559,7 @@ class AliigoWidget extends HTMLElement {
         flex-direction: column;
         animation: panel-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      
+
       .panel.inline { width: 100%; max-width: 100%; height: 500px; box-shadow: none; border: 1px solid #e5e7eb; }
       .panel.hero { width: 100%; max-width: 100%; height: 100%; box-shadow: none; border: none; border-radius: 0; }
 
@@ -457,7 +594,7 @@ class AliigoWidget extends HTMLElement {
         padding: 20px;
         scroll-behavior: smooth;
       }
-      
+
       .row {
         margin-top: 12px;
         display: flex;
@@ -466,13 +603,13 @@ class AliigoWidget extends HTMLElement {
       .row.user { justify-content: flex-end; }
       .row.bot { justify-content: flex-start; }
 
-      /* --- Bubbles (Best-in-Class Look) --- */
+      /* --- Bubbles --- */
       .bubble {
         display: block;
         position: relative;
         max-width: 85%;
         padding: 10px 16px;
-        border-radius: 18px; /* High radius for round look */
+        border-radius: 18px;
         font-size: 15px;
         line-height: 1.5;
         word-wrap: break-word;
@@ -482,17 +619,15 @@ class AliigoWidget extends HTMLElement {
         transform-origin: bottom center;
       }
 
-      /* User: Sharp bottom-right corner */
       .bubble.user {
         border-bottom-right-radius: 4px;
         margin-left: 40px;
       }
 
-      /* Bot: Sharp bottom-left corner */
       .bubble.bot {
         border-bottom-left-radius: 4px;
         margin-right: 40px;
-        border: 1px solid rgba(0,0,0,0.04); /* Subtle border for gray bubbles */
+        border: 1px solid rgba(0,0,0,0.04);
       }
 
       .bubble strong { font-weight: 600; }
@@ -514,7 +649,7 @@ class AliigoWidget extends HTMLElement {
         height: 44px;
         border: 1px solid #e5e7eb;
         background: #f9fafb;
-        border-radius: 22px; /* Pill shape input */
+        border-radius: 22px;
         padding: 0 16px;
         font-size: 15px;
         outline: none;
@@ -542,7 +677,6 @@ class AliigoWidget extends HTMLElement {
       .send:active { transform: scale(0.96); }
       .send:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
-      /* --- Animations --- */
       @keyframes message-enter {
         0% { opacity: 0; transform: translateY(10px) scale(0.98); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -552,7 +686,6 @@ class AliigoWidget extends HTMLElement {
         100% { opacity: 1; transform: translateY(0) scale(1); }
       }
 
-      /* --- Mobile --- */
       @media (max-width: 480px) {
         .floating.fixed { left: 0; right: 0; bottom: 0; }
         .panel { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
@@ -561,8 +694,6 @@ class AliigoWidget extends HTMLElement {
       }
     `;
   }
-
-
 
   private render() {
     this.ensureRoot();
@@ -578,28 +709,26 @@ class AliigoWidget extends HTMLElement {
     const send = splitPair(theme.sendBg, { bg: "#2563eb", text: "#ffffff" });
 
     const brand = (this.getBrandOverride() || session?.brand || "").trim();
-
     const open = variant !== "floating" ? true : this.state.open;
 
-    const floatingMode = this.getFloatingMode(); 
+    const floatingMode = this.getFloatingMode();
     const wrapperClass =
       variant === "floating"
         ? `wrap floating ${floatingMode}`
         : variant === "hero"
           ? "wrap hero"
           : "wrap inline";
+
     const panelClass = variant === "hero" ? "panel hero" : variant === "inline" ? "panel inline" : "panel";
 
-    // Build messages html
     const msgs = this.state.msgs;
     const messagesHtml =
       msgs.length === 0
         ? `<div class="row bot" id="msg-0">
-              <div class="bubble bot" style="--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);">
-                ${t.welcome}
-              </div>
-            </div>`
-
+            <div class="bubble bot" style="--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);">
+              ${t.welcome}
+            </div>
+          </div>`
         : msgs
             .map((m, i) => {
               const isUser = m.role === "user";
@@ -607,9 +736,12 @@ class AliigoWidget extends HTMLElement {
                 ? `--bg:${user.bg};--fg:${user.text};background:var(--bg);color:var(--fg);`
                 : `--bg:${bot.bg};--fg:${bot.text};background:var(--bg);color:var(--fg);`;
 
-
-              return `<div class="row ${isUser ? "user" : "bot"}" id="msg-${i}"><div class="bubble ${isUser ? "user" : "bot"}" style="${bubbleStyle}">${formatMessageHtml(m.content)}</div></div>`;
-                })
+              return `<div class="row ${isUser ? "user" : "bot"}" id="msg-${i}">
+                <div class="bubble ${isUser ? "user" : "bot"}" style="${bubbleStyle}">
+                  ${formatMessageHtml(m.content)}
+                </div>
+              </div>`;
+            })
             .join("");
 
     // floating closed => pill only
@@ -626,13 +758,15 @@ class AliigoWidget extends HTMLElement {
           <button class="pill" style="background:${send.bg};color:${send.text};">${t.pill(brand)}</button>
         </div>
       `;
+
       const btn = this.root.querySelector(".pill") as HTMLButtonElement | null;
       btn?.addEventListener("click", () => {
         this.state.open = true;
-        this.savePersisted();
+        this.savePersisted(false);
         this.pendingScroll = "bottom";
         this.render();
       });
+
       return;
     }
 
@@ -660,7 +794,7 @@ class AliigoWidget extends HTMLElement {
     const close = this.root.querySelector(".close") as HTMLButtonElement | null;
     close?.addEventListener("click", () => {
       this.state.open = false;
-      this.savePersisted();
+      this.savePersisted(false);
       this.render();
     });
 
@@ -684,7 +818,7 @@ class AliigoWidget extends HTMLElement {
 
     this.state.busy = true;
     this.state.msgs = [...this.state.msgs, { role: "user", content }];
-    this.savePersisted();
+    this.savePersisted(true);
     this.pendingScroll = "bottom";
     this.render();
 
@@ -703,29 +837,81 @@ class AliigoWidget extends HTMLElement {
         }),
       });
 
-      const raw = (await res.json().catch(() => ({}))) as { conversationId?: string; reply?: string; error?: string; locale?: string };
+      const raw = (await res.json().catch(() => ({}))) as {
+        conversationId?: string;
+        reply?: string;
+        error?: string;
+        locale?: string;
+      };
 
       if (!res.ok) {
+        const errText = (raw.error || "").toLowerCase();
+
+        // Auto-recover from "Session expired" once (refresh token, retry)
+        if (res.status === 403 && errText.includes("session expired")) {
+          const fresh = await this.tryRefreshSessionToken();
+
+          if (fresh) {
+            const retry = await fetch(`${apiBase}/api/conversation`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                token: fresh,
+                conversationId: this.state.conversationId,
+                externalRef: this.state.visitorSessionId,
+                message: content,
+                locale: this.state.locale,
+                channel: "web",
+              }),
+            });
+
+            const raw2 = (await retry.json().catch(() => ({}))) as {
+              conversationId?: string;
+              reply?: string;
+              error?: string;
+              locale?: string;
+            };
+
+            if (retry.ok) {
+              if (raw2.conversationId) this.state.conversationId = raw2.conversationId;
+              this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw2.reply || "" }];
+              this.state.busy = false;
+              this.savePersisted(true);
+              this.pendingScroll = "lastAssistantStart";
+              this.render();
+              return;
+            }
+
+            // retry failed
+            this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw2.error || "Error" }];
+            this.state.busy = false;
+            this.savePersisted(true);
+            this.pendingScroll = "lastAssistantStart";
+            this.render();
+            return;
+          }
+        }
+
+        // default error path
         this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.error || "Error" }];
         this.state.busy = false;
-        this.savePersisted();
+        this.savePersisted(true);
         this.pendingScroll = "lastAssistantStart";
         this.render();
         return;
       }
 
-
       if (raw.conversationId) this.state.conversationId = raw.conversationId;
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.reply || "" }];
       this.state.busy = false;
-      this.savePersisted();
+      this.savePersisted(true);
       this.pendingScroll = "lastAssistantStart";
       this.render();
     } catch {
       this.state.msgs = [...this.state.msgs, { role: "assistant", content: "Network error" }];
       this.pendingScroll = "lastAssistantStart";
       this.state.busy = false;
-      this.savePersisted();
+      this.savePersisted(true);
       this.render();
     }
   }
@@ -814,4 +1000,3 @@ function formatMessageHtml(raw: string) {
 if (!customElements.get("aliigo-widget")) {
   customElements.define("aliigo-widget", AliigoWidget);
 }
-
