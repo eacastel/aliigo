@@ -1,75 +1,44 @@
 // src/app/api/billing/status/route.ts
-
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { requireBusiness } from "@/lib/server/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type BillingStatus = "incomplete" | "trialing" | "active" | "canceled" | "past_due";
+type BillingPlan = "starter" | "growth" | null;
 
-
-
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, { status });
-}
-
-function getBearer(req: NextRequest) {
-  const auth = req.headers.get("authorization") || "";
-  return auth.startsWith("Bearer ") ? auth.slice(7) : "";
-}
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
-
-
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
-    const jwt = getBearer(req);
-    if (!jwt) return json({ error: "Unauthorized" }, 401);
+    const { businessId } = await requireBusiness(req);
 
-    // Validate user token (anon client with Authorization header)
-    const supabaseUser = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { global: { headers: { Authorization: `Bearer ${jwt}` } } }
-    );
-
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser();
-    const userId = userRes?.user?.id ?? null;
-    if (userErr || !userId) return json({ error: "Unauthorized" }, 401);
-
-    // Find business_id for this user
-    const prof = await supabaseAdmin
-      .from("business_profiles")
-      .select("business_id")
-      .eq("id", userId)
-      .maybeSingle<{ business_id: string | null }>();
-
-    if (prof.error) return json({ error: "Supabase error", details: prof.error.message }, 500);
-    const businessId = prof.data?.business_id ?? null;
-
-      if (!businessId) {
-        const status: BillingStatus = "incomplete";
-        return json({ status }, 200);
-      }
-
-    // Read billing status from businesses (placeholder logic)
-    const biz = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("businesses")
-      .select("billing_status")
+      .select("billing_status,billing_plan,trial_end,current_period_end,cancel_at_period_end")
       .eq("id", businessId)
-      .maybeSingle<{ billing_status: BillingStatus | null }>();
+      .single<{
+        billing_status: BillingStatus | null;
+        billing_plan: BillingPlan;
+        trial_end: string | null;
+        current_period_end: string | null;
+        cancel_at_period_end: boolean | null;
+      }>();
 
-    if (biz.error) return json({ error: "Supabase error", details: biz.error.message }, 500);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!data) return NextResponse.json({ error: "Business not found" }, { status: 404 });
 
-    const status: BillingStatus = biz.data?.billing_status ?? "incomplete";
-    return json({ status }, 200);
-  } catch (e: unknown) {
+
+    return NextResponse.json({
+      status: data?.billing_status ?? "incomplete",
+      plan: data?.billing_plan ?? null,
+      trial_end: data?.trial_end ?? null,
+      current_period_end: data?.current_period_end ?? null,
+      cancel_at_period_end: Boolean(data?.cancel_at_period_end),
+    });
+  } catch (e) {
+    if (e instanceof Response) return e;
     const msg = e instanceof Error ? e.message : "Server error";
-    return json({ error: msg }, 500);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

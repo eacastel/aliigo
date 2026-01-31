@@ -46,6 +46,17 @@ export default function SettingsAssistantPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // --- UI parity with Billing + Messages buttons ---
+  const btnBase =
+    "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-60 disabled:!cursor-not-allowed";
+
+  const btnBrand =
+    `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
+
+  const btnNeutral =
+    `${btnBase} bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40`;
+
+
   async function load() {
     setMsg(null);
     setLoading(true);
@@ -270,14 +281,14 @@ export default function SettingsAssistantPage() {
           <button
             onClick={save}
             disabled={!dirty || saving}
-            className="bg-white text-black rounded px-4 py-2 disabled:opacity-50"
+            className={btnBrand}
           >
             {saving ? "Saving…" : "Save"}
           </button>
 
           <button
             onClick={() => void load()}
-            className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
+            className={btnNeutral}
           >
             Reset changes
           </button>

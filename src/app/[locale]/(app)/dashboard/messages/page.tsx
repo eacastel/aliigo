@@ -383,7 +383,7 @@ export default function DashboardMessagesPage() {
                             onClick={() => openConversation(cid)}
                             className={[
                               "font-mono underline underline-offset-2",
-                              canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-not-allowed",
+                              canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-pointer disabled:cursor-not-allowed",
                             ].join(" ")}
                           >
                             {cidLabel}

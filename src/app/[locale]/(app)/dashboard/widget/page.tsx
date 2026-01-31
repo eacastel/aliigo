@@ -65,6 +65,18 @@ const splitTwoHex = (v?: string) => {
   };
 };
 
+  // --- UI parity with Billing + Messages buttons ---
+  const btnBase =
+    "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-60 disabled:!cursor-not-allowed";
+
+  const btnBrand =
+    `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
+
+  const btnNeutral =
+    `${btnBase} bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40`;
+
+  const btnNeutralStrong =
+    `${btnBase} bg-zinc-950/40 text-zinc-200 ring-zinc-700/60 hover:bg-zinc-900/50`;
 
 
 
@@ -656,7 +668,7 @@ export default function WidgetSettingsPage() {
 
           <div className="flex flex-wrap gap-2">
             <button
-              className="bg-white text-black rounded px-4 py-2 disabled:opacity-50"
+              className={btnBrand}
               onClick={saveTheme}
               disabled={!dirty || saving}
             >
@@ -664,7 +676,7 @@ export default function WidgetSettingsPage() {
             </button>
 
             <button
-              className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900 disabled:opacity-50"
+              className={btnNeutral}
               onClick={() => {
                 setTheme(initialTheme);
                 setBrand(initialBrand);
@@ -676,14 +688,14 @@ export default function WidgetSettingsPage() {
             </button>
 
             <button
-              className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
+              className={btnNeutralStrong}
               onClick={rotateToken}
             >
               Generate token
             </button>
 
             <button
-              className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
+              className={btnNeutralStrong}
               onClick={rotatePublicKey}
             >
               Rotate public key

@@ -31,7 +31,7 @@ function toSlug(name: string, fallback: string) {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function getAuthUserWithRetry(supabaseAdmin: SupabaseClient, id: string) {
-  const waits = [0, 200, 600, 1200]; // ms
+  const waits = [0, 300, 700, 1200, 2000, 3500, 5000]; // ~12s total
   for (const w of waits) {
     if (w) await sleep(w);
     const { data, error } = await supabaseAdmin.auth.admin.getUserById(id);
@@ -39,6 +39,7 @@ async function getAuthUserWithRetry(supabaseAdmin: SupabaseClient, id: string) {
   }
   return null;
 }
+
 
 function getClientIp(req: Request) {
   const xf = req.headers.get("x-forwarded-for");
@@ -132,6 +133,27 @@ export async function POST(req: Request) {
         { status: 400, headers: CORS }
       );
     }
+    if (source === "signup") {
+      if (!email || !String(email).trim()) {
+        return NextResponse.json(
+          { ok: false, where: "input", error: "Missing field: email" },
+          { status: 400, headers: CORS }
+        );
+      }
+      if (!nombre_contacto || !String(nombre_contacto).trim()) {
+        return NextResponse.json(
+          { ok: false, where: "input", error: "Missing field: nombre_contacto" },
+          { status: 400, headers: CORS }
+        );
+      }
+      if (!telefono || !String(telefono).trim()) {
+        return NextResponse.json(
+          { ok: false, where: "input", error: "Missing field: telefono" },
+          { status: 400, headers: CORS }
+        );
+      }
+    }
+
 
     // ✅ TS-safe narrowing boundary
     const id = idRaw as string;

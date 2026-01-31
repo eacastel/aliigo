@@ -29,10 +29,10 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
 
-    const redirectTo = `${window.location.origin}/${locale}/update-password`;
+    const redirectTo = `${window.location.origin}/${locale}/auth/callback?next=/update-password`;
 
     const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-      redirectTo,
+  redirectTo,
     });
 
     if (error) {

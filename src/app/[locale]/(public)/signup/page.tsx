@@ -38,7 +38,7 @@ export default function SignupPage() {
   const [businessName, setBusinessName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [company, setCompany] = useState(""); // honeypot
+  const [fax, setFax] = useState(""); // honeypot
 
   // UI State
   const [loading, setLoading] = useState(false);
@@ -77,8 +77,8 @@ export default function SignupPage() {
         id: input.id, // REQUIRED uuid
         email: input.email,
         nombre_negocio: input.businessName, // REQUIRED
-        nombre_contacto: input.name || null,
-        telefono: input.phone || null,
+        nombre_contacto: input.name,
+        telefono: input.phone,
         source: "signup",
       }),
     });
@@ -93,6 +93,42 @@ export default function SignupPage() {
     return j;
   }
 
+  async function ensureBusinessProfileWithRetry(input: {
+    id: string;
+    email: string;
+    name: string;
+    businessName: string;
+    phone: string;
+  }) {
+    // total ~10s max
+    const waits = [0, 300, 700, 1200, 2000, 2500, 3500];
+
+    let lastErr: unknown = null;
+
+    for (const w of waits) {
+      if (w) await new Promise((r) => setTimeout(r, w));
+      try {
+        return await ensureBusinessProfile(input);
+      } catch (e) {
+        lastErr = e;
+        const msg = e instanceof Error ? e.message : String(e);
+
+        // Only retry the known eventual-consistency error
+        const retryable =
+          /auth\.users/i.test(msg) ||
+          /after retry/i.test(msg) ||
+          /User not found/i.test(msg);
+
+        if (!retryable) throw e;
+      }
+    }
+
+    throw lastErr instanceof Error
+      ? lastErr
+      : new Error("profiles/ensure failed after retries");
+  }
+
+
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -103,21 +139,14 @@ export default function SignupPage() {
     const normalizedPhone = phone.trim();
 
     // Honeypot: if filled, silently pretend success (do not create account)
-    if (company.trim().length > 0) {
-      router.push("/check-email");
-      return;
-    }
-    setError(null);
-
-    // Honeypot: if filled, silently pretend success (do not create account)
-    if (company.trim().length > 0) {
+    if (fax.trim().length > 0) {
       router.push("/check-email");
       return;
     }
     setError(null);
 
     // Validation
-    if (!normalizedEmail || !normalizedBiz || !password) {
+    if (!normalizedEmail || !normalizedBiz || !password || !normalizedName || !normalizedPhone) {
       setError(t("errorValidation"));
       return;
     }
@@ -125,6 +154,7 @@ export default function SignupPage() {
       setError(t("errorPassword"));
       return;
     }
+
 
     setLoading(true);
     try {
@@ -156,7 +186,7 @@ export default function SignupPage() {
       }
 
       // Create/link business + profile (server)
-      await ensureBusinessProfile({
+      await ensureBusinessProfileWithRetry({
         id: userId,
         email: normalizedEmail,
         name: normalizedName,
@@ -235,12 +265,12 @@ export default function SignupPage() {
           className="absolute -left-[10000px] top-auto w-px h-px overflow-hidden"
         >
           <label>
-            Company
+            Fax
             <input
               type="text"
-              name="company"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
+              name="fax"
+              value={fax}
+              onChange={(e) => setFax(e.target.value)}
               tabIndex={-1}
               autoComplete="off"
             />
@@ -257,6 +287,7 @@ export default function SignupPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+            required
           />
         </div>
 
@@ -285,6 +316,7 @@ export default function SignupPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+              required
             />
           </div>
 
