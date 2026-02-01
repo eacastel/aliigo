@@ -8,16 +8,24 @@ declare module "react" {
         HTMLElement
       > & {
         "embed-key"?: string;
-        variant?: "floating" | "inline" | "hero";
-        "api-base"?: string;
-        locale?: string;
-        "session-token"?: string;
-        theme?: string;
-        "floating-mode"?: "fixed" | "absolute";
-        "start-open"?: "true" | "false"; 
-        brand?: string;                  
+        variant?: "floating" | "inline" | "hero" | string;
 
-        [key: `data-${string}`]: string | undefined;
+        // session modes
+        "embed-key"?: string;
+        "session-token"?: string;
+
+        // config
+        "api-base"?: string;
+        locale?: "en" | "es" | string;
+        brand?: string;
+        theme?: string; // JSON string: {"headerBg":"#111827 #fff", ...}
+
+        // floating
+        "floating-mode"?: "fixed" | "absolute" | string;
+        "start-open"?: boolean | "true" | "false";
+
+        // allow any other attrs without fighting TS
+        [key: string]: any;
       };
     }
   }

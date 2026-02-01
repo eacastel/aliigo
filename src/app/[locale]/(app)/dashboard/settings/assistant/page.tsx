@@ -46,7 +46,7 @@ export default function SettingsAssistantPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // --- UI parity with Billing + Messages buttons ---
+  // --- UI parity buttons ---
   const btnBase =
     "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-60 disabled:!cursor-not-allowed";
 

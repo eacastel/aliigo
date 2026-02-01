@@ -118,22 +118,26 @@
       "titleHighlight": "una voz.",
       "subtitle": "Aliigo es un asistente de IA integrado en tu sitio web. Responde preguntas, entiende la intención y convierte conversaciones en oportunidades cualificadas de forma automática.",
       "ctaPrimary": "Empezar",
-      "ctaSecondary": "Ver en acción"
+      "ctaSecondary": "Ver en acción",
+      "qualifier": "Ideal si tu web recibe tráfico constante o si recibes muchas consultas repetidas."
+
     },
     "demo": {
-      "badge": "Demo en vivo del asistente",
-      "titleLine1": "Conoce Aliigo.",
-      "titleLine2": "Tu asistente de IA para convertir visitas en oportunidades.",
-      "subtitle": "Aliigo vive en tu web. Responde al instante, detecta la intención del visitante y ayuda a captar oportunidades cualificadas, 24/7.",
-      "pricingPrefix": "Planes desde",
-      "price": "99€/mes",
-      "pricingSuffix": ". El precio escala según el volumen de mensajes y el nivel de personalización.",
-      "prompts": {
-        "p1": "¿Cómo capta oportunidades Aliigo?",
-        "p2": "¿Cuánto tarda la instalación?",
-        "p3": "¿Cómo funciona el precio?"
-      },
-      "liveTag": "En vivo"
+      "badge": "Demo interactiva en vivo",
+      "headlineLine1": "No te quedes solo con la teoría.",
+      "headlineEmphasis": "Pruébalo ahora mismo.",
+      "subtitle": "Escribe tu pregunta. Y observa cómo Aliigo responde consultas complejas, cualifica contactos y reserva reuniones en segundos—sin un agente humano.",
+      "feature1": "Respuestas instantáneas con IA",
+      "feature2": "Cualificación automática de contactos",
+      "cta": "Empieza la prueba gratis →",
+      "phone": {
+        "time": "9:41",
+        "statusConnection": "Conexión",
+        "statusWifi": "WiFi",
+        "statusBattery": "Batería",
+        "agentName": "Agente de soporte",
+        "agentSub": "Responde al instante, casi siempre"
+      }
     },
     "socialProof": {
       "title": "CASOS DONDE UNA CONVERSACIÓN MARCA LA DIFERENCIA",
@@ -146,32 +150,85 @@
         "nextStep": "Guiar al siguiente paso: llamar, reservar o contactar"
       }
     },
-    "features": {
-      "title": "Qué hace el asistente",
-      "subtitle": "Sin complejidad. Solo respuestas claras y mejores conversaciones.",
-      "f1": {
-        "title": "Responde al instante",
-        "desc": "Aliigo responde 24/7 usando la información real de tu negocio: servicios, horarios, ubicación, políticas y siguientes pasos."
+    "featuresGrid": {
+      "title": "Mucho más que un simple chat.",
+      "subtitle": "Aliigo no solo responde. Entiende tu negocio y convierte conversaciones en resultados.",
+
+      "card1": {
+        "title": "Aprende de tu contenido al instante",
+        "desc": "Sin diagramas ni flujos manuales. Aliigo analiza tu web, PDFs y documentos para crear una base de conocimiento que responde bien desde el primer día.",
+        "syncLabel": "ESTADO_SYNC: ACTIVO",
+        "tagUrl": "URL",
+        "tagPdf": "PDF",
+        "tagDoc": "DOC",
+        "imported": "Importado",
+        "scanning": "Analizando…"
       },
-      "f2": {
-        "title": "Entiende la intención",
-        "desc": "No se limita a responder. Detecta cuándo una persona está lista para contactar, reservar o pedir más información."
+
+      "card2": {
+        "title": "Capta contactos de forma natural",
+        "desc": "Detecta la intención y solo pide datos cuando hay interés real.",
+        "notifTitle": "Nuevo contacto captado"
       },
-      "f3": {
-        "title": "Capta oportunidades de forma natural",
-        "desc": "Cuando hay interés real, Aliigo solicita datos de contacto dentro de la conversación. Sin formularios. Sin fricción."
-      },
-      "f4": {
+
+      "card3": {
         "title": "Guía el siguiente paso",
-        "desc": "Llamadas, reservas, formularios o seguimiento. El asistente sugiere la acción adecuada según tu negocio."
+        "desc": "No se queda en el texto. Muestra acciones para reservar, iniciar una prueba o abrir la página correcta.",
+        "cta": "Agenda una cita"
+      },
+
+      "card4": {
+        "title": "Visibilidad total de las conversaciones",
+        "desc": "Descubre qué preguntan tus clientes, detecta oportunidades de mejora y aumenta la conversión con el tiempo.",
+        "chartMon": "Lun",
+        "chartSun": "Dom"
       }
     },
     "pricing": {
-      "title": "Un precio simple",
-      "desc": "Un asistente ajustado a tu negocio. El precio escala según uso y personalización.",
-      "price": "99€",
+      "title": "Transforma tus conversaciones en clientes",
+      "badge": "Prueba gratis de 30 días en todos los planes",
       "period": "/mes",
-      "cta": "Empezar"
+      "from": "desde",
+
+      "starter": {
+        "name": "Starter",
+        "subtitle": "Para negocios con tráfico web que quieren convertir visitas en contactos.",
+        "cta": "Empieza la prueba gratis",
+        "features": {
+          "f1": "Asistente de chat inteligente en tu web",
+          "f2": "Incluye un buen volumen de conversaciones",
+          "f3": "Configuración básica del negocio",
+          "f4": "Captura de contactos (nombre y email)",
+          "f5": "Soporte en español e inglés"
+        }
+      },
+
+      "growth": {
+        "name": "Growth",
+        "subtitle": "Para equipos de servicios con tráfico constante que necesitan cualificar y priorizar contactos.",
+        "tag": "Mejor opción",
+        "cta": "Empieza la prueba gratis",
+        "plusLabel": "Todo lo de Starter, y además:",
+        "features": {
+          "f1": "Más volumen de conversaciones",
+          "f2": "Personalización más avanzada",
+          "f3": "Cualificación de contactos más precisa",
+          "f4": "Prioridad a visitantes con alta intención"
+        }
+      },
+
+      "pro": {
+        "name": "Pro",
+        "subtitle": "Para negocios con mucho tráfico o clientes de alto valor que requieren flujos a medida.",
+        "cta": "Hablar con ventas",
+        "plusLabel": "Todo lo de Growth, y además:",
+        "features": {
+          "f1": "Personalización a medida",
+          "f2": "Mensajes ilimitados",
+          "f3": "Comportamientos y flujos personalizados",
+          "f4": "Gestor de cuenta dedicado"
+        }
+      }
     },
     "howItWorks": {
       "title": "Cómo funciona",
@@ -209,7 +266,7 @@
       }
     },
     "finalCta": {
-      "title": "Deja que tu web responda por sí misma",
+      "title": "Convierte visitas en oportunidades cualificadas",
       "button": "Empezar"
     }
   },

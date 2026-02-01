@@ -117,22 +117,30 @@
       "titleHighlight": "a voice.",
       "subtitle": "Aliigo is an AI assistant that lives on your website. It answers questions, understands intent, and turns real conversations into qualified leads automatically.",
       "ctaPrimary": "Get started",
-      "ctaSecondary": "See it in action"
+      "ctaSecondary": "See it in action",
+      "qualifier": "Best for businesses with consistent website traffic or a high volume of repetitive customer questions."
+
     },
     "demo": {
-      "badge": "Live assistant demo",
-      "titleLine1": "Meet Aliigo.",
-      "titleLine2": "Your AI assistant for converting visitors into leads.",
-      "subtitle": "Aliigo lives on your website. It answers instantly, understands visitor intent, and helps you capture qualified leads, 24/7.",
-      "pricingPrefix": "Plans from",
-      "price": "€99/month",
-      "pricingSuffix": ". Pricing scales with message volume and customization.",
-      "prompts": {
-        "p1": "How does Aliigo capture leads?",
-        "p2": "How long does setup take?",
-        "p3": "How does pricing work?"
-      },
-      "liveTag": "Live"
+      "badge": "Live interactive demo",
+      "headlineLine1": "Don’t just read about it.",
+      "headlineEmphasis": "Try it right now.",
+      "subtitle": "Type a question below. See how Aliigo answers complex questions, qualifies contacts, and books meetings in seconds—without a human agent.",
+
+      "feature1": "Instant AI replies",
+      "feature2": "Automatic contact qualification",
+
+      "cta": "Start free trial →",
+
+      "phone": {
+        "time": "9:41",
+        "statusConnection": "Connection",
+        "statusWifi": "WiFi",
+        "statusBattery": "Batt",
+
+        "agentName": "Support Agent",
+        "agentSub": "Typically replies instantly"
+      }
     },
     "socialProof": {
       "title": "WHERE A CONVERSATION CHANGES EVERYTHING",
@@ -145,32 +153,82 @@
         "nextStep": "Drive the next step: call, book, or contact"
       }
     },
-    "features": {
-      "title": "What the assistant does",
-      "subtitle": "No complexity. Just clear answers and better conversations.",
-      "f1": {
-        "title": "Answers instantly",
-        "desc": "Aliigo replies 24/7 using your business information: services, hours, location, policies, and next steps."
+    "featuresGrid": {
+      "title": "More than just a chat window.",
+      "subtitle": "Aliigo doesn’t just “chat.” It understands your business logic to drive real results.",
+
+      "card1": {
+        "title": "Trains on your data instantly",
+        "desc": "No manual flowcharting. Aliigo scans your website, PDFs, and docs to build a knowledge base that answers accurately from day one.",
+        "syncLabel": "SYNC_STATUS: ACTIVE",
+        "tagUrl": "URL",
+        "tagPdf": "PDF",
+        "tagDoc": "DOC",
+        "imported": "Imported",
+        "scanning": "Scanning…"
       },
-      "f2": {
-        "title": "Understands intent",
-        "desc": "It does not only answer questions. It detects when someone is ready to book, call, or request more information."
+
+      "card2": {
+        "title": "Captures contacts naturally",
+        "desc": "It detects intent and asks for details only when someone is genuinely interested.",
+        "notifTitle": "New contact captured"
       },
-      "f3": {
-        "title": "Captures leads naturally",
-        "desc": "When there is real interest, Aliigo asks for contact details as part of the conversation. No forms. No friction."
+
+      "card3": {
+        "title": "Drives the next step",
+        "desc": "More than text. It can show action buttons to book meetings, start trials, or open the right page.",
+        "cta": "Book a demo"
       },
-      "f4": {
-        "title": "Guides the next step",
-        "desc": "Calls, bookings, forms, or follow-ups. The assistant suggests the right action based on your business."
+
+      "card4": {
+        "title": "Full visibility into conversations",
+        "desc": "See what customers ask, spot content gaps, and watch your conversion rate improve over time.",
+        "chartMon": "Mon",
+        "chartSun": "Sun"
       }
     },
     "pricing": {
-      "title": "Simple pricing",
-      "desc": "One assistant, tuned to your business. Pricing scales with usage and customization.",
-      "price": "€99",
+      "title": "Invest in conversations that convert",
+      "badge": "30-day free trial on all plans",
       "period": "/month",
-      "cta": "Get started"
+      "from": "from",
+      "starter": {
+        "name": "Starter",
+        "subtitle": "For businesses with website traffic that want to turn visits into contacts.",
+        "cta": "Try free for 30 days",
+        "features": {
+          "f1": "Smart website chat assistant",
+          "f2": "Generous conversation allowance",
+          "f3": "Basic business configuration",
+          "f4": "Lead capture (name, email)",
+          "f5": "English & Spanish support"
+        }
+      },
+      "growth": {
+        "name": "Growth",
+        "subtitle": "For service teams with steady traffic that need to qualify and prioritize contacts.",
+        "tag": "Best value",
+        "cta": "Try free for 30 days",
+        "plusLabel": "Everything in Starter, plus:",
+        "features": {
+          "f1": "Higher conversation allowance",
+          "f2": "Deeper business customization",
+          "f3": "Smarter lead qualification",
+          "f4": "Priority handling for high-intent visitors"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "subtitle": "For high-traffic or high-value businesses that require custom flows.",
+        "cta": "Contact sales",
+        "plusLabel": "Everything in Growth, plus:",
+        "features": {
+          "f1": "Advanced customization",
+          "f2": "Unlimited message volume",
+          "f3": "Custom behavior & flows",
+          "f4": "Dedicated account manager"
+        }
+      }
     },
     "howItWorks": {
       "title": "How it works",
@@ -208,7 +266,7 @@
       }
     },
     "finalCta": {
-      "title": "Let your website answer for itself",
+      "title": "Turn visitors into qualified leads",
       "button": "Get started"
     }
   },
