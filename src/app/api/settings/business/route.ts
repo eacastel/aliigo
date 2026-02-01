@@ -16,6 +16,7 @@ type BusinessPayload = {
   name?: string | null;
   timezone?: string | null;
   system_prompt?: string | null;
+  qualification_prompt?: string | null;
   knowledge?: string | null;
   allowed_domains?: string[] | null;
   default_locale?: "en" | "es" | string | null;
@@ -109,6 +110,7 @@ export async function POST(req: NextRequest) {
       const name = nonEmpty(body.business.name);
       const tz = nonEmpty(body.business.timezone);
       const sp = body.business.system_prompt ?? undefined;
+      const qp = body.business.qualification_prompt ?? undefined; 
       const knowledge = body.business.knowledge ?? undefined;
       const domains = normalizeDomains(body.business.allowed_domains);
 
@@ -120,6 +122,7 @@ export async function POST(req: NextRequest) {
       if (name !== null && name !== undefined) nextBiz.name = name;
       if (tz !== null && tz !== undefined) nextBiz.timezone = tz;
       if (sp !== undefined) nextBiz.system_prompt = nonEmpty(sp);
+      if (qp !== undefined) nextBiz.qualification_prompt = nonEmpty(qp);
       if (knowledge !== undefined) nextBiz.knowledge = nonEmpty(knowledge);
       if (domains !== null) nextBiz.allowed_domains = domains;
       if (dlRaw !== undefined) nextBiz.default_locale = defaultLocale;
@@ -138,7 +141,7 @@ export async function POST(req: NextRequest) {
     // 6) Return current business row
     const { data: currentBiz, error: readErr } = await admin
       .from("businesses")
-      .select("id, slug, name, timezone, system_prompt, knowledge, allowed_domains, public_embed_key, default_locale")
+      .select("id, slug, name, timezone, system_prompt, qualification_prompt, knowledge, allowed_domains, public_embed_key, default_locale")
       .eq("id", businessId)
       .single();
 

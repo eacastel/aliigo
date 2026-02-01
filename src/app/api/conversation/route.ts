@@ -1,10 +1,7 @@
-// src/app/api/conversation/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { originHost, hostAllowed } from "@/lib/embedGate";
-
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,7 +29,9 @@ type MessagesRow = { role: ChatRole; content: string; created_at: string };
 
 class RateLimitError extends Error {
   status = 429 as const;
-  constructor(m = "Rate limited") { super(m); }
+  constructor(m = "Rate limited") {
+    super(m);
+  }
 }
 
 function sanitizeHost(v: string) {
@@ -61,30 +60,61 @@ function clientIp(req: NextRequest) {
   return fwd?.split(",")[0]?.trim() || "0.0.0.0";
 }
 
+// --- lead intent heuristic (simple keywords; expand as needed) ---
+function wantsLead(s: string) {
+  return /precio|presupuesto|cita|reserva|comprar|contratar|cotización|quote|price|book|schedule|estimate|budget/i.test(
+    s || ""
+  );
+}
 
-function embedHostFromReq(req: NextRequest): string {
-  // Prefer explicit host passed in referer: /es/chat?...&host=asociacion-avast.org
-  const ref = req.headers.get("referer") || "";
+
+type ToolExtract = { name: string; arguments: string };
+
+function getFunctionToolCall(
+  tc: OpenAI.Chat.Completions.ChatCompletionMessageToolCall | null | undefined
+): ToolExtract | null {
+  if (!tc) return null;
+  if (tc.type !== "function") return null;
+
+  // After tc.type narrowing, tc.function exists on this variant.
+  const fn = tc.function;
+
+  if (!fn || typeof fn.name !== "string") return null;
+
+  return {
+    name: fn.name,
+    arguments: typeof fn.arguments === "string" ? fn.arguments : "{}",
+  };
+}
+
+function safeJsonParseObject(raw: string): Record<string, unknown> {
   try {
-    const u = new URL(ref);
-    const h = (u.searchParams.get("host") || "").trim().toLowerCase();
-    return h.replace(/:\d+$/, "");
+    const v: unknown = JSON.parse(raw);
+    if (v && typeof v === "object" && !Array.isArray(v)) return v as Record<string, unknown>;
+    return {};
   } catch {
-    return "";
+    return {};
   }
 }
 
-// --- lead intent heuristic (simple keywords; expand as needed) ---
-function wantsLead(s: string) {
-  return /precio|presupuesto|cita|reserva|comprar|contratar|cotización|quote|price|book|schedule|estimate|budget/i.test(s || "");
+function asString(v: unknown): string | null {
+  return typeof v === "string" ? v : null;
 }
+
+function asArray(v: unknown): unknown[] {
+  return Array.isArray(v) ? v : [];
+}
+
+
 
 async function rateLimit(businessId: string, ip: string) {
   const WINDOW_MS = process.env.NODE_ENV === "production" ? 5 * 60 * 1000 : 30 * 1000;
   const LIMIT = process.env.NODE_ENV === "production" ? 20 : 1000;
 
   const ins = await supabase.from("rate_events").insert({
-    ip, bucket: `chat:${businessId}`, business_id: businessId,
+    ip,
+    bucket: `chat:${businessId}`,
+    business_id: businessId,
   });
   if (ins.error) throw ins.error;
 
@@ -147,21 +177,12 @@ async function validateEmbedAccess(token: string, host: string) {
   }
 
   // 2) legacy fallback (keep temporarily; remove later)
-  const tok = await supabase
-    .from("embed_tokens")
-    .select("business_id")
-    .eq("token", token)
-    .single();
-
+  const tok = await supabase.from("embed_tokens").select("business_id").eq("token", token).single();
   if (tok.error || !tok.data) return { ok: false as const, reason: "Invalid token" };
 
-  const biz = await supabase
-    .from("businesses")
-    .select("id,allowed_domains")
-    .eq("id", tok.data.business_id)
-    .single();
-
+  const biz = await supabase.from("businesses").select("id,allowed_domains").eq("id", tok.data.business_id).single();
   if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
+
   if (!hostAllowed(host, biz.data.allowed_domains)) {
     return { ok: false as const, reason: "Domain not allowed" };
   }
@@ -169,6 +190,125 @@ async function validateEmbedAccess(token: string, host: string) {
   return { ok: true as const, businessId: biz.data.id };
 }
 
+// -------------------- Actions schema --------------------
+
+type ActionCollectLead = {
+  type: "collect_lead";
+  fields: Array<"name" | "email" | "phone">; // widget shows a small form
+  reason?: string; // optional internal hint
+};
+
+type ActionCta = {
+  type: "cta";
+  label: string;
+  url: string;
+};
+
+type Action = ActionCollectLead | ActionCta;
+
+function isAction(v: unknown): v is Action {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+
+  if (o.type === "collect_lead") {
+    const fields = o.fields;
+    if (!Array.isArray(fields) || fields.length < 1) return false;
+    return fields.every((f) => f === "name" || f === "email" || f === "phone");
+  }
+
+  if (o.type === "cta") {
+    return typeof o.label === "string" && typeof o.url === "string";
+  }
+
+  return false;
+}
+
+type LeadPayload = {
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+};
+
+function normalizeEmail(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const s = v.trim().toLowerCase();
+  if (!s) return null;
+  // minimal check; don’t over-validate
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return null;
+  return s.slice(0, 254);
+}
+
+function normalizePhone(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const s = v.trim();
+  if (!s) return null;
+  return s.slice(0, 40);
+}
+
+function normalizeName(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const s = v.trim();
+  if (!s) return null;
+  return s.slice(0, 120);
+}
+
+function normalizeLead(lead: LeadPayload): LeadPayload {
+  return {
+    name: normalizeName(lead.name),
+    email: normalizeEmail(lead.email),
+    phone: normalizePhone(lead.phone),
+  };
+}
+
+function hasAnyLead(lead: LeadPayload | null | undefined) {
+  return !!(lead?.email || lead?.phone || lead?.name);
+}
+
+async function saveLeadClean(opts: {
+  businessId: string;
+  conversationId: string;
+  channel: Channel;
+  host: string;
+  externalRef: string | null;
+  ip: string;
+  lead: LeadPayload;
+}) {
+  const lead = normalizeLead(opts.lead);
+
+  if (!hasAnyLead(lead)) return;
+
+  const ins = await supabase.from("leads").insert({
+    business_id: opts.businessId,
+    conversation_id: opts.conversationId,
+    channel: opts.channel,
+    source_host: opts.host,
+    external_ref: opts.externalRef,
+    ip: opts.ip,
+    name: lead.name ?? null,
+    email: lead.email ?? null,
+    phone: lead.phone ?? null,
+  });
+
+  if (ins.error) throw ins.error;
+}
+
+async function trySaveLead(opts: {
+  businessId: string;
+  conversationId: string;
+  channel: Channel;
+  host: string;
+  externalRef: string | null;
+  ip: string;
+  lead: LeadPayload;
+}) {
+  try {
+    await saveLeadClean(opts);
+  } catch (e) {
+    console.error("Lead save failed:", e);
+  }
+}
+
+// -------------------- HTTP --------------------
 
 export async function OPTIONS(req: NextRequest) {
   return new NextResponse(null, { status: 200, headers: corsHeadersFor(req) });
@@ -188,10 +328,22 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   }
+
   try {
     const ip = clientIp(req);
 
-    // 1) Parse body first
+    const body = (await req.json()) as {
+      token?: string;
+      conversationId?: string;
+      externalRef?: string;
+      message?: string;
+      customerName?: string;
+      channel?: unknown;
+      locale?: unknown;
+      // NEW: allow widget to pass structured lead directly
+      lead?: LeadPayload;
+    };
+
     const {
       token,
       conversationId: inputConvId,
@@ -200,26 +352,16 @@ export async function POST(req: NextRequest) {
       customerName,
       channel: bodyChannel,
       locale: bodyLocale,
-    } = (await req.json()) as {
-      token?: string;
-      conversationId?: string;
-      externalRef?: string;
-      message?: string;
-      customerName?: string;
-      host?: string;
-      channel?: unknown;
-      locale?: unknown;
-    };
+      lead: leadFromClient,
+    } = body;
 
     const ch: Channel = isChannel(bodyChannel) ? bodyChannel : "web";
 
     const externalRef =
       typeof inputExternalRef === "string" ? inputExternalRef.trim().slice(0, 120) : null;
 
-
-    // 2) Then compute host
     const origin = req.headers.get("origin") || "";
-    const host = sanitizeHost(originHost(req));
+    const host = sanitizeHost(origin ? new URL(origin).host : originHost(req));
 
     // Enterprise hardening: for embed session tokens, we expect an Origin.
     // If origin is missing, we allow only same-site requests from aliigo.com.
@@ -230,7 +372,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!message) {
+    if (!message || typeof message !== "string") {
       return NextResponse.json(
         { error: "Missing message" },
         { status: 400, headers: corsHeadersFor(req) }
@@ -240,7 +382,10 @@ export async function POST(req: NextRequest) {
     // token + domain gate
     const gate = await validateEmbedAccess(token || "", host);
     if (!gate.ok) {
-      return NextResponse.json({ error: `Forbidden: ${gate.reason}` }, { status: 403, headers: corsHeadersFor(req) });
+      return NextResponse.json(
+        { error: `Forbidden: ${gate.reason}` },
+        { status: 403, headers: corsHeadersFor(req) }
+      );
     }
     const businessId = gate.businessId;
 
@@ -264,12 +409,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    
-
-    // business prompt (also gives us default_locale)
+    // business prompt (also gives us default_locale + qualification_prompt)
     const bizRes = await supabase
       .from("businesses")
-      .select("name, timezone, system_prompt, slug, knowledge, default_locale")
+      .select("name, timezone, system_prompt, slug, knowledge, default_locale, qualification_prompt")
       .eq("id", businessId)
       .single<{
         name: string;
@@ -278,16 +421,14 @@ export async function POST(req: NextRequest) {
         slug: string;
         knowledge: string | null;
         default_locale: string | null;
+        qualification_prompt: string | null;
       }>();
 
     if (bizRes.error) throw bizRes.error;
     if (!bizRes.data) throw new Error("Business not found");
 
     const supported = new Set(["en", "es", "fr", "it", "de"]);
-
-    const requestedLocale =
-      typeof bodyLocale === "string" ? bodyLocale.toLowerCase().trim() : "";
-
+    const requestedLocale = typeof bodyLocale === "string" ? bodyLocale.toLowerCase().trim() : "";
     const localeRaw = requestedLocale || (bizRes.data.default_locale || "en").toLowerCase().trim();
     const locale = supported.has(localeRaw) ? localeRaw : "en";
 
@@ -295,8 +436,6 @@ export async function POST(req: NextRequest) {
     let conversationId = inputConvId ?? null;
 
     if (!conversationId) {
-      // 1) Reuse latest conversation for this visitor/session (if we have externalRef)
-      // Only if it has recent activity (<= 30 minutes)
       if (externalRef) {
         const cutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
@@ -315,7 +454,6 @@ export async function POST(req: NextRequest) {
         if (existing.data?.id) conversationId = existing.data.id;
       }
 
-      // 2) Otherwise create a new conversation
       if (!conversationId) {
         const convRes = await supabase
           .from("conversations")
@@ -343,20 +481,17 @@ export async function POST(req: NextRequest) {
       channel: ch,
       role: "user",
       content: message,
-      meta: {},
+      meta: hasAnyLead(leadFromClient) ? { lead: leadFromClient } : {},
     });
     if (m1.error) throw m1.error;
 
-    // touch conversation (for reuse-by-external_ref + last_message_at)
+    // touch conversation
     const now = new Date().toISOString();
     const convTouch = await supabase
       .from("conversations")
-      .update(
-        { last_message_at: now, last_seen_at: now },
-      )
+      .update({ last_message_at: now, last_seen_at: now })
       .eq("id", conversationId)
       .eq("business_id", businessId);
-
     if (convTouch.error) throw convTouch.error;
 
     // last 20 for context
@@ -369,24 +504,26 @@ export async function POST(req: NextRequest) {
 
     const history = (historyRes.data as MessagesRow[]) ?? [];
 
-
-
     const langName =
-      locale === "es" ? "Spanish (Castilian)" :
-        locale === "fr" ? "French" :
-          locale === "it" ? "Italian" :
-            locale === "de" ? "German" :
-              "English";
+      locale === "es"
+        ? "Spanish (Castilian)"
+        : locale === "fr"
+        ? "French"
+        : locale === "it"
+        ? "Italian"
+        : locale === "de"
+        ? "German"
+        : "English";
 
     const defaultSys = `You are the AI concierge for ${bizRes.data?.name ?? "the business"} (${bizRes.data?.slug ?? ""}).
 
-    IMPORTANT:
-    - Always reply in ${langName}.
-    - Do NOT switch languages unless the user explicitly asks.
-    - Be concise, friendly, and professional.
+IMPORTANT:
+- Always reply in ${langName}.
+- Do NOT switch languages unless the user explicitly asks.
+- Be concise, friendly, and professional.
+- If you are unsure of a fact, say so briefly.
 
-    Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.
-    If you are unsure of a fact, say so briefly.`;
+Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.`;
 
     let sys = (bizRes.data?.system_prompt ?? "").trim() || defaultSys;
 
@@ -394,45 +531,139 @@ export async function POST(req: NextRequest) {
     if (knowledge) {
       sys += `
 
-    Business knowledge (authoritative): 
-    ${knowledge}
+Business knowledge (authoritative):
+${knowledge}
 
-    Rules:
-    - Prefer the business knowledge when answering.
-    - If the knowledge does not cover it, say so briefly and ask 1 follow-up question.`;
+Rules:
+- Prefer the business knowledge when answering.
+- If the knowledge does not cover it, say so briefly and ask 1 follow-up question.`;
     }
-    // lead intent → collect contact details
-    if (wantsLead(message)) {
+
+    // NEW: inject qualification criteria
+    const qual = (bizRes.data?.qualification_prompt ?? "").trim();
+    if (qual) {
       sys += `
 
-    Lead intent detected.
-    - Ask for full name, email, and phone in ONE short message.
-    - After collecting, confirm we'll contact them soon and offer to keep answering questions.
-    - Keep it under ~4 sentences. Do not invent prices or guarantees.`;
+Qualification criteria (authoritative):
+${qual}
+
+Rules:
+- Use this to decide whether the visitor looks like a good fit.
+- If they are a good fit, guide them to the next step (and you may propose a CTA action).
+- If they are not a fit or unclear, ask 1 short clarifying question and avoid over-qualifying.`;
     }
 
-    // reply
+    // Lead intent -> bias toward collect lead action
+    const leadIntent = wantsLead(message);
+
+    // Default fallback reply if OpenAI not available
     let reply =
       locale === "es"
         ? "Gracias por tu mensaje. Te respondemos enseguida."
         : locale === "fr"
-          ? "Merci pour votre message. Nous vous répondons tout de suite."
-          : locale === "it"
-            ? "Grazie per il messaggio. Ti rispondiamo subito."
-            : locale === "de"
-              ? "Danke für deine Nachricht. Wir antworten gleich."
-              : "Thanks for your message. We'll reply right away.";
+        ? "Merci pour votre message. Nous vous répondons tout de suite."
+        : locale === "it"
+        ? "Grazie per il messaggio. Ti rispondiamo subito."
+        : locale === "de"
+        ? "Danke für deine Nachricht. Wir antworten gleich."
+        : "Thanks for your message. We'll reply right away.";
 
+    let actions: Action[] = [];
+    let extractedLead: LeadPayload | null = null;
+    const leadAlreadySent = hasAnyLead(leadFromClient);
+
+    // Always save explicit lead from widget if present (even before OpenAI)
+    
+    if (hasAnyLead(leadFromClient)) {
+      await trySaveLead({
+        businessId,
+        conversationId,
+        channel: ch,
+        host,
+        externalRef,
+        ip,
+        lead: leadFromClient!,
+      });
+    }
 
     if (openai) {
       try {
+        const toolDef: OpenAI.Chat.Completions.ChatCompletionTool = {
+          type: "function",
+          function: {
+            name: "aliigo_response",
+            description:
+              "Return the assistant reply plus optional UI actions. Optionally extract lead details if provided by the user.",
+            parameters: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                reply: { type: "string" },
+                actions: {
+                  type: "array",
+                  items: {
+                    oneOf: [
+                      {
+                        type: "object",
+                        additionalProperties: false,
+                        properties: {
+                          type: { const: "collect_lead" },
+                          fields: {
+                            type: "array",
+                            items: { enum: ["name", "email", "phone"] },
+                            minItems: 1,
+                          },
+                          reason: { type: "string" },
+                        },
+                        required: ["type", "fields"],
+                      },
+                      {
+                        type: "object",
+                        additionalProperties: false,
+                        properties: {
+                          type: { const: "cta" },
+                          label: { type: "string" },
+                          url: { type: "string" },
+                        },
+                        required: ["type", "label", "url"],
+                      },
+                    ],
+                  },
+                },
+                lead: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    name: { type: ["string", "null"] },
+                    email: { type: ["string", "null"] },
+                    phone: { type: ["string", "null"] },
+                  },
+                },
+              },
+              required: ["reply"],
+            },
+          },
+        };
+
         const messages = [
           { role: "system" as const, content: sys },
+          // tiny instruction layer to force tool use / policy
+          {
+            role: "system" as const,
+            content: `Output requirements:
+          - You MUST call the tool "aliigo_response".
+          - Keep reply concise (<= 5 short sentences).
+          - The visitor-facing reply must be in the language specified in the system prompt.
+          - If lead intent is detected OR if the visitor asks about pricing, quotes, booking, availability, or next steps:
+            - Ask them to share at least ONE contact method in chat (email OR phone). Prefer email.
+            - If they also share their name, capture it.
+            - Explain in one short sentence why (e.g., "so we can send details / confirm availability").
+          - Prefer actions {type:"collect_lead", fields:["name","email","phone"]} when lead intent is detected, even if the UI doesn't render it yet.
+          - Only extract lead fields if the user explicitly provides them (don’t invent).
+          `
+          },
           ...history.map((m) => ({
-            role: (m.role === "tool" ? "system" : m.role) as
-              | "user"
-              | "assistant"
-              | "system",
+            role: (m.role === "tool" ? "system" : m.role) as "user" | "assistant" | "system",
             content: m.content,
           })),
         ];
@@ -440,71 +671,105 @@ export async function POST(req: NextRequest) {
         const completion = await openai.chat.completions.create({
           model: process.env.OPENAI_MODEL || "gpt-4o-mini",
           messages,
+          tools: [toolDef],
+          tool_choice: { type: "function", function: { name: "aliigo_response" } },
           temperature: 0.3,
-          max_tokens: 300,
+          max_tokens: 450,
         });
 
-        reply = completion.choices?.[0]?.message?.content?.trim() || reply;
+        const choice = completion.choices?.[0];
+        const toolCalls = choice?.message?.tool_calls;
+        const first = Array.isArray(toolCalls) ? toolCalls[0] : null;
+
+        const extracted = getFunctionToolCall(first);
+
+        if (extracted?.name === "aliigo_response") {
+          const obj = safeJsonParseObject(extracted.arguments);
+
+          const replyFromTool = asString(obj.reply);
+          if (replyFromTool) {
+            reply = replyFromTool.trim();
+            if (reply.length > 900) reply = reply.slice(0, 900).trim();
+          }
+
+          const actionsRaw = asArray(obj.actions);
+          actions = actionsRaw.filter(isAction);
+
+          const leadRaw = obj.lead;
+          extractedLead =
+            leadRaw && typeof leadRaw === "object" && !Array.isArray(leadRaw)
+              ? (leadRaw as LeadPayload)
+              : null;
+        } else {
+          const plain = choice?.message?.content?.trim();
+          if (plain) {
+            reply = plain;
+            if (reply.length > 900) reply = reply.slice(0, 900).trim();
+          }
+        }
+
+        // If lead intent and model didn't add actions, add a minimal collect_lead action.
+        if (leadIntent && actions.length === 0) {
+          actions.push({ type: "collect_lead", fields: ["name", "email", "phone"] });
+        }
       } catch (err: unknown) {
-        // OpenAI SDK errors often expose `status` (number) but we keep this lint-safe.
         const status =
-          typeof err === "object" && err !== null && "status" in err
-            ? (err as { status?: number }).status
-            : undefined;
+          typeof err === "object" && err !== null && "status" in err ? (err as { status?: number }).status : undefined;
 
         if (status === 429 || status === 401 || status === 403) {
           reply =
             locale === "es"
-              ? "Gracias por tu mensaje. Ahora mismo no puedo responder automáticamente. Déjanos tu nombre y un teléfono o email y te contactamos enseguida."
-              : locale === "fr"
-                ? "Merci pour votre message. Je ne peux pas répondre automatiquement pour le moment. Laissez votre nom et un téléphone ou email et nous vous contacterons rapidement."
-                : locale === "it"
-                  ? "Grazie per il messaggio. In questo momento non posso rispondere automaticamente. Lascia nome e telefono o email e ti contatteremo a breve."
-                  : locale === "de"
-                    ? "Danke für deine Nachricht. Ich kann gerade nicht automatisch antworten. Bitte nenne deinen Namen und eine Telefonnummer oder E-Mail, dann melden wir uns kurzfristig."
-                    : "Thanks for your message. I can’t reply automatically right now. Share your name and a phone or email and we’ll reach out shortly.";
+              ? "Ahora mismo no puedo responder automáticamente. Déjanos tu nombre y un email o teléfono y te contactamos enseguida."
+              : "I can’t reply automatically right now. Share your name plus an email or phone and we’ll reach out shortly.";
+          if (leadIntent) actions = [{ type: "collect_lead", fields: ["name", "email", "phone"] }];
         } else {
           reply =
             locale === "es"
-              ? "Gracias por tu mensaje. Hemos tenido un problema temporal y te responderemos en breve."
-              : locale === "fr"
-                ? "Merci pour votre message. Nous avons eu un problème temporaire et nous vous répondrons bientôt."
-                : locale === "it"
-                  ? "Grazie per il messaggio. Abbiamo avuto un problema temporaneo e ti risponderemo a breve."
-                  : locale === "de"
-                    ? "Danke für deine Nachricht. Es gab ein temporäres Problem. Wir melden uns in Kürze."
-                    : "Thanks for your message. We had a temporary issue and we’ll reply shortly.";
+              ? "Hemos tenido un problema temporal y te responderemos en breve."
+              : "We had a temporary issue and we’ll reply shortly.";
         }
       }
+    } else {
+      // No OpenAI configured: if lead intent, still return action so widget can collect.
+      if (leadIntent) actions = [{ type: "collect_lead", fields: ["name", "email", "phone"] }];
     }
 
+    // Save extracted lead (if any)
+    if (!leadAlreadySent && hasAnyLead(extractedLead)) {
+      await trySaveLead({
+        businessId,
+        conversationId,
+        channel: ch,
+        host,
+        externalRef,
+        ip,
+        lead: extractedLead!,
+      });
+    }
 
-    // persist assistant reply
+    // persist assistant reply (store actions in meta so you can inspect later)
     const m2 = await supabase.from("messages").insert({
       conversation_id: conversationId,
       channel: ch,
       role: "assistant",
       content: reply,
-      meta: {},
+      meta: { actions },
     });
     if (m2.error) throw m2.error;
 
-    return NextResponse.json({ conversationId, reply, locale }, { status: 200, headers: corsHeadersFor(req) });
-    } catch (e: unknown) {
-      console.error("Conversation API error:", e);
+    return NextResponse.json({ conversationId, reply, locale, actions }, { status: 200, headers: corsHeadersFor(req) });
+  } catch (e: unknown) {
+    console.error("Conversation API error:", e);
 
-      const status = e instanceof RateLimitError ? e.status : 500;
+    const status = e instanceof RateLimitError ? e.status : 500;
 
-      const message =
-        e instanceof Error
-          ? e.message
-          : typeof e === "object" && e !== null && "message" in e
-            ? String((e as { message?: unknown }).message)
-            : JSON.stringify(e);
+    const message =
+      e instanceof Error
+        ? e.message
+        : typeof e === "object" && e !== null && "message" in e
+        ? String((e as { message?: unknown }).message)
+        : JSON.stringify(e);
 
-      return NextResponse.json(
-        { error: message || "Server error" },
-        { status, headers: corsHeadersFor(req) }
-      );
-    }
+    return NextResponse.json({ error: message || "Server error" }, { status, headers: corsHeadersFor(req) });
   }
+}

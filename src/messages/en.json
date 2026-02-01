@@ -73,26 +73,12 @@
     "growthF3": "Priority support"
   },
   "Dashboard": {
-    "welcome": "Welcome, {name}",
-    "welcomeGeneric": "Welcome",
-    "trialDays": "{days} days left",
-    "verifyTitle": "Verify your email",
-    "verifyMessage": "We sent a link to {email}. Confirm it to access all features.",
-    "resendButton": "Resend email",
-    "resendSuccess": "Email sent. Check spam if you do not see it.",
-    "resendError": "Error sending: {error}",
-    "businessInfo": {
-      "defaultName": "Your Business",
-      "contactLabel": "Contact:",
-      "phoneLabel": "Phone:"
-    },
     "cards": {
       "reviewsTitle": "Request reviews",
       "reviewsDesc": "Send SMS or email to your customers.",
       "campaignsTitle": "Campaigns",
       "campaignsDesc": "Automate bulk messaging."
     },
-    "loading": "Loading...",
     "messages": {
       "title": "Messages",
       "subtitle": "Review conversations and recent messages from your website assistant.",
@@ -108,6 +94,59 @@
       "footerNote": "Tip: This page loads tenant-scoped data using your business_id derived from business_profiles.",
       "openStatus": "Open",
       "closedStatus": "Closed"
+    },
+    "loading": "Loading…",
+
+    "welcome": "Welcome, {name}",
+    "welcomeGeneric": "Welcome",
+
+    "trialDays": "{days} days left in your trial",
+
+    "businessInfo": {
+      "defaultName": "Your business",
+      "contactLabel": "Contact:",
+      "phoneLabel": "Phone:"
+    },
+
+    "businessOverview": {
+      "title": "Business overview",
+      "contactLine": "Contact: {name} · Phone: {phone}",
+      "emailLine": "Email: {email}",
+      "edit": "Edit"
+    },
+
+    "verifyTitle": "Verify your email",
+    "verifyMessage": "Please confirm your email address to activate your assistant. We sent a verification link to {email}.",
+    "resendButton": "Resend email",
+    "resendSuccess": "Verification email sent.",
+    "resendError": "Could not resend: {error}",
+
+    "onboarding": {
+      "title": "Onboarding",
+      "subtitle": "Complete the required steps to activate your assistant and widget.",
+      "completion": "{pct}% complete",
+      "requiredMissing": "Required items missing",
+      "open": "Open",
+      "fix": "Fix",
+      "done": "Done",
+      "requiredTag": "(required)"
+    },
+
+    "groups": {
+      "business": "Business",
+      "assistant": "Assistant",
+      "widget": "Widget"
+    },
+
+    "items": {
+      "allowed_domains": "Allowed domains configured",
+      "default_locale": "Default language selected",
+      "contact_name": "Contact name added",
+      "phone": "Phone added",
+      "system_prompt": "System prompt filled",
+      "qualification_prompt": "Qualification criteria filled",
+      "knowledge": "Knowledge filled",
+      "token": "Token generated"
     }
   },
   "Landing": {

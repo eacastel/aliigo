@@ -1,15 +1,10 @@
 // src/app/[locale]/(app)/dashboard/page.tsx
-
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-// IMPORTANT: Import router from your i18n routing file, not next/navigation
-import { useRouter } from "@/i18n/routing";
+import { useRouter, Link } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 import { useTranslations, useLocale } from "next-intl";
-import { Link } from "@/i18n/routing";
-
-
 
 // Types
 type BusinessRow = {
@@ -18,6 +13,7 @@ type BusinessRow = {
   allowed_domains: string[] | null;
   default_locale: string | null;
   system_prompt: string | null;
+  qualification_prompt: string | null; // ✅ make it consistent
   knowledge: string | null;
 };
 
@@ -47,11 +43,7 @@ function nonEmpty(v: unknown) {
 
 function normalizeDomains(domains: string[] | null | undefined) {
   return (domains ?? [])
-    .map((d) =>
-      String(d || "")
-        .trim()
-        .toLowerCase()
-    )
+    .map((d) => String(d || "").trim().toLowerCase())
     .filter(Boolean);
 }
 
@@ -75,7 +67,6 @@ function pct(done: number, total: number) {
 }
 
 export default function DashboardPage() {
-  // 1. Initialize Translations
   const locale = useLocale();
   const t = useTranslations("Dashboard");
   const router = useRouter();
@@ -86,10 +77,8 @@ export default function DashboardPage() {
   const [pending, setPending] = useState<PendingSignup | null>(null);
 
   const [embedToken, setEmbedToken] = useState<string | null>(null);
-
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  // 2. Logic (Same as before, just cleaner)
   const daysLeft = useMemo(() => {
     const start = business?.created_at
       ? new Date(business.created_at).getTime()
@@ -128,27 +117,27 @@ export default function DashboardPage() {
           .from("business_profiles")
           .select(
             `
-          id,
-          nombre_negocio,
-          nombre_contacto,
-          telefono,
-          created_at,
-          business_id,
-          businesses:businesses!business_profiles_business_id_fkey (
             id,
-            slug,
-            allowed_domains,
-            default_locale,
-            system_prompt,
-            knowledge
-          )
-        `
+            nombre_negocio,
+            nombre_contacto,
+            telefono,
+            created_at,
+            business_id,
+            businesses:businesses!business_profiles_business_id_fkey (
+              id,
+              slug,
+              allowed_domains,
+              default_locale,
+              system_prompt,
+              qualification_prompt,
+              knowledge
+            )
+          `
           )
           .eq("id", session.user.id)
           .maybeSingle<BusinessProfile>();
 
         if (error) console.error("DB Error:", error.message);
-
         if (mounted) setBusiness(data ?? null);
 
         if (data?.business_id) {
@@ -205,13 +194,11 @@ export default function DashboardPage() {
       },
     });
 
-    // Translation usage in alerts
     if (error) alert(t("resendError", { error: error.message }));
     else alert(t("resendSuccess"));
   };
 
   const trialExpired = daysLeft !== null && daysLeft <= 0;
-  // later you'll replace this with (trialExpired && !isPaid)
   const featuresDisabled = !isConfirmed || trialExpired;
 
   if (loading) {
@@ -223,12 +210,9 @@ export default function DashboardPage() {
     );
   }
 
-  // Helper variables for display
   const displayName = business?.nombre_contacto || pending?.contactName || null;
   const displayBusinessName =
-    business?.nombre_negocio ||
-    pending?.businessName ||
-    t("businessInfo.defaultName");
+    business?.nombre_negocio || pending?.businessName || t("businessInfo.defaultName");
 
   const displayEmail = userEmail || pending?.email || "";
   const displayPhone = business?.telefono || pending?.phone || "—";
@@ -237,73 +221,79 @@ export default function DashboardPage() {
 
   const checklist: { group: string; items: ChecklistItem[] }[] = [
     {
-      group: "Business",
+      group: t("groups.business"),
       items: [
         {
           id: "allowed_domains",
-          label: "Allowed domains configured",
+          label: t("items.allowed_domains"),
           done: hasNonAliigoDomain(biz?.allowed_domains),
           required: true,
-          href: `/dashboard/settings/business`,
+          href: "/dashboard/settings/business",
         },
         {
           id: "default_locale",
-          label: "Default language selected",
+          label: t("items.default_locale"),
           done: biz?.default_locale === "en" || biz?.default_locale === "es",
           required: true,
-          href: `/dashboard/settings/business`,
+          href: "/dashboard/settings/business",
         },
         {
           id: "contact_name",
-          label: "Contact name added",
+          label: t("items.contact_name"),
           done: nonEmpty(business?.nombre_contacto),
           required: false,
-          href: `/dashboard/settings/business`,
+          href: "/dashboard/settings/business",
         },
         {
           id: "phone",
-          label: "Phone added",
+          label: t("items.phone"),
           done: nonEmpty(business?.telefono),
           required: false,
-          href: `/dashboard/settings/business`,
+          href: "/dashboard/settings/business",
         },
       ],
     },
     {
-      group: "Assistant",
+      group: t("groups.assistant"),
       items: [
         {
           id: "system_prompt",
-          label: "System prompt filled",
+          label: t("items.system_prompt"),
           done: nonEmpty(biz?.system_prompt),
           required: true,
-          href: `/dashboard/settings/assistant`,
+          href: "/dashboard/settings/assistant",
+        },
+        {
+          id: "qualification_prompt",
+          label: t("items.qualification_prompt"),
+          done: nonEmpty(biz?.qualification_prompt),
+          required: true,
+          href: "/dashboard/settings/assistant",
         },
         {
           id: "knowledge",
-          label: "Knowledge filled",
+          label: t("items.knowledge"),
           done: nonEmpty(biz?.knowledge),
           required: true,
-          href: `/dashboard/settings/assistant`,
+          href: "/dashboard/settings/assistant",
         },
       ],
     },
     {
-      group: "Widget",
+      group: t("groups.widget"),
       items: [
         {
           id: "token",
-          label: "Token generated",
+          label: t("items.token"),
           done: nonEmpty(embedToken),
           required: true,
-          href: `/dashboard/widget`,
+          href: "/dashboard/widget",
         },
       ],
     },
   ];
 
   const flat = checklist.flatMap((g) => g.items);
-
   const required = flat.filter((x) => x.required);
   const optional = flat.filter((x) => !x.required);
 
@@ -314,21 +304,14 @@ export default function DashboardPage() {
   const done = requiredDone + optionalDone;
 
   const completion = pct(done, total);
-
   const blockers = required.filter((x) => !x.done);
 
   return (
     <div className="mx-auto mt-10 max-w-3xl px-4">
-      {/* HEADER + BUSINESS OVERVIEW + VERIFICATION WARNING (dark UI) */}
       <div className="mb-8">
-
-        
-        {/* HEADER */}
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold text-zinc-100">
-            {displayName
-              ? t("welcome", { name: displayName })
-              : t("welcomeGeneric")}{" "}
+            {displayName ? t("welcome", { name: displayName }) : t("welcomeGeneric")}{" "}
           </h1>
 
           {daysLeft !== null && (
@@ -338,13 +321,12 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* BUSINESS OVERVIEW */}
         <div className="mt-6 overflow-hidden rounded-xl bg-zinc-900/70 border border-zinc-800 shadow-lg">
           <div className="px-4 py-4 sm:px-6">
             <div className="flex items-start justify-between gap-6">
               <div className="min-w-0">
                 <h2 className="text-sm font-medium text-zinc-200">
-                  Business overview
+                  {t("businessOverview.title")}
                 </h2>
 
                 <p className="mt-1 text-sm text-zinc-100 truncate">
@@ -352,21 +334,27 @@ export default function DashboardPage() {
                 </p>
 
                 <p className="mt-2 text-sm text-zinc-400">
-                  Contact: {displayName || "—"} · Phone: {displayPhone}
+                  {t("businessOverview.contactLine", {
+                    name: displayName || "—",
+                    phone: displayPhone,
+                  })}
                 </p>
 
                 <p className="mt-1 text-sm text-zinc-400">
-                  Email: {displayEmail || "—"}
+                  {t("businessOverview.emailLine", { email: displayEmail || "—" })}
                 </p>
               </div>
-                <Link href="/dashboard/settings/business" className="shrink-0 text-sm font-medium text-brand-400 hover:text-brand-300">
-                  Edit
+
+              <Link
+                href="/dashboard/settings/business"
+                className="shrink-0 text-sm font-medium text-brand-400 hover:text-brand-300"
+              >
+                {t("businessOverview.edit")}
               </Link>
             </div>
           </div>
         </div>
 
-        {/* VERIFICATION WARNING (muted, not harsh yellow) */}
         {!isConfirmed && (
           <div className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
             <div className="flex gap-3">
@@ -408,46 +396,37 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* ONBOARDING */}
       <div className="mb-8 overflow-hidden rounded-xl bg-zinc-900/70 border border-zinc-800 shadow-lg">
         <div className="px-4 py-5 sm:p-6">
           <div className="flex items-start justify-between gap-6">
             <div>
               <h3 className="text-base font-semibold leading-6 text-zinc-100">
-                Onboarding
+                {t("onboarding.title")}
               </h3>
               <p className="mt-1 text-sm text-zinc-400">
-                Complete the required steps to activate your assistant and
-                widget.
+                {t("onboarding.subtitle")}
               </p>
             </div>
 
             <div className="text-right">
               <div className="text-sm font-medium text-zinc-200">
-                {completion}% complete
+                {t("onboarding.completion", { pct: completion })}
               </div>
               <div className="mt-2 h-2 w-40 rounded-full bg-zinc-800 overflow-hidden">
-                <div
-                  className="h-2 bg-brand-500"
-                  style={{ width: `${completion}%` }}
-                />
+                <div className="h-2 bg-brand-500" style={{ width: `${completion}%` }} />
               </div>
             </div>
           </div>
 
-          {/* Blockers (muted, not harsh red) */}
           {blockers.length > 0 && (
             <div className="mt-4 rounded-lg border border-zinc-800 bg-zinc-950/40 px-3 py-2">
               <div className="text-sm font-medium text-zinc-200">
-                Required items missing
+                {t("onboarding.requiredMissing")}
               </div>
               <ul className="mt-1 list-disc pl-5 text-sm text-zinc-400">
                 {blockers.map((b) => (
                   <li key={b.id}>
-                    <Link
-                      className="text-brand-400 hover:text-brand-300 underline"
-                      href={b.href}
-                    >
+                    <Link className="text-brand-400 hover:text-brand-300 underline" href={b.href}>
                       {b.label}
                     </Link>
                   </li>
@@ -456,7 +435,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Checklist groups */}
           <div className="mt-5 space-y-4">
             {checklist.map((g) => (
               <div
@@ -464,14 +442,12 @@ export default function DashboardPage() {
                 className="rounded-xl border border-zinc-800 bg-zinc-950/30 overflow-hidden"
               >
                 <div className="flex items-center justify-between px-4 py-3 bg-zinc-950/50">
-                  <div className="text-sm font-medium text-zinc-200">
-                    {g.group}
-                  </div>
+                  <div className="text-sm font-medium text-zinc-200">{g.group}</div>
                   <Link
                     href={g.items[0]?.href}
                     className="text-sm font-medium text-brand-400 hover:text-brand-300"
                   >
-                    Open
+                    {t("onboarding.open")}
                   </Link>
                 </div>
 
@@ -482,7 +458,6 @@ export default function DashboardPage() {
                       className="flex items-center justify-between gap-4 px-4 py-3"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        {/* status dot (muted) */}
                         <span
                           className={[
                             "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border",
@@ -504,25 +479,17 @@ export default function DashboardPage() {
                         </span>
 
                         <div className="min-w-0">
-                          <div
-                            className={[
-                              "text-sm truncate",
-                              it.required && !it.done
-                                ? "text-zinc-200"
-                                : "text-zinc-200",
-                            ].join(" ")}
-                          >
+                          <div className="text-sm truncate text-zinc-200">
                             {it.label}
                             {it.required && (
                               <span className="ml-2 text-xs text-zinc-500">
-                                (required)
+                                {t("onboarding.requiredTag")}
                               </span>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Action */}
                       {!it.done ? (
                         <Link
                           href={it.href}
@@ -533,11 +500,11 @@ export default function DashboardPage() {
                               : "text-brand-400 hover:text-brand-300",
                           ].join(" ")}
                         >
-                          Fix
+                          {t("onboarding.fix")}
                         </Link>
                       ) : (
                         <span className="text-xs text-zinc-500 shrink-0">
-                          Done
+                          {t("onboarding.done")}
                         </span>
                       )}
                     </li>
@@ -546,6 +513,9 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
+
+          {/* currently unused but kept as your variable exists */}
+          {featuresDisabled && null}
         </div>
       </div>
     </div>

@@ -74,26 +74,12 @@
     "growthF3": "Soporte prioritario"
   },
   "Dashboard": {
-    "welcome": "Bienvenido, {name}",
-    "welcomeGeneric": "Bienvenido",
-    "trialDays": "{days} días restantes",
-    "verifyTitle": "Verifica tu correo electrónico",
-    "verifyMessage": "Hemos enviado un enlace a {email}. Debes confirmarlo para acceder a todas las funciones.",
-    "resendButton": "Reenviar correo",
-    "resendSuccess": "Correo enviado. Revisa spam si no lo ves.",
-    "resendError": "Error al enviar: {error}",
-    "businessInfo": {
-      "defaultName": "Tu negocio",
-      "contactLabel": "Contacto:",
-      "phoneLabel": "Teléfono:"
-    },
     "cards": {
       "reviewsTitle": "Solicitar reseñas",
       "reviewsDesc": "Envía SMS o email a tus clientes.",
       "campaignsTitle": "Campañas",
       "campaignsDesc": "Automatiza mensajes masivos."
     },
-    "loading": "Cargando...",
     "messages": {
       "title": "Mensajes",
       "subtitle": "Revisa conversaciones y mensajes recientes de tu asistente web.",
@@ -109,6 +95,59 @@
       "footerNote": "Tip: Esta página carga datos del tenant usando tu business_id derivado de business_profiles.",
       "openStatus": "Abierta",
       "closedStatus": "Cerrada"
+    },
+    "loading": "Cargando…",
+
+    "welcome": "Bienvenido, {name}",
+    "welcomeGeneric": "Bienvenido",
+
+    "trialDays": "Te quedan {days} días de prueba",
+
+    "businessInfo": {
+      "defaultName": "Tu negocio",
+      "contactLabel": "Contacto:",
+      "phoneLabel": "Teléfono:"
+    },
+
+    "businessOverview": {
+      "title": "Resumen del negocio",
+      "contactLine": "Contacto: {name} · Teléfono: {phone}",
+      "emailLine": "Email: {email}",
+      "edit": "Editar"
+    },
+
+    "verifyTitle": "Verifica tu email",
+    "verifyMessage": "Confirma tu email para activar el asistente. Te hemos enviado un enlace de verificación a {email}.",
+    "resendButton": "Reenviar email",
+    "resendSuccess": "Email de verificación enviado.",
+    "resendError": "No se pudo reenviar: {error}",
+
+    "onboarding": {
+      "title": "Puesta en marcha",
+      "subtitle": "Completa los pasos obligatorios para activar tu asistente y el widget.",
+      "completion": "{pct}% completado",
+      "requiredMissing": "Faltan elementos obligatorios",
+      "open": "Abrir",
+      "fix": "Corregir",
+      "done": "Hecho",
+      "requiredTag": "(obligatorio)"
+    },
+
+    "groups": {
+      "business": "Negocio",
+      "assistant": "Asistente",
+      "widget": "Widget"
+    },
+
+    "items": {
+      "allowed_domains": "Dominios permitidos configurados",
+      "default_locale": "Idioma predeterminado seleccionado",
+      "contact_name": "Nombre de contacto añadido",
+      "phone": "Teléfono añadido",
+      "system_prompt": "Prompt del sistema completado",
+      "qualification_prompt": "Criterios de cualificación completados",
+      "knowledge": "Base de conocimiento completada",
+      "token": "Token generado"
     }
   },
   "Landing": {

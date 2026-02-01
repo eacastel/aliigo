@@ -9,12 +9,14 @@ import { supabase } from "@/lib/supabaseClient";
 /* ---------- Types ---------- */
 type AssistantState = {
   system_prompt: string;
+  qualification_prompt: string;
   knowledge: string;
 };
 
 type JoinedBusiness = {
   id?: string | null;
   system_prompt?: string | null;
+  qualification_prompt?: string | null;
   knowledge?: string | null;
 } | null;
 
@@ -38,6 +40,7 @@ export default function SettingsAssistantPage() {
 
   const [assistant, setAssistant] = useState<AssistantState>({
     system_prompt: "",
+    qualification_prompt: "",
     knowledge: "",
   });
 
@@ -77,6 +80,7 @@ export default function SettingsAssistantPage() {
           businesses:businesses!business_profiles_business_id_fkey (
             id,
             system_prompt,
+            qualification_prompt,
             knowledge
           )
         `
@@ -102,6 +106,7 @@ export default function SettingsAssistantPage() {
 
         const next: AssistantState = {
           system_prompt: (biz.system_prompt ?? "").trim(),
+          qualification_prompt: (biz.qualification_prompt ?? "").trim(),
           knowledge: (biz.knowledge ?? "").trim(),
         };
 
@@ -109,7 +114,7 @@ export default function SettingsAssistantPage() {
         initialAssistant.current = next;
       } else {
         setBusinessId(null);
-        const empty = { system_prompt: "", knowledge: "" };
+        const empty = { system_prompt: "", qualification_prompt: "", knowledge: "" };
         setAssistant(empty);
         initialAssistant.current = empty;
       }
@@ -120,7 +125,6 @@ export default function SettingsAssistantPage() {
 
   useEffect(() => {
     void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const dirty = useMemo(() => {
@@ -128,6 +132,7 @@ export default function SettingsAssistantPage() {
     if (!ia) return false;
     return (
       assistant.system_prompt.trim() !== ia.system_prompt.trim() ||
+      assistant.qualification_prompt.trim() !== ia.qualification_prompt.trim() ||
       assistant.knowledge.trim() !== ia.knowledge.trim()
     );
   }, [assistant]);
@@ -152,6 +157,7 @@ export default function SettingsAssistantPage() {
       const payload = {
         business: {
           system_prompt: assistant.system_prompt,
+          qualification_prompt: assistant.qualification_prompt,
           knowledge: assistant.knowledge,
         },
       };
@@ -167,7 +173,9 @@ export default function SettingsAssistantPage() {
 
       const j: {
         error?: string;
-        business?: { system_prompt?: string | null; knowledge?: string | null };
+        business?: { system_prompt?: string | null; 
+        qualification_prompt?: string | null;
+        knowledge?: string | null };
       } = await res.json().catch(() => ({}));
 
       if (!res.ok) {
@@ -177,6 +185,7 @@ export default function SettingsAssistantPage() {
 
       const next: AssistantState = {
         system_prompt: (j.business?.system_prompt ?? assistant.system_prompt).trim(),
+        qualification_prompt: (j.business?.qualification_prompt ?? assistant.qualification_prompt).trim(),
         knowledge: (j.business?.knowledge ?? assistant.knowledge).trim(),
       };
 
@@ -259,6 +268,24 @@ export default function SettingsAssistantPage() {
             This controls tone + rules for the assistant across channels.
           </p>
         </div>
+        
+        <div>
+          <label className="block text-xs text-zinc-400 mb-1">
+            Qualification (fit + lead capture)
+          </label>
+          <textarea
+            className="w-full min-h-[220px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+            placeholder="Qualification flow, thresholds, when to ask for email/phone, next-step CTAs…"
+            value={assistant.qualification_prompt}
+            onChange={(e) =>
+              setAssistant((a) => ({ ...a, qualification_prompt: e.target.value }))
+            }
+          />
+          <p className="text-[11px] text-zinc-500 mt-1">
+            This guides how the assistant qualifies and when it should collect contact info.
+          </p>
+        </div>
+
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
