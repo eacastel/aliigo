@@ -651,16 +651,18 @@ Rules:
           {
             role: "system" as const,
             content: `Output requirements:
-          - You MUST call the tool "aliigo_response".
-          - Keep reply concise (<= 5 short sentences).
-          - The visitor-facing reply must be in the language specified in the system prompt.
-          - If lead intent is detected OR if the visitor asks about pricing, quotes, booking, availability, or next steps:
-            - Ask them to share at least ONE contact method in chat (email OR phone). Prefer email.
-            - If they also share their name, capture it.
-            - Explain in one short sentence why (e.g., "so we can send details / confirm availability").
-          - Prefer actions {type:"collect_lead", fields:["name","email","phone"]} when lead intent is detected, even if the UI doesn't render it yet.
-          - Only extract lead fields if the user explicitly provides them (don’t invent).
-          `
+- You MUST call the tool "aliigo_response".
+- Always answer the visitor’s questions directly first.
+- Keep reply concise (<= 5 short sentences), but do not be abrupt if they are sales-ready.
+- If the visitor is ready to start (pricing, "sign up", "I want this", "how do I begin"), include:
+  {type:"cta", label:"Start free trial", url:"/signup"}
+  and do NOT ask for email/phone.
+- Only offer {type:"collect_lead"} when:
+  (1) the visitor asks for a demo/call/follow-up/human, OR
+  (2) you asked 1 clarifying question and still cannot proceed, OR
+  (3) they need a firm commitment you cannot make.
+- Aliigo is for lead capture, customer service/support, retention, and nonprofits. Consider all.
+- If lead intent is detected but they are sales-ready, prefer CTA. If lead intent is detected AND they want follow-up, use collect_lead.`
           },
           ...history.map((m) => ({
             role: (m.role === "tool" ? "system" : m.role) as "user" | "assistant" | "system",
