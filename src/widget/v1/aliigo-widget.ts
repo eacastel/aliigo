@@ -1,7 +1,11 @@
 // src/widget/v1/aliigo-widget.ts
 
 type Role = "user" | "assistant";
-type Msg = { role: Role; content: string };
+type Action =
+  | { type: "link"; label: string; url: string }
+  | { type: "handoff"; label: string; channels?: ("email"|"telegram"|"whatsapp")[] };
+
+type Msg = { role: Role; content: string; actions?: Action[] };
 
 type Theme = {
   headerBg?: string;   // "#111827 #ffffff"
@@ -27,6 +31,38 @@ type WidgetState = {
   locale: "en" | "es";
   visitorSessionId: string | null;
 };
+
+type ServerAction =
+  | { type: "cta"; label: string; url: string }
+  | { type: "collect_lead"; fields: ("name" | "email" | "phone")[]; reason?: string };
+
+function mapServerActionsToWidget(actions: unknown): Action[] | undefined {
+  if (!Array.isArray(actions)) return undefined;
+
+  const out: Action[] = [];
+
+  for (const a of actions) {
+    if (!a || typeof a !== "object") continue;
+    const obj = a as Record<string, unknown>;
+    const t = obj.type;
+
+    if (t === "cta") {
+      const label = typeof obj.label === "string" ? obj.label : "";
+      const url = typeof obj.url === "string" ? obj.url : "";
+      if (label && url) out.push({ type: "link", label, url });
+      continue;
+    }
+
+    if (t === "collect_lead") {
+      // Simple for now: one handoff button (you can build a lead form later)
+      out.push({ type: "handoff", label: "Talk to a person" });
+      continue;
+    }
+  }
+
+  return out.length ? out : undefined;
+}
+
 
 const UI = {
   en: {
@@ -700,6 +736,17 @@ class AliigoWidget extends HTMLElement {
         background: #ffffff;
       }
 
+      /* --- Actions (buttons/links under assistant messages) --- */
+      .actions { margin-top: 8px; display:flex; flex-wrap:wrap; gap:8px; }
+      .action, .action-btn {
+        display:inline-flex; align-items:center; justify-content:center;
+        padding:10px 12px; border-radius:12px; font-weight:600; font-size:14px;
+        border:1px solid rgba(0,0,0,0.10); background:#fff; color:#111827;
+        text-decoration:none; cursor:pointer;
+      }
+      .action:hover, .action-btn:hover { border-color: rgba(0,0,0,0.18); }
+
+
       .input {
         flex: 1;
         height: 44px;
@@ -835,10 +882,28 @@ class AliigoWidget extends HTMLElement {
               return `<div class="row ${isUser ? "user" : "bot"}" id="msg-${i}">
                 <div class="bubble ${isUser ? "user" : "bot"} ${isLast ? "anim" : ""}" style="${bubbleStyle}">
                   ${formatMessageHtml(m.content)}
+                  ${
+                    !isUser && Array.isArray(m.actions) && m.actions.length
+                      ? `<div class="actions">
+                          ${m.actions
+                            .map((a) => {
+                              if (a.type === "link") {
+                                return `<a class="action" href="${escapeHtml(a.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.label)}</a>`;
+                              }
+                              if (a.type === "handoff") {
+                                return `<button class="action-btn" type="button" data-action="handoff" data-i="${i}">${escapeHtml(a.label)}</button>`;
+                              }
+                              return "";
+                            })
+                            .join("")}
+                        </div>`
+                      : ""
+                  }
                 </div>
               </div>`;
             })
             .join("");
+            
 
     // floating closed => pill only
     if (variant === "floating" && !open) {
@@ -855,6 +920,14 @@ class AliigoWidget extends HTMLElement {
           <button class="pill" style="background:${send.bg};color:${send.text};">${t.pill(brand)}</button>
         </div>
       `;
+      this.root
+        .querySelectorAll(".action-btn[data-action='handoff']")
+        .forEach((btn) => {
+          btn.addEventListener("click", () => {
+            // Temporary: send a message that triggers your server’s lead-intent flow
+            void this.send("I’d like a human follow-up.");
+          });
+        });
 
       const btn = this.root.querySelector(".pill") as HTMLButtonElement | null;
       btn?.addEventListener("click", () => {
@@ -941,6 +1014,7 @@ class AliigoWidget extends HTMLElement {
       const raw = (await res.json().catch(() => ({}))) as {
         conversationId?: string;
         reply?: string;
+        actions?: unknown;
         error?: string;
         locale?: string;
       };
@@ -971,11 +1045,17 @@ class AliigoWidget extends HTMLElement {
               reply?: string;
               error?: string;
               locale?: string;
+              actions?: unknown;
             };
 
             if (retry.ok) {
               if (raw2.conversationId) this.state.conversationId = raw2.conversationId;
-              this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw2.reply || "" }];
+              const nextActions2 = mapServerActionsToWidget(raw2.actions);
+
+              this.state.msgs = [
+                ...this.state.msgs,
+                { role: "assistant", content: raw2.reply || "", actions: nextActions2 },
+              ];
               this.pendingFocus = true;
               this.state.busy = false;
               this.savePersisted(true);
@@ -1006,7 +1086,11 @@ class AliigoWidget extends HTMLElement {
       }
 
       if (raw.conversationId) this.state.conversationId = raw.conversationId;
-      this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.reply || "" }];
+      const nextActions = mapServerActionsToWidget(raw.actions);
+      this.state.msgs = [
+        ...this.state.msgs,
+        { role: "assistant", content: raw.reply || "", actions: nextActions },
+      ];
       this.pendingFocus = true;
       this.state.busy = false;
       this.savePersisted(true);
@@ -1032,9 +1116,19 @@ function escapeHtml(s: string) {
     .replaceAll("'", "&#039;");
 }
 
+function linkify(escaped: string) {
+  // escaped is already HTML-escaped, so safe to inject our own <a>
+  // Matches http(s) URLs
+  return escaped.replace(
+    /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g,
+    `<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>`
+  );
+}
+
 function formatMessageHtml(raw: string) {
   const escaped = escapeHtml(raw || "");
-  const lines = escaped.split(/\r?\n/);
+  const escapedWithLinks = linkify(escaped);
+  const lines = escapedWithLinks.split(/\r?\n/);
 
   const inline = (s: string) =>
     s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");

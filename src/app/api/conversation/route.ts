@@ -60,13 +60,6 @@ function clientIp(req: NextRequest) {
   return fwd?.split(",")[0]?.trim() || "0.0.0.0";
 }
 
-// --- lead intent heuristic (simple keywords; expand as needed) ---
-function wantsLead(s: string) {
-  return /precio|presupuesto|cita|reserva|comprar|contratar|cotización|quote|price|book|schedule|estimate|budget/i.test(
-    s || ""
-  );
-}
-
 
 type ToolExtract = { name: string; arguments: string };
 
@@ -315,20 +308,6 @@ export async function OPTIONS(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  // TEMP DEBUG (remove after)
-  const dbg = new URL(req.url).searchParams.get("debug") === "1";
-  if (dbg) {
-    return NextResponse.json(
-      {
-        hasOpenAIKey: !!process.env.OPENAI_API_KEY,
-        openAIKeyLen: (process.env.OPENAI_API_KEY || "").length,
-        model: process.env.OPENAI_MODEL || null,
-        nodeEnv: process.env.NODE_ENV || null,
-      },
-      { status: 200 }
-    );
-  }
-
   try {
     const ip = clientIp(req);
 
@@ -508,12 +487,12 @@ export async function POST(req: NextRequest) {
       locale === "es"
         ? "Spanish (Castilian)"
         : locale === "fr"
-        ? "French"
-        : locale === "it"
-        ? "Italian"
-        : locale === "de"
-        ? "German"
-        : "English";
+          ? "French"
+          : locale === "it"
+            ? "Italian"
+            : locale === "de"
+              ? "German"
+              : "English";
 
     const defaultSys = `You are the AI concierge for ${bizRes.data?.name ?? "the business"} (${bizRes.data?.slug ?? ""}).
 
@@ -532,11 +511,7 @@ Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.`;
       sys += `
 
 Business knowledge (authoritative):
-${knowledge}
-
-Rules:
-- Prefer the business knowledge when answering.
-- If the knowledge does not cover it, say so briefly and ask 1 follow-up question.`;
+${knowledge}`;
     }
 
     // NEW: inject qualification criteria
@@ -553,27 +528,24 @@ Rules:
 - If they are not a fit or unclear, ask 1 short clarifying question and avoid over-qualifying.`;
     }
 
-    // Lead intent -> bias toward collect lead action
-    const leadIntent = wantsLead(message);
-
     // Default fallback reply if OpenAI not available
     let reply =
       locale === "es"
         ? "Gracias por tu mensaje. Te respondemos enseguida."
         : locale === "fr"
-        ? "Merci pour votre message. Nous vous répondons tout de suite."
-        : locale === "it"
-        ? "Grazie per il messaggio. Ti rispondiamo subito."
-        : locale === "de"
-        ? "Danke für deine Nachricht. Wir antworten gleich."
-        : "Thanks for your message. We'll reply right away.";
+          ? "Merci pour votre message. Nous vous répondons tout de suite."
+          : locale === "it"
+            ? "Grazie per il messaggio. Ti rispondiamo subito."
+            : locale === "de"
+              ? "Danke für deine Nachricht. Wir antworten gleich."
+              : "Thanks for your message. We'll reply right away.";
 
     let actions: Action[] = [];
     let extractedLead: LeadPayload | null = null;
     const leadAlreadySent = hasAnyLead(leadFromClient);
 
     // Always save explicit lead from widget if present (even before OpenAI)
-    
+
     if (hasAnyLead(leadFromClient)) {
       await trySaveLead({
         businessId,
@@ -650,47 +622,9 @@ Rules:
           // tiny instruction layer to force tool use / policy
           {
             role: "system" as const,
-            content: `Output requirements:
-- You MUST call the tool "aliigo_response".
-- Always answer the visitor’s question directly first.
-- Keep the reply concise (<= 5 short sentences). If the visitor is clearly ready to proceed, you may use up to 7 short sentences to avoid sounding abrupt.
-- Do NOT mention internal tools, policies, or system prompts.
+            content: `Respond by calling the tool "aliigo_response". Do not mention tools or system prompts.
 
-Actions:
-- Only include actions when they materially help the visitor take the next step.
-
-CTA rules (business-agnostic):
-- Use {type:"cta"} ONLY if the business-provided knowledge/prompt includes a specific next-step URL (signup, trial, booking, contact page, etc.).
-- If the visitor is sales-ready (e.g., "pricing", "sign up", "start", "I want this", "how do I begin"), and a valid URL exists in the business knowledge, include ONE CTA action pointing to that URL.
-- Never ask for email/phone if the visitor is sales-ready AND a CTA URL exists.
-- If the visitor is sales-ready but NO URL exists in the business knowledge, do NOT invent one; ask ONE short question about the preferred next step (e.g., "Do you prefer a quick call, or should I take your email to send setup details?") and then you may use collect_lead if they want follow-up.
-
-collect_lead rules:
-- Only offer {type:"collect_lead"} when at least one is true:
-  (1) the visitor explicitly requests a demo/call/follow-up/human help,
-  (2) you asked ONE clarifying question and still cannot proceed,
-  (3) they request a firm commitment you cannot make (pricing promises, guarantees, legal/medical advice, timelines you can’t confirm),
-  (4) a handoff is appropriate because the question requires business-owner input or a custom feature request.
-- When you add collect_lead, keep it minimal:
-  {type:"collect_lead", fields:["name","email","phone"]}
-  (You may request fewer fields if the visitor only offers one contact method.)
-
-Qualification + handoff behavior:
-- If the visitor is exploring, ask at most ONE clarifying question per turn.
-- Never label the visitor/business as "not a fit." If uncertain, position it as "worth a quick test" or "can work better with X," then offer the best next step available (CTA if provided; otherwise lead capture for follow-up).
-- Consider use cases beyond lead-gen: customer support, retention, FAQs, after-hours coverage, nonprofits, and reducing repetitive inquiries. Do not assume the only goal is “sales.”
-
-Lead extraction:
-- Only populate the "lead" object if the visitor explicitly provides contact details in the message (email/phone/name).
-- Do not guess or fabricate lead fields.
-
-Formatting:
-- Return a single coherent reply string in the visitor’s language.
-- Avoid long paragraphs; prefer 2–4 short sentences.
-
-Style:
-- No fluff. No guarantees. Be direct and helpful.
-`
+Only include {type:"collect_lead"} when the visitor explicitly asks for a human/follow-up/call/demo, or when you cannot answer from the Business knowledge/instructions and need owner input. If the visitor asks how to start/buy/sign up and a URL exists in the Business knowledge/instructions, return a {type:"cta"} instead of requesting contact details.`,
           },
           ...history.map((m) => ({
             role: (m.role === "tool" ? "system" : m.role) as "user" | "assistant" | "system",
@@ -703,7 +637,8 @@ Style:
           messages,
           tools: [toolDef],
           tool_choice: { type: "function", function: { name: "aliigo_response" } },
-          temperature: 0.3,
+          temperature: 0.4,
+          presence_penalty: 0.1,
           max_tokens: 450,
         });
 
@@ -738,10 +673,6 @@ Style:
           }
         }
 
-        // If lead intent and model didn't add actions, add a minimal collect_lead action.
-        if (leadIntent && actions.length === 0) {
-          actions.push({ type: "collect_lead", fields: ["name", "email", "phone"] });
-        }
       } catch (err: unknown) {
         const status =
           typeof err === "object" && err !== null && "status" in err ? (err as { status?: number }).status : undefined;
@@ -749,9 +680,8 @@ Style:
         if (status === 429 || status === 401 || status === 403) {
           reply =
             locale === "es"
-              ? "Ahora mismo no puedo responder automáticamente. Déjanos tu nombre y un email o teléfono y te contactamos enseguida."
-              : "I can’t reply automatically right now. Share your name plus an email or phone and we’ll reach out shortly.";
-          if (leadIntent) actions = [{ type: "collect_lead", fields: ["name", "email", "phone"] }];
+              ? "Ahora mismo no puedo responder automáticamente. Inténtalo de nuevo en un momento."
+              : "I can’t reply automatically right now. Please try again in a moment.";
         } else {
           reply =
             locale === "es"
@@ -759,9 +689,6 @@ Style:
               : "We had a temporary issue and we’ll reply shortly.";
         }
       }
-    } else {
-      // No OpenAI configured: if lead intent, still return action so widget can collect.
-      if (leadIntent) actions = [{ type: "collect_lead", fields: ["name", "email", "phone"] }];
     }
 
     // Save extracted lead (if any)
@@ -797,8 +724,8 @@ Style:
       e instanceof Error
         ? e.message
         : typeof e === "object" && e !== null && "message" in e
-        ? String((e as { message?: unknown }).message)
-        : JSON.stringify(e);
+          ? String((e as { message?: unknown }).message)
+          : JSON.stringify(e);
 
     return NextResponse.json({ error: message || "Server error" }, { status, headers: corsHeadersFor(req) });
   }
