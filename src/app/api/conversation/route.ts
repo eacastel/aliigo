@@ -637,7 +637,7 @@ Only include {type:"collect_lead"} when the visitor explicitly asks for a human/
           messages,
           tools: [toolDef],
           tool_choice: { type: "function", function: { name: "aliigo_response" } },
-          temperature: 0.4,
+          temperature: 0.3,
           presence_penalty: 0.1,
           max_tokens: 450,
         });
