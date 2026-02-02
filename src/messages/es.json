@@ -1,4 +1,9 @@
 {
+  "Metadata": {
+    "title": "Aliigo — Asistente IA para tu Web",
+    "titleTemplate": "%s | Aliigo",
+    "description": "Un asistente personalizado de IA para tu web, que responde al instante con la información correcta y guía al visitante al siguiente paso."
+  },
   "Navigation": {
     "brand": "Aliigo",
     "links": {

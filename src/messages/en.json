@@ -1,4 +1,9 @@
 {
+  "Metadata": {
+    "title": "Aliigo — Your Business-Owned AI Assistant",
+    "titleTemplate": "%s | Aliigo",
+    "description": "A business-owned AI assistant for your website that answers instantly, shares the right information, and guides visitors to the next step."
+  },
   "Navigation": {
     "brand": "Aliigo",
     "links": {
