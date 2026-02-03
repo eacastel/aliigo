@@ -220,7 +220,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Widget Area */}
-                  <div className="flex-1 bg-zinc-50 relative overflow-hidden">
+                  <div className="flex-1 bg-zinc-700 relative overflow-hidden">
                     <HomepageAssistantDemo
                       brand="Aliigo"
                       businessSlug="aliigo"
