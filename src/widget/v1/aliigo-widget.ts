@@ -12,6 +12,8 @@ type Theme = {
   bubbleUser?: string; // "#2563eb #ffffff"
   bubbleBot?: string;  // "#f3f4f6 #111827"
   sendBg?: string;     // "#2563eb #ffffff"
+  panelBg?: string;        // "#09090b"
+  panelOpacity?: number;   // 0..1
 };
 
 type SessionPayload = {
@@ -92,6 +94,34 @@ function splitPair(v?: string, defaults?: { bg: string; text: string }) {
   const text = m[1] || defaults?.text || "#ffffff";
   return { bg, text };
 }
+
+function clamp01(n: number) {
+  return Math.max(0, Math.min(1, n));
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const h = (hex || "").trim().replace("#", "");
+  if (h.length === 3) {
+    const r = parseInt(h[0] + h[0], 16);
+    const g = parseInt(h[1] + h[1], 16);
+    const b = parseInt(h[2] + h[2], 16);
+    return { r, g, b };
+  }
+  if (h.length === 6) {
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return { r, g, b };
+  }
+  return null;
+}
+
+function rgbaFromHex(hex: string, a: number) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return null;
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${clamp01(a)})`;
+}
+
 
 class AliigoWidget extends HTMLElement {
   private root!: ShadowRoot;
@@ -483,6 +513,9 @@ class AliigoWidget extends HTMLElement {
       if (typeof o.bubbleUser === "string") out.bubbleUser = o.bubbleUser;
       if (typeof o.bubbleBot === "string") out.bubbleBot = o.bubbleBot;
       if (typeof o.sendBg === "string") out.sendBg = o.sendBg;
+      if (typeof o.panelBg === "string") out.panelBg = o.panelBg;
+      if (typeof o.panelOpacity === "number") out.panelOpacity = o.panelOpacity;
+
 
       return out;
     } catch {
@@ -638,7 +671,8 @@ class AliigoWidget extends HTMLElement {
         width: 380px;
         height: 600px;
         max-height: 80vh;
-        background: #ffffff;
+
+        background: var(--panel-bg, #ffffff); /* NEW */
         border: 1px solid rgba(0,0,0,0.06);
         border-radius: 16px;
         overflow: hidden;
@@ -646,6 +680,7 @@ class AliigoWidget extends HTMLElement {
         display: flex;
         flex-direction: column;
       }
+
       .panel.animate-in {
       animation: panel-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       }
@@ -675,7 +710,7 @@ class AliigoWidget extends HTMLElement {
         flex: 1;
         min-height: 0;
         position: relative;
-        background-color: #ffffff;
+        background: transparent; /* NEW */
       }
       .messages {
         height: 100%;
@@ -733,7 +768,8 @@ class AliigoWidget extends HTMLElement {
         gap: 10px;
         padding: 16px;
         border-top: 1px solid rgba(0,0,0,0.06);
-        background: #ffffff;
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(6px);
       }
 
       /* --- Actions (buttons/links under assistant messages) --- */
@@ -790,11 +826,24 @@ class AliigoWidget extends HTMLElement {
       }
 
       @media (max-width: 480px) {
-        .floating.fixed { left: 0; right: 0; bottom: 0; }
-        .panel { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
-        .header { padding: 12px 16px; }
-        .pill { bottom: 20px; right: 20px; }
+      .floating.fixed { left: 0; right: 0; bottom: 0; }
+
+      /* Only remove rounding when it's truly the fullscreen fixed widget. */
+      .floating.fixed .panel {
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 0;
       }
+
+      /* Keep absolute-mode preview looking like a widget (rounded). */
+      .floating.absolute .panel {
+        border-radius: 16px;
+      }
+
+      .header { padding: 12px 16px; }
+      .pill { bottom: 20px; right: 20px; }
+    }
     `;
   }
 
@@ -835,6 +884,16 @@ class AliigoWidget extends HTMLElement {
     const t = UI[locale];
 
     const theme = this.getThemeOverride() || session?.theme || this.cachedTheme || {};
+
+    const panelHex = (theme.panelBg || "").trim();
+    const panelOpacity =
+      typeof theme.panelOpacity === "number" ? clamp01(theme.panelOpacity) : 1;
+
+    const panelRgba = panelHex ? rgbaFromHex(panelHex, panelOpacity) : null;
+
+
+    const panelStyle = panelRgba ? `style="--panel-bg:${panelRgba};"` : "";
+
 
     const brand = (this.getBrandOverride() || session?.brand || this.cachedBrand || "").trim();
 
@@ -944,7 +1003,7 @@ class AliigoWidget extends HTMLElement {
     this.root.innerHTML = `
       <style>${this.css()}</style>
       <div class="${wrapperClass}">
-        <div class="${panelClass}">
+      <div class="${panelClass}" ${panelStyle}>
           <div class="header" style="background:${header.bg};color:${header.text};">
             <div>${t.title(brand)}</div>
             ${variant === "floating" ? `<button class="close" aria-label="Close" style="color:${header.text};">×</button>` : ``}

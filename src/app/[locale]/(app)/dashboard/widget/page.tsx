@@ -12,6 +12,8 @@ type Theme = {
   bubbleBot: string;
   sendBg: string;
   sendText: string;
+  panelBg: string;   
+  panelOpacity: number;   
 };
 
 type ThemeDb = Partial<Theme>;
@@ -90,6 +92,8 @@ const DEFAULT_THEME: Theme = {
   bubbleBot: "#f3f4f6 #111827", // bg + text
   sendBg: "#2563eb #ffffff", // bg + text
   sendText: "#ffffff", // kept for backwards compat, not used by new UI
+  panelBg: "#09090b",
+  panelOpacity: 0.72,
 };
 
 function mergeTheme(db: ThemeDb | null | undefined): Theme {
@@ -108,6 +112,9 @@ function toThemeDb(x: unknown): ThemeDb | undefined {
   if (typeof o.bubbleBot === "string") out.bubbleBot = o.bubbleBot;
   if (typeof o.sendBg === "string") out.sendBg = o.sendBg;
   if (typeof o.sendText === "string") out.sendText = o.sendText;
+  if (typeof o.panelBg === "string") out.panelBg = o.panelBg;
+  if (typeof o.panelOpacity === "number") out.panelOpacity = o.panelOpacity;
+
 
   return out;
 }
@@ -312,6 +319,8 @@ export default function WidgetSettingsPage() {
     bubbleUser: theme.bubbleUser,
     bubbleBot: theme.bubbleBot,
     sendBg: theme.sendBg,
+    panelBg: theme.panelBg,
+    panelOpacity: theme.panelOpacity,
   });
 }, [theme]);
 
@@ -597,6 +606,44 @@ export default function WidgetSettingsPage() {
                 }}
               />
             </div>
+            
+            {/* Panel background */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-zinc-300 font-medium">Panel background</div>
+                <div className="text-xs text-zinc-500">color + opacity</div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input
+                  className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                  value={theme.panelBg}
+                  placeholder="#RRGGBB"
+                  onChange={(e) => {
+                    const bg = safeHex(e.target.value);
+                    setTheme((t) => ({ ...t, panelBg: bg }));
+                  }}
+                />
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={Math.round((theme.panelOpacity ?? 1) * 100)}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      setTheme((t) => ({ ...t, panelOpacity: Math.max(0, Math.min(1, v / 100)) }));
+                    }}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-zinc-400 w-[44px] text-right">
+                    {Math.round((theme.panelOpacity ?? 1) * 100)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
 
             {/* Send button */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

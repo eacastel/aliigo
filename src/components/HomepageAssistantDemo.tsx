@@ -11,11 +11,11 @@ function pathLocale(pathname: string): "en" | "es" {
 }
 
 // AliigoWidgetElement Theme supports these keys and expects hex pairs.
-const DEMO_THEME = {
+const SUPPORT_THEME = {
   headerBg: "#0b1220 #ffffff",
-  bubbleUser: "#84c9ad #0b0f0e",
-  bubbleBot: "#0b1220 #e5e7eb",
-  sendBg: "#84c9ad #0b0f0e",
+  bubbleUser: "#84c9ad #0a0a0a",
+  bubbleBot: "#f3f4f6 #111827",
+  sendBg: "#84c9ad #0a0a0a",
 };
 
 export function HomepageAssistantDemo({
@@ -54,7 +54,7 @@ export function HomepageAssistantDemo({
         locale={locale}
         brand={brand}
         sessionToken={token}
-        theme={DEMO_THEME}
+        theme={SUPPORT_THEME}
         startOpen
       />
 
