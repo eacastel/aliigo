@@ -12,6 +12,8 @@ type Theme = {
   bubbleBot: string;
   sendBg: string;
   sendText: string;
+  panelBg?: string;
+  panelOpacity?: number;
 };
 type ThemeDb = Partial<Theme>;
 
