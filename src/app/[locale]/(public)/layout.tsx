@@ -38,6 +38,13 @@ export default function PublicLayout({
             <LanguageSwitcher />
 
             {/* Hidden on mobile, visible on tablet+ */}
+            <Link
+              href="/pricing"
+              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
+            >
+              {t("publicLinks.pricing")}
+            </Link>
+
             <Link 
               href="/login" 
               className="hidden md:block text-zinc-400 hover:text-white transition-colors"

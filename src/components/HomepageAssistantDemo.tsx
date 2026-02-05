@@ -80,6 +80,7 @@ export function HomepageAssistantDemo() {
         sessionToken={cfg.token}
         theme={cfg.theme ?? undefined}
         startOpen
+        hideHeader
       />
     </div>
   );

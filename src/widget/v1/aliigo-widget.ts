@@ -527,6 +527,10 @@ class AliigoWidget extends HTMLElement {
     return (this.getAttribute("start-open") || "").toLowerCase() === "true";
   }
 
+  private getHideHeader(): boolean {
+    return (this.getAttribute("hide-header") || "").toLowerCase() === "true";
+  }
+
   private getFloatingMode(): "fixed" | "absolute" {
     const v = (this.getAttribute("floating-mode") || "").toLowerCase();
     return v === "absolute" ? "absolute" : "fixed";
@@ -687,6 +691,7 @@ class AliigoWidget extends HTMLElement {
 
       .panel.inline { width: 100%; max-width: 100%; height: 500px; box-shadow: none; border: 1px solid #e5e7eb; }
       .panel.hero { width: 100%; max-width: 100%; height: 100%; box-shadow: none; border: none; border-radius: 0; }
+      .panel.no-header .messages { padding-top: 24px; }
 
       /* --- Header --- */
       .header {
@@ -897,6 +902,7 @@ class AliigoWidget extends HTMLElement {
     const user = splitPair(theme.bubbleUser, { bg: "#2563eb", text: "#ffffff" });
     const bot = splitPair(theme.bubbleBot, { bg: "#f3f4f6", text: "#111827" });
     const send = splitPair(theme.sendBg, { bg: "#2563eb", text: "#ffffff" });
+    const hideHeader = this.getHideHeader();
 
     const open = variant !== "floating" ? true : this.state.open;
 
@@ -916,6 +922,7 @@ class AliigoWidget extends HTMLElement {
       variant === "hero" ? "panel hero" : variant === "inline" ? "panel inline" : "panel";
 
     const panelClass = animateIn ? `${basePanelClass} animate-in` : basePanelClass;
+    const panelClassWithHeader = hideHeader ? `${panelClass} no-header` : panelClass;
 
 
     const msgs = this.state.msgs;
@@ -999,11 +1006,15 @@ class AliigoWidget extends HTMLElement {
     this.root.innerHTML = `
       <style>${this.css()}</style>
       <div class="${wrapperClass}">
-      <div class="${panelClass}" ${panelStyle}>
-          <div class="header" style="background:${header.bg};color:${header.text};">
+      <div class="${panelClassWithHeader}" ${panelStyle}>
+          ${
+            hideHeader
+              ? ""
+              : `<div class="header" style="background:${header.bg};color:${header.text};">
             <div>${t.title(brand)}</div>
             ${variant === "floating" ? `<button class="close" aria-label="Close" style="color:${header.text};">×</button>` : ``}
-          </div>
+          </div>`
+          }
 
           <div class="body">
             <div class="messages">${messagesHtml}<div id="bottom"></div></div>

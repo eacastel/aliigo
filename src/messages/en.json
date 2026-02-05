@@ -34,6 +34,37 @@
       "terminos": "Terms of Use"
     }
   },
+  "PricingPage": {
+    "badge": "Simple, transparent plans",
+    "title": "Pricing that scales with your business",
+    "subtitle": "Launch with confidence on Starter or Growth. Talk to us for Pro.",
+    "description": "All plans include the Aliigo concierge experience, secure embed, and multi-language support. Start your 30-day free trial and upgrade anytime.",
+    "ctaPrimary": "Start free trial",
+    "ctaSecondary": "Talk to sales",
+    "contactTitle": "Contact us about Aliigo Pro",
+    "contactSubtitle": "Tell us about your volume, channels, and workflows so we can tailor the plan.",
+    "contactNote": "We respond in 1 business day.",
+    "form": {
+      "name": "Full name",
+      "namePlaceholder": "Jane Doe",
+      "email": "Work email",
+      "emailPlaceholder": "you@company.com",
+      "company": "Company",
+      "companyPlaceholder": "Acme Clinics",
+      "phone": "Phone (optional)",
+      "phonePlaceholder": "+34 600 000 000",
+      "website": "Website (optional)",
+      "websitePlaceholder": "https://yourcompany.com",
+      "message": "What do you need Aliigo to handle?",
+      "messagePlaceholder": "Describe your use case, volume, and preferred channels.",
+      "honeypot": "Leave this field empty",
+      "helper": "We’ll reach out with a tailored Pro recommendation and next steps.",
+      "submit": "Request Pro details",
+      "submitting": "Sending…",
+      "success": "Thanks — we’ll be in touch shortly.",
+      "error": "Something went wrong. Please try again."
+    }
+  },
   "Billing": {
     "title": "Billing",
     "statusLabel": "Status:",

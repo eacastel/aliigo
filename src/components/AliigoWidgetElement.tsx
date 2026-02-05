@@ -23,6 +23,7 @@ export function AliigoWidgetElement({
   floatingMode,
   theme,
   startOpen,
+  hideHeader,
   apiBase,
   embedKey,
 }: {
@@ -33,6 +34,7 @@ export function AliigoWidgetElement({
   floatingMode?: "fixed" | "absolute";
   theme?: Theme | null;
   startOpen?: boolean;
+  hideHeader?: boolean;
   apiBase?: string; // optional override
   embedKey?: string; // optional for real installs
 }) {
@@ -73,6 +75,7 @@ export function AliigoWidgetElement({
       brand={brand}
       theme={themeAttr}
       start-open={startOpen ? "true" : undefined}
+      hide-header={hideHeader ? "true" : undefined}
     />
   );
 }

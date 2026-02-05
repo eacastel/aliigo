@@ -34,6 +34,37 @@
       "terminos": "Términos de Uso"
     }
   },
+  "PricingPage": {
+    "badge": "Planes simples y transparentes",
+    "title": "Precios que crecen con tu negocio",
+    "subtitle": "Empieza con Starter o Growth. Para Pro, hablemos.",
+    "description": "Todos los planes incluyen la experiencia Aliigo, el widget seguro y soporte multilingüe. Inicia la prueba gratuita de 30 días y cambia de plan cuando quieras.",
+    "ctaPrimary": "Iniciar prueba gratis",
+    "ctaSecondary": "Hablar con ventas",
+    "contactTitle": "Contacta con nosotros sobre Aliigo Pro",
+    "contactSubtitle": "Cuéntanos tu volumen, canales y flujos para adaptar el plan.",
+    "contactNote": "Respondemos en 1 día laborable.",
+    "form": {
+      "name": "Nombre y apellidos",
+      "namePlaceholder": "María López",
+      "email": "Correo de trabajo",
+      "emailPlaceholder": "tu@empresa.com",
+      "company": "Empresa",
+      "companyPlaceholder": "Clínicas Acme",
+      "phone": "Teléfono (opcional)",
+      "phonePlaceholder": "+34 600 000 000",
+      "website": "Web (opcional)",
+      "websitePlaceholder": "https://tuempresa.com",
+      "message": "¿Qué necesitas que gestione Aliigo?",
+      "messagePlaceholder": "Describe tu caso de uso, volumen y canales preferidos.",
+      "honeypot": "Deja este campo vacío",
+      "helper": "Te contactaremos con una propuesta Pro y los siguientes pasos.",
+      "submit": "Solicitar información Pro",
+      "submitting": "Enviando…",
+      "success": "Gracias — te contactaremos en breve.",
+      "error": "Ha ocurrido un error. Inténtalo de nuevo."
+    }
+  },
   "Billing": {
     "title": "Facturación",
     "statusLabel": "Estado:",
