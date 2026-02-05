@@ -238,21 +238,21 @@
       "from": "from",
       "starter": {
         "name": "Starter",
-        "subtitle": "For businesses with website traffic that want to turn visits into contacts.",
-        "cta": "Try free for 30 days",
+        "subtitle": "Best for small local businesses.",
+        "cta": "Start free trial",
         "features": {
           "f1": "Smart website chat assistant",
-          "f2": "Generous conversation allowance",
+          "f2": "Ample monthly conversation allowance",
           "f3": "Basic business configuration",
-          "f4": "Lead capture (name, email)",
+          "f4": "Lead capture (name, email, phone)",
           "f5": "English & Spanish support"
         }
       },
       "growth": {
         "name": "Growth",
-        "subtitle": "For service teams with steady traffic that need to qualify and prioritize contacts.",
+        "subtitle": "Best for clinics, agencies, and service businesses.",
         "tag": "Best value",
-        "cta": "Try free for 30 days",
+        "cta": "Start free trial",
         "plusLabel": "Everything in Starter, plus:",
         "features": {
           "f1": "Higher conversation allowance",
@@ -263,14 +263,14 @@
       },
       "pro": {
         "name": "Pro",
-        "subtitle": "For high-traffic or high-value businesses that require custom flows.",
-        "cta": "Contact sales",
+        "subtitle": "Best for high-traffic or high-value businesses.",
+        "cta": "Contact us",
         "plusLabel": "Everything in Growth, plus:",
         "features": {
           "f1": "Advanced customization",
-          "f2": "Unlimited message volume",
-          "f3": "Custom behavior & flows",
-          "f4": "Dedicated account manager"
+          "f2": "Higher or unlimited message volume",
+          "f3": "Custom behavior and flows",
+          "f4": "Built for high-traffic teams"
         }
       }
     },
@@ -279,7 +279,7 @@
       "subtitle": "You define the knowledge and goals. Aliigo does the rest.",
       "step1": {
         "title": "Create your account",
-        "desc": "Sign up, confirm your email, and activate billing to access your dashboard."
+        "desc": "Choose a plan, add a payment method, and start your 30-day free trial."
       },
       "step2": {
         "title": "Add business information",

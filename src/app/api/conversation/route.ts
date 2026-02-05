@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { originHost, hostAllowed } from "@/lib/embedGate";
+import {
+  countUserMessagesForBusiness,
+  resolveUsageWindow,
+  type BillingPlan,
+  type BillingStatus,
+} from "@/lib/billingUsage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -181,6 +187,16 @@ async function validateEmbedAccess(token: string, host: string) {
   }
 
   return { ok: true as const, businessId: biz.data.id };
+}
+
+function isBillingActive(status: BillingStatus | null | undefined) {
+  return status === "trialing" || status === "active";
+}
+
+function isTrialExpired(trialEnd: string | null) {
+  if (!trialEnd) return false;
+  const endMs = Date.parse(trialEnd);
+  return Number.isFinite(endMs) && endMs <= Date.now();
 }
 
 // -------------------- Actions schema --------------------
@@ -368,6 +384,74 @@ export async function POST(req: NextRequest) {
     }
     const businessId = gate.businessId;
 
+    // business prompt (also gives us default_locale + qualification_prompt + billing gate)
+    const bizRes = await supabase
+      .from("businesses")
+      .select(
+        "name, timezone, system_prompt, slug, knowledge, default_locale, qualification_prompt, billing_status, billing_plan, trial_end, current_period_end"
+      )
+      .eq("id", businessId)
+      .single<{
+        name: string;
+        timezone: string;
+        system_prompt: string | null;
+        slug: string;
+        knowledge: string | null;
+        default_locale: string | null;
+        qualification_prompt: string | null;
+        billing_status: BillingStatus | null;
+        billing_plan: BillingPlan;
+        trial_end: string | null;
+        current_period_end: string | null;
+      }>();
+
+    if (bizRes.error) throw bizRes.error;
+    if (!bizRes.data) throw new Error("Business not found");
+
+    const billingStatus = bizRes.data.billing_status ?? "incomplete";
+
+    if (!isBillingActive(billingStatus)) {
+      return NextResponse.json(
+        { error: "Billing inactive. Please activate your subscription." },
+        { status: 402, headers: corsHeadersFor(req) }
+      );
+    }
+
+    if (billingStatus === "trialing" && isTrialExpired(bizRes.data.trial_end)) {
+      return NextResponse.json(
+        { error: "Trial expired. Please activate your subscription." },
+        { status: 402, headers: corsHeadersFor(req) }
+      );
+    }
+
+    const usageWindow = resolveUsageWindow({
+      status: billingStatus,
+      plan: bizRes.data.billing_plan ?? null,
+      trialEnd: bizRes.data.trial_end ?? null,
+      currentPeriodEnd: bizRes.data.current_period_end ?? null,
+    });
+
+    if (usageWindow.limit !== null) {
+      const used = await countUserMessagesForBusiness({
+        supabase,
+        businessId,
+        periodStart: usageWindow.periodStart,
+        periodEnd: usageWindow.periodEnd,
+      });
+
+      if (used >= usageWindow.limit) {
+        return NextResponse.json(
+          {
+            error: "Usage limit reached for this billing period.",
+            limit: usageWindow.limit,
+            used,
+            period_end: usageWindow.periodEnd,
+          },
+          { status: 402, headers: corsHeadersFor(req) }
+        );
+      }
+    }
+
     await rateLimit(businessId, ip);
 
     if (inputConvId) {
@@ -387,24 +471,6 @@ export async function POST(req: NextRequest) {
         );
       }
     }
-
-    // business prompt (also gives us default_locale + qualification_prompt)
-    const bizRes = await supabase
-      .from("businesses")
-      .select("name, timezone, system_prompt, slug, knowledge, default_locale, qualification_prompt")
-      .eq("id", businessId)
-      .single<{
-        name: string;
-        timezone: string;
-        system_prompt: string | null;
-        slug: string;
-        knowledge: string | null;
-        default_locale: string | null;
-        qualification_prompt: string | null;
-      }>();
-
-    if (bizRes.error) throw bizRes.error;
-    if (!bizRes.data) throw new Error("Business not found");
 
     const supported = new Set(["en", "es", "fr", "it", "de"]);
     const requestedLocale = typeof bodyLocale === "string" ? bodyLocale.toLowerCase().trim() : "";
