@@ -828,21 +828,13 @@ class AliigoWidget extends HTMLElement {
       @media (max-width: 480px) {
       .floating.fixed { left: 0; right: 0; bottom: 0; }
 
-      /* Only remove rounding when it's truly the fullscreen fixed widget. */
-      .floating.fixed .panel {
+      /* Only go fullscreen if explicitly enabled */
+      :host([mobile-fullscreen="true"]) .floating.fixed .panel {
         width: 100%;
         height: 100%;
         max-height: 100%;
         border-radius: 0;
       }
-
-      /* Keep absolute-mode preview looking like a widget (rounded). */
-      .floating.absolute .panel {
-        border-radius: 16px;
-      }
-
-      .header { padding: 12px 16px; }
-      .pill { bottom: 20px; right: 20px; }
     }
     `;
   }
@@ -850,6 +842,9 @@ class AliigoWidget extends HTMLElement {
   private render() {
     this.ensureRoot();
     const variant = this.getVariant();
+
+    
+
 
     const needsRemoteTheme =
       !!this.getEmbedKey() &&
@@ -882,6 +877,7 @@ class AliigoWidget extends HTMLElement {
     const session = this.state.session;
     const locale = this.getLocaleOverride() || this.state.locale;
     const t = UI[locale];
+
 
     const theme = this.getThemeOverride() || session?.theme || this.cachedTheme || {};
 

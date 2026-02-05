@@ -1,64 +1,86 @@
-// src/components/HomepageAssistantDemo.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AliigoWidgetElement } from "@/components/AliigoWidgetElement";
+import type { WidgetTheme } from "@/types/widgetTheme";
 
 function pathLocale(pathname: string): "en" | "es" {
   const seg = (pathname.split("/")[1] || "").toLowerCase();
   return seg === "es" ? "es" : "en";
 }
 
-// AliigoWidgetElement Theme supports these keys and expects hex pairs.
-const SUPPORT_THEME = {
-  headerBg: "#0b1220 #ffffff",
-  bubbleUser: "#84c9ad #0a0a0a",
-  bubbleBot: "#f3f4f6 #111827",
-  sendBg: "#84c9ad #0a0a0a",
+type SupportCfg = {
+  token: string;
+  brand: string;
+  theme: WidgetTheme | null;
 };
 
-export function HomepageAssistantDemo({
-  brand = "Aliigo",
-  businessSlug = "aliigo",
-}: {
-  brand?: string;
-  businessSlug?: string;
-}) {
-  const [token, setToken] = useState<string | null>(null);
+function isWidgetTheme(x: unknown): x is WidgetTheme {
+  if (!x || typeof x !== "object") return false;
+  const o = x as Record<string, unknown>;
+
+  const okStr = (v: unknown) => typeof v === "string";
+  const okNum = (v: unknown) => typeof v === "number";
+
+  return (
+    (o.headerBg === undefined || okStr(o.headerBg)) &&
+    (o.bubbleUser === undefined || okStr(o.bubbleUser)) &&
+    (o.bubbleBot === undefined || okStr(o.bubbleBot)) &&
+    (o.sendBg === undefined || okStr(o.sendBg)) &&
+    (o.panelBg === undefined || okStr(o.panelBg)) &&
+    (o.panelOpacity === undefined || okNum(o.panelOpacity))
+  );
+}
+
+export function HomepageAssistantDemo() {
+  const [cfg, setCfg] = useState<SupportCfg | null>(null);
   const pathname = usePathname();
   const locale = pathLocale(pathname);
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       try {
-        const res = await fetch("/api/support-token");
-        const j = await res.json().catch(() => ({}));
-        if (res.ok) setToken(j.token || null);
+        const res = await fetch("/api/support-token", { cache: "no-store" });
+        const j = (await res.json().catch(() => ({}))) as unknown;
+
+        if (!res.ok) return;
+
+        const o = (j && typeof j === "object") ? (j as Record<string, unknown>) : {};
+        const token = typeof o.token === "string" ? o.token : "";
+        if (!token) return;
+
+        const brand = typeof o.brand === "string" && o.brand.trim() ? o.brand.trim() : "Aliigo";
+        const theme = isWidgetTheme(o.theme) ? o.theme : null;
+
+        if (!cancelled) setCfg({ token, brand, theme });
       } catch {
         // noop
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (!token) return null;
+  if (!cfg?.token) return null;
 
   return (
     <div
       id="homepage-assistant-demo"
-      className="relative h-[495
-      px] border-0 bg-zinc-950/60 overflow-hidden"
+      className="relative h-[495px] border-0 bg-zinc-950/60 overflow-hidden"
     >
       <AliigoWidgetElement
         variant="inline"
         locale={locale}
-        brand={brand}
-        sessionToken={token}
-        theme={SUPPORT_THEME}
+        brand={cfg.brand}
+        sessionToken={cfg.token}
+        theme={cfg.theme ?? undefined}
         startOpen
       />
-
-      <span className="hidden" data-business-slug={businessSlug} />
     </div>
   );
 }

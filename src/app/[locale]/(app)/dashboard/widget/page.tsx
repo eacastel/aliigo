@@ -480,12 +480,11 @@ export default function WidgetSettingsPage() {
 
           <Script src="/widget/v1/aliigo-widget.js" strategy="afterInteractive" />
 
-          <div className="relative h-[420px] border border-zinc-800 rounded bg-zinc-950 overflow-hidden">
+          <div className="relative h-[420px] border border-zinc-800 rounded bg-zinc-950 p-6 overflow-visible">
             {previewSessionToken ? (
               <div className="absolute inset-0">
                 <aliigo-widget
                   style={{ display: "block", width: "100%", height: "100%" }}
-                  embed-key={biz.public_embed_key}
                   variant="floating"
                   floating-mode="absolute"
                   start-open="true"
@@ -495,12 +494,12 @@ export default function WidgetSettingsPage() {
                   theme={previewThemeJson}
                   brand={brand}
                 />
-
               </div>
             ) : (
               <div className="p-4 text-sm text-zinc-400">Loading preview…</div>
             )}
           </div>
+
 
           {/* HEX inputs (bg + text) */}
           <div className="space-y-3">
