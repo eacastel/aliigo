@@ -68,47 +68,8 @@ export async function GET(req: NextRequest) {
     }
     if (!bizRes.data) return json(req, { error: "Invalid key" }, 403);
 
-    /**
-     * DOMAIN GATE (TEMP OVERRIDE)
-     *
-     * WHY:
-     * - The dashboard/widget preview runs on aliigo.com.
-     * - Today, /api/embed/session enforces allowed_domains strictly.
-     * - That forces every client to manually add "aliigo.com" to allowed domains just to preview,
-     *   which is wrong UX and blocks onboarding.
-     *
-     * WHAT WE’RE DOING (TEMP):
-     * - Always allow aliigo.com + www.aliigo.com in addition to the business’s allowed_domains.
-     * - This keeps customer-site security intact while unblocking internal preview immediately.
-     *
-     * TODO (FIX PROPERLY LATER):
-     * - Remove this hardcoded union.
-     * - Use /api/embed/preview-session for internal preview only, and make the widget preview
-     *   explicitly call preview-session (Bearer-auth) instead of session.
-     *   OR: Add a server-side "is_internal_preview" switch that only bypasses domain gate
-     *   when request originates from authenticated dashboard context.
-     */
-
-    // --- ORIGINAL (STRICT) CHECK - COMMENTED OUT FOR TEMP PREVIEW UNBLOCK ---
-    // const allowed = bizRes.data.allowed_domains ?? [];
-    // if (!hostAllowed(host, allowed)) {
-    //   return json(req, { error: "Domain not allowed" }, 403);
-    // }
-
-    // --- TEMP REPLACEMENT: REMOVE AFTER PREVIEW-SESSION FLOW IS WIRED IN ---
     const allowed = bizRes.data.allowed_domains ?? [];
-
-    // TEMP: always allow Aliigo’s own domain so dashboard preview works without requiring
-    // customers to add aliigo.com manually.
-    const effectiveAllowed = Array.from(
-      new Set(
-        [...allowed, "aliigo.com", "www.aliigo.com"]
-          .map((d) => (d || "").trim().toLowerCase().replace(/:\d+$/, ""))
-          .filter(Boolean)
-      )
-    );
-
-    if (!hostAllowed(host, effectiveAllowed)) {
+    if (!hostAllowed(host, allowed)) {
       return json(req, { error: "Domain not allowed" }, 403);
     }
 

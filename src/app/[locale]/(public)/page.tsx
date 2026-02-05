@@ -649,7 +649,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/contact"
+                href="/pricing#pro-contact"
                 className="block w-full py-3 px-4 bg-zinc-800 text-white text-center rounded-lg text-sm font-semibold hover:bg-zinc-700 transition-colors border border-white/5"
               >
                 {t("pricing.pro.cta")}

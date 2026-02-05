@@ -34,6 +34,37 @@
       "terminos": "Términos de Uso"
     }
   },
+  "PricingPage": {
+    "badge": "Planes simples y transparentes",
+    "title": "Precios que crecen con tu negocio",
+    "subtitle": "Empieza con Starter o Growth. Para Pro, hablemos.",
+    "description": "Todos los planes incluyen la experiencia Aliigo, el widget seguro y soporte multilingüe. Inicia la prueba gratuita de 30 días y cambia de plan cuando quieras.",
+    "ctaPrimary": "Iniciar prueba gratis",
+    "ctaSecondary": "Hablar con ventas",
+    "contactTitle": "Contacta con nosotros sobre Aliigo Pro",
+    "contactSubtitle": "Cuéntanos tu volumen, canales y flujos para adaptar el plan.",
+    "contactNote": "Respondemos en 1 día laborable.",
+    "form": {
+      "name": "Nombre y apellidos",
+      "namePlaceholder": "María López",
+      "email": "Correo de trabajo",
+      "emailPlaceholder": "tu@empresa.com",
+      "company": "Empresa",
+      "companyPlaceholder": "Clínicas Acme",
+      "phone": "Teléfono (opcional)",
+      "phonePlaceholder": "+34 600 000 000",
+      "website": "Web (opcional)",
+      "websitePlaceholder": "https://tuempresa.com",
+      "message": "¿Qué necesitas que gestione Aliigo?",
+      "messagePlaceholder": "Describe tu caso de uso, volumen y canales preferidos.",
+      "honeypot": "Deja este campo vacío",
+      "helper": "Te contactaremos con una propuesta Pro y los siguientes pasos.",
+      "submit": "Solicitar información Pro",
+      "submitting": "Enviando…",
+      "success": "Gracias — te contactaremos en breve.",
+      "error": "Ha ocurrido un error. Inténtalo de nuevo."
+    }
+  },
   "Billing": {
     "title": "Facturación",
     "statusLabel": "Estado:",
@@ -236,20 +267,20 @@
 
       "starter": {
         "name": "Starter",
-        "subtitle": "Para negocios con tráfico web que quieren convertir visitas en contactos.",
+        "subtitle": "Ideal para pequeños negocios locales.",
         "cta": "Empieza la prueba gratis",
         "features": {
           "f1": "Asistente de chat inteligente en tu web",
-          "f2": "Incluye un buen volumen de conversaciones",
+          "f2": "Amplio volumen mensual de conversaciones",
           "f3": "Configuración básica del negocio",
-          "f4": "Captura de contactos (nombre y email)",
+          "f4": "Captura de leads (nombre, email y teléfono)",
           "f5": "Soporte en español e inglés"
         }
       },
 
       "growth": {
         "name": "Growth",
-        "subtitle": "Para equipos de servicios con tráfico constante que necesitan cualificar y priorizar contactos.",
+        "subtitle": "Ideal para clínicas, agencias y negocios de servicios.",
         "tag": "Mejor opción",
         "cta": "Empieza la prueba gratis",
         "plusLabel": "Todo lo de Starter, y además:",
@@ -257,20 +288,20 @@
           "f1": "Más volumen de conversaciones",
           "f2": "Personalización más avanzada",
           "f3": "Cualificación de contactos más precisa",
-          "f4": "Prioridad a visitantes con alta intención"
+          "f4": "Prioridad para visitantes con alta intención"
         }
       },
 
       "pro": {
         "name": "Pro",
-        "subtitle": "Para negocios con mucho tráfico o clientes de alto valor que requieren flujos a medida.",
-        "cta": "Hablar con ventas",
+        "subtitle": "Ideal para negocios con mucho tráfico o alto valor.",
+        "cta": "Contactar",
         "plusLabel": "Todo lo de Growth, y además:",
         "features": {
           "f1": "Personalización a medida",
-          "f2": "Mensajes ilimitados",
+          "f2": "Mayor volumen de mensajes o ilimitado",
           "f3": "Comportamientos y flujos personalizados",
-          "f4": "Gestor de cuenta dedicado"
+          "f4": "Pensado para equipos con alto volumen"
         }
       }
     },
@@ -279,7 +310,7 @@
       "subtitle": "Tú defines el conocimiento y los objetivos. Aliigo hace el resto.",
       "step1": {
         "title": "Crea tu cuenta",
-        "desc": "Regístrate, confirma tu email y activa la facturación para acceder a tu panel."
+        "desc": "Elige un plan, añade un método de pago y empieza la prueba gratis de 30 días."
       },
       "step2": {
         "title": "Añade información del negocio",

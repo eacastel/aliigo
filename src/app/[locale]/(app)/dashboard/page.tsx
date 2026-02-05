@@ -35,6 +35,16 @@ type PendingSignup = {
   createdAtMs: number;
 };
 
+type UsagePayload = {
+  status: "incomplete" | "trialing" | "active" | "canceled" | "past_due";
+  plan: "starter" | "growth" | null;
+  used: number;
+  limit: number | null;
+  remaining: number | null;
+  period_start: string;
+  period_end: string;
+};
+
 const DEFAULT_ALLOWED_DOMAINS = new Set(["aliigo.com", "www.aliigo.com"]);
 
 function nonEmpty(v: unknown) {
@@ -78,6 +88,7 @@ export default function DashboardPage() {
 
   const [embedToken, setEmbedToken] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [usage, setUsage] = useState<UsagePayload | null>(null);
 
   const daysLeft = useMemo(() => {
     const start = business?.created_at
@@ -154,6 +165,24 @@ export default function DashboardPage() {
         } else {
           setEmbedToken(null);
         }
+
+        const token = session.access_token;
+        const usageRes = await fetch("/api/billing/usage", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const usageJson = (await usageRes.json().catch(() => ({}))) as Partial<UsagePayload>;
+        if (usageRes.ok && usageJson.used !== undefined) {
+          setUsage({
+            status: usageJson.status ?? "incomplete",
+            plan: usageJson.plan ?? null,
+            used: usageJson.used ?? 0,
+            limit: usageJson.limit ?? null,
+            remaining: usageJson.remaining ?? null,
+            period_start: usageJson.period_start ?? "",
+            period_end: usageJson.period_end ?? "",
+          });
+        }
       } catch (error) {
         console.error("Dashboard Load Error:", error);
       } finally {
@@ -218,6 +247,14 @@ export default function DashboardPage() {
   const displayPhone = business?.telefono || pending?.phone || "—";
 
   const biz = business?.businesses;
+  const usagePct =
+    usage?.limit && usage.limit > 0 ? Math.min(100, Math.round((usage.used / usage.limit) * 100)) : 0;
+  const usageFmt = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const usagePeriodEnd = usage?.period_end ? usageFmt.format(new Date(usage.period_end)) : "—";
 
   const checklist: { group: string; items: ChecklistItem[] }[] = [
     {
@@ -354,6 +391,40 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {usage && (
+          <div className="mt-6 overflow-hidden rounded-xl bg-zinc-900/70 border border-zinc-800 shadow-lg">
+            <div className="px-4 py-4 sm:px-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-sm font-medium text-zinc-200">Message usage</h2>
+                  <p className="mt-1 text-xs text-zinc-400">
+                    Resets on {usagePeriodEnd}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-zinc-100">
+                    {usage.used}
+                    {usage.limit === null ? " / ∞" : ` / ${usage.limit}`}
+                  </div>
+                  <div className="text-xs text-zinc-400 capitalize">
+                    {usage.plan ? `${usage.plan} plan` : usage.status}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
+                <div className="h-2 bg-brand-500" style={{ width: `${usagePct}%` }} />
+              </div>
+
+              {usage.limit !== null && (
+                <div className="mt-2 text-xs text-zinc-400">
+                  {usage.remaining ?? 0} messages left this period.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {!isConfirmed && (
           <div className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">

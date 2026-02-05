@@ -34,6 +34,37 @@
       "terminos": "Terms of Use"
     }
   },
+  "PricingPage": {
+    "badge": "Simple, transparent plans",
+    "title": "Pricing that scales with your business",
+    "subtitle": "Launch with confidence on Starter or Growth. Talk to us for Pro.",
+    "description": "All plans include the Aliigo concierge experience, secure embed, and multi-language support. Start your 30-day free trial and upgrade anytime.",
+    "ctaPrimary": "Start free trial",
+    "ctaSecondary": "Talk to sales",
+    "contactTitle": "Contact us about Aliigo Pro",
+    "contactSubtitle": "Tell us about your volume, channels, and workflows so we can tailor the plan.",
+    "contactNote": "We respond in 1 business day.",
+    "form": {
+      "name": "Full name",
+      "namePlaceholder": "Jane Doe",
+      "email": "Work email",
+      "emailPlaceholder": "you@company.com",
+      "company": "Company",
+      "companyPlaceholder": "Acme Clinics",
+      "phone": "Phone (optional)",
+      "phonePlaceholder": "+34 600 000 000",
+      "website": "Website (optional)",
+      "websitePlaceholder": "https://yourcompany.com",
+      "message": "What do you need Aliigo to handle?",
+      "messagePlaceholder": "Describe your use case, volume, and preferred channels.",
+      "honeypot": "Leave this field empty",
+      "helper": "We’ll reach out with a tailored Pro recommendation and next steps.",
+      "submit": "Request Pro details",
+      "submitting": "Sending…",
+      "success": "Thanks — we’ll be in touch shortly.",
+      "error": "Something went wrong. Please try again."
+    }
+  },
   "Billing": {
     "title": "Billing",
     "statusLabel": "Status:",
@@ -238,21 +269,21 @@
       "from": "from",
       "starter": {
         "name": "Starter",
-        "subtitle": "For businesses with website traffic that want to turn visits into contacts.",
-        "cta": "Try free for 30 days",
+        "subtitle": "Best for small local businesses.",
+        "cta": "Start free trial",
         "features": {
           "f1": "Smart website chat assistant",
-          "f2": "Generous conversation allowance",
+          "f2": "Ample monthly conversation allowance",
           "f3": "Basic business configuration",
-          "f4": "Lead capture (name, email)",
+          "f4": "Lead capture (name, email, phone)",
           "f5": "English & Spanish support"
         }
       },
       "growth": {
         "name": "Growth",
-        "subtitle": "For service teams with steady traffic that need to qualify and prioritize contacts.",
+        "subtitle": "Best for clinics, agencies, and service businesses.",
         "tag": "Best value",
-        "cta": "Try free for 30 days",
+        "cta": "Start free trial",
         "plusLabel": "Everything in Starter, plus:",
         "features": {
           "f1": "Higher conversation allowance",
@@ -263,14 +294,14 @@
       },
       "pro": {
         "name": "Pro",
-        "subtitle": "For high-traffic or high-value businesses that require custom flows.",
-        "cta": "Contact sales",
+        "subtitle": "Best for high-traffic or high-value businesses.",
+        "cta": "Contact us",
         "plusLabel": "Everything in Growth, plus:",
         "features": {
           "f1": "Advanced customization",
-          "f2": "Unlimited message volume",
-          "f3": "Custom behavior & flows",
-          "f4": "Dedicated account manager"
+          "f2": "Higher or unlimited message volume",
+          "f3": "Custom behavior and flows",
+          "f4": "Built for high-traffic teams"
         }
       }
     },
@@ -279,7 +310,7 @@
       "subtitle": "You define the knowledge and goals. Aliigo does the rest.",
       "step1": {
         "title": "Create your account",
-        "desc": "Sign up, confirm your email, and activate billing to access your dashboard."
+        "desc": "Choose a plan, add a payment method, and start your 30-day free trial."
       },
       "step2": {
         "title": "Add business information",
