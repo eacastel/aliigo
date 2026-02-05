@@ -1,18 +1,9 @@
-// app/(app)/dashboard/widget/page.tsx
-
+// src/app/(app)/dashboard/widget/page.tsx
 "use client";
 
+import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { AliigoChatWidget } from "@/components/AliigoChatWidget";
-
-/* ---------- Types ---------- */
-type BizLocal = {
-  id: string;
-  slug: string;
-  system_prompt: string | null;
-  allowed_domains: string[];
-};
 
 type Theme = {
   headerBg: string;
@@ -21,6 +12,18 @@ type Theme = {
   bubbleBot: string;
   sendBg: string;
   sendText: string;
+  panelBg: string;   
+  panelOpacity: number;   
+};
+
+type ThemeDb = Partial<Theme>;
+
+type BizLocal = {
+  id: string;
+  slug: string;
+  public_embed_key: string;
+  default_locale: "en" | "es";
+  widget_theme: ThemeDb;
 };
 
 type WidgetJoinRow = {
@@ -28,8 +31,9 @@ type WidgetJoinRow = {
   businesses: {
     id: string;
     slug: string;
-    system_prompt: string | null;
-    allowed_domains: string[] | null;
+    public_embed_key: string | null;
+    default_locale: string | null;
+    widget_theme: ThemeDb | null;
   } | null;
 };
 
@@ -39,61 +43,242 @@ function isWidgetJoinRow(x: unknown): x is WidgetJoinRow {
   return "business_id" in o && "businesses" in o;
 }
 
-export default function WidgetSettingsPage() {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [biz, setBiz] = useState<BizLocal | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [brand, setBrand] = useState("Aliigo");
-  const [theme, setTheme] = useState<Theme>({
-    headerBg: "bg-gray-900",
-    headerText: "text-white",
-    bubbleUser: "bg-blue-600 text-white",
-    bubbleBot: "bg-gray-100 text-gray-900",
-    sendBg: "bg-blue-600",
-    sendText: "text-white",
-  });
+function getBaseUrl() {
+  if (typeof window !== "undefined") return window.location.origin;
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com";
+}
 
-  // Load user -> profile+business, then latest token (no `any`)
+const isHex = (v?: string) =>
+  typeof v === "string" && /^#([0-9a-fA-F]{3}){1,2}$/.test(v.trim());
+
+const normalizeHex = (v: string) => v.trim();
+
+// For strings that contain 1–2 hex values, returns bg + text.
+// Example: "#111827 #ffffff" -> { bg:"#111827", text:"#ffffff" }
+const splitTwoHex = (v?: string) => {
+  const s = (v || "").trim();
+  if (!s) return { bg: "", text: "" };
+
+  // Accept partial tokens while typing (no regex)
+  const parts = s.split(/\s+/);
+  return {
+    bg: parts[0] ?? "",
+    text: parts[1] ?? "",
+  };
+};
+
+  // --- UI parity with Billing + Messages buttons ---
+  const btnBase =
+    "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-60 disabled:!cursor-not-allowed";
+
+  const btnBrand =
+    `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
+
+  const btnNeutral =
+    `${btnBase} bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40`;
+
+  const btnNeutralStrong =
+    `${btnBase} bg-zinc-950/40 text-zinc-200 ring-zinc-700/60 hover:bg-zinc-900/50`;
+
+
+
+const joinTwoHex = (bg: string, text: string) =>
+  `${normalizeHex(bg)} ${normalizeHex(text)}`.trim();
+
+const DEFAULT_THEME: Theme = {
+  headerBg: "#111827 #ffffff", // bg + text
+  headerText: "#ffffff", // kept for backwards compat, not used by new UI
+  bubbleUser: "#2563eb #ffffff", // bg + text
+  bubbleBot: "#f3f4f6 #111827", // bg + text
+  sendBg: "#2563eb #ffffff", // bg + text
+  sendText: "#ffffff", // kept for backwards compat, not used by new UI
+  panelBg: "#09090b",
+  panelOpacity: 0.72,
+};
+
+function mergeTheme(db: ThemeDb | null | undefined): Theme {
+  return { ...DEFAULT_THEME, ...(db ?? {}) };
+}
+
+function toThemeDb(x: unknown): ThemeDb | undefined {
+  if (!x || typeof x !== "object") return undefined;
+
+  const o = x as Record<string, unknown>;
+  const out: ThemeDb = {};
+
+  if (typeof o.headerBg === "string") out.headerBg = o.headerBg;
+  if (typeof o.headerText === "string") out.headerText = o.headerText;
+  if (typeof o.bubbleUser === "string") out.bubbleUser = o.bubbleUser;
+  if (typeof o.bubbleBot === "string") out.bubbleBot = o.bubbleBot;
+  if (typeof o.sendBg === "string") out.sendBg = o.sendBg;
+  if (typeof o.sendText === "string") out.sendText = o.sendText;
+  if (typeof o.panelBg === "string") out.panelBg = o.panelBg;
+  if (typeof o.panelOpacity === "number") out.panelOpacity = o.panelOpacity;
+
+
+  return out;
+}
+
+type PostgrestErrLike = { message?: string } | null;
+
+function errMsg(e: PostgrestErrLike): string {
+  return typeof e?.message === "string" ? e.message : "";
+}
+
+// Small helper to keep inputs valid: if empty or invalid, return "" (so user can type)
+function safeHex(v: string) {
+  const s = v.trim();
+
+  // allow empty so user can clear the field
+  if (!s) return "";
+
+  // allow typing partial: "#", "#1", "#12", "#123", "#1234"... etc
+  if (s[0] !== "#") return s; // don’t block if they paste without '#', you can enforce later
+  const rest = s.slice(1).replace(/[^0-9a-fA-F]/g, "");
+  return "#" + rest.slice(0, 6);
+}
+
+export default function WidgetSettingsPage() {
+  const [biz, setBiz] = useState<BizLocal | null>(null);
+
+  // dev-only convenience token (preview)
+  const [token, setToken] = useState<string | null>(null);
+
+  const [brand, setBrand] = useState("Aliigo");
+
+  const [initialBrand, setInitialBrand] = useState("Aliigo");
+
+  const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
+  const [initialTheme, setInitialTheme] = useState<Theme>(DEFAULT_THEME);
+
+  const [msg, setMsg] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const [previewSessionToken, setPreviewSessionToken] = useState<string | null>(null);
+  const [previewLocale, setPreviewLocale] = useState<"en" | "es">("en");
+
+  type BizRow = {
+    id: string;
+    slug: string;
+    name: string | null;
+    brand_name: string | null;
+    public_embed_key: string | null;
+    default_locale: string | null;
+    widget_theme?: unknown;
+  };
+
+  type JoinRow = {
+    business_id: string | null;
+    businesses: BizRow | null;
+  };
+
   useEffect(() => {
     (async () => {
+      setMsg(null);
+
       const { data: sess } = await supabase.auth.getSession();
       const uid = sess.session?.user?.id || null;
-      setUserId(uid);
       if (!uid) return;
 
-      const { data, error } = await supabase
+      const r1 = await supabase
         .from("business_profiles")
         .select(
           `
           business_id,
-          businesses:business_id (
+          businesses:businesses!business_profiles_business_id_fkey (
             id,
+            name,
+            brand_name,
             slug,
-            system_prompt,
-            allowed_domains
+            public_embed_key,
+            default_locale,
+            widget_theme
           )
         `
         )
         .eq("id", uid)
-        .limit(1)
-        .maybeSingle();
+        .maybeSingle<JoinRow>();
+
+      let data: JoinRow | null = r1.data ?? null;
+      let error: PostgrestErrLike = r1.error;
+
+      
+
+      if (/widget_theme.*does not exist/i.test(errMsg(error))) {
+        const r2 = await supabase
+          .from("business_profiles")
+          .select(
+            `
+            business_id,
+            businesses:businesses!business_profiles_business_id_fkey (
+              id,
+              slug,
+              name,
+              brand_name,
+              public_embed_key,
+              default_locale
+            )
+          `
+          )
+          .eq("id", uid)
+          .maybeSingle<JoinRow>();
+
+        data = r2.data ?? null;
+        error = r2.error;
+      }
 
       if (error) {
-        console.error("[widget] profile join error:", error.message);
+        console.error("[widget] profile join error:", errMsg(error));
+        setMsg("Could not load your business.");
         return;
       }
-      if (!isWidgetJoinRow(data) || !data.business_id || !data.businesses) {
+
+      if (!data?.business_id || !data.businesses) {
         setBiz(null);
         return;
       }
 
       const b = data.businesses;
+
+      const accessToken = sess.session?.access_token;
+      if (accessToken && b.public_embed_key) {
+        const r = await fetch(
+          `/api/embed/preview-session?key=${encodeURIComponent(b.public_embed_key)}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
+
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.token) {
+          setPreviewSessionToken(String(j.token));
+          setPreviewLocale(
+            (String(j.locale || "en").toLowerCase().startsWith("es") ? "es" : "en") as
+              | "en"
+              | "es"
+          );
+        }
+      }
+
+
+      const effectiveBrand = (b.brand_name || b.name || "Aliigo").trim();
+      setBrand(effectiveBrand);
+      setInitialBrand(effectiveBrand);
+
+      const dbTheme = toThemeDb(b.widget_theme);
+      const merged = mergeTheme(dbTheme);
+
       setBiz({
         id: b.id,
         slug: b.slug,
-        system_prompt: b.system_prompt,
-        allowed_domains: b.allowed_domains ?? [],
+        public_embed_key: b.public_embed_key ?? "",
+        default_locale: b.default_locale === "es" ? "es" : "en",
+        widget_theme: dbTheme ?? {},
       });
+
+      setTheme(merged);
+      setInitialTheme(merged);
 
       const { data: t, error: tErr } = await supabase
         .from("embed_tokens")
@@ -107,210 +292,472 @@ export default function WidgetSettingsPage() {
     })();
   }, []);
 
-  const saveSettings = async () => {
-    if (!userId) return;
-    await fetch("/api/widget/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId,
-        system_prompt: biz?.system_prompt || "",
-        allowed_domains: biz?.allowed_domains || [],
-      }),
-    });
-    alert("Widget settings saved.");
+  const dirty = useMemo(() => {
+    const themeDirty = JSON.stringify(theme) !== JSON.stringify(initialTheme);
+    const brandDirty = brand.trim() !== initialBrand.trim();
+    return themeDirty || brandDirty;
+  }, [theme, initialTheme, brand, initialBrand]);
+
+  // ✅ split values for the new UI (no DB change)
+  const headerSplit = useMemo(
+    () => splitTwoHex(theme.headerBg),
+    [theme.headerBg]
+  );
+  const userSplit = useMemo(
+    () => splitTwoHex(theme.bubbleUser),
+    [theme.bubbleUser]
+  );
+  const botSplit = useMemo(
+    () => splitTwoHex(theme.bubbleBot),
+    [theme.bubbleBot]
+  );
+  const sendSplit = useMemo(() => splitTwoHex(theme.sendBg), [theme.sendBg]);
+
+  const previewThemeJson = useMemo(() => {
+  return JSON.stringify({
+    headerBg: theme.headerBg,
+    bubbleUser: theme.bubbleUser,
+    bubbleBot: theme.bubbleBot,
+    sendBg: theme.sendBg,
+    panelBg: theme.panelBg,
+    panelOpacity: theme.panelOpacity,
+  });
+}, [theme]);
+
+
+  const saveTheme = async () => {
+    setMsg(null);
+    setSaving(true);
+
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const accessToken = sess.session?.access_token;
+      if (!accessToken) {
+        setMsg("Login required.");
+        return;
+      }
+
+      const res = await fetch("/api/widget/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          widget_theme: theme,
+          brand_name: brand,
+        }),
+      });
+
+      const j: {
+        ok?: boolean;
+        error?: string;
+        theme?: ThemeDb;
+        brand_name?: string | null;
+      } = await res.json().catch(() => ({}));
+
+      if (!res.ok || !j.ok) {
+        setMsg(j.error || "Save error");
+        return;
+      }
+
+      if (typeof j.brand_name === "string" && j.brand_name.trim()) {
+        const bn = j.brand_name.trim();
+        setBrand(bn);
+        setInitialBrand(bn);
+      } else {
+        // If API didn’t echo, still lock in what we saved
+        setInitialBrand(brand.trim());
+      }
+
+      const merged = mergeTheme(j.theme ?? theme);
+      setTheme(merged);
+      setInitialTheme(merged);
+      setMsg("Saved.");
+    } catch (e: unknown) {
+      console.error(e);
+      setMsg("Could not save now.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const rotateToken = async () => {
-    if (!userId) return;
-    const res = await fetch("/api/widget/rotate-token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-    });
-    const j: { token?: string; error?: string } = await res.json();
-    if (res.ok && j.token) setToken(j.token);
-    else alert(j.error || "Error");
+    const rotateToken = async () => {
+      setMsg(null);
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        const accessToken = sess.session?.access_token;
+        if (!accessToken) {
+          setMsg("Login required.");
+          return;
+        }
+
+        const res = await fetch("/api/widget/rotate-token", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const j: { token?: string; error?: string } = await res.json().catch(() => ({}));
+        if (!res.ok || !j.token) {
+          setMsg(j.error || "Could not generate token.");
+          return;
+        }
+
+        setToken(j.token);
+        setMsg("Token generated.");
+      } catch (e) {
+        console.error(e);
+        setMsg("Could not generate token.");
+      }
+    };
+
+
+
+
+  const rotatePublicKey = async () => {
+    setMsg(
+      "TODO: implement /api/widget/rotate-public-key to rotate businesses.public_embed_key."
+    );
   };
 
   const embedCode = useMemo(() => {
-    const base = process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.vercel.app";
-    const themeParam = encodeURIComponent(JSON.stringify(theme));
-    const slug = biz?.slug || "horchata-labs";
-    const tk = token || "SET_TOKEN";
+    const key = biz?.public_embed_key || "PUBLIC_KEY";
+
+    // IMPORTANT: client sites always load from aliigo.com
+    const script = `<script src="https://aliigo.com/widget/v1/aliigo-widget.js" defer></script>`;
+
+    const floating = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="floating"></aliigo-widget>`;
+    const inline = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="inline"></aliigo-widget>`;
+    const hero = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="hero"></aliigo-widget>`;
+
+
     return [
-      "<!-- Aliigo Chat Widget -->",
-      "<script>",
-      "(function(){",
-      "  var iframe=document.createElement('iframe');",
-      `  iframe.src='${base}/embed/chat?slug=${slug}&brand=${encodeURIComponent(
-        brand
-      )}&token=${tk}&theme=${themeParam}';`,
-      "  iframe.style.position='fixed';",
-      "  iframe.style.bottom='24px';",
-      "  iframe.style.right='24px';",
-      "  iframe.style.width='360px';",
-      "  iframe.style.height='420px';",
-      "  iframe.style.border='0';",
-      "  iframe.style.zIndex='999999';",
-      "  document.body.appendChild(iframe);",
-      "})();",
-      "</script>",
+      script,
+      "",
+      "<!-- Floating (bottom-right pill) -->",
+      floating,
+      "",
+      "<!-- Inline (embed in a section) -->",
+      inline,
+      "",
+      "<!-- Hero (component-style) -->",
+      hero,
     ].join("\n");
-  }, [biz?.slug, brand, theme, token]);
+  }, [biz?.public_embed_key]);
 
   if (!biz) {
     return (
       <div className="max-w-lg p-4 text-white">
         <h1 className="text-xl font-semibold mb-2">No linked business</h1>
         <p className="text-sm text-zinc-400">
-          We couldn’t find a business associated with your profile. Complete your business
-          details in Settings first, then return here.
+          We couldn’t find a business associated with your profile. Complete
+          Settings → Business first, then return here.
         </p>
+        {msg && <p className="mt-3 text-sm text-red-400">{msg}</p>}
       </div>
     );
   }
-
   return (
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">Widget</h1>
 
+      {msg && (
+        <div
+          className={`mb-4 text-sm ${
+            msg === "Saved." ? "text-green-400" : "text-zinc-300"
+          }`}
+        >
+          {msg}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Settings */}
-        <section className="space-y-4 bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
-          <div>
-            <label className="block text-sm font-medium mb-1 text-zinc-200">
-              Allowed domains
-            </label>
-            <input
-              className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm text-white"
-              placeholder="example.com, store.example.com"
-              value={biz.allowed_domains?.join(", ") || ""}
-              onChange={(e) =>
-                setBiz((b) =>
-                  b
-                    ? {
-                        ...b,
-                        allowed_domains: e.target.value
-                          .split(",")
-                          .map((s) => s.trim())
-                          .filter(Boolean),
-                      }
-                    : b
-                )
-              }
-            />
-            <p className="text-xs text-zinc-500 mt-1">
-              Domains allowed to embed your widget.
-            </p>
+        {/* LEFT: Preview + Theme */}
+        <section className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/40 space-y-4">
+          <h2 className="font-semibold">Live preview</h2>
+
+          <Script src="/widget/v1/aliigo-widget.js" strategy="afterInteractive" />
+
+          <div className="relative h-[420px] border border-zinc-800 rounded bg-zinc-950 p-6 overflow-visible">
+            {previewSessionToken ? (
+              <div className="absolute inset-0">
+                <aliigo-widget
+                  style={{ display: "block", width: "100%", height: "100%" }}
+                  variant="floating"
+                  floating-mode="absolute"
+                  start-open="true"
+                  api-base={getBaseUrl()}
+                  locale={previewLocale}
+                  session-token={previewSessionToken}
+                  theme={previewThemeJson}
+                  brand={brand}
+                />
+              </div>
+            ) : (
+              <div className="p-4 text-sm text-zinc-400">Loading preview…</div>
+            )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-zinc-200">
-              Assistant instructions
-            </label>
-            <textarea
-              className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm text-white"
-              rows={6}
-              value={biz.system_prompt || ""}
-              onChange={(e) => setBiz((b) => (b ? { ...b, system_prompt: e.target.value } : b))}
-            />
-          </div>
 
-          <div className="flex gap-2">
-            <button className="bg-white text-black rounded px-4 py-2" onClick={saveSettings}>
-              Save
-            </button>
-            <button
-              className="border border-zinc-700 rounded px-4 py-2 hover:bg-zinc-900"
-              onClick={rotateToken}
-            >
-              Rotate token
-            </button>
-          </div>
+          {/* HEX inputs (bg + text) */}
+          <div className="space-y-3">
+            {/* Header */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="text-sm text-zinc-300 font-medium">Header</div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
 
-          <div className="text-sm text-zinc-400">
-            Current token: <code className="text-zinc-300">{token || "—"}</code>
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={headerSplit.bg}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const bg = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    headerBg: joinTwoHex(bg, headerSplit.text || "#ffffff"),
+                  }));
+                }}
+              />
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={headerSplit.text}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const text = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    headerBg: joinTwoHex(headerSplit.bg || "#111827", text),
+                  }));
+                }}
+              />
+            </div>
+
+            {/* User bubble */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="text-sm text-zinc-300 font-medium">
+                User bubble
+              </div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
+
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={userSplit.bg}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const bg = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    bubbleUser: joinTwoHex(bg, userSplit.text || "#ffffff"),
+                  }));
+                }}
+              />
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={userSplit.text}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const text = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    bubbleUser: joinTwoHex(userSplit.bg || "#2563eb", text),
+                  }));
+                }}
+              />
+            </div>
+
+            {/* Bot bubble */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="text-sm text-zinc-300 font-medium">
+                Bot bubble
+              </div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
+
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={botSplit.bg}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const bg = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    bubbleBot: joinTwoHex(bg, botSplit.text || "#111827"),
+                  }));
+                }}
+              />
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={botSplit.text}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const text = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    bubbleBot: joinTwoHex(botSplit.bg || "#f3f4f6", text),
+                  }));
+                }}
+              />
+            </div>
+            
+            {/* Panel background */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-zinc-300 font-medium">Panel background</div>
+                <div className="text-xs text-zinc-500">color + opacity</div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input
+                  className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                  value={theme.panelBg}
+                  placeholder="#RRGGBB"
+                  onChange={(e) => {
+                    const bg = safeHex(e.target.value);
+                    setTheme((t) => ({ ...t, panelBg: bg }));
+                  }}
+                />
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={Math.round((theme.panelOpacity ?? 1) * 100)}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      setTheme((t) => ({ ...t, panelOpacity: Math.max(0, Math.min(1, v / 100)) }));
+                    }}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-zinc-400 w-[44px] text-right">
+                    {Math.round((theme.panelOpacity ?? 1) * 100)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            {/* Send button */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="text-sm text-zinc-300 font-medium">
+                Send button
+              </div>
+              <div className="text-xs text-zinc-500 sm:text-right">
+                bg / text
+              </div>
+
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={sendSplit.bg}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const bg = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    sendBg: joinTwoHex(bg, sendSplit.text || "#ffffff"),
+                  }));
+                }}
+              />
+              <input
+                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                value={sendSplit.text}
+                placeholder="#RRGGBB"
+                onChange={(e) => {
+                  const text = safeHex(e.target.value);
+                  setTheme((t) => ({
+                    ...t,
+                    sendBg: joinTwoHex(sendSplit.bg || "#2563eb", text),
+                  }));
+                }}
+              />
+            </div>
           </div>
         </section>
 
-        {/* Live Preview */}
-        <section className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/40">
-          <h2 className="font-semibold mb-2">Live preview</h2>
-          <div className="relative h-[420px] border border-zinc-800 rounded bg-zinc-950">
-            <AliigoChatWidget
-              businessSlug={biz.slug}
-              brand={brand}
-              token={token ?? undefined}
-              theme={theme}
-            />
+        {/* RIGHT: Keys + actions */}
+        <section className="space-y-4 bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
+          <div className="text-sm text-zinc-400 space-y-1">
+            <div>
+              Business slug: <code className="text-zinc-200">{biz.slug}</code>
+            </div>
+            <div>
+              Default language:{" "}
+              <code className="text-zinc-200">{biz.default_locale}</code>
+            </div>
+            <div>
+              Public embed key:{" "}
+              <code className="text-zinc-200">
+                {biz.public_embed_key || "—"}
+              </code>
+            </div>
+            <div>
+              Preview token (dev):{" "}
+              <code className="text-zinc-200">{token || "—"}</code>
+            </div>
           </div>
 
-          <div className="mt-4 grid sm:grid-cols-2 gap-2">
-            <label className="text-sm text-zinc-300">Brand</label>
+          <div>
+            <label className="block text-sm text-zinc-300 mb-1">Brand</label>
             <input
-              className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              className="w-full border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
             />
+          </div>
 
-            <label className="text-sm text-zinc-300">Header bg (Tailwind)</label>
-            <input
-              className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
-              value={theme.headerBg}
-              onChange={(e) => setTheme((t) => ({ ...t, headerBg: e.target.value }))}
-            />
+          <div className="flex flex-wrap gap-2">
+            <button
+              className={btnBrand}
+              onClick={saveTheme}
+              disabled={!dirty || saving}
+            >
+              {saving ? "Saving…" : "Save theme"}
+            </button>
 
-            <label className="text-sm text-zinc-300">Header text</label>
-            <input
-              className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
-              value={theme.headerText}
-              onChange={(e) => setTheme((t) => ({ ...t, headerText: e.target.value }))}
-            />
+            <button
+              className={btnNeutral}
+              onClick={() => {
+                setTheme(initialTheme);
+                setBrand(initialBrand);
+                setMsg(null);
+              }}
+              disabled={!dirty || saving}
+            >
+              Reset
+            </button>
 
-            <label className="text-sm text-zinc-300">User bubble</label>
-            <input
-              className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
-              value={theme.bubbleUser}
-              onChange={(e) => setTheme((t) => ({ ...t, bubbleUser: e.target.value }))}
-            />
+            <button
+              className={btnNeutralStrong}
+              onClick={rotateToken}
+            >
+              Generate token
+            </button>
 
-            <label className="text-sm text-zinc-300">Bot bubble</label>
-            <input
-              className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
-              value={theme.bubbleBot}
-              onChange={(e) => setTheme((t) => ({ ...t, bubbleBot: e.target.value }))}
-            />
-
-            <label className="text-sm text-zinc-300">Send bg</label>
-            <input
-              className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
-              value={theme.sendBg}
-              onChange={(e) => setTheme((t) => ({ ...t, sendBg: e.target.value }))}
-            />
-
-            <label className="text-sm text-zinc-300">Send text</label>
-            <input
-              className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
-              value={theme.sendText}
-              onChange={(e) => setTheme((t) => ({ ...t, sendText: e.target.value }))}
-            />
+            <button
+              className={btnNeutralStrong}
+              onClick={rotatePublicKey}
+            >
+              Rotate public key
+            </button>
           </div>
         </section>
       </div>
 
-      {/* Embed snippet */}
       <section className="mt-8">
         <h2 className="font-semibold mb-2">Embed snippet</h2>
         <textarea
           className="w-full border border-zinc-800 bg-zinc-950 text-zinc-200 rounded px-3 py-2 text-xs"
-          rows={10}
+          rows={14}
           value={embedCode}
           readOnly
         />
-        <p className="text-xs text-zinc-500 mt-2">
-          Paste before the closing <code>&lt;/body&gt;</code> tag of your site.
-        </p>
       </section>
     </div>
   );

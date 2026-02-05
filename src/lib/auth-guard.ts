@@ -1,3 +1,5 @@
+// src/lib/auth-guard.ts
+
 /**
  * Client-side session hardening:
  * - Ensures a valid current session AND a valid user from Supabase.

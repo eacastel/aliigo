@@ -1,324 +1,517 @@
 {
-    "Navigation": {
-        "brand": "Aliigo",
-        "links": {
-            "dashboard": "Overview",
-            "settings": "Business",
-            "widget": "Widget",
-            "billing": "Billing"
-        },
-        "publicLinks": {
-            "features": "How it works",
-            "pricing": "Pricing",
-            "blog": "Resources"
-        },
-        "actions": {
-            "panel": "Dashboard",
-            "login": "Log in",
-            "logout": "Log out",
-            "sidebarTitle": "Dashboard",
-            "getStarted": "Get Invite"
-        },
-        "footer": "All rights reserved.",
-        "footerLinks": {
-            "avisoLegal": "Legal Notice",
-            "privacidad": "Privacy",
-            "cookies": "Cookies",
-            "terminos": "Terms of Use"
-        }
+  "Metadata": {
+    "title": "Aliigo — Your Business-Owned AI Assistant",
+    "titleTemplate": "%s | Aliigo",
+    "description": "A business-owned AI assistant for your website that answers instantly, shares the right information, and guides visitors to the next step."
+  },
+  "Navigation": {
+    "brand": "Aliigo",
+    "links": {
+      "dashboard": "Overview",
+      "business": "Business",
+      "assistant": "Assistant",
+      "widget": "Widget",
+      "messages": "Messages",
+      "billing": "Billing"
     },
-    "Dashboard": {
-        "welcome": "Welcome, {name}",
-        "welcomeGeneric": "Welcome",
-        "trialDays": "{days} days left in trial",
-        "verifyTitle": "Verify your email",
-        "verifyMessage": "We sent a link to {email}. You must confirm it to access all features.",
-        "resendButton": "Resend Email",
-        "resendSuccess": "Email sent. Check your spam folder.",
-        "resendError": "Error sending: {error}",
-        "businessInfo": {
-            "defaultName": "Your Business",
-            "contactLabel": "Contact:",
-            "phoneLabel": "Phone:"
-        },
-        "cards": {
-            "reviewsTitle": "Request Reviews",
-            "reviewsDesc": "Send SMS or Email to your clients.",
-            "campaignsTitle": "Campaigns",
-            "campaignsDesc": "Automate bulk messaging."
-        },
-        "loading": "Loading..."
+    "publicLinks": {
+      "features": "How it works",
+      "pricing": "Pricing",
+      "blog": "Resources"
     },
-    "Landing": {
-        "hero": {
-            "betaNote": "Private Beta Live 🚀",
-            "title": "Your local reputation,",
-            "titleHighlight": "automated.",
-            "subtitle": "Turn Google reviews into loyal customers and automate WhatsApp. All in one dashboard designed for local businesses.",
-            "ctaPrimary": "Request Invite",
-            "ctaSecondary": "See how it works"
-        },
-        "socialProof": {
-            "title": "BUILT FOR INDUSTRIES WHERE TRUST IS EVERYTHING",
-            "industries": {
-                "clinics": "Medical Clinics",
-                "schools": "Education",
-                "aesthetics": "Aesthetics",
-                "physio": "Physiotherapy",
-                "legal": "Legal Services",
-                "dental": "Dental Clinics"
-            }
-        },
-        "features": {
-            "title": "All the essentials, zero clutter",
-            "subtitle": "We focus on what actually moves the needle: getting messages, replying fast, and keeping your Google reputation under control.",
-            "f1": {
-                "title": "AI Web Chat",
-                "desc": "An assistant that replies 24/7 using your business's real info. Train it with your services and hours in minutes."
-            },
-            "f2": {
-                "title": "Unified Inbox",
-                "desc": "Manage web and WhatsApp messages in one place. Customer history, internal notes, and custom tags."
-            },
-            "f3": {
-                "title": "Google Reviews",
-                "desc": "See your reviews at a glance, spot issues before they grow, and reply directly from the dashboard."
-            },
-            "f4": {
-                "title": "Review Requests",
-                "desc": "Send direct links via SMS or Email to encourage happy customers to leave you 5 stars."
-            }
-        },
-        "pricing": {
-            "title": "Launch Pricing",
-            "desc": "We are finalizing pricing. Businesses joining the beta get preferential terms and locked-in rates.",
-            "price": "49€",
-            "period": "/mo",
-            "cta": "Join Beta"
-        },
-        "howItWorks": {
-            "title": "How it works",
-            "subtitle": "No complex technical setup. You are live in 3 steps.",
-            "step1": {
-                "title": "Request Invite",
-                "desc": "Leave your details. We verify your business fits our private beta criteria."
-            },
-            "step2": {
-                "title": "Connect Profile",
-                "desc": "We sync your Google Business Profile and train the AI assistant with your info."
-            },
-            "step3": {
-                "title": "Autopilot Mode",
-                "desc": "Receive your activation code and start replying to customers and reviews instantly."
-            }
-        },
-        "faq": {
-            "title": "Frequently Asked Questions",
-            "q1": {
-                "q": "What does Aliigo actually do?",
-                "a": "It combines an AI web chat, a unified inbox, and Google Review management in one dashboard."
-            },
-            "q2": {
-                "q": "What features are in Beta?",
-                "a": "AI Web Chat, Unified Inbox, and Review Management. WhatsApp Business is coming in the next update."
-            },
-            "q3": {
-                "q": "Is there a contract?",
-                "a": "No. We want you to stay for the results, not a contract. Cancel anytime."
-            },
-            "q4": {
-                "q": "Do I need technical skills?",
-                "a": "Zero. We give you a small snippet for your website (or send it to your webmaster) and that's it."
-            }
-        },
-        "finalCta": {
-            "title": "Give your reputation the place it deserves",
-            "button": "Request Invite"
-        }
+    "actions": {
+      "panel": "Dashboard",
+      "login": "Log in",
+      "logout": "Log out",
+      "sidebarTitle": "Dashboard",
+      "getStarted": "Get started"
     },
-    "Auth": {
-        "login": {
-            "title": "Log In",
-            "emailLabel": "Email address",
-            "passwordLabel": "Password",
-            "submitButton": "Log In",
-            "loading": "Logging in...",
-            "forgotPassword": "Forgot password?",
-            "resetLink": "Reset it",
-            "okVerified": "✅ Email verified. You can now log in.",
-            "msgValidation": "Please enter your email and password.",
-            "msgUnconfirmed": "You must confirm your email before logging in.",
-            "msgTooManyRequests": "Too many attempts. Try again later.",
-            "msgInvalidCreds": "Invalid credentials.",
-            "resendButton": "Resend confirmation",
-            "resending": "Resending...",
-            "msgResendSuccess": "Confirmation email resent.",
-            "msgResendError": "Error resending. Try again later."
-        },
-        "signup": {
-            "introTitle": "Request invitation to Aliigo",
-            "introText": "During launch, Aliigo is available by invitation only. Create your account and tell us a bit about your business. We will review your application and, if it fits the program, activate your access.",
-            "emailPlaceholder": "Contact Email *",
-            "namePlaceholder": "Your Name",
-            "businessPlaceholder": "Business Name *",
-            "googleUrlPlaceholder": "Website or Google Profile",
-            "phonePlaceholder": "Phone",
-            "passwordPlaceholder": "Password *",
-            "submitButton": "Create account and request invitation",
-            "disclaimer": "We will use your data only to contact you about Aliigo and your account activation.",
-            "alreadyAccount": "Already have an account?",
-            "signInLink": "Log in",
-            "errorValidation": "Please complete all required fields.",
-            "errorPassword": "Password must be at least 6 characters.",
-            "loading": "Sending request..."
-        },
-        "checkEmail": {
-            "title": "Thanks for requesting an invite",
-            "subtitle": "We have received your application successfully.",
-            "desc1": "During this private beta phase, we review each business manually to ensure the best service.",
-            "desc2": "If your business fits the program, you will receive an email shortly with:",
-            "list1": "Your exclusive activation code",
-            "list2": "Immediate dashboard access",
-            "list3": "Special lifetime conditions",
-            "footer": "Did you enter the wrong email?",
-            "backLink": "Go back home"
-        },
-        "reset": {
-            "title": "Reset password",
-            "desc": "Enter your email and we'll send you a recovery link.",
-            "emailPlaceholder": "you@example.com",
-            "submitButton": "Send link",
-            "loading": "Sending...",
-            "success": "✉️ Link sent. Check your inbox (and spam).",
-            "errorEmail": "Please enter a valid email.",
-            "backToLogin": "Back to Log In"
-        },
-        "update": {
-            "title": "New Password",
-            "desc": "Enter your new password to secure your account.",
-            "passwordLabel": "New password",
-            "submitButton": "Update Password",
-            "success": "Password updated! Redirecting...",
-            "errorLength": "Password must be at least 6 characters."
-        }
-    },
-    "Legal": {
-        "avisoLegal": {
-            "title": "Legal Notice",
-            "lastUpdated": "Last updated: {date}",
-            "intro": "In compliance with the duty of information contained in Article 10 of Law 34/2002, of July 11, on Information Society Services and Electronic Commerce (LSSI-CE), the following general information data of the website is declared:",
-            "section1": {
-                "title": "1. Identifying Data",
-                "owner": "Legal Owner:",
-                "brand": "Commercial Name:",
-                "nif": "Tax ID (NIF):",
-                "address": "Address:",
-                "email": "Email:"
-            },
-            "section2": {
-                "title": "2. Purpose",
-                "content": "This Legal Notice regulates the access, navigation, and use of the website, as well as the responsibilities derived from the use of its contents (understanding 'contents' as texts, graphics, drawings, designs, codes, software, photographs, music, videos, sounds, databases, images, expressions, and information, as well as any other creation protected by national laws and international treaties on intellectual and industrial property)."
-            },
-            "section3": {
-                "title": "3. Users",
-                "content": "Access and/or use of this portal attributes the condition of USER, who accepts, from said access and/or use, the General Conditions of Use reflected here. Said Conditions shall apply regardless of the General Contracting Conditions that may be mandatory."
-            },
-            "section4": {
-                "title": "4. Use of the Portal",
-                "content": "Aliigo provides access to a multitude of information, services, programs, or data on the Internet belonging to the Owner or its licensors to which the USER may have access. The USER assumes responsibility for the use of the portal. This responsibility extends to the registration necessary to access certain services or contents. In such registration, the USER will be responsible for providing truthful and lawful information."
-            },
-            "section5": {
-                "title": "5. Intellectual and Industrial Property",
-                "content": "The Owner, by itself or as an assignee, is the owner of all intellectual and industrial property rights of its website, as well as the elements contained therein (by way of example: images, sound, audio, video, software or texts; trademarks or logos, color combinations, structure and design, selection of materials used, computer programs necessary for its operation, access and use, etc.), ownership of the Owner or its licensors."
-            },
-            "section6": {
-                "title": "6. Exclusion of Guarantees and Responsibility",
-                "content": "The Owner is not responsible, in any case, for damages of any nature that could cause, by way of example: errors or omissions in the contents, lack of availability of the portal, or the transmission of viruses or malicious or harmful programs in the contents, despite having adopted all necessary technological measures to avoid it."
-            }
-        },
-        "cookies": {
-            "title": "Cookie Policy",
-            "lastUpdated": "Last updated: {date}",
-            "intro": "This policy explains what cookies are, how we use them at Aliigo, and how you can manage them.",
-            "section1": {
-                "title": "1. What are cookies?",
-                "content": "A cookie is a small text file that is stored in your browser when you visit almost any web page. Its utility is that the web is capable of remembering your visit when you browse that page again. Cookies usually store technical information, personal preferences, content personalization, usage statistics, links to social networks, access to user accounts, etc."
-            },
-            "section2": {
-                "title": "2. Cookies used on this website",
-                "technical": "Technical Cookies (Necessary):",
-                "technicalDesc": "Those that allow the user to navigate through the web page and use the different options or services that exist in it, such as identifying the session, accessing restricted access parts (Dashboard), or carrying out the purchase process.",
-                "analytical": "Analytical Cookies:",
-                "analyticalDesc": "Those that, treated by us or by third parties (such as Google Analytics), allow us to quantify the number of users and thus carry out the measurement and statistical analysis of the use made by users of the service offered."
-            },
-            "section3": {
-                "title": "3. Third Parties",
-                "content": "This website may use third-party services that will collect information for statistical purposes, use of the Site by the user, and for the provision of other services related to the activity of the Website and other Internet services. In particular, this website uses Google Analytics and Supabase (for session management)."
-            },
-            "section4": {
-                "title": "4. Management and deactivation of cookies",
-                "content": "At any time you can exercise your right to deactivate or delete cookies from this website. These actions are performed differently depending on the browser you are using (Chrome, Safari, Firefox, Edge)."
-            }
-        },
-        "privacidad": {
-            "title": "Privacy Policy",
-            "lastUpdated": "Last updated: {date}",
-            "intro": "At Aliigo, we take your privacy very seriously. This policy describes how we collect, use, and protect your personal data in compliance with the GDPR and LOPDGDD.",
-            "section1": {
-                "title": "1. Data Controller",
-                "label": "Identity:",
-                "address": "Address:",
-                "email": "Email:"
-            },
-            "section2": {
-                "title": "2. Purpose of treatment",
-                "content": "We treat the information provided by interested persons in order to:",
-                "point1": "Manage registration and provision of the SaaS (Software as a Service) service.",
-                "point2": "Manage billing and collection of contracted services.",
-                "point3": "Send commercial communications about our products or services (only if you have given your consent).",
-                "dataRetention": "The personal data provided will be kept as long as the commercial relationship is maintained or its deletion is not requested by the interested party."
-            },
-            "section3": {
-                "title": "3. Legitimation",
-                "content": "The legal basis for the processing of your data is the execution of the subscription contract to Aliigo (Terms and Conditions) and, for the sending of commercial communications, the consent of the interested party."
-            },
-            "section4": {
-                "title": "4. Recipients",
-                "content": "Data will not be communicated to third parties unless legally obliged or to suppliers necessary for the provision of the service (Data Processors) such as hosting providers (Vercel), database (Supabase), or payment gateways (Stripe)."
-            },
-            "section5": {
-                "title": "5. Rights",
-                "content": "Any person has the right to obtain confirmation as to whether or not we are treating personal data concerning them at Aliigo. Interested persons have the right to access their personal data, as well as to request the rectification of inaccurate data or request its deletion when, among other reasons, the data is no longer necessary for the purposes for which it was collected."
-            }
-        },
-        "terminos": {
-            "title": "Terms and Conditions of Use",
-            "lastUpdated": "Last updated: {date}",
-            "intro": "These General Conditions regulate the use of the services offered by Aliigo through the website.",
-            "section1": {
-                "title": "1. The Service",
-                "content": "Aliigo is a SaaS platform that allows local businesses to manage their online reputation, reviews, and communications. The service is currently offered in 'Private Beta' mode, which implies that there may be changes, interruptions, or new features added progressively."
-            },
-            "section2": {
-                "title": "2. User Account",
-                "content": "To use the service, you must register and create an account. You are responsible for maintaining the confidentiality of your password and for all activities that occur under your account. You must notify us immediately of any unauthorized use."
-            },
-            "section3": {
-                "title": "3. Prices and Payments",
-                "content": "During the Beta phase, the service may be offered under special pricing conditions. Aliigo reserves the right to modify rates with reasonable notice. Payments are recurring (monthly) and can be canceled at any time before the next billing cycle."
-            },
-            "section4": {
-                "title": "4. Cancellation",
-                "content": "The user can cancel their subscription at any time from their dashboard. The service will remain active until the end of the paid billing period."
-            },
-            "section5": {
-                "title": "5. Limitation of Liability",
-                "content": "Aliigo does not guarantee that the service will be uninterrupted or error-free. To the maximum extent permitted by law, Aliigo shall not be liable for indirect, incidental, or consequential damages derived from the use of the service."
-            },
-            "section6": {
-                "title": "6. Applicable Legislation",
-                "content": "These conditions shall be governed and interpreted in accordance with the laws of Spain. For any controversy, the parties submit to the courts and tribunals of the Owner's domicile."
-            }
-        }
+    "footer": "All rights reserved.",
+    "footerLinks": {
+      "avisoLegal": "Legal Notice",
+      "privacidad": "Privacy",
+      "cookies": "Cookies",
+      "terminos": "Terms of Use"
     }
+  },
+  "Billing": {
+    "title": "Billing",
+    "statusLabel": "Status:",
+    "pending": "Your workspace is created, but billing is not active yet.",
+    "step1": "1) Confirm your email (required).",
+    "step2": "2) Activate billing to access the dashboard (Stripe is not enabled yet in this build).",
+    "step3": "3) Until billing is active, you will remain on this page.",
+    "contact": "Contact support",
+    "logout": "Log out",
+    "loading": "Loading...",
+    "statusPrefix": "Status:",
+    "activeMessage": "Billing is active. You now have access to the dashboard.",
+    "activePanelHint": "Your subscription is active. You can now use Aliigo.",
+    "stepConfirmEmail": "1) Confirm your email to activate your account.",
+    "stepChoosePlan": "Choose a plan and add a payment method to start the free trial.",
+    "subscribedIntro": "Billing is active. You already have access to the dashboard.",
+    "alreadyActiveTitle": "Your subscription is active.",
+    "currentPlan": "Current plan:",
+    "trialEnds": "Your trial ends on:",
+    "renewsOn": "Renews on:",
+    "cancelAtPeriodEnd": "will cancel at period end",
+    "noNeedToPayAgain": "You don’t need to pay again. Your subscription is already active.",
+    "planStarter": "Aliigo Starter",
+    "planGrowth": "Aliigo Growth",
+    "planUnknown": "Plan not set",
+    "daysLeft": "{count, plural, one {# day remaining} other {# days remaining}}",
+    "managePlan": "Manage plan",
+    "openingPortal": "Opening…",
+    "perMonth": "/month",
+    "plansTitle": "Plans",
+    "upgradeToGrowth": "Upgrade to Growth",
+    "switchToStarter": "Switch to Starter",
+    "resumeMembership": "Keep membership",
+    "cancelMembership": "Cancel membership",
+    "planProTitle": "Aliigo Pro",
+    "planProDesc": "Custom. Contact support to set it up.",
+    "starterF1": "Website chat widget + inbox",
+    "starterF2": "Basic assistant + domain verification",
+    "starterF3": "Conversation history",
+    "growthF1": "Advanced assistant controls",
+    "growthF2": "Team workflows + analytics (coming)",
+    "growthF3": "Priority support"
+  },
+  "Dashboard": {
+    "cards": {
+      "reviewsTitle": "Request reviews",
+      "reviewsDesc": "Send SMS or email to your customers.",
+      "campaignsTitle": "Campaigns",
+      "campaignsDesc": "Automate bulk messaging."
+    },
+    "messages": {
+      "title": "Messages",
+      "subtitle": "Review conversations and recent messages from your website assistant.",
+      "searchPlaceholder": "Search messages / conversation IDs…",
+      "verifyTitle": "Verify your email",
+      "verifyBody": "Some features may be limited until your email is confirmed. If you already confirmed, sign out and sign back in to refresh your session.",
+      "tabRecent": "Recent messages",
+      "tabConversations": "Conversations",
+      "loading": "Loading…",
+      "emptyRecent": "No messages yet.",
+      "emptyConversations": "No conversations yet.",
+      "open": "Open",
+      "footerNote": "Tip: This page loads tenant-scoped data using your business_id derived from business_profiles.",
+      "openStatus": "Open",
+      "closedStatus": "Closed"
+    },
+    "loading": "Loading…",
+
+    "welcome": "Welcome, {name}",
+    "welcomeGeneric": "Welcome",
+
+    "trialDays": "{days} days left in your trial",
+
+    "businessInfo": {
+      "defaultName": "Your business",
+      "contactLabel": "Contact:",
+      "phoneLabel": "Phone:"
+    },
+
+    "businessOverview": {
+      "title": "Business overview",
+      "contactLine": "Contact: {name} · Phone: {phone}",
+      "emailLine": "Email: {email}",
+      "edit": "Edit"
+    },
+
+    "verifyTitle": "Verify your email",
+    "verifyMessage": "Please confirm your email address to activate your assistant. We sent a verification link to {email}.",
+    "resendButton": "Resend email",
+    "resendSuccess": "Verification email sent.",
+    "resendError": "Could not resend: {error}",
+
+    "onboarding": {
+      "title": "Onboarding",
+      "subtitle": "Complete the required steps to activate your assistant and widget.",
+      "completion": "{pct}% complete",
+      "requiredMissing": "Required items missing",
+      "open": "Open",
+      "fix": "Fix",
+      "done": "Done",
+      "requiredTag": "(required)"
+    },
+
+    "groups": {
+      "business": "Business",
+      "assistant": "Assistant",
+      "widget": "Widget"
+    },
+
+    "items": {
+      "allowed_domains": "Allowed domains configured",
+      "default_locale": "Default language selected",
+      "contact_name": "Contact name added",
+      "phone": "Phone added",
+      "system_prompt": "System prompt filled",
+      "qualification_prompt": "Qualification criteria filled",
+      "knowledge": "Knowledge filled",
+      "token": "Token generated"
+    }
+  },
+  "Landing": {
+    "hero": {
+      "betaNote": "Now live",
+      "title": "Give your website",
+      "titleHighlight": "a voice.",
+      "subtitle": "Aliigo is an AI assistant that lives on your website. It answers questions, understands intent, and turns real conversations into qualified leads automatically.",
+      "ctaPrimary": "Get started",
+      "ctaSecondary": "See it in action",
+      "qualifier": "Best for businesses with consistent website traffic or a high volume of repetitive customer questions."
+
+    },
+    "demo": {
+      "badge": "Live interactive demo",
+      "headlineLine1": "Don’t just read about it.",
+      "headlineEmphasis": "Try it right now.",
+      "subtitle": "Type a question below. See how Aliigo answers complex questions, qualifies contacts, and books meetings in seconds—without a human agent.",
+
+      "feature1": "Instant AI replies",
+      "feature2": "Automatic contact qualification",
+
+      "cta": "Start free trial →",
+
+      "phone": {
+        "time": "9:41",
+        "statusConnection": "Connection",
+        "statusWifi": "WiFi",
+        "statusBattery": "Batt",
+
+        "agentName": "Support Agent",
+        "agentSub": "Typically replies instantly"
+      }
+    },
+    "socialProof": {
+      "title": "WHERE A CONVERSATION CHANGES EVERYTHING",
+      "industries": {
+        "preContact": "Answer questions before they reach out",
+        "complexServices": "Explain complex services clearly",
+        "qualifyIntent": "Qualify real intent automatically",
+        "reduceNoise": "Reduce unnecessary calls and emails",
+        "highValue": "Guide high-value decisions",
+        "nextStep": "Drive the next step: call, book, or contact"
+      }
+    },
+    "featuresGrid": {
+      "title": "More than just a chat window.",
+      "subtitle": "Aliigo doesn’t just “chat.” It understands your business logic to drive real results.",
+
+      "card1": {
+        "title": "Trains on your data instantly",
+        "desc": "No manual flowcharting. Aliigo scans your website, PDFs, and docs to build a knowledge base that answers accurately from day one.",
+        "syncLabel": "SYNC_STATUS: ACTIVE",
+        "tagUrl": "URL",
+        "tagPdf": "PDF",
+        "tagDoc": "DOC",
+        "imported": "Imported",
+        "scanning": "Scanning…"
+      },
+
+      "card2": {
+        "title": "Captures contacts naturally",
+        "desc": "It detects intent and asks for details only when someone is genuinely interested.",
+        "notifTitle": "New contact captured"
+      },
+
+      "card3": {
+        "title": "Drives the next step",
+        "desc": "More than text. It can show action buttons to book meetings, start trials, or open the right page.",
+        "cta": "Book a demo"
+      },
+
+      "card4": {
+        "title": "Full visibility into conversations",
+        "desc": "See what customers ask, spot content gaps, and watch your conversion rate improve over time.",
+        "chartMon": "Mon",
+        "chartSun": "Sun"
+      }
+    },
+    "pricing": {
+      "title": "Invest in conversations that convert",
+      "badge": "30-day free trial on all plans",
+      "period": "/month",
+      "from": "from",
+      "starter": {
+        "name": "Starter",
+        "subtitle": "Best for small local businesses.",
+        "cta": "Start free trial",
+        "features": {
+          "f1": "Smart website chat assistant",
+          "f2": "Ample monthly conversation allowance",
+          "f3": "Basic business configuration",
+          "f4": "Lead capture (name, email, phone)",
+          "f5": "English & Spanish support"
+        }
+      },
+      "growth": {
+        "name": "Growth",
+        "subtitle": "Best for clinics, agencies, and service businesses.",
+        "tag": "Best value",
+        "cta": "Start free trial",
+        "plusLabel": "Everything in Starter, plus:",
+        "features": {
+          "f1": "Higher conversation allowance",
+          "f2": "Deeper business customization",
+          "f3": "Smarter lead qualification",
+          "f4": "Priority handling for high-intent visitors"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "subtitle": "Best for high-traffic or high-value businesses.",
+        "cta": "Contact us",
+        "plusLabel": "Everything in Growth, plus:",
+        "features": {
+          "f1": "Advanced customization",
+          "f2": "Higher or unlimited message volume",
+          "f3": "Custom behavior and flows",
+          "f4": "Built for high-traffic teams"
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "subtitle": "You define the knowledge and goals. Aliigo does the rest.",
+      "step1": {
+        "title": "Create your account",
+        "desc": "Choose a plan, add a payment method, and start your 30-day free trial."
+      },
+      "step2": {
+        "title": "Add business information",
+        "desc": "Services, hours, location, tone, and what a qualified lead looks like for you."
+      },
+      "step3": {
+        "title": "Go live",
+        "desc": "Add a small snippet to your site and the assistant is live immediately."
+      }
+    },
+    "faq": {
+      "title": "Questions",
+      "q1": {
+        "q": "What exactly is Aliigo?",
+        "a": "Aliigo is an AI assistant that lives on your website. It answers visitor questions and turns conversations into qualified leads."
+      },
+      "q2": {
+        "q": "Is this a chatbot?",
+        "a": "It is an assistant, not a script. It uses your business knowledge and adapts to each conversation."
+      },
+      "q3": {
+        "q": "Does it replace my staff?",
+        "a": "No. It handles first contact and qualification so your team only deals with real, high-intent conversations."
+      },
+      "q4": {
+        "q": "How hard is setup?",
+        "a": "Simple. We provide a small snippet for your website. Most businesses can go live the same day."
+      }
+    },
+    "finalCta": {
+      "title": "Turn visitors into qualified leads",
+      "button": "Get started"
+    }
+  },
+  "Auth": {
+    "login": {
+      "title": "Log in",
+      "emailLabel": "Email address",
+      "passwordLabel": "Password",
+      "submitButton": "Log in",
+      "loading": "Logging in...",
+      "forgotPassword": "Forgot password?",
+      "resetLink": "Reset it",
+      "okVerified": "Email verified. You can now log in.",
+      "msgValidation": "Please enter your email and password.",
+      "msgUnconfirmed": "You must confirm your email before logging in.",
+      "msgTooManyRequests": "Too many attempts. Try again later.",
+      "msgInvalidCreds": "Invalid credentials.",
+      "resendButton": "Resend confirmation",
+      "resending": "Resending...",
+      "msgResendSuccess": "Confirmation email resent.",
+      "msgResendError": "Error resending. Try again later."
+    },
+    "signup": {
+      "introTitle": "Create your Aliigo account",
+      "introText": "Confirm your email to continue. Then log in to activate billing and access your workspace.",
+      "emailPlaceholder": "Contact email *",
+      "namePlaceholder": "Your name *",
+      "businessPlaceholder": "Business name *",
+      "googleUrlPlaceholder": "Website or Google Business Profile",
+      "phonePlaceholder": "Phone *",
+      "passwordPlaceholder": "Password *",
+      "submitButton": "Create account",
+      "disclaimer": "We use this information to create your workspace and help you onboard. You control what you share with visitors.",
+      "alreadyAccount": "Already have an account?",
+      "signInLink": "Log in",
+      "errorValidation": "Please complete all required fields.",
+      "errorPassword": "Password must be at least 6 characters.",
+      "loading": "Creating account..."
+    },
+    "checkEmail": {
+      "title": "Check your email",
+      "subtitle": "Confirm your account to continue",
+      "desc1": "We sent a confirmation link to your inbox.",
+      "desc2": "After confirming, you will be redirected to login. Then you can activate billing and access your dashboard.",
+      "list1": "Confirm your email",
+      "list2": "Log in to your account",
+      "list3": "Activate billing to go live",
+      "footer": "If you do not see the email, check spam or promotions and try again in a minute. If you have an account already you will receive a new confirmation email or reset your password.",
+      "backLink": "Back to login"
+    },
+    "reset": {
+      "title": "Reset password",
+      "desc": "Enter your email and we will send you a recovery link.",
+      "emailPlaceholder": "you@example.com",
+      "submitButton": "Send link",
+      "loading": "Sending...",
+      "success": "Link sent. Check your inbox and spam.",
+      "errorEmail": "Please enter a valid email.",
+      "backToLogin": "Back to log in"
+    },
+    "update": {
+      "title": "New password",
+      "desc": "Enter your new password to secure your account.",
+      "passwordLabel": "New password",
+      "submitButton": "Update password",
+      "success": "Password updated. Redirecting...",
+      "errorLength": "Password must be at least 6 characters."
+    },
+    "callback": {
+      "loading": "Confirming your access..."
+    }
+  },
+  "Legal": {
+    "avisoLegal": {
+      "title": "Legal Notice",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "In compliance with Article 10 of Law 34/2002 (LSSI-CE), the following information is provided:",
+      "section1": {
+        "title": "1. Identifying Data",
+        "owner": "Legal Owner:",
+        "brand": "Commercial Name:",
+        "nif": "Tax ID:",
+        "address": "Address:",
+        "email": "Email:"
+      },
+      "section2": {
+        "title": "2. Purpose",
+        "content": "This Legal Notice regulates access, navigation, and use of the website, as well as responsibilities arising from the use of its contents."
+      },
+      "section3": {
+        "title": "3. Users",
+        "content": "Access and/or use of this site grants USER status and implies acceptance of these conditions."
+      },
+      "section4": {
+        "title": "4. Use of the Portal",
+        "content": "Aliigo provides access to information and services. The USER is responsible for use of the portal and for providing truthful information during registration."
+      },
+      "section5": {
+        "title": "5. Intellectual and Industrial Property",
+        "content": "Aliigo and/or its licensors own the intellectual and industrial property rights of the website and its elements. Unauthorized reproduction, distribution, or modification is prohibited."
+      },
+      "section6": {
+        "title": "6. Exclusion of Guarantees and Responsibility",
+        "content": "Aliigo is not responsible for damages arising from errors or omissions in content, lack of availability, or malicious programs, despite adopting reasonable measures to prevent them."
+      }
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "This policy explains what cookies are, how Aliigo uses them, and how you can manage them.",
+      "section1": {
+        "title": "1. What are cookies?",
+        "content": "A cookie is a small text file stored in your browser that allows a site to remember your visit and preferences."
+      },
+      "section2": {
+        "title": "2. Cookies used on this website",
+        "technical": "Technical Cookies (Necessary):",
+        "technicalDesc": "Cookies required for navigation, authentication, and access to restricted areas such as the dashboard.",
+        "analytical": "Analytics Cookies:",
+        "analyticalDesc": "Cookies that help measure usage and improve the service (for example, analytics providers)."
+      },
+      "section3": {
+        "title": "3. Third Parties",
+        "content": "This website may use third-party services for analytics, hosting, authentication, and service delivery."
+      },
+      "section4": {
+        "title": "4. Managing cookies",
+        "content": "You can disable or delete cookies from your browser settings (Chrome, Safari, Firefox, Edge)."
+      }
+    },
+    "privacidad": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "Aliigo takes privacy seriously. This policy explains how we collect, use, and protect personal data in compliance with applicable data protection laws.",
+      "section1": {
+        "title": "1. Data Controller",
+        "label": "Identity:",
+        "address": "Address:",
+        "email": "Email:"
+      },
+      "section2": {
+        "title": "2. Purposes",
+        "content": "We process personal data to:",
+        "point1": "Create and manage user accounts and provide the SaaS service.",
+        "point2": "Manage billing and payments for contracted services.",
+        "point3": "Provide customer support and service communications.",
+        "dataRetention": "Data will be kept while the relationship is active or as required by law, or until deletion is requested where applicable."
+      },
+      "section3": {
+        "title": "3. Legal Basis",
+        "content": "The legal basis is performance of the contract and, where applicable, user consent for optional communications."
+      },
+      "section4": {
+        "title": "4. Recipients",
+        "content": "Data may be shared with vendors necessary to provide the service (processors) such as hosting, database, authentication, analytics, communications, and payment providers, under appropriate safeguards."
+      },
+      "section5": {
+        "title": "5. Rights",
+        "content": "You may request access, rectification, deletion, restriction, objection, and portability, subject to applicable law."
+      }
+    },
+    "terminos": {
+      "title": "Terms of Use",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "These terms govern access to and use of Aliigo and its services.",
+      "section1": {
+        "title": "1. The Service",
+        "content": "Aliigo is a SaaS platform that enables businesses to use an AI assistant on their websites and manage related configuration, content, and integrations. Features may evolve over time."
+      },
+      "section2": {
+        "title": "2. User Account",
+        "content": "You are responsible for maintaining the confidentiality of your credentials and for all activity under your account. You must notify us of any unauthorized use."
+      },
+      "section3": {
+        "title": "3. Prices and Payments",
+        "content": "Paid features require an active subscription. Pricing, billing cycles, and applicable taxes are disclosed during checkout. Subscriptions renew automatically unless canceled before renewal."
+      },
+      "section4": {
+        "title": "4. Cancellation",
+        "content": "You may cancel your subscription at any time from your dashboard. Access remains until the end of the current paid period, unless otherwise required by law."
+      },
+      "section5": {
+        "title": "5. Platform Content, Messaging, and AI Outputs",
+        "content": "You are solely responsible for all content, prompts, instructions, configurations, messages, and materials you or your end users submit, collect, send, or display through Aliigo, including any communications sent to customers (SMS, email, chat, or otherwise). You must ensure compliance with applicable laws, including data protection and anti-spam rules, and obtain all required consents. Aliigo may generate AI-assisted outputs based on the information and instructions you provide. AI outputs may be inaccurate or inappropriate and must be reviewed and used at your own risk. You are responsible for implementing appropriate guardrails, reviewing outputs, and deciding whether and how to use or send them."
+      },
+      "section6": {
+        "title": "6. Limitation of Liability",
+        "content": "Aliigo does not guarantee uninterrupted or error-free operation. To the maximum extent permitted by law, Aliigo is not liable for indirect, incidental, special, consequential, or punitive damages, or for loss of profits, revenue, data, or goodwill arising from or related to use of the service."
+      },
+      "section7": {
+        "title": "7. Indemnity",
+        "content": "You agree to defend, indemnify, and hold harmless Aliigo from claims, damages, liabilities, costs, and expenses arising from your use of the service, your content, your communications, your AI configurations, or your violation of law or third-party rights."
+      },
+      "section8": {
+        "title": "8. Acceptable Use",
+        "content": "You must not use Aliigo to transmit unlawful, harmful, deceptive, infringing, harassing, or abusive content, or to send spam or unauthorized marketing. We may suspend or terminate accounts that violate these terms or pose risk to the platform or others."
+      },
+      "section9": {
+        "title": "9. Applicable Law",
+        "content": "These terms are governed by the laws of Spain. For disputes, the parties submit to the courts of the Owner's domicile, unless mandatory law provides otherwise."
+      }
+    }
+  }
 }

@@ -1,3 +1,5 @@
+// src/app/[locale]/(public)/login/page.tsx
+
 "use client";
 
 import React, { Suspense, useState } from "react";
@@ -5,7 +7,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import type { AuthError } from "@supabase/supabase-js";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { getMetaBrowserIDs } from '@/lib/metaHelpers'; 
 
 export default function LoginPage() {
@@ -21,6 +23,7 @@ function LoginWithSearchParams() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from"); 
+  const locale = useLocale();
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -82,8 +85,29 @@ function LoginWithSearchParams() {
 
       // Success
       void fireLoginEvent(normalizedEmail);
-      const redirect = searchParams.get("redirect");
-      router.push(redirect || "/dashboard");
+      const redirect = searchParams.get("redirect") || "/dashboard";
+
+      // 1) Get access token from the session (client must send it)
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      
+      if (!token) {
+        // Should be rare after successful sign-in, but fail closed
+        router.push("/login");
+        return;
+      }
+
+      // 2) Ask server if user is already trialing/active
+      const res = await fetch("/api/billing/status", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const j = await res.json().catch(() => ({}));
+      const ok = res.ok && (j.status === "trialing" || j.status === "active");
+
+      // 3) Route based on billing gate
+      router.push(ok ? redirect : "/dashboard/billing");
     } finally {
       setLoading(false);
     }
@@ -96,7 +120,7 @@ function LoginWithSearchParams() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: email.trim(),
-        options: { emailRedirectTo: `${origin}/auth/callback` }, 
+        options: { emailRedirectTo: `${origin}/${locale}/auth/callback` }, 
       });
 
       if (error) {

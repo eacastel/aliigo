@@ -46,9 +46,10 @@ export type ConversationRow = {
 export type MessageRow = {
   id: UUID;
   conversation_id: UUID;
-  channel: "web" | "whatsapp" | "sms" | "email";
+  channel: "web" | "whatsapp" | "sms" | "email" | "telegram";
   role: "user" | "assistant" | "system" | "tool";
   content: string;
+  meta: Record<string, unknown>; // <-- add this
   created_at: string;
 };
 

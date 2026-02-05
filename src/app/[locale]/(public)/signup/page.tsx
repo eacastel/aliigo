@@ -1,33 +1,45 @@
+// src/app/[locale]/(public)/signup/page.tsx
+
 "use client";
 
 import { useState } from "react";
 import { Link, useRouter } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { getMetaBrowserIDs } from "@/lib/metaHelpers";
 
 const pushToGTM = (event: string, data?: Record<string, unknown>) => {
-  if (typeof window === 'undefined') return;
-
+  if (typeof window === "undefined") return;
   const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
-  
-  if (w.dataLayer) {
-    w.dataLayer.push({ event, ...data });
-  }
+  w.dataLayer?.push({ event, ...data });
 };
 
+async function readJsonObject(res: Response): Promise<Record<string, unknown>> {
+  const text = await res.text().catch(() => "");
+  if (!text) return {};
+  try {
+    const parsed: unknown = JSON.parse(text);
+    return parsed && typeof parsed === "object"
+      ? (parsed as Record<string, unknown>)
+      : {};
+  } catch {
+    return {};
+  }
+}
+
 export default function SignupPage() {
-  const t = useTranslations('Auth.signup');
+  const t = useTranslations("Auth.signup");
   const router = useRouter();
+  const locale = useLocale();
 
   // State
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [businessName, setBusinessName] = useState('');
-  const [googleUrl, setGoogleUrl] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [fax, setFax] = useState(""); // honeypot
+
   // UI State
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,14 +47,14 @@ export default function SignupPage() {
   const fireLeadCAPIEvent = async (userEmail: string) => {
     try {
       const { fbc, fbp } = getMetaBrowserIDs();
-      await fetch('/api/meta-events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/meta-events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          event_name: 'Lead',
+          event_name: "Lead",
           email: userEmail,
-          fbc: fbc,
-          fbp: fbp,
+          fbc,
+          fbp,
         }),
       });
     } catch (e) {
@@ -50,61 +62,161 @@ export default function SignupPage() {
     }
   };
 
+  async function ensureBusinessProfile(input: {
+    id: string; // uuid
+    email: string;
+    name?: string;
+    businessName: string;
+    phone?: string;
+    googleUrl?: string;
+  }) {
+    const res = await fetch("/api/profiles/ensure", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: input.id, // REQUIRED uuid
+        email: input.email,
+        nombre_negocio: input.businessName, // REQUIRED
+        nombre_contacto: input.name,
+        telefono: input.phone,
+        source: "signup",
+      }),
+    });
+
+    const j = await readJsonObject(res);
+
+    if (!res.ok) {
+      const err = typeof j.error === "string" ? j.error : "";
+      throw new Error(err || `profiles/ensure failed (${res.status})`);
+    }
+
+    return j;
+  }
+
+  async function ensureBusinessProfileWithRetry(input: {
+    id: string;
+    email: string;
+    name: string;
+    businessName: string;
+    phone: string;
+  }) {
+    // total ~10s max
+    const waits = [0, 300, 700, 1200, 2000, 2500, 3500];
+
+    let lastErr: unknown = null;
+
+    for (const w of waits) {
+      if (w) await new Promise((r) => setTimeout(r, w));
+      try {
+        return await ensureBusinessProfile(input);
+      } catch (e) {
+        lastErr = e;
+        const msg = e instanceof Error ? e.message : String(e);
+
+        // Only retry the known eventual-consistency error
+        const retryable =
+          /auth\.users/i.test(msg) ||
+          /after retry/i.test(msg) ||
+          /User not found/i.test(msg);
+
+        if (!retryable) throw e;
+      }
+    }
+
+    throw lastErr instanceof Error
+      ? lastErr
+      : new Error("profiles/ensure failed after retries");
+  }
+
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
+
+    // Normalize once
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedName = name.trim();
+    const normalizedBiz = businessName.trim();
+    const normalizedPhone = phone.trim();
+
+    // Honeypot: if filled, silently pretend success (do not create account)
+    if (fax.trim().length > 0) {
+      router.push("/check-email");
+      return;
+    }
     setError(null);
 
     // Validation
-    if (!email.trim() || !businessName.trim() || !password) {
-      setError(t('errorValidation'));
+    if (!normalizedEmail || !normalizedBiz || !password || !normalizedName || !normalizedPhone) {
+      setError(t("errorValidation"));
       return;
     }
     if (password.length < 6) {
-      setError(t('errorPassword'));
+      setError(t("errorPassword"));
       return;
     }
+
 
     setLoading(true);
-
-    const { data: { user }, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: {
-          full_name: name,
-          business_name: businessName,
-          google_url: googleUrl,
-          phone: phone
-        }
-      }
-    });
-
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Success Handling
-    if (user) {
-      // 1. Fire Server CAPI
-      void fireLeadCAPIEvent(email);
-      
-      // 2. Fire Browser GTM
-      pushToGTM('generate_lead', { 
-        email: email, 
-        source: 'signup_form' 
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
+          data: {
+            full_name: normalizedName,
+            business_name: normalizedBiz,
+            phone: normalizedPhone,
+          },
+        },
       });
-    }
 
-    localStorage.setItem('aliigo_pending_signup', JSON.stringify({ email, businessName }));
-    router.push('/check-email');
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      const userId = user?.id;
+      if (!userId) {
+        setError("No se pudo obtener el usuario después del registro.");
+        return;
+      }
+
+      // Create/link business + profile (server)
+      await ensureBusinessProfileWithRetry({
+        id: userId,
+        email: normalizedEmail,
+        name: normalizedName,
+        businessName: normalizedBiz,
+        phone: normalizedPhone,
+      });
+
+
+      // Analytics
+      void fireLeadCAPIEvent(normalizedEmail);
+      pushToGTM("generate_lead", { email: normalizedEmail, source: "signup_form" });
+
+      // Local marker
+      localStorage.setItem(
+        "aliigo_pending_signup",
+      JSON.stringify({ email: normalizedEmail, businessName: normalizedBiz })
+      );
+
+      router.push("/check-email");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "No se pudo crear el negocio/perfil."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="max-w-lg mx-auto mt-12 px-4 pb-20 relative">
-      
       {/* 1. Background Glow Blob */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 opacity-30 blur-[80px] pointer-events-none">
         <div className="w-[300px] h-[300px] bg-[#84c9ad] rounded-full mix-blend-screen" />
@@ -114,20 +226,19 @@ export default function SignupPage() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-white mb-3">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
-            {t('introTitle')}
+            {t("introTitle")}
           </span>
         </h1>
         <p className="text-sm text-zinc-400 leading-relaxed max-w-sm mx-auto">
-          {t('introText')}
+          {t("introText")}
         </p>
       </div>
 
       {/* Card Container */}
-      <form 
-        onSubmit={handleSubmit} 
+      <form
+        onSubmit={handleSubmit}
         className="space-y-5 bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md"
       >
-        
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center font-medium">
             {error}
@@ -136,73 +247,92 @@ export default function SignupPage() {
 
         {/* Email */}
         <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('emailPlaceholder')}</label>
-            <input
+          <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+            {t("emailPlaceholder")}
+          </label>
+          <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
             required
+          />
+        </div>
+
+        {/* HP */}
+        <div
+          aria-hidden="true"
+          className="absolute -left-[10000px] top-auto w-px h-px overflow-hidden"
+        >
+          <label>
+            Fax
+            <input
+              type="text"
+              name="fax"
+              value={fax}
+              onChange={(e) => setFax(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
             />
+          </label>
         </div>
 
         {/* Name */}
         <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('namePlaceholder')}</label>
-            <input
+          <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+            {t("namePlaceholder")}
+          </label>
+          <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
-            />
+            required
+          />
         </div>
 
         {/* Business Name */}
         <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('businessPlaceholder')}</label>
-            <input
+          <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+            {t("businessPlaceholder")}
+          </label>
+          <input
             type="text"
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
             className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
             required
-            />
-        </div>
-
-        {/* Google URL */}
-        <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('googleUrlPlaceholder')}</label>
-            <input
-            type="text" 
-            value={googleUrl}
-            onChange={(e) => setGoogleUrl(e.target.value)}
-            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
-            />
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Phone */}
-            <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('phonePlaceholder')}</label>
-                <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
-                />
-            </div>
-            
-            {/* Password */}
-            <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('passwordPlaceholder')}</label>
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
-                    required
-                />
-            </div>
+          {/* Phone */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+              {t("phonePlaceholder")}
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+              required
+            />
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+              {t("passwordPlaceholder")}
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+              required
+            />
+          </div>
         </div>
 
         {/* CTA Button */}
@@ -211,20 +341,23 @@ export default function SignupPage() {
           className="w-full bg-[#84c9ad] text-zinc-950 py-3.5 rounded-xl font-bold hover:bg-[#73bba0] disabled:opacity-50 transition-all mt-4 shadow-[0_0_20px_rgba(132,201,173,0.15)] hover:shadow-[0_0_25px_rgba(132,201,173,0.3)] transform active:scale-[0.98]"
           disabled={loading}
         >
-          {loading ? t('loading') : t('submitButton')}
+          {loading ? t("loading") : t("submitButton")}
         </button>
 
         <p className="text-[10px] text-zinc-500 text-center leading-normal px-4 pt-2">
-          {t('disclaimer')}
+          {t("disclaimer")}
         </p>
 
         <div className="border-t border-white/10 pt-6 mt-6 text-center">
-            <p className="text-sm text-zinc-400">
-            {t('alreadyAccount')}{" "}
-            <Link href="/login" className="text-[#84c9ad] hover:text-white transition-colors font-medium ml-1">
-                {t('signInLink')}
+          <p className="text-sm text-zinc-400">
+            {t("alreadyAccount")}{" "}
+            <Link
+              href="/login"
+              className="text-[#84c9ad] hover:text-white transition-colors font-medium ml-1"
+            >
+              {t("signInLink")}
             </Link>
-            </p>
+          </p>
         </div>
       </form>
     </div>

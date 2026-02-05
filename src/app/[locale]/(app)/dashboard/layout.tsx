@@ -1,7 +1,10 @@
+// src/app/[locale]/(app)/dashboard/layout.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import "../../../globals.css";
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing"; 
 import { supabase } from "@/lib/supabaseClient";
@@ -19,17 +22,48 @@ export default function DashboardLayout({
 
   const nav = [
     { href: "/dashboard", label: t('links.dashboard') },
-    { href: "/dashboard/settings", label: t('links.settings') },
+    { href: "/dashboard/settings/business", label: t('links.business') },
+    { href: "/dashboard/settings/assistant", label: t('links.assistant') },
     { href: "/dashboard/widget", label: t('links.widget') },
+    { href: "/dashboard/messages", label: t('links.messages') },
     { href: "/dashboard/billing", label: t('links.billing') },
   ];
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       const { data } = await supabase.auth.getSession();
-      setEmail(data.session?.user?.email ?? null);
+      const s = data.session;
+
+      if (!s?.user) {
+        router.replace("/login?redirect=/dashboard");
+        return;
+      }
+
+      setEmail(s.user.email ?? null);
+
+      const token = s.access_token;
+
+      const res = await fetch("/api/billing/status", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const j = await res.json().catch(() => ({}));
+
+      const ok = res.ok && (j.status === "trialing" || j.status === "active");
+
+      if (!ok && !cancelled) {
+        router.replace("/dashboard/billing");
+      }
     })();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
