@@ -23,6 +23,7 @@
       "panel": "Dashboard",
       "login": "Log in",
       "logout": "Log out",
+      "loggingOut": "Logging out…",
       "sidebarTitle": "Dashboard",
       "getStarted": "Get started"
     },

@@ -4,6 +4,7 @@ import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import PublicAuthActions from "@/components/PublicAuthActions";
 
 export default function PublicLayout({
   children,
@@ -45,12 +46,7 @@ export default function PublicLayout({
               {t("publicLinks.pricing")}
             </Link>
 
-            <Link 
-              href="/login" 
-              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
-            >
-              {t('actions.login')}
-            </Link>
+            <PublicAuthActions className="hidden md:flex items-center gap-3" />
 
             {/* Compact button on mobile */}
             <Link
@@ -59,6 +55,8 @@ export default function PublicLayout({
             >
               {t('actions.getStarted')}
             </Link>
+
+            <PublicAuthActions className="flex md:hidden items-center gap-3" />
           </nav>
         </div>
       </header>

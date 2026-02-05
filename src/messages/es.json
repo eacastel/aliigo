@@ -23,6 +23,7 @@
       "panel": "Panel",
       "login": "Iniciar sesión",
       "logout": "Cerrar sesión",
+      "loggingOut": "Saliendo…",
       "sidebarTitle": "Panel",
       "getStarted": "Empezar"
     },
