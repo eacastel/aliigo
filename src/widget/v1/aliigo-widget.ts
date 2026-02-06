@@ -646,6 +646,18 @@ class AliigoWidget extends HTMLElement {
     return s?.token ?? null;
   }
 
+  private async refreshSessionIfStale() {
+    // Enforce chat TTL before sending
+    this.checkExpiryNow();
+
+    const idleMs = this.lastActiveAtMs ? Date.now() - this.lastActiveAtMs : 0;
+    const refreshThresholdMs = 25 * 60 * 1000;
+
+    if (idleMs >= refreshThresholdMs || !this.state.session?.token) {
+      await this.tryRefreshSessionToken();
+    }
+  }
+
   private renderError(msg: string) {
     this.ensureRoot();
     this.root.innerHTML = `
@@ -1213,6 +1225,7 @@ class AliigoWidget extends HTMLElement {
     postReply?: string,
     opts?: { silentUser?: boolean; suppressReply?: boolean }
   ) {
+    await this.refreshSessionIfStale();
     const session = this.state.session;
     if (!session?.token) return;
 
