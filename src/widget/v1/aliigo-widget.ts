@@ -89,6 +89,7 @@ const UI = {
       submit: "Send details",
       sent: "Thanks! We’ll be in touch.",
       message: "Here are my contact details.",
+      hiddenMessage: "Lead submitted.",
       followUp:
         "Thanks — I’ve got your details. Do you have any other questions? I can share pricing, show how the widget works, or help you get set up.",
       consent: "I agree to be contacted about my request.",
@@ -109,6 +110,7 @@ const UI = {
       submit: "Enviar datos",
       sent: "¡Gracias! Te contactaremos.",
       message: "Aquí tienes mis datos de contacto.",
+      hiddenMessage: "Datos enviados.",
       followUp:
         "Gracias — ya tengo tus datos. ¿Tienes alguna otra pregunta? Puedo compartir precios, enseñarte cómo funciona el widget o ayudarte a empezar.",
       consent: "Acepto que me contacten sobre mi solicitud.",
@@ -1194,7 +1196,10 @@ class AliigoWidget extends HTMLElement {
           this.render();
         }
 
-        void this.send(t.lead.message, lead, t.lead.followUp);
+        void this.send(t.lead.hiddenMessage, lead, t.lead.followUp, {
+          silentUser: true,
+          suppressReply: true,
+        });
       });
     });
 
@@ -1205,13 +1210,16 @@ class AliigoWidget extends HTMLElement {
   private async send(
     content: string,
     lead?: { name?: string; email?: string; phone?: string; consent?: boolean },
-    postReply?: string
+    postReply?: string,
+    opts?: { silentUser?: boolean; suppressReply?: boolean }
   ) {
     const session = this.state.session;
     if (!session?.token) return;
 
     this.state.busy = true;
-    this.state.msgs = [...this.state.msgs, { role: "user", content }];
+    if (!opts?.silentUser) {
+      this.state.msgs = [...this.state.msgs, { role: "user", content }];
+    }
     this.pendingFocus = true;
     this.savePersisted(true);
     this.pendingScroll = "bottom";
@@ -1278,10 +1286,12 @@ class AliigoWidget extends HTMLElement {
                 ? nextActions2?.filter((a) => a.type !== "lead_form")
                 : nextActions2;
 
-              this.state.msgs = [
-                ...this.state.msgs,
-                { role: "assistant", content: raw2.reply || "", actions: cleanedActions2 },
-              ];
+              if (!opts?.suppressReply) {
+                this.state.msgs = [
+                  ...this.state.msgs,
+                  { role: "assistant", content: raw2.reply || "", actions: cleanedActions2 },
+                ];
+              }
               if (postReply) {
                 this.state.msgs = [
                   ...this.state.msgs,
@@ -1322,10 +1332,12 @@ class AliigoWidget extends HTMLElement {
       const cleanedActions = lead
         ? nextActions?.filter((a) => a.type !== "lead_form")
         : nextActions;
-      this.state.msgs = [
-        ...this.state.msgs,
-        { role: "assistant", content: raw.reply || "", actions: cleanedActions },
-      ];
+      if (!opts?.suppressReply) {
+        this.state.msgs = [
+          ...this.state.msgs,
+          { role: "assistant", content: raw.reply || "", actions: cleanedActions },
+        ];
+      }
       if (postReply) {
         this.state.msgs = [
           ...this.state.msgs,
