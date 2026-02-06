@@ -89,6 +89,8 @@ const UI = {
       submit: "Send details",
       sent: "Thanks! We’ll be in touch.",
       message: "Here are my contact details.",
+      followUp:
+        "Thanks — I’ve got your details. Do you have any other questions? I can share pricing, show how the widget works, or help you get set up.",
       consent: "I agree to be contacted about my request.",
       consentNote: "Your information will only be used to follow up on this request.",
     },
@@ -107,6 +109,8 @@ const UI = {
       submit: "Enviar datos",
       sent: "¡Gracias! Te contactaremos.",
       message: "Aquí tienes mis datos de contacto.",
+      followUp:
+        "Gracias — ya tengo tus datos. ¿Tienes alguna otra pregunta? Puedo compartir precios, enseñarte cómo funciona el widget o ayudarte a empezar.",
       consent: "Acepto que me contacten sobre mi solicitud.",
       consentNote: "Usaremos estos datos solo para dar seguimiento a tu solicitud.",
     },
@@ -1058,9 +1062,12 @@ class AliigoWidget extends HTMLElement {
                                   <span>${escapeHtml(t.lead.consent)}</span>
                                 </label>
                                 <div class="lead-consent-note">${escapeHtml(t.lead.consentNote)}</div>`;
-                                return `<form class="lead-form" data-action="lead-form">${reason}${rows}${consent}<button class="lead-submit" type="submit">${escapeHtml(
-                                  t.lead.submit
-                                )}</button></form>`;
+                                return `<form class="lead-form" data-action="lead-form" data-i="${i}">
+                                  ${reason}
+                                  ${rows}
+                                  ${consent}
+                                  <button class="lead-submit" type="submit">${escapeHtml(t.lead.submit)}</button>
+                                </form>`;
                               }
                               return "";
                             })
@@ -1173,7 +1180,18 @@ class AliigoWidget extends HTMLElement {
         const btn = formEl.querySelector(".lead-submit") as HTMLButtonElement | null;
         if (btn) btn.textContent = t.lead.sent;
 
-        void this.send(t.lead.message, lead);
+        const messageIndex = Number(formEl.dataset.i || "");
+        if (!Number.isNaN(messageIndex)) {
+          const msg = this.state.msgs[messageIndex];
+          if (msg?.actions?.length) {
+            msg.actions = msg.actions.filter((a) => a.type !== "lead_form");
+            this.state.msgs = [...this.state.msgs];
+            this.pendingScroll = "bottom";
+            this.render();
+          }
+        }
+
+        void this.send(t.lead.message, lead, t.lead.followUp);
       });
     });
 
@@ -1181,7 +1199,11 @@ class AliigoWidget extends HTMLElement {
     this.applyPendingFocus();
   }
 
-  private async send(content: string, lead?: { name?: string; email?: string; phone?: string; consent?: boolean }) {
+  private async send(
+    content: string,
+    lead?: { name?: string; email?: string; phone?: string; consent?: boolean },
+    postReply?: string
+  ) {
     const session = this.state.session;
     if (!session?.token) return;
 
@@ -1254,6 +1276,12 @@ class AliigoWidget extends HTMLElement {
                 ...this.state.msgs,
                 { role: "assistant", content: raw2.reply || "", actions: nextActions2 },
               ];
+              if (postReply) {
+                this.state.msgs = [
+                  ...this.state.msgs,
+                  { role: "assistant", content: postReply },
+                ];
+              }
               this.pendingFocus = true;
               this.state.busy = false;
               this.savePersisted(true);
@@ -1289,6 +1317,12 @@ class AliigoWidget extends HTMLElement {
         ...this.state.msgs,
         { role: "assistant", content: raw.reply || "", actions: nextActions },
       ];
+      if (postReply) {
+        this.state.msgs = [
+          ...this.state.msgs,
+          { role: "assistant", content: postReply },
+        ];
+      }
       this.pendingFocus = true;
       this.state.busy = false;
       this.savePersisted(true);
