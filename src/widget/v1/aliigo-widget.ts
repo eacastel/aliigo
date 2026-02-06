@@ -1264,9 +1264,11 @@ class AliigoWidget extends HTMLElement {
 
       if (!res.ok) {
         const errText = (raw.error || "").toLowerCase();
+        const shouldRefresh = res.status === 401 || res.status === 403;
+        const isExpired = errText.includes("session expired");
 
-        // Auto-recover from "Session expired" once (refresh token, retry)
-        if (res.status === 403 && errText.includes("session expired")) {
+        // Auto-recover from auth/session errors once (refresh token, retry)
+        if (shouldRefresh) {
           const fresh = await this.tryRefreshSessionToken();
 
           if (fresh) {
@@ -1320,7 +1322,11 @@ class AliigoWidget extends HTMLElement {
             }
 
             // retry failed
-            this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw2.error || "Error" }];
+            const friendly =
+              (raw2.error || "").toLowerCase().includes("session expired")
+                ? "Session refreshed. Please try again."
+                : (raw2.error || "Error");
+            this.state.msgs = [...this.state.msgs, { role: "assistant", content: friendly }];
             this.pendingFocus = true;
             this.state.busy = false;
             this.savePersisted(true);
@@ -1331,7 +1337,9 @@ class AliigoWidget extends HTMLElement {
         }
 
         // default error path
-        this.state.msgs = [...this.state.msgs, { role: "assistant", content: raw.error || "Error" }];
+        const friendly =
+          isExpired ? "Session refreshed. Please try again." : (raw.error || "Error");
+        this.state.msgs = [...this.state.msgs, { role: "assistant", content: friendly }];
         this.pendingFocus = true;
         this.state.busy = false;
         this.savePersisted(true);
