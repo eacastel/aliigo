@@ -12,7 +12,8 @@
       "assistant": "Asistente",
       "widget": "Widget",
       "messages": "Mensajes",
-      "billing": "Facturación"
+      "billing": "Facturación",
+      "help": "Ayuda"
     },
     "publicLinks": {
       "features": "Cómo funciona",
@@ -116,6 +117,72 @@
     "growthF3": "Soporte prioritario"
   },
   "Dashboard": {
+    "help": {
+      "title": "Centro de ayuda",
+      "subtitle": "Guías rápidas para configurar Aliigo y lanzar tu asistente.",
+      "quickLinks": {
+        "title": "Accesos rápidos",
+        "widget": "Configuración del widget",
+        "assistant": "Configuración del asistente",
+        "messages": "Mensajes",
+        "billing": "Facturación"
+      },
+      "tip": {
+        "title": "Consejo",
+        "body": "Empieza por Widget y Asistente, y prueba un chat real para validar la captura de contactos y notificaciones."
+      },
+      "gettingStarted": {
+        "title": "1. Primeros pasos",
+        "desc": "Crea tu espacio, confirma el correo y valida la configuración antes de publicar.",
+        "steps": [
+          "Confirma tu correo para activar la cuenta.",
+          "Completa el perfil del negocio en Empresa.",
+          "Abre Widget para obtener el script de instalación.",
+          "Prueba el widget en tu web y envía un mensaje."
+        ],
+        "screenshot": "Marcador de captura: Perfil del negocio y panel."
+      },
+      "installWidget": {
+        "title": "2. Instalar el widget",
+        "desc": "Añade el script a tu web y verifica que el widget aparece y responde.",
+        "steps": [
+          "Copia el script de instalación en Panel → Widget.",
+          "Pégalo antes de </body> en tu web.",
+          "Publica los cambios y recarga tu sitio.",
+          "Inicia una conversación para comprobar que llegan los mensajes."
+        ],
+        "snippetTitle": "Script de instalación",
+        "troubleshootingTitle": "Resolución de problemas",
+        "troubleshooting": [
+          "Asegúrate de cargar el script en todas las páginas que quieras cubrir.",
+          "Desactiva bloqueadores de anuncios para una prueba rápida.",
+          "Confirma que tu dominio está permitido en Widget."
+        ],
+        "screenshot": "Marcador de captura: Ajustes del widget con la clave."
+      },
+      "customize": {
+        "title": "3. Personalizar el asistente",
+        "desc": "Haz que el asistente suene como tu marca y responda con precisión.",
+        "bullets": [
+          "Actualiza tu conocimiento: servicios, políticas, horarios y FAQ.",
+          "Define tono e instrucciones en Ajustes del asistente.",
+          "Elige el idioma por defecto y prueba con preguntas reales.",
+          "Activa la captura de leads y notificaciones si quieres seguimiento."
+        ],
+        "screenshot": "Marcador de captura: Ajustes del asistente y base de conocimiento."
+      },
+      "billing": {
+        "title": "5. Facturación y planes",
+        "desc": "Activa la prueba gratuita y gestiona tu suscripción.",
+        "bullets": [
+          "Tienes 30 días de prueba gratis en Starter o Growth.",
+          "Cancela antes de que termine la prueba para no pagar.",
+          "Sube o baja de plan cuando quieras desde Facturación.",
+          "Pro es personalizado — contáctanos para una propuesta."
+        ],
+        "screenshot": "Marcador de captura: Facturación y selector de plan."
+      }
+    },
     "cards": {
       "reviewsTitle": "Solicitar reseñas",
       "reviewsDesc": "Envía SMS o email a tus clientes.",

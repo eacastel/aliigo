@@ -12,7 +12,8 @@
       "assistant": "Assistant",
       "widget": "Widget",
       "messages": "Messages",
-      "billing": "Billing"
+      "billing": "Billing",
+      "help": "Help"
     },
     "publicLinks": {
       "features": "How it works",
@@ -115,6 +116,72 @@
     "growthF3": "Priority support"
   },
   "Dashboard": {
+    "help": {
+      "title": "Help Center",
+      "subtitle": "Quick guides to set up Aliigo and launch your assistant.",
+      "quickLinks": {
+        "title": "Quick links",
+        "widget": "Widget settings",
+        "assistant": "Assistant settings",
+        "messages": "Messages",
+        "billing": "Billing"
+      },
+      "tip": {
+        "title": "Tip",
+        "body": "Start with Widget and Assistant settings, then test a real chat to confirm lead capture and notifications."
+      },
+      "gettingStarted": {
+        "title": "1. Getting Started",
+        "desc": "Create your workspace, confirm your email, and validate your setup before going live.",
+        "steps": [
+          "Confirm your email to activate your account.",
+          "Complete your business profile in Business settings.",
+          "Open the Widget page to get your embed script.",
+          "Test the widget on your site and send a message."
+        ],
+        "screenshot": "Screenshot placeholder: Business profile and dashboard overview."
+      },
+      "installWidget": {
+        "title": "2. Install the Widget",
+        "desc": "Add the script to your website and verify that the widget appears and replies.",
+        "steps": [
+          "Copy the embed script from Dashboard → Widget.",
+          "Paste it before the closing </body> tag on your site.",
+          "Publish the changes and refresh your site.",
+          "Open a conversation to verify messages arrive."
+        ],
+        "snippetTitle": "Embed script",
+        "troubleshootingTitle": "Troubleshooting",
+        "troubleshooting": [
+          "Make sure the script is loaded on every page you want to support.",
+          "Disable ad blockers for a quick test.",
+          "Confirm your domain is allowed in Widget settings."
+        ],
+        "screenshot": "Screenshot placeholder: Widget settings with embed key."
+      },
+      "customize": {
+        "title": "3. Customize the Assistant",
+        "desc": "Make the assistant sound like your brand and answer accurately.",
+        "bullets": [
+          "Update your business knowledge: services, policies, hours, and FAQs.",
+          "Set tone and instructions in Assistant settings.",
+          "Choose a default language and test with real questions.",
+          "Enable lead capture and notifications if you want follow‑ups."
+        ],
+        "screenshot": "Screenshot placeholder: Assistant settings + knowledge base."
+      },
+      "billing": {
+        "title": "5. Billing & Plans",
+        "desc": "Start your free trial and manage your subscription.",
+        "bullets": [
+          "You get a 30‑day free trial on Starter or Growth.",
+          "Cancel anytime before the trial ends to avoid charges.",
+          "Upgrade or downgrade anytime from Billing.",
+          "Pro plans are custom — contact us for a tailored setup."
+        ],
+        "screenshot": "Screenshot placeholder: Billing and plan selector."
+      }
+    },
     "cards": {
       "reviewsTitle": "Request reviews",
       "reviewsDesc": "Send SMS or email to your customers.",
