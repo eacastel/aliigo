@@ -158,7 +158,10 @@ function LoginWithSearchParams() {
       <div className="space-y-6 bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md">
         
         {msg && (
-          <div className={`p-3 rounded-lg text-sm text-center border ${
+          <div
+            role={msg.type === "error" ? "alert" : "status"}
+            aria-live={msg.type === "error" ? "assertive" : "polite"}
+            className={`p-3 rounded-lg text-sm text-center border ${
             msg.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
           }`}>
             {msg.text}
@@ -166,8 +169,14 @@ function LoginWithSearchParams() {
         )}
 
         <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('emailLabel')}</label>
+            <label
+              htmlFor="login-email"
+              className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+            >
+              {t('emailLabel')}
+            </label>
             <input
+              id="login-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -176,8 +185,14 @@ function LoginWithSearchParams() {
         </div>
 
         <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('passwordLabel')}</label>
+            <label
+              htmlFor="login-password"
+              className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+            >
+              {t('passwordLabel')}
+            </label>
             <input
+              id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

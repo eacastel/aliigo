@@ -66,13 +66,21 @@ export default function ResetPasswordPage() {
       <div className="bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md">
 
         {sent ? (
-          <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl text-center text-sm">
+          <div
+            role="status"
+            aria-live="polite"
+            className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl text-center text-sm"
+          >
             <p>{t('success')}</p>
           </div>
         ) : (
           <>
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm text-center">
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm text-center"
+              >
                 {error}
               </div>
             )}

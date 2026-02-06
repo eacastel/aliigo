@@ -241,17 +241,25 @@ export default function SignupPage() {
         className="space-y-5 bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md"
       >
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center font-medium">
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center font-medium"
+          >
             {error}
           </div>
         )}
 
         {/* Email */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+          <label
+            htmlFor="signup-email"
+            className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+          >
             {t("emailPlaceholder")}
           </label>
           <input
+            id="signup-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -280,10 +288,14 @@ export default function SignupPage() {
 
         {/* Name */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+          <label
+            htmlFor="signup-name"
+            className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+          >
             {t("namePlaceholder")}
           </label>
           <input
+            id="signup-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -294,10 +306,14 @@ export default function SignupPage() {
 
         {/* Business Name */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+          <label
+            htmlFor="signup-business"
+            className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+          >
             {t("businessPlaceholder")}
           </label>
           <input
+            id="signup-business"
             type="text"
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
@@ -309,10 +325,14 @@ export default function SignupPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Phone */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+            <label
+              htmlFor="signup-phone"
+              className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+            >
               {t("phonePlaceholder")}
             </label>
             <input
+              id="signup-phone"
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -323,10 +343,14 @@ export default function SignupPage() {
 
           {/* Password */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">
+            <label
+              htmlFor="signup-password"
+              className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+            >
               {t("passwordPlaceholder")}
             </label>
             <input
+              id="signup-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

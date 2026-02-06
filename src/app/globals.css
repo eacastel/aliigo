@@ -40,6 +40,23 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Clickable affordances */
+a,
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+summary {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+[role="button"][aria-disabled="true"],
+a[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Smooth focus ring for keyboard users */
 :focus-visible {
   outline: 2px solid rgba(var(--ring) / 0.75);

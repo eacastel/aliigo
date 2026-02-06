@@ -57,15 +57,25 @@ export default function UpdatePasswordPage() {
       <div className="bg-zinc-900/60 p-8 rounded-2xl border border-white/10 shadow-[0_0_40px_-10px_rgba(132,201,173,0.1)] backdrop-blur-md">
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm text-center">
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm text-center"
+          >
             {error}
           </div>
         )}
 
         <div className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide">{t('passwordLabel')}</label>
+            <label
+              htmlFor="update-password"
+              className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+            >
+              {t('passwordLabel')}
+            </label>
             <input
+                id="update-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

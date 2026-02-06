@@ -31,8 +31,10 @@ export default function LanguageSwitcher() {
 
   return (
     <button
+      type="button"
       onClick={toggleLanguage}
       disabled={isPending}
+      aria-label={locale === "es" ? "Switch language to English" : "Cambiar idioma a Español"}
       className={`
         flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all
         border border-zinc-800

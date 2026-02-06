@@ -82,6 +82,8 @@ export default function DashboardMessagesPage() {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const selectedConversationId = searchParams.get("conversationId") || null;
+  const isViewingConversation = Boolean(selectedConversationId);
 
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<ViewTab>("recent");
@@ -96,7 +98,7 @@ export default function DashboardMessagesPage() {
   const [selectedLoading, setSelectedLoading] = useState(false);
   const [selectedError, setSelectedError] = useState<string | null>(null);
 
-  const initialQuery = searchParams.get("conversationId") || "";
+  const initialQuery = "";
   const [query, setQuery] = useState(initialQuery);
   const q = query.trim().toLowerCase();
 
@@ -189,11 +191,7 @@ export default function DashboardMessagesPage() {
   }, [router]);
 
   useEffect(() => {
-    const conv = searchParams.get("conversationId");
-    if (conv) {
-      setQuery(conv);
-      setTab("conversations");
-    } else {
+    if (isViewingConversation) {
       setQuery("");
       setTab("recent");
     }
@@ -201,7 +199,7 @@ export default function DashboardMessagesPage() {
 
   useEffect(() => {
     let cancelled = false;
-    const conv = searchParams.get("conversationId");
+    const conv = selectedConversationId;
 
     if (!conv) {
       setSelectedMessages([]);
@@ -270,6 +268,10 @@ export default function DashboardMessagesPage() {
               placeholder={t("Dashboard.messages.searchPlaceholder", {
                 default: "Search messages / conversation IDs…",
               })}
+              disabled={isViewingConversation}
+              aria-label={t("Dashboard.messages.searchPlaceholder", {
+                default: "Search messages / conversation IDs…",
+              })}
               className="w-full rounded-xl border border-zinc-800 bg-zinc-950/40 px-4 py-2.5 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-brand-500/40 focus:ring-1 focus:ring-brand-500/30"
             />
           </div>
@@ -318,12 +320,12 @@ export default function DashboardMessagesPage() {
         </div>
       )}
 
-      {searchParams.get("conversationId") ? (
+      {isViewingConversation ? (
         <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950/40 p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-sm text-zinc-400">
               {t("Dashboard.messages.conversationTitle", { default: "Conversation" })}:{" "}
-              <span className="font-mono text-zinc-200">{searchParams.get("conversationId")}</span>
+              <span className="font-mono text-zinc-200">{selectedConversationId}</span>
             </div>
             <button
               type="button"
@@ -368,7 +370,7 @@ export default function DashboardMessagesPage() {
       ) : null}
 
       {/* Tabs */}
-      {!searchParams.get("conversationId") ? (
+      {!isViewingConversation ? (
         <div className="mb-4 flex items-center gap-2">
           <button
             type="button"
@@ -400,7 +402,7 @@ export default function DashboardMessagesPage() {
         </div>
       ) : null}
 
-      {!searchParams.get("conversationId") ? (
+      {!isViewingConversation ? (
         <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 shadow-lg">
           {loading ? (
             <div className="flex items-center gap-3 p-6">
