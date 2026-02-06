@@ -193,6 +193,9 @@ export default function DashboardMessagesPage() {
     if (conv) {
       setQuery(conv);
       setTab("conversations");
+    } else {
+      setQuery("");
+      setTab("recent");
     }
   }, [searchParams]);
 
@@ -239,6 +242,8 @@ export default function DashboardMessagesPage() {
   };
 
   const closeConversation = () => {
+    setQuery("");
+    setTab("recent");
     router.push("/dashboard/messages");
   };
 
@@ -363,95 +368,152 @@ export default function DashboardMessagesPage() {
       ) : null}
 
       {/* Tabs */}
-      <div className="mb-4 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setTab("recent")}
-          className={[
-            "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors",
-            tab === "recent"
-              ? "bg-brand-500/10 text-brand-200 ring-brand-500/25"
-              : "bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40",
-          ].join(" ")}
-        >
-          {t("Dashboard.messages.tabRecent", { default: "Recent messages" })}
-          <span className="ml-2 text-xs text-zinc-400">({filteredRecent.length})</span>
-        </button>
+      {!searchParams.get("conversationId") ? (
+        <div className="mb-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setTab("recent")}
+            className={[
+              "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors",
+              tab === "recent"
+                ? "bg-brand-500/10 text-brand-200 ring-brand-500/25"
+                : "bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40",
+            ].join(" ")}
+          >
+            {t("Dashboard.messages.tabRecent", { default: "Recent messages" })}
+            <span className="ml-2 text-xs text-zinc-400">({filteredRecent.length})</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setTab("conversations")}
-          className={[
-            "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors",
-            tab === "conversations"
-              ? "bg-brand-500/10 text-brand-200 ring-brand-500/25"
-              : "bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40",
-          ].join(" ")}
-        >
-          {t("Dashboard.messages.tabConversations", { default: "Conversations" })}
-          <span className="ml-2 text-xs text-zinc-400">({filteredConvos.length})</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => setTab("conversations")}
+            className={[
+              "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors",
+              tab === "conversations"
+                ? "bg-brand-500/10 text-brand-200 ring-brand-500/25"
+                : "bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40",
+            ].join(" ")}
+          >
+            {t("Dashboard.messages.tabConversations", { default: "Conversations" })}
+            <span className="ml-2 text-xs text-zinc-400">({filteredConvos.length})</span>
+          </button>
+        </div>
+      ) : null}
 
-      {/* Content */}
-      <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 shadow-lg">
-        {loading ? (
-          <div className="flex items-center gap-3 p-6">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300/40 border-t-brand-500/70" />
-            <div className="text-sm text-zinc-300">{t("Dashboard.messages.loading", { default: "Loading…" })}</div>
-          </div>
-        ) : tab === "recent" ? (
-          <ul className="divide-y divide-zinc-800">
-            {filteredRecent.length === 0 ? (
-              <li className="p-6 text-sm text-zinc-400">{t("Dashboard.messages.emptyRecent", { default: "No messages yet." })}</li>
-            ) : (
-              filteredRecent.map((m) => {
-                const cid = convIdFromRecent(m);
-                const cidLabel = cid ? `${cid.slice(0, 8)}…${cid.slice(-6)}` : "—";
-                const canOpen = Boolean(cid);
+      {!searchParams.get("conversationId") ? (
+        <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 shadow-lg">
+          {loading ? (
+            <div className="flex items-center gap-3 p-6">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300/40 border-t-brand-500/70" />
+              <div className="text-sm text-zinc-300">{t("Dashboard.messages.loading", { default: "Loading…" })}</div>
+            </div>
+          ) : tab === "recent" ? (
+            <ul className="divide-y divide-zinc-800">
+              {filteredRecent.length === 0 ? (
+                <li className="p-6 text-sm text-zinc-400">{t("Dashboard.messages.emptyRecent", { default: "No messages yet." })}</li>
+              ) : (
+                filteredRecent.map((m) => {
+                  const cid = convIdFromRecent(m);
+                  const cidLabel = cid ? `${cid.slice(0, 8)}…${cid.slice(-6)}` : "—";
+                  const canOpen = Boolean(cid);
 
-                return (
-                  <li key={m.message_id} className="p-5 hover:bg-zinc-950/30 transition-colors">
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span
-                            className={[
-                              "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                              badgeForRole(m.role),
-                            ].join(" ")}
-                          >
-                            {m.role}
-                          </span>
-
-                          {m.channel && (
-                            <span className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-950/30 px-2 py-0.5 text-xs text-zinc-300">
-                              {m.channel}
+                  return (
+                    <li key={m.message_id} className="p-5 hover:bg-zinc-950/30 transition-colors">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={[
+                                "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+                                badgeForRole(m.role),
+                              ].join(" ")}
+                            >
+                              {m.role}
                             </span>
-                          )}
 
-                          <span className="text-xs text-zinc-500">{fmtWhen(m.created_at)}</span>
+                            {m.channel && (
+                              <span className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-950/30 px-2 py-0.5 text-xs text-zinc-300">
+                                {m.channel}
+                              </span>
+                            )}
+
+                            <span className="text-xs text-zinc-500">{fmtWhen(m.created_at)}</span>
+                          </div>
+
+                          <p className="mt-2 text-sm text-zinc-200 whitespace-pre-wrap">{clampText(m.content, 320)}</p>
+
+                          <div className="mt-2 text-xs text-zinc-500">
+                            Conversation:{" "}
+                            <button
+                              type="button"
+                              disabled={!canOpen}
+                              onClick={() => openConversation(cid)}
+                              className={[
+                                "underline underline-offset-2 font-mono",
+                                canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-not-allowed",
+                              ].join(" ")}
+                            >
+                              {cidLabel}
+                            </button>
+                          </div>
                         </div>
 
-                        <p className="mt-2 text-sm text-zinc-200 whitespace-pre-wrap">{clampText(m.content, 320)}</p>
-
-                        <div className="mt-2 text-xs text-zinc-500">
-                          Conversation:{" "}
+                        <div className="shrink-0">
                           <button
                             type="button"
                             disabled={!canOpen}
                             onClick={() => openConversation(cid)}
                             className={[
-                              "underline underline-offset-2 font-mono",
-                              canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-not-allowed",
+                              "rounded-lg border px-3 py-2 text-xs font-medium",
+                              canOpen
+                                ? "border-zinc-800 bg-zinc-950/30 text-zinc-200 hover:bg-zinc-900/50"
+                                : "border-zinc-800 bg-zinc-950/10 text-zinc-500 cursor-not-allowed",
                             ].join(" ")}
                           >
-                            {cidLabel}
+                            {t("Dashboard.messages.open", { default: "Open" })}
                           </button>
                         </div>
                       </div>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          ) : (
+            <ul className="divide-y divide-zinc-800">
+              {filteredConvos.length === 0 ? (
+                <li className="p-6 text-sm text-zinc-400">
+                  {t("Dashboard.messages.emptyConversations", { default: "No conversations yet." })}
+                </li>
+              ) : (
+                filteredConvos.map((c, idx) => {
+                  const cid = convIdFromConvo(c);
+                  const cidLabel = cid ? `${cid.slice(0, 8)}…${cid.slice(-6)}` : "—";
+                  const canOpen = Boolean(cid);
 
-                      <div className="shrink-0">
+                  return (
+                    <li key={cid || `${c.last_message_at || "no-last"}-${idx}`} className="p-5 hover:bg-zinc-950/30 transition-colors">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-zinc-200">
+                            <button
+                              type="button"
+                              disabled={!canOpen}
+                              onClick={() => openConversation(cid)}
+                              className={[
+                                "font-mono underline underline-offset-2",
+                                canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-pointer disabled:cursor-not-allowed",
+                              ].join(" ")}
+                            >
+                              {cidLabel}
+                            </button>
+                          </div>
+
+                          <div className="mt-1 text-xs text-zinc-500">
+                            Last message: {c.last_message_at ? fmtWhen(c.last_message_at) : "—"} · Messages: {c.message_count ?? 0}
+                          </div>
+                        </div>
+
                         <button
                           type="button"
                           disabled={!canOpen}
@@ -466,68 +528,14 @@ export default function DashboardMessagesPage() {
                           {t("Dashboard.messages.open", { default: "Open" })}
                         </button>
                       </div>
-                    </div>
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        ) : (
-          <ul className="divide-y divide-zinc-800">
-            {filteredConvos.length === 0 ? (
-              <li className="p-6 text-sm text-zinc-400">
-                {t("Dashboard.messages.emptyConversations", { default: "No conversations yet." })}
-              </li>
-            ) : (
-              filteredConvos.map((c, idx) => {
-                const cid = convIdFromConvo(c);
-                const cidLabel = cid ? `${cid.slice(0, 8)}…${cid.slice(-6)}` : "—";
-                const canOpen = Boolean(cid);
-
-                return (
-                  <li key={cid || `${c.last_message_at || "no-last"}-${idx}`} className="p-5 hover:bg-zinc-950/30 transition-colors">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium text-zinc-200">
-                          <button
-                            type="button"
-                            disabled={!canOpen}
-                            onClick={() => openConversation(cid)}
-                            className={[
-                              "font-mono underline underline-offset-2",
-                              canOpen ? "text-brand-400 hover:text-brand-300" : "text-zinc-600 cursor-pointer disabled:cursor-not-allowed",
-                            ].join(" ")}
-                          >
-                            {cidLabel}
-                          </button>
-                        </div>
-
-                        <div className="mt-1 text-xs text-zinc-500">
-                          Last message: {c.last_message_at ? fmtWhen(c.last_message_at) : "—"} · Messages: {c.message_count ?? 0}
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        disabled={!canOpen}
-                        onClick={() => openConversation(cid)}
-                        className={[
-                          "rounded-lg border px-3 py-2 text-xs font-medium",
-                          canOpen
-                            ? "border-zinc-800 bg-zinc-950/30 text-zinc-200 hover:bg-zinc-900/50"
-                            : "border-zinc-800 bg-zinc-950/10 text-zinc-500 cursor-not-allowed",
-                        ].join(" ")}
-                      >
-                        {t("Dashboard.messages.open", { default: "Open" })}
-                      </button>
-                    </div>
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        )}
-      </div>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          )}
+        </div>
+      ) : null}
 
       {/* Footer note */}
       <div className="mt-4 text-xs text-zinc-500">

@@ -124,6 +124,9 @@
     "messages": {
       "title": "Messages",
       "subtitle": "Review conversations and recent messages from your website assistant.",
+      "back": "Back to all",
+      "conversationTitle": "Conversation",
+      "emptyConversation": "No messages in this conversation yet.",
       "searchPlaceholder": "Search messages / conversation IDs…",
       "verifyTitle": "Verify your email",
       "verifyBody": "Some features may be limited until your email is confirmed. If you already confirmed, sign out and sign back in to refresh your session.",

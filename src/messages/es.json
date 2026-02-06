@@ -125,6 +125,9 @@
     "messages": {
       "title": "Mensajes",
       "subtitle": "Revisa conversaciones y mensajes recientes de tu asistente web.",
+      "back": "Volver a todos",
+      "conversationTitle": "Conversación",
+      "emptyConversation": "No hay mensajes en esta conversación todavía.",
       "searchPlaceholder": "Buscar mensajes / IDs de conversación…",
       "verifyTitle": "Confirma tu email",
       "verifyBody": "Algunas funciones pueden estar limitadas hasta que confirmes tu email. Si ya lo confirmaste, cierra sesión y vuelve a iniciar para refrescar la sesión.",
