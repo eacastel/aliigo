@@ -22,6 +22,25 @@ Save it as:
 SEND_EMAIL_HOOK_SECRET
 ```
 
+## 1b) Configure Supabase Auth Webhook (Welcome email)
+
+In Supabase Dashboard:
+
+- Go to **Auth → Webhooks**
+- Enable **user.confirmed**
+- Set the URL to:
+
+```
+https://YOUR_DOMAIN.com/api/auth/webhook
+```
+
+Supabase will show a secret (format like `v1,whsec_...`).  
+Save it as:
+
+```
+AUTH_WEBHOOK_SECRET
+```
+
 ## Email sending behavior
 
 If **Email Provider** is enabled and **Send Email Hook** is enabled, Supabase will use the hook
@@ -38,6 +57,7 @@ RESEND_API_KEY=...
 RESEND_FROM_EMAIL=Aliigo <hello@aliigo.com>
 RESEND_TO_EMAIL=you@aliigo.com   # optional, for internal signup notifications
 SEND_EMAIL_HOOK_SECRET=...
+AUTH_WEBHOOK_SECRET=...
 ```
 
 ## 3) Email change mapping (important)

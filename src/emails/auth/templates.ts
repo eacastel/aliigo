@@ -168,3 +168,126 @@ export function buildAdminSignupEmail(opts: {
 export function normalizeLocale(raw?: string | null): Locale {
   return raw === "es" ? "es" : "en";
 }
+
+function firstName(fullName?: string | null) {
+  if (!fullName) return null;
+  const parts = fullName.trim().split(/\s+/);
+  return parts[0] || null;
+}
+
+export function buildWelcomeEmail(opts: {
+  email: string;
+  fullName?: string | null;
+  locale: Locale;
+  dashboardUrl?: string | null;
+}) {
+  const name = firstName(opts.fullName);
+
+  if (opts.locale === "es") {
+    const subject = "Bienvenido a Aliigo — me alegra tenerte aquí";
+    const intro = name ? `Hola ${name},` : "Hola,";
+    const html = wrapHtml(
+      `
+      <h2 style="margin:0 0 8px;">Bienvenido a Aliigo</h2>
+      <p style="margin:0 0 16px; color:#333; font-size:14px;">${intro}</p>
+      <p style="margin:0 0 16px; color:#333; font-size:14px;">
+        Soy Emilio, fundador y CEO de Aliigo — gracias por unirte.
+      </p>
+      <p style="margin:0 0 16px; color:#333; font-size:14px;">
+        Aliigo nació para que las empresas tengan un asistente concierge que realmente controlan.
+        Aquí tienes tres pasos rápidos para empezar con buen pie:
+      </p>
+      <ol style="margin:0 0 16px; padding-left:18px; color:#333; font-size:14px;">
+        <li>Instala el widget para atender visitantes desde hoy.</li>
+        <li>Añade tu dominio y contenido para respuestas precisas.</li>
+        <li>Invita a tu equipo si quieres buzón compartido y flujos de trabajo.</li>
+      </ol>
+      ${
+        opts.dashboardUrl
+          ? `<p style="margin:0 0 16px;"><a href="${opts.dashboardUrl}" style="display:inline-block; padding:10px 16px; background:#111; color:#fff; text-decoration:none; border-radius:8px; font-size:14px;">Abrir panel</a></p>`
+          : ""
+      }
+      <p style="margin:0 0 16px; color:#333; font-size:14px;">
+        Si tienes 2 minutos, responde a este correo y dime:
+        <strong>¿Qué te trajo a Aliigo y qué quieres que gestione primero?</strong>
+        Leo y respondo todos los mensajes.
+      </p>
+      <p style="margin:0 0 4px; color:#333; font-size:14px;">Un abrazo,</p>
+      <p style="margin:0; color:#333; font-size:14px;">Emilio</p>
+      `,
+      "es"
+    );
+
+    const text = [
+      "Bienvenido a Aliigo",
+      intro,
+      "Soy Emilio, fundador y CEO de Aliigo — gracias por unirte.",
+      "Aliigo nació para que las empresas tengan un asistente concierge que realmente controlan.",
+      "Tres pasos rápidos para empezar:",
+      "1) Instala el widget para atender visitantes desde hoy.",
+      "2) Añade tu dominio y contenido para respuestas precisas.",
+      "3) Invita a tu equipo si quieres buzón compartido y flujos de trabajo.",
+      opts.dashboardUrl ? `Panel: ${opts.dashboardUrl}` : "",
+      "Responde a este correo y dime: ¿Qué te trajo a Aliigo y qué quieres que gestione primero?",
+      "Un abrazo,",
+      "Emilio",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    return { subject, html, text };
+  }
+
+  const subject = "Welcome to Aliigo — glad you’re here";
+  const intro = name ? `Hi ${name},` : "Hi,";
+  const html = wrapHtml(
+    `
+    <h2 style="margin:0 0 8px;">Welcome to Aliigo</h2>
+    <p style="margin:0 0 16px; color:#333; font-size:14px;">${intro}</p>
+    <p style="margin:0 0 16px; color:#333; font-size:14px;">
+      I’m Emilio, founder & CEO of Aliigo — thanks for joining us.
+    </p>
+    <p style="margin:0 0 16px; color:#333; font-size:14px;">
+      Aliigo was built to help businesses deploy a concierge-style assistant they actually control.
+      Here are three fast wins to get value quickly:
+    </p>
+    <ol style="margin:0 0 16px; padding-left:18px; color:#333; font-size:14px;">
+      <li>Install your widget so visitors can start conversations today.</li>
+      <li>Add your domain + content so answers stay accurate.</li>
+      <li>Invite your team if you want a shared inbox and workflows.</li>
+    </ol>
+    ${
+      opts.dashboardUrl
+        ? `<p style="margin:0 0 16px;"><a href="${opts.dashboardUrl}" style="display:inline-block; padding:10px 16px; background:#111; color:#fff; text-decoration:none; border-radius:8px; font-size:14px;">Open dashboard</a></p>`
+        : ""
+    }
+    <p style="margin:0 0 16px; color:#333; font-size:14px;">
+      If you have 2 minutes, hit reply and tell me:
+      <strong>What brought you to Aliigo, and what do you want it to handle first?</strong>
+      I read every reply.
+    </p>
+    <p style="margin:0 0 4px; color:#333; font-size:14px;">Cheers,</p>
+    <p style="margin:0; color:#333; font-size:14px;">Emilio</p>
+    `,
+    "en"
+  );
+
+  const text = [
+    "Welcome to Aliigo",
+    intro,
+    "I’m Emilio, founder & CEO of Aliigo — thanks for joining us.",
+    "Aliigo was built to help businesses deploy a concierge-style assistant they actually control.",
+    "Three fast wins to get value quickly:",
+    "1) Install your widget so visitors can start conversations today.",
+    "2) Add your domain + content so answers stay accurate.",
+    "3) Invite your team if you want a shared inbox and workflows.",
+    opts.dashboardUrl ? `Dashboard: ${opts.dashboardUrl}` : "",
+    "Reply and tell me: What brought you to Aliigo, and what do you want it to handle first?",
+    "Cheers,",
+    "Emilio",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return { subject, html, text };
+}
