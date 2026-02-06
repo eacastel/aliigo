@@ -293,7 +293,7 @@ async function saveLeadClean(opts: {
 }): Promise<LeadPayload | null> {
   const lead = normalizeLead(opts.lead);
 
-  if (!hasAnyLead(lead)) return;
+  if (!hasAnyLead(lead)) return null;
 
   const basePayload = {
     business_id: opts.businessId,
