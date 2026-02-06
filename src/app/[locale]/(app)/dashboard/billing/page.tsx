@@ -224,6 +224,26 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                 : safeT("pending", undefined, "Billing is not active yet.")}
           </p>
 
+          {!isSubscribed && emailConfirmed ? (
+            <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950/60 p-5 text-sm text-zinc-200">
+              <div className="text-base font-semibold text-white">
+                {safeT("trialTitle", undefined, "30-day free trial, cancel anytime")}
+              </div>
+              <p className="mt-2 text-zinc-400">
+                {safeT(
+                  "trialSubtitle",
+                  undefined,
+                  "Start your trial now. You won’t be charged until it ends, and you can cancel or change plans at any time."
+                )}
+              </p>
+              <div className="mt-3 space-y-1 text-zinc-300">
+                <div>• {safeT("trialBullet1", undefined, "No charge if you cancel before the trial ends.")}</div>
+                <div>• {safeT("trialBullet2", undefined, "Upgrade, downgrade, or cancel anytime from this page.")}</div>
+                <div>• {safeT("trialBullet3", undefined, "You’ll keep access until the end of your current period.")}</div>
+              </div>
+            </div>
+          ) : null}
+
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 space-y-3 text-sm text-zinc-200">
             {portalError ? (
               <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
