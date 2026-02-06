@@ -70,10 +70,13 @@ function t(locale: Locale) {
 
 function wrapHtml(content: string, locale: Locale) {
   const strings = t(locale);
+  const logoUrl = "https://aliigo.com/aliigo-logo-color.png";
   return `
   <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color:#111; background:#ffffff;">
     <div style="max-width:560px; margin:0 auto; padding:24px;">
-      <div style="font-weight:700; font-size:18px; margin-bottom:12px;">${strings.brand}</div>
+      <div style="margin-bottom:16px;">
+        <img src="${logoUrl}" alt="${strings.brand}" width="120" height="32" style="display:block;" />
+      </div>
       ${content}
       <p style="font-size:12px; color:#666; margin-top:24px;">${strings.footer}</p>
     </div>
@@ -105,7 +108,7 @@ export function buildAuthEmail(input: AuthEmailInput) {
     <h2 style="margin:0 0 8px;">${content.title}</h2>
     <p style="margin:0 0 16px; color:#333; font-size:14px;">${content.body}</p>
     <p style="margin:0 0 16px;">
-      <a href="${input.confirmUrl}" style="display:inline-block; padding:10px 16px; background:#111; color:#fff; text-decoration:none; border-radius:8px; font-size:14px;">
+      <a href="${input.confirmUrl}" style="display:inline-block; padding:10px 16px; background:#84C9AD; color:#0b0b0b; text-decoration:none; border-radius:8px; font-size:14px; font-weight:600;">
         ${strings.button}
       </a>
     </p>
@@ -204,7 +207,7 @@ export function buildWelcomeEmail(opts: {
       </ol>
       ${
         opts.dashboardUrl
-          ? `<p style="margin:0 0 16px;"><a href="${opts.dashboardUrl}" style="display:inline-block; padding:10px 16px; background:#111; color:#fff; text-decoration:none; border-radius:8px; font-size:14px;">Abrir panel</a></p>`
+          ? `<p style="margin:0 0 16px;"><a href="${opts.dashboardUrl}" style="display:inline-block; padding:10px 16px; background:#84C9AD; color:#0b0b0b; text-decoration:none; border-radius:8px; font-size:14px; font-weight:600;">Abrir panel</a></p>`
           : ""
       }
       <p style="margin:0 0 16px; color:#333; font-size:14px;">
@@ -258,7 +261,7 @@ export function buildWelcomeEmail(opts: {
     </ol>
     ${
       opts.dashboardUrl
-        ? `<p style="margin:0 0 16px;"><a href="${opts.dashboardUrl}" style="display:inline-block; padding:10px 16px; background:#111; color:#fff; text-decoration:none; border-radius:8px; font-size:14px;">Open dashboard</a></p>`
+        ? `<p style="margin:0 0 16px;"><a href="${opts.dashboardUrl}" style="display:inline-block; padding:10px 16px; background:#84C9AD; color:#0b0b0b; text-decoration:none; border-radius:8px; font-size:14px; font-weight:600;">Open dashboard</a></p>`
         : ""
     }
     <p style="margin:0 0 16px; color:#333; font-size:14px;">

@@ -225,11 +225,11 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
           </p>
 
           {!isSubscribed && emailConfirmed ? (
-            <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950/60 p-5 text-sm text-zinc-200">
+            <div className="mb-6 rounded-2xl border border-[#84c9ad]/30 bg-zinc-950/60 p-5 text-sm text-zinc-200 shadow-[0_0_0_1px_rgba(132,201,173,0.08)]">
               <div className="text-base font-semibold text-white">
                 {safeT("trialTitle", undefined, "30-day free trial, cancel anytime")}
               </div>
-              <p className="mt-2 text-zinc-400">
+              <p className="mt-2 text-zinc-300">
                 {safeT(
                   "trialSubtitle",
                   undefined,
@@ -237,9 +237,18 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                 )}
               </p>
               <div className="mt-3 space-y-1 text-zinc-300">
-                <div>• {safeT("trialBullet1", undefined, "No charge if you cancel before the trial ends.")}</div>
-                <div>• {safeT("trialBullet2", undefined, "Upgrade, downgrade, or cancel anytime from this page.")}</div>
-                <div>• {safeT("trialBullet3", undefined, "You’ll keep access until the end of your current period.")}</div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#84c9ad]" />
+                  <span>{safeT("trialBullet1", undefined, "No charge if you cancel before the trial ends.")}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#84c9ad]" />
+                  <span>{safeT("trialBullet2", undefined, "Upgrade, downgrade, or cancel anytime from this page.")}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#84c9ad]" />
+                  <span>{safeT("trialBullet3", undefined, "You’ll keep access until the end of your current period.")}</span>
+                </div>
               </div>
             </div>
           ) : null}
