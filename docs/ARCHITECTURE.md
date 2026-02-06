@@ -16,8 +16,10 @@
   2) allowlisted domain(s) per business
 
 ### Embed Model (current)
-- Widget is loaded via the embedded route `/[locale]/chat`
-- Widget uses a token passed through query params (dev only)
+- Web Component v1 (`public/widget/v1/aliigo-widget.js`) is the primary embed.
+- Sessions are minted by `/api/embed/session` using `embed_key + host`.
+- Tokens are short‑lived and host-validated.
+- The widget persists local transcript with a 30‑minute TTL.
 
 ### Chat Pipeline (POST /api/conversation)
 - Validate message
@@ -31,7 +33,11 @@
 - Build system prompt using business fields (and lead heuristic)
 - Call OpenAI
 - Insert assistant message
-- Return reply
+- Return reply + structured actions
+- Optional lead capture:
+  - Widget can submit structured lead payload (name/email/phone/consent)
+  - Leads are stored in `leads`
+  - Lead notification emails are sent via Resend
 
 ## Security boundaries
 - Browser Supabase client uses anon key and relies on Supabase Auth.
@@ -39,7 +45,6 @@
 - Domain allowlisting is critical for the widget.
 
 ## Known gaps to close (production hardening)
-- CORS wildcard in conversation endpoint
-- conversationId ownership verification
-- token handling: avoid URL token passing; add public key → session token minting
-- token rotation and authenticated token management
+- CORS rules should remain strict (no wildcard in production)
+- Token rotation and authenticated token management
+- Optional: background reindexing for knowledge updates

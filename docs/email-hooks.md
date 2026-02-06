@@ -1,7 +1,8 @@
 # Supabase Send Email Hook (Resend)
 
 This project uses Supabase Auth **Send Email Hook** to deliver all auth emails via Resend,
-with EN/ES localization and internal signup notifications.
+with EN/ES localization and internal signup notifications. The hook is the single source of truth
+for auth emails (SMTP is not used when the hook is enabled).
 
 ## 1) Configure Supabase Auth Hook
 
@@ -49,13 +50,13 @@ When `email_action_type` is `email_change`, Supabase uses counterintuitive field
 
 If Secure Email Change is disabled, only one token/hash is present and the hook should send a single email.
 
-## 3) Locale Support
+## 4) Locale Support
 
 - Locale is captured at signup and stored in `user_metadata.locale`.
 - Emails to users use EN/ES based on this value.
 - Internal admin emails are English.
 
-## 4) Email audit + welcome flag (optional but recommended)
+## 5) Email audit + welcome flag (optional but recommended)
 
 Run the SQL in:
 
@@ -67,9 +68,28 @@ This creates:
 - `email_audit` table for logging sends
 - `business_profiles.welcome_email_sent_at` to avoid duplicate welcome emails
 
-## 4) Testing
+## 6) Welcome email behavior (free plan)
+
+On the free Supabase plan you can only configure one hook. The welcome email is sent from the
+auth callback flow (not the hook) to avoid needing a second hook:
+
+- `/[locale]/auth/callback` sends the **welcome email** after signup confirmation.
+- This uses `business_profiles.welcome_email_sent_at` to avoid duplicates.
+
+## 7) Lead notification emails (widget)
+
+When a lead is submitted in the widget, a lead notification email is sent via Resend.
+Locale for this email uses the business default locale (`businesses.default_locale`).
+The email includes:
+
+- Lead details (name, email, phone)
+- A short conversation summary
+- A link to the conversation in the dashboard
+
+## 8) Testing
 
 - Create a new account (signup) → confirmation email (localized) + admin notification.
 - Request password reset → recovery email (localized).
+- Submit a lead from the widget → lead notification email.
 
 If emails are not sent, check Vercel logs for `/api/auth/send-email-hook`.
