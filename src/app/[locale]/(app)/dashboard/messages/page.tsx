@@ -187,7 +187,7 @@ export default function DashboardMessagesPage() {
 
   const openConversation = (conversationId: string) => {
     if (!conversationId) return;
-    router.push(`/dashboard/messages/${conversationId}`);
+    router.push(`/dashboard/messages?conversationId=${conversationId}`);
   };
 
   return (
