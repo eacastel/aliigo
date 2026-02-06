@@ -187,34 +187,48 @@ export function buildWelcomeEmail(opts: {
   const name = firstName(opts.fullName);
 
   if (opts.locale === "es") {
-    const subject = "Bienvenido a Aliigo — me alegra tenerte aquí";
+    const subject = "Bienvenido a Aliigo — encantado de tenerte aquí";
     const intro = name ? `Hola ${name},` : "Hola,";
     const html = wrapHtml(
       `
       <h2 style="margin:0 0 8px;">Bienvenido a Aliigo</h2>
       <p style="margin:0 0 16px; color:#333; font-size:14px;">${intro}</p>
       <p style="margin:0 0 16px; color:#333; font-size:14px;">
-        Soy Emilio, fundador y CEO de Aliigo — gracias por unirte.
+        Soy Emilio, fundador de Aliigo. Gracias por unirte.
       </p>
+
       <p style="margin:0 0 16px; color:#333; font-size:14px;">
-        Aliigo nació para que las empresas tengan un asistente concierge que realmente controlan.
-        Aquí tienes tres pasos rápidos para empezar con buen pie:
+        Aliigo nació para que las organizaciones puedan contar con un asistente tipo concierge que realmente controlan, y que represente bien su forma de trabajar.
       </p>
+
+      <p style="margin:0 0 16px; color:#333; font-size:14px;">
+        Para empezar, te propongo los siguientes pasos:
+      </p>
+
       <ol style="margin:0 0 16px; padding-left:18px; color:#333; font-size:14px;">
-        <li>Instala el widget para atender visitantes desde hoy.</li>
-        <li>Añade tu dominio y contenido para respuestas precisas.</li>
-        <li>Invita a tu equipo si quieres buzón compartido y flujos de trabajo.</li>
+        <li>Instala el widget y empieza a atender consultas desde hoy.</li>
+        <li>Añade tu dominio y branding, selecciona idioma y personaliza el widget.</li>
+        <li>Ajusta el conocimiento y le comportamiento del asistente según los objetivos de tu empresa y el tipo de visitantes.</li>
       </ol>
+
       ${
         opts.dashboardUrl
-          ? `<p style="margin:0 0 16px;"><a href="${opts.dashboardUrl}" style="display:inline-block; padding:10px 16px; background:#84C9AD; color:#0b0b0b; text-decoration:none; border-radius:8px; font-size:14px; font-weight:600;">Abrir panel</a></p>`
+          ? `<p style="margin:0 0 16px;">
+              <a href="${opts.dashboardUrl}"
+                  style="display:inline-block; padding:10px 16px; background:#84C9AD; color:#0b0b0b;
+                        text-decoration:none; border-radius:8px; font-size:14px; font-weight:600;">
+                Abrir panel
+              </a>
+            </p>`
           : ""
       }
+
       <p style="margin:0 0 16px; color:#333; font-size:14px;">
-        Si tienes 2 minutos, responde a este correo y dime:
-        <strong>¿Qué te trajo a Aliigo y qué quieres que gestione primero?</strong>
-        Leo y respondo todos los mensajes.
+        Si tienes un par de minutos, responde a este correo y dime:
+        <strong>¿qué te trajo a Aliigo y qué te gustaría que el asistente gestione primero?</strong>
+        Leo y respondo todos los mensajes personalmente.
       </p>
+
       <p style="margin:0 0 4px; color:#333; font-size:14px;">Un abrazo,</p>
       <p style="margin:0; color:#333; font-size:14px;">Emilio</p>
       `,
