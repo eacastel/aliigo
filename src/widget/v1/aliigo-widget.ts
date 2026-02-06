@@ -1185,10 +1185,13 @@ class AliigoWidget extends HTMLElement {
           const msg = this.state.msgs[messageIndex];
           if (msg?.actions?.length) {
             msg.actions = msg.actions.filter((a) => a.type !== "lead_form");
-            this.state.msgs = [...this.state.msgs];
-            this.pendingScroll = "bottom";
-            this.render();
           }
+          // Remove the assistant bubble that asked for details to avoid duplication
+          const nextMsgs = this.state.msgs.slice();
+          nextMsgs.splice(messageIndex, 1);
+          this.state.msgs = nextMsgs;
+          this.pendingScroll = "bottom";
+          this.render();
         }
 
         void this.send(t.lead.message, lead, t.lead.followUp);
