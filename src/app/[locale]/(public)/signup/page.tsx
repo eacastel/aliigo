@@ -165,7 +165,7 @@ export default function SignupPage() {
         email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/${locale}/auth/callback?type=signup&next=/dashboard`,
           data: {
             full_name: normalizedName,
             business_name: normalizedBiz,
