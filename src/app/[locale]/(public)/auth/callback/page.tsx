@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import { useRouter } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 function getHashParams() {
   const hash = typeof window === "undefined" ? "" : window.location.hash.replace(/^#/, "");
@@ -14,12 +14,13 @@ function getHashParams() {
 export default function AuthCallbackPage() {
   const router = useRouter();
   const t = useTranslations("Auth.callback");
+  const locale = useLocale();
 
   useEffect(() => {
     (async () => {
       try {
         const url = new URL(window.location.href);
-        const next = url.searchParams.get("next") || "/login";
+        const next = url.searchParams.get("next") || "/dashboard";
 
         // Support both new (code=) and old (hash access_token) flows
         const hasCode = url.searchParams.has("code");
@@ -43,6 +44,25 @@ export default function AuthCallbackPage() {
         if (type === "recovery") {
           router.replace({ pathname: "/update-password" });
           return;
+        }
+
+        if (type === "signup") {
+          try {
+            const { data } = await supabase.auth.getSession();
+            const token = data.session?.access_token;
+            if (token) {
+              await fetch("/api/auth/welcome", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ locale }),
+              });
+            }
+          } catch (e) {
+            console.warn("Welcome email send failed:", e);
+          }
         }
 
         // Default: go to whatever caller requested (or login)

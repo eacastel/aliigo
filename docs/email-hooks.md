@@ -41,6 +41,10 @@ Save it as:
 AUTH_WEBHOOK_SECRET
 ```
 
+> Free plan note: Supabase free plan allows only one hook.  
+> If you can't add the `user.confirmed` webhook, the app will send the welcome email from
+> the `/auth/callback` page instead, using `/api/auth/welcome`.
+
 ## Email sending behavior
 
 If **Email Provider** is enabled and **Send Email Hook** is enabled, Supabase will use the hook
@@ -74,6 +78,18 @@ If Secure Email Change is disabled, only one token/hash is present and the hook 
 - Locale is captured at signup and stored in `user_metadata.locale`.
 - Emails to users use EN/ES based on this value.
 - Internal admin emails are English.
+
+## 4) Email audit + welcome flag (optional but recommended)
+
+Run the SQL in:
+
+```
+docs/db/email_audit.sql
+```
+
+This creates:
+- `email_audit` table for logging sends
+- `business_profiles.welcome_email_sent_at` to avoid duplicate welcome emails
 
 ## 4) Testing
 

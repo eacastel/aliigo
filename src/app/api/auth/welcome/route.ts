@@ -1,19 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Webhook } from "standardwebhooks";
-import { buildWelcomeEmail, normalizeLocale } from "@/emails/auth/templates";
+import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { requireUser } from "@/lib/server/auth";
+import { buildWelcomeEmail, normalizeLocale } from "@/emails/auth/templates";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-type AuthEventPayload = {
-  type: string;
-  user: {
-    id: string;
-    email: string;
-    user_metadata?: Record<string, unknown> | null;
-  };
-};
 
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, { status });
@@ -23,14 +14,6 @@ function requireEnv(name: string) {
   const value = process.env[name];
   if (!value) throw new Error(`Missing ${name}`);
   return value;
-}
-
-function getHookSecret() {
-  const raw = requireEnv("AUTH_WEBHOOK_SECRET");
-  return raw
-    .replace("v1,whsec_", "")
-    .replace("whsec_", "")
-    .replace("v1,", "");
 }
 
 async function sendResendEmail(opts: {
@@ -82,56 +65,54 @@ async function logEmailAudit(entry: {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const payload = await req.text();
-    const headers = Object.fromEntries(req.headers.entries());
-    const wh = new Webhook(getHookSecret());
-    const verified = wh.verify(payload, headers) as AuthEventPayload;
+    const { userId, email } = await requireUser(req);
+    if (!email) return json({ ok: false, error: "Missing email" }, 400);
 
-    if (verified.type !== "user.confirmed") {
+    const body = await req.json().catch(() => ({}));
+    const localeInput = typeof body?.locale === "string" ? body.locale : null;
+
+    // Load user metadata for name/locale
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const meta = authUser?.user?.user_metadata ?? {};
+    const locale = normalizeLocale(
+      typeof meta.locale === "string" ? meta.locale : localeInput
+    );
+    const fullName = typeof meta.full_name === "string" ? meta.full_name : null;
+
+    // Avoid duplicate welcome emails
+    const { data: profile } = await supabaseAdmin
+      .from("business_profiles")
+      .select("welcome_email_sent_at")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profile?.welcome_email_sent_at) {
+      await logEmailAudit({
+        email,
+        event: "welcome_skipped",
+        locale,
+        source: "auth_callback",
+        payload: { user_id: userId },
+      });
       return json({ ok: true });
     }
-
-    const meta = verified.user.user_metadata ?? {};
-    const locale = normalizeLocale(
-      typeof meta.locale === "string" ? meta.locale : null
-    );
-    const fullName =
-      typeof meta.full_name === "string" ? meta.full_name : null;
 
     const dashboardUrl =
       locale === "es"
         ? "https://aliigo.com/es/dashboard"
         : "https://aliigo.com/en/dashboard";
 
-    // Avoid duplicate welcome emails
-    const { data: profile } = await supabaseAdmin
-      .from("business_profiles")
-      .select("welcome_email_sent_at")
-      .eq("id", verified.user.id)
-      .maybeSingle();
-
-    if (profile?.welcome_email_sent_at) {
-      await logEmailAudit({
-        email: verified.user.email,
-        event: "welcome_skipped",
-        locale,
-        source: "auth_webhook",
-        payload: { user_id: verified.user.id },
-      });
-      return json({ ok: true });
-    }
-
     const welcome = buildWelcomeEmail({
-      email: verified.user.email,
+      email,
       fullName,
       locale,
       dashboardUrl,
     });
 
     await sendResendEmail({
-      to: verified.user.email,
+      to: email,
       subject: welcome.subject,
       html: welcome.html,
       text: welcome.text,
@@ -140,29 +121,19 @@ export async function POST(req: NextRequest) {
     await supabaseAdmin
       .from("business_profiles")
       .update({ welcome_email_sent_at: new Date().toISOString() })
-      .eq("id", verified.user.id);
+      .eq("id", userId);
 
     await logEmailAudit({
-      email: verified.user.email,
+      email,
       event: "welcome_sent",
       locale,
-      source: "auth_webhook",
-      payload: { user_id: verified.user.id },
+      source: "auth_callback",
+      payload: { user_id: userId },
     });
 
     return json({ ok: true });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Server error";
-    try {
-      await logEmailAudit({
-        email: "unknown",
-        event: "welcome_error",
-        source: "auth_webhook",
-        payload: { error: msg },
-      });
-    } catch {
-      // ignore
-    }
     return json({ ok: false, error: msg }, 400);
   }
 }
