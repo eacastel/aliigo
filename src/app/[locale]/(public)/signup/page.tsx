@@ -170,6 +170,7 @@ export default function SignupPage() {
             full_name: normalizedName,
             business_name: normalizedBiz,
             phone: normalizedPhone,
+            locale,
           },
         },
       });
