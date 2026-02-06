@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 type RecentMessageRow = {
@@ -72,6 +73,7 @@ export default function DashboardMessagesPage() {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<ViewTab>("recent");
@@ -83,7 +85,8 @@ export default function DashboardMessagesPage() {
   const [recent, setRecent] = useState<RecentMessageRow[]>([]);
   const [convos, setConvos] = useState<ConversationRow[]>([]);
 
-  const [query, setQuery] = useState("");
+  const initialQuery = searchParams.get("conversationId") || "";
+  const [query, setQuery] = useState(initialQuery);
   const q = query.trim().toLowerCase();
 
   const filteredRecent = useMemo(() => {
@@ -173,6 +176,14 @@ export default function DashboardMessagesPage() {
       cancelled = true;
     };
   }, [router]);
+
+  useEffect(() => {
+    const conv = searchParams.get("conversationId");
+    if (conv) {
+      setQuery(conv);
+      setTab("conversations");
+    }
+  }, [searchParams]);
 
   const openConversation = (conversationId: string) => {
     if (!conversationId) return;

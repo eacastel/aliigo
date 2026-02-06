@@ -8,6 +8,7 @@ import {
   type BillingPlan,
   type BillingStatus,
 } from "@/lib/billingUsage";
+import { buildLeadNotification, normalizeLocale as normalizeLeadLocale } from "@/emails/lead/notification";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,6 +65,12 @@ function corsHeadersFor(req: NextRequest): HeadersInit {
 function clientIp(req: NextRequest) {
   const fwd = req.headers.get("x-forwarded-for");
   return fwd?.split(",")[0]?.trim() || "0.0.0.0";
+}
+
+function clampText(v: string, max = 160) {
+  const s = (v || "").trim();
+  if (s.length <= max) return s;
+  return `${s.slice(0, max)}…`;
 }
 
 
@@ -236,6 +243,7 @@ type LeadPayload = {
   name?: string | null;
   email?: string | null;
   phone?: string | null;
+  consent?: boolean | null;
 };
 
 function normalizeEmail(v: unknown): string | null {
@@ -266,6 +274,7 @@ function normalizeLead(lead: LeadPayload): LeadPayload {
     name: normalizeName(lead.name),
     email: normalizeEmail(lead.email),
     phone: normalizePhone(lead.phone),
+    consent: lead.consent === true,
   };
 }
 
@@ -281,12 +290,12 @@ async function saveLeadClean(opts: {
   externalRef: string | null;
   ip: string;
   lead: LeadPayload;
-}) {
+}): Promise<LeadPayload | null> {
   const lead = normalizeLead(opts.lead);
 
   if (!hasAnyLead(lead)) return;
 
-  const ins = await supabase.from("leads").insert({
+  const basePayload = {
     business_id: opts.businessId,
     conversation_id: opts.conversationId,
     channel: opts.channel,
@@ -296,9 +305,23 @@ async function saveLeadClean(opts: {
     name: lead.name ?? null,
     email: lead.email ?? null,
     phone: lead.phone ?? null,
+  };
+
+  const ins = await supabase.from("leads").insert({
+    ...basePayload,
+    consent: lead.consent === true,
   });
 
-  if (ins.error) throw ins.error;
+  if (ins.error) {
+    const msg = (ins.error.message || "").toLowerCase();
+    if (msg.includes("consent") && msg.includes("does not exist")) {
+      const retry = await supabase.from("leads").insert(basePayload);
+      if (retry.error) throw retry.error;
+    } else {
+      throw ins.error;
+    }
+  }
+  return lead;
 }
 
 async function trySaveLead(opts: {
@@ -309,12 +332,100 @@ async function trySaveLead(opts: {
   externalRef: string | null;
   ip: string;
   lead: LeadPayload;
-}) {
+}): Promise<LeadPayload | null> {
   try {
-    await saveLeadClean(opts);
+    return await saveLeadClean(opts);
   } catch (e) {
     console.error("Lead save failed:", e);
+    return null;
   }
+}
+
+async function sendResendEmail(opts: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM_EMAIL;
+  if (!apiKey || !from) return;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: opts.to,
+      subject: opts.subject,
+      html: opts.html,
+      text: opts.text,
+    }),
+  });
+}
+
+async function logEmailAudit(entry: {
+  email: string;
+  event: string;
+  locale?: string | null;
+  source?: string | null;
+  payload?: Record<string, unknown> | null;
+}) {
+  try {
+    await supabase.from("email_audit").insert({
+      email: entry.email,
+      event: entry.event,
+      locale: entry.locale ?? null,
+      source: entry.source ?? null,
+      payload: entry.payload ?? null,
+    });
+  } catch {
+    // fail-open
+  }
+}
+
+async function getBusinessContactEmail(businessId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("business_profiles")
+    .select("email")
+    .eq("business_id", businessId)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle<{ email: string | null }>();
+
+  return data?.email || process.env.RESEND_TO_EMAIL || null;
+}
+
+async function buildConversationSummary(conversationId: string, locale: "en" | "es") {
+  const { data } = await supabase
+    .from("messages")
+    .select("role, content, created_at")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+  const rows = Array.isArray(data) ? (data as MessagesRow[]) : [];
+  return rows
+    .slice()
+    .reverse()
+    .map((m) => {
+      const label =
+        m.role === "assistant"
+          ? locale === "es"
+            ? "Asistente"
+            : "Assistant"
+          : m.role === "system"
+            ? locale === "es"
+              ? "Sistema"
+              : "System"
+            : locale === "es"
+              ? "Visitante"
+              : "Visitor";
+      return `${label}: ${clampText(m.content || "")}`;
+    });
 }
 
 // -------------------- HTTP --------------------
@@ -409,6 +520,9 @@ export async function POST(req: NextRequest) {
     if (!bizRes.data) throw new Error("Business not found");
 
     const billingStatus = bizRes.data.billing_status ?? "incomplete";
+    const bizLocale = normalizeLeadLocale(bizRes.data.default_locale ?? null);
+    const bizName = bizRes.data.name;
+    const bizSlug = bizRes.data.slug;
 
     if (!isBillingActive(billingStatus)) {
       return NextResponse.json(
@@ -609,11 +723,12 @@ Rules:
     let actions: Action[] = [];
     let extractedLead: LeadPayload | null = null;
     const leadAlreadySent = hasAnyLead(leadFromClient);
+    let leadSaved: LeadPayload | null = null;
 
     // Always save explicit lead from widget if present (even before OpenAI)
 
     if (hasAnyLead(leadFromClient)) {
-      await trySaveLead({
+      leadSaved = await trySaveLead({
         businessId,
         conversationId,
         channel: ch,
@@ -759,7 +874,7 @@ Only include {type:"collect_lead"} when the visitor explicitly asks for a human/
 
     // Save extracted lead (if any)
     if (!leadAlreadySent && hasAnyLead(extractedLead)) {
-      await trySaveLead({
+      leadSaved = await trySaveLead({
         businessId,
         conversationId,
         channel: ch,
@@ -779,6 +894,40 @@ Only include {type:"collect_lead"} when the visitor explicitly asks for a human/
       meta: { actions },
     });
     if (m2.error) throw m2.error;
+
+    if (leadSaved) {
+      const contactEmail = await getBusinessContactEmail(businessId);
+      if (contactEmail) {
+        const summaryLines = await buildConversationSummary(conversationId, bizLocale);
+        const conversationUrl = `https://aliigo.com/${bizLocale}/dashboard/messages?conversationId=${conversationId}`;
+        const email = buildLeadNotification({
+          locale: bizLocale,
+          businessName: bizName || "Aliigo",
+          conversationUrl,
+          lead: leadSaved,
+          summaryLines,
+        });
+
+        await sendResendEmail({
+          to: contactEmail,
+          subject: email.subject,
+          html: email.html,
+          text: email.text,
+        });
+
+        await logEmailAudit({
+          email: contactEmail,
+          event: "lead_notify_sent",
+          locale: bizLocale,
+          source: "widget",
+          payload: {
+            business_id: businessId,
+            conversation_id: conversationId,
+            business_slug: bizSlug,
+          },
+        });
+      }
+    }
 
     return NextResponse.json({ conversationId, reply, locale, actions }, { status: 200, headers: corsHeadersFor(req) });
   } catch (e: unknown) {

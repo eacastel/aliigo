@@ -3,7 +3,8 @@
 type Role = "user" | "assistant";
 type Action =
   | { type: "link"; label: string; url: string }
-  | { type: "handoff"; label: string; channels?: ("email"|"telegram"|"whatsapp")[] };
+  | { type: "handoff"; label: string; channels?: ("email"|"telegram"|"whatsapp")[] }
+  | { type: "lead_form"; fields: ("name" | "email" | "phone")[]; reason?: string };
 
 type Msg = { role: Role; content: string; actions?: Action[] };
 
@@ -56,8 +57,15 @@ function mapServerActionsToWidget(actions: unknown): Action[] | undefined {
     }
 
     if (t === "collect_lead") {
-      // Simple for now: one handoff button (you can build a lead form later)
-      out.push({ type: "handoff", label: "Talk to a person" });
+      const fields = Array.isArray(obj.fields)
+        ? obj.fields.filter((f) => f === "name" || f === "email" || f === "phone")
+        : [];
+      const reason = typeof obj.reason === "string" ? obj.reason : undefined;
+      out.push({
+        type: "lead_form",
+        fields: fields.length ? (fields as ("name" | "email" | "phone")[]) : ["name", "email"],
+        reason,
+      });
       continue;
     }
   }
@@ -73,6 +81,17 @@ const UI = {
     welcome: "Ask a question and we’ll help right away.",
     placeholder: "Type your question…",
     send: "Send",
+    lead: {
+      title: "Share your details",
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      submit: "Send details",
+      sent: "Thanks! We’ll be in touch.",
+      message: "Here are my contact details.",
+      consent: "I agree to be contacted about my request.",
+      consentNote: "Your information will only be used to follow up on this request.",
+    },
   },
   es: {
     pill: (brand: string) => (brand ? `Pregunta a ${brand}` : "Chat"),
@@ -80,6 +99,17 @@ const UI = {
     welcome: "Haz tu consulta y te ayudamos al momento.",
     placeholder: "Escribe tu consulta…",
     send: "Enviar",
+    lead: {
+      title: "Déjanos tus datos",
+      name: "Nombre",
+      email: "Email",
+      phone: "Teléfono",
+      submit: "Enviar datos",
+      sent: "¡Gracias! Te contactaremos.",
+      message: "Aquí tienes mis datos de contacto.",
+      consent: "Acepto que me contacten sobre mi solicitud.",
+      consentNote: "Usaremos estos datos solo para dar seguimiento a tu solicitud.",
+    },
   },
 } as const;
 
@@ -787,6 +817,60 @@ class AliigoWidget extends HTMLElement {
       }
       .action:hover, .action-btn:hover { border-color: rgba(0,0,0,0.18); }
 
+      .lead-form {
+        margin-top: 8px;
+        display: grid;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.08);
+        background: rgba(255,255,255,0.75);
+      }
+      .lead-form .lead-reason { font-size: 13px; color:#374151; }
+      .lead-field { display: grid; gap: 4px; }
+      .lead-label { font-size: 12px; color:#6b7280; }
+      .lead-input {
+        height: 36px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 0 10px;
+        font-size: 14px;
+        color: #111827;
+        outline: none;
+      }
+      .lead-input:focus { border-color:#d1d5db; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
+      .lead-submit {
+        height: 36px;
+        border: 0;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #111827;
+        color: #ffffff;
+      }
+      .lead-consent {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        font-size: 12px;
+        color: #374151;
+      }
+      .lead-consent input {
+        margin-top: 2px;
+      }
+      .lead-consent-note {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: -2px;
+      }
+      .lead-form.sent .lead-input,
+      .lead-form.sent .lead-submit {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
 
       .input {
         flex: 1;
@@ -955,6 +1039,29 @@ class AliigoWidget extends HTMLElement {
                               if (a.type === "handoff") {
                                 return `<button class="action-btn" type="button" data-action="handoff" data-i="${i}">${escapeHtml(a.label)}</button>`;
                               }
+                              if (a.type === "lead_form") {
+                                const fields = Array.isArray(a.fields) ? a.fields : ["name", "email"];
+                                const reason = a.reason ? `<div class="lead-reason">${escapeHtml(a.reason)}</div>` : "";
+                                const rows = fields
+                                  .map((f) => {
+                                    const label =
+                                      f === "name" ? t.lead.name : f === "phone" ? t.lead.phone : t.lead.email;
+                                    const type = f === "email" ? "email" : f === "phone" ? "tel" : "text";
+                                    return `<label class="lead-field">
+                                      <span class="lead-label">${escapeHtml(label)}</span>
+                                      <input class="lead-input" name="${f}" type="${type}" required />
+                                    </label>`;
+                                  })
+                                  .join("");
+                                const consent = `<label class="lead-consent">
+                                  <input type="checkbox" name="consent" required />
+                                  <span>${escapeHtml(t.lead.consent)}</span>
+                                </label>
+                                <div class="lead-consent-note">${escapeHtml(t.lead.consentNote)}</div>`;
+                                return `<form class="lead-form" data-action="lead-form">${reason}${rows}${consent}<button class="lead-submit" type="submit">${escapeHtml(
+                                  t.lead.submit
+                                )}</button></form>`;
+                              }
                               return "";
                             })
                             .join("")}
@@ -1047,11 +1154,34 @@ class AliigoWidget extends HTMLElement {
       void this.send(v);
     });
 
+    this.root.querySelectorAll(".lead-form").forEach((el) => {
+      const formEl = el as HTMLFormElement;
+      formEl.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const fd = new FormData(formEl);
+        const lead = {
+          name: (fd.get("name") || "").toString().trim(),
+          email: (fd.get("email") || "").toString().trim(),
+          phone: (fd.get("phone") || "").toString().trim(),
+          consent: (fd.get("consent") || "") === "on",
+        };
+
+        if (!lead.name && !lead.email && !lead.phone) return;
+        if (!lead.consent) return;
+
+        formEl.classList.add("sent");
+        const btn = formEl.querySelector(".lead-submit") as HTMLButtonElement | null;
+        if (btn) btn.textContent = t.lead.sent;
+
+        void this.send(t.lead.message, lead);
+      });
+    });
+
     this.applyPendingScroll();
     this.applyPendingFocus();
   }
 
-  private async send(content: string) {
+  private async send(content: string, lead?: { name?: string; email?: string; phone?: string; consent?: boolean }) {
     const session = this.state.session;
     if (!session?.token) return;
 
@@ -1067,15 +1197,16 @@ class AliigoWidget extends HTMLElement {
       const res = await fetch(`${apiBase}/api/conversation`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: session.token,
-          conversationId: this.state.conversationId,
-          externalRef: this.state.visitorSessionId,
-          message: content,
-          locale: this.state.locale,
-          channel: "web",
-        }),
-      });
+          body: JSON.stringify({
+            token: session.token,
+            conversationId: this.state.conversationId,
+            externalRef: this.state.visitorSessionId,
+            message: content,
+            locale: this.state.locale,
+            channel: "web",
+            ...(lead ? { lead } : {}),
+          }),
+        });
 
       const raw = (await res.json().catch(() => ({}))) as {
         conversationId?: string;
@@ -1103,6 +1234,7 @@ class AliigoWidget extends HTMLElement {
                 message: content,
                 locale: this.state.locale,
                 channel: "web",
+                ...(lead ? { lead } : {}),
               }),
             });
 
