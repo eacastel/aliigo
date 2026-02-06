@@ -29,6 +29,14 @@ type ConversationRow = {
   message_count: number | null;
 };
 
+type MessageRow = {
+  id: string;
+  conversation_id: string;
+  role: string;
+  content: string;
+  created_at: string;
+};
+
 type ViewTab = "recent" | "conversations";
 
 function safeStr(v: unknown) {
@@ -84,6 +92,9 @@ export default function DashboardMessagesPage() {
 
   const [recent, setRecent] = useState<RecentMessageRow[]>([]);
   const [convos, setConvos] = useState<ConversationRow[]>([]);
+  const [selectedMessages, setSelectedMessages] = useState<MessageRow[]>([]);
+  const [selectedLoading, setSelectedLoading] = useState(false);
+  const [selectedError, setSelectedError] = useState<string | null>(null);
 
   const initialQuery = searchParams.get("conversationId") || "";
   const [query, setQuery] = useState(initialQuery);
@@ -185,9 +196,50 @@ export default function DashboardMessagesPage() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const conv = searchParams.get("conversationId");
+
+    if (!conv) {
+      setSelectedMessages([]);
+      setSelectedError(null);
+      setSelectedLoading(false);
+      return;
+    }
+
+    const run = async () => {
+      setSelectedLoading(true);
+      setSelectedError(null);
+      try {
+        const { data, error } = await supabase
+          .from("messages")
+          .select("id, conversation_id, role, content, created_at")
+          .eq("conversation_id", conv)
+          .order("created_at", { ascending: true });
+
+        if (error) throw error;
+        if (!cancelled) setSelectedMessages((data as MessageRow[]) || []);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Failed to load conversation.";
+        if (!cancelled) setSelectedError(msg);
+      } finally {
+        if (!cancelled) setSelectedLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams]);
+
   const openConversation = (conversationId: string) => {
     if (!conversationId) return;
     router.push(`/dashboard/messages?conversationId=${conversationId}`);
+  };
+
+  const closeConversation = () => {
+    router.push("/dashboard/messages");
   };
 
   return (
@@ -260,6 +312,55 @@ export default function DashboardMessagesPage() {
           </div>
         </div>
       )}
+
+      {searchParams.get("conversationId") ? (
+        <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950/40 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="text-sm text-zinc-400">
+              {t("Dashboard.messages.conversationTitle", { default: "Conversation" })}:{" "}
+              <span className="font-mono text-zinc-200">{searchParams.get("conversationId")}</span>
+            </div>
+            <button
+              type="button"
+              onClick={closeConversation}
+              className="rounded-lg border border-zinc-800 bg-zinc-950/30 px-3 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-900/50"
+            >
+              {t("Dashboard.messages.back", { default: "Back to all" })}
+            </button>
+          </div>
+
+          {selectedLoading ? (
+            <div className="mt-4 text-sm text-zinc-400">
+              {t("Dashboard.messages.loading", { default: "Loading…" })}
+            </div>
+          ) : selectedError ? (
+            <div className="mt-4 text-sm text-red-300">{selectedError}</div>
+          ) : selectedMessages.length === 0 ? (
+            <div className="mt-4 text-sm text-zinc-400">
+              {t("Dashboard.messages.emptyConversation", { default: "No messages in this conversation yet." })}
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {selectedMessages.map((m) => (
+                <div key={m.id} className="rounded-xl border border-zinc-800 bg-zinc-950/30 p-4">
+                  <div className="flex items-center gap-2 text-xs text-zinc-500">
+                    <span
+                      className={[
+                        "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+                        badgeForRole(m.role),
+                      ].join(" ")}
+                    >
+                      {m.role}
+                    </span>
+                    <span>{fmtWhen(m.created_at)}</span>
+                  </div>
+                  <div className="mt-2 text-sm text-zinc-200 whitespace-pre-wrap">{m.content}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {/* Tabs */}
       <div className="mb-4 flex items-center gap-2">

@@ -899,7 +899,7 @@ Only include {type:"collect_lead"} when the visitor explicitly asks for a human/
       const contactEmail = await getBusinessContactEmail(businessId);
       if (contactEmail) {
         const summaryLines = await buildConversationSummary(conversationId, bizLocale);
-        const conversationUrl = `https://aliigo.com/${bizLocale}/dashboard/messages?conversationId=${conversationId}`;
+        const conversationUrl = `https://aliigo.com/${bizLocale}/dashboard/messages/${conversationId}`;
         const email = buildLeadNotification({
           locale: bizLocale,
           businessName: bizName || "Aliigo",
