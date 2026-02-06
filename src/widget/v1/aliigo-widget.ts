@@ -1271,10 +1271,13 @@ class AliigoWidget extends HTMLElement {
             if (retry.ok) {
               if (raw2.conversationId) this.state.conversationId = raw2.conversationId;
               const nextActions2 = mapServerActionsToWidget(raw2.actions);
+              const cleanedActions2 = lead
+                ? nextActions2?.filter((a) => a.type !== "lead_form")
+                : nextActions2;
 
               this.state.msgs = [
                 ...this.state.msgs,
-                { role: "assistant", content: raw2.reply || "", actions: nextActions2 },
+                { role: "assistant", content: raw2.reply || "", actions: cleanedActions2 },
               ];
               if (postReply) {
                 this.state.msgs = [
@@ -1313,9 +1316,12 @@ class AliigoWidget extends HTMLElement {
 
       if (raw.conversationId) this.state.conversationId = raw.conversationId;
       const nextActions = mapServerActionsToWidget(raw.actions);
+      const cleanedActions = lead
+        ? nextActions?.filter((a) => a.type !== "lead_form")
+        : nextActions;
       this.state.msgs = [
         ...this.state.msgs,
-        { role: "assistant", content: raw.reply || "", actions: nextActions },
+        { role: "assistant", content: raw.reply || "", actions: cleanedActions },
       ];
       if (postReply) {
         this.state.msgs = [

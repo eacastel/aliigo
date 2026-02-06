@@ -269,6 +269,15 @@ function normalizeName(v: unknown): string | null {
   return s.slice(0, 120);
 }
 
+function normalizeConversationId(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const s = v.trim();
+  if (!s) return null;
+  const uuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuid.test(s) ? s : null;
+}
+
 function normalizeLead(lead: LeadPayload): LeadPayload {
   return {
     name: normalizeName(lead.name),
@@ -462,6 +471,7 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const ch: Channel = isChannel(bodyChannel) ? bodyChannel : "web";
+    const safeInputConvId = normalizeConversationId(inputConvId);
 
     const externalRef =
       typeof inputExternalRef === "string" ? inputExternalRef.trim().slice(0, 120) : null;
@@ -568,11 +578,11 @@ export async function POST(req: NextRequest) {
 
     await rateLimit(businessId, ip);
 
-    if (inputConvId) {
+    if (safeInputConvId) {
       const own = await supabase
         .from("conversations")
         .select("id")
-        .eq("id", inputConvId)
+        .eq("id", safeInputConvId)
         .eq("business_id", businessId)
         .maybeSingle<{ id: string }>();
 
@@ -592,7 +602,7 @@ export async function POST(req: NextRequest) {
     const locale = supported.has(localeRaw) ? localeRaw : "en";
 
     // ensure conversation (reuse by business_id + external_ref)
-    let conversationId = inputConvId ?? null;
+    let conversationId = safeInputConvId ?? null;
 
     if (!conversationId) {
       if (externalRef) {
@@ -895,7 +905,7 @@ Only include {type:"collect_lead"} when the visitor explicitly asks for a human/
     });
     if (m2.error) throw m2.error;
 
-    if (leadSaved) {
+    if (leadSaved && conversationId) {
       const contactEmail = await getBusinessContactEmail(businessId);
       if (contactEmail) {
         const summaryLines = await buildConversationSummary(conversationId, bizLocale);
