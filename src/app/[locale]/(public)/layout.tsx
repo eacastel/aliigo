@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
@@ -14,8 +14,9 @@ export default async function PublicLayout({
   children: React.ReactNode;
 }) {
   const t = await getTranslations("Navigation");
-  const locale = await getLocale();
   const cookieStore = await cookies();
+  const localeCookie = cookieStore.get("NEXT_LOCALE")?.value || "en";
+  const locale = localeCookie.toUpperCase();
   const currency = getCurrencyFromCookies(cookieStore) ?? "EUR";
   const debugCountry = cookieStore.get("aliigo_country_debug")?.value;
 

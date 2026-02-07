@@ -99,10 +99,12 @@ export default function middleware(req: NextRequest) {
 
   if (queryCurrency) {
     setCurrencyCookie(res, queryCurrency);
-  } else if (!cookieCurrency) {
+  } else {
     const country = getCountryCode(req);
     const inferred = currencyForCountry(country);
-    setCurrencyCookie(res, inferred);
+    if (!cookieCurrency || cookieCurrency !== inferred) {
+      setCurrencyCookie(res, inferred);
+    }
   }
 
   const debugCountry = getCountryCode(req);

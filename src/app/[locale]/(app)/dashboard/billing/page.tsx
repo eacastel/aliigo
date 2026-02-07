@@ -440,11 +440,6 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
               </>
             ) : null}
 
-            {/* Status debug line */}
-            <div className="pt-2 text-xs text-zinc-500">
-              {safeT("statusLabel", undefined, "Status:")}{" "}
-              <span className="text-zinc-400">{status ?? "—"}</span>
-            </div>
           </div>
 
           {/* Only show checkout when payment is actually needed */}
