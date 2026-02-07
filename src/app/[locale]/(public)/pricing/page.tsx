@@ -5,11 +5,12 @@ import { ProContactForm } from "@/components/ProContactForm";
 import { cookies } from "next/headers";
 import { getCurrencyFromCookies, type AliigoCurrency } from "@/lib/currency";
 
-export default function PricingPage() {
+export default async function PricingPage() {
   const t = useTranslations("Landing");
   const p = useTranslations("PricingPage");
   const locale = useLocale();
-  const currency = (getCurrencyFromCookies(cookies()) ?? "EUR") as AliigoCurrency;
+  const cookieStore = await cookies();
+  const currency = (getCurrencyFromCookies(cookieStore) ?? "EUR") as AliigoCurrency;
   const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
   const starterPrice = priceFmt.format(99);
   const growthPrice = priceFmt.format(149);
