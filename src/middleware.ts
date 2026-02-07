@@ -98,7 +98,6 @@ export default function middleware(req: NextRequest) {
     const country =
       req.headers.get("x-vercel-ip-country") ||
       req.headers.get("cf-ipcountry") ||
-      req.geo?.country ||
       null;
     const inferred = currencyForCountry(country);
     setCurrencyCookie(res, inferred);
