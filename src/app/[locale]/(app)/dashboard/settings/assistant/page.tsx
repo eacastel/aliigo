@@ -700,8 +700,6 @@ export default function SettingsAssistantPage() {
               </div>
             </div>
           </div>
-        </div>
-
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
           <div className="text-sm font-semibold text-zinc-100">{t("sections.business.title")}</div>
           <p className="text-xs text-zinc-400">{t("sections.business.desc")}</p>
