@@ -747,7 +747,7 @@ export default function SettingsAssistantPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
             <div className="text-sm font-semibold text-zinc-100 mb-2">
               {t("preview.title")}
             </div>
