@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 
 /* ---------- Types ---------- */
@@ -32,6 +33,7 @@ type AssistantForm = {
   keyFacts: string;
   policies: string;
   links: string;
+  ctaUrls: string;
   additionalBusinessInfo: string;
   qualificationPrompt: string;
 };
@@ -157,6 +159,9 @@ function composeKnowledge(form: AssistantForm) {
     SECTION_HEADER("Links"),
     form.links || "",
     "",
+    SECTION_HEADER("CTA URLs"),
+    form.ctaUrls || "",
+    "",
     SECTION_HEADER("Additional Business Info"),
     form.additionalBusinessInfo || "",
   ]
@@ -166,6 +171,7 @@ function composeKnowledge(form: AssistantForm) {
 
 export default function SettingsAssistantPage() {
   const router = useRouter();
+  const t = useTranslations("AssistantSettings");
 
   const [loading, setLoading] = useState(true);
   const [unauth, setUnauth] = useState(false);
@@ -190,12 +196,15 @@ export default function SettingsAssistantPage() {
     businessDetails: "",
     keyFacts: "",
     policies: "",
-    links: "",
-    additionalBusinessInfo: "",
+      links: "",
+      ctaUrls: "",
+      additionalBusinessInfo: "",
     qualificationPrompt: "",
   });
 
   const initialAssistant = useRef<AssistantState | null>(null);
+  const lastSavedForm = useRef<AssistantForm | null>(null);
+  const presetSaveTimer = useRef<number | null>(null);
 
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -280,11 +289,30 @@ export default function SettingsAssistantPage() {
           keyFacts: parsedKnowledge.keyFacts,
           policies: parsedKnowledge.policies,
           links: parsedKnowledge.links,
+          ctaUrls: "",
           additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
         }));
 
         initialAssistant.current = next;
+        lastSavedForm.current = {
+          tone: parsedSystem.tone,
+          goal: parsedSystem.goal,
+          handoff: parsedSystem.handoff,
+          cta: parsedSystem.cta,
+          intro: parsedSystem.intro,
+          scope: parsedSystem.scope,
+          styleRules: parsedSystem.styleRules,
+          additionalInstructions: parsedSystem.additionalInstructions,
+          businessSummary: parsedKnowledge.businessSummary,
+          businessDetails: parsedKnowledge.businessDetails,
+          keyFacts: parsedKnowledge.keyFacts,
+          policies: parsedKnowledge.policies,
+          links: parsedKnowledge.links,
+          ctaUrls: "",
+          additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
+          qualificationPrompt: next.qualification_prompt,
+        };
       } else {
         setBusinessId(null);
         const empty = { system_prompt: "", qualification_prompt: "", knowledge: "" };
@@ -303,10 +331,12 @@ export default function SettingsAssistantPage() {
           keyFacts: "",
           policies: "",
           links: "",
+          ctaUrls: "",
           additionalBusinessInfo: "",
           qualificationPrompt: "",
         });
         initialAssistant.current = empty;
+        lastSavedForm.current = null;
       }
     } finally {
       setLoading(false);
@@ -330,6 +360,90 @@ export default function SettingsAssistantPage() {
       composedKnowledge !== ia.knowledge.trim()
     );
   }, [assistant, form]);
+
+  const previewText = useMemo(() => {
+    const business = form.businessSummary.trim() || t("preview.businessFallback");
+    return t("preview.response", {
+      tone: t(`preview.tone.${form.tone}`),
+      goal: t(`preview.goal.${form.goal}`),
+      handoff: t(`preview.handoff.${form.handoff}`),
+      cta: t(`preview.cta.${form.cta}`),
+      business,
+    });
+  }, [form, t]);
+
+  const autosavePresets = async () => {
+    const saved = lastSavedForm.current;
+    if (!saved) return;
+    if (!initialAssistant.current) return;
+    if (saving) return;
+
+    const nextForm: AssistantForm = {
+      ...saved,
+      tone: form.tone,
+      goal: form.goal,
+      handoff: form.handoff,
+      cta: form.cta,
+    };
+
+    const composedSystem = composeSystemPrompt(nextForm);
+    const composedKnowledge = composeKnowledge(nextForm);
+
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) return;
+
+      const res = await fetch("/api/settings/business", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          business: {
+            system_prompt: composedSystem,
+            qualification_prompt: nextForm.qualificationPrompt,
+            knowledge: composedKnowledge,
+          },
+        }),
+      });
+
+      if (!res.ok) return;
+
+      const j: { business?: { system_prompt?: string | null; qualification_prompt?: string | null; knowledge?: string | null } } =
+        await res.json().catch(() => ({}));
+
+      const next: AssistantState = {
+        system_prompt: (j.business?.system_prompt ?? composedSystem).trim(),
+        qualification_prompt: (j.business?.qualification_prompt ?? nextForm.qualificationPrompt).trim(),
+        knowledge: (j.business?.knowledge ?? composedKnowledge).trim(),
+      };
+
+      initialAssistant.current = next;
+      setAssistant(next);
+      lastSavedForm.current = nextForm;
+      setMsg(null);
+    } catch (e) {
+      console.error("[settings-assistant] autosave presets failed", e);
+    }
+  };
+
+  useEffect(() => {
+    if (!lastSavedForm.current) return;
+    if (presetSaveTimer.current) {
+      window.clearTimeout(presetSaveTimer.current);
+    }
+    presetSaveTimer.current = window.setTimeout(() => {
+      void autosavePresets();
+    }, 600);
+
+    return () => {
+      if (presetSaveTimer.current) {
+        window.clearTimeout(presetSaveTimer.current);
+      }
+    };
+  }, [form.tone, form.goal, form.handoff, form.cta]);
 
   // valid even if empty; let them clear fields
   const save = async () => {
@@ -388,6 +502,7 @@ export default function SettingsAssistantPage() {
 
       initialAssistant.current = next;
       setAssistant(next);
+      lastSavedForm.current = form;
       setMsg("Saved.");
     } catch (e: unknown) {
       console.error(e);
@@ -397,20 +512,20 @@ export default function SettingsAssistantPage() {
     }
   };
 
-  if (loading) return <p className="p-4 text-sm text-zinc-400">Cargando…</p>;
+  if (loading) return <p className="p-4 text-sm text-zinc-400">{t("loading")}</p>;
 
   if (unauth) {
     return (
       <div className="max-w-lg p-4 text-white">
-        <h1 className="text-xl font-semibold mb-2">Login required</h1>
+        <h1 className="text-xl font-semibold mb-2">{t("loginRequired.title")}</h1>
         <p className="text-sm text-zinc-400 mb-4">
-          Please sign in to edit assistant settings.
+          {t("loginRequired.body")}
         </p>
         <button
           onClick={() => router.push("/login")}
           className="bg-white text-black rounded px-4 py-2"
         >
-          Sign in
+          {t("loginRequired.cta")}
         </button>
       </div>
     );
@@ -419,16 +534,15 @@ export default function SettingsAssistantPage() {
   if (!businessId) {
     return (
       <div className="max-w-lg p-4 text-white">
-        <h1 className="text-xl font-semibold mb-2">No linked business</h1>
+        <h1 className="text-xl font-semibold mb-2">{t("noBusiness.title")}</h1>
         <p className="text-sm text-zinc-400">
-          We didn’t find a business linked to your profile. Reload the page. If
-          it persists, try signup again.
+          {t("noBusiness.body")}
         </p>
         <button
           onClick={() => void load()}
           className="mt-3 border border-zinc-700 text-white rounded px-4 py-2 hover:bg-zinc-900"
         >
-          Retry
+          {t("noBusiness.cta")}
         </button>
       </div>
     );
@@ -436,7 +550,10 @@ export default function SettingsAssistantPage() {
 
   return (
     <div className="max-w-3xl text-white">
-      <h1 className="text-2xl font-bold mb-4">Assistant</h1>
+      <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
+      <p className="mb-6 text-sm text-zinc-400">
+        {t("description")}
+      </p>
 
       {msg && (
         <div
@@ -449,19 +566,19 @@ export default function SettingsAssistantPage() {
       )}
 
       <section className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 space-y-6">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-          <div className="text-sm font-semibold text-zinc-100">Universal guardrails (always on)</div>
-          <ul className="mt-2 text-xs text-zinc-400 space-y-1">
-            <li>• Honest, factual answers only. No hallucinations.</li>
-            <li>• Stay focused on the business. No jokes, trivia, or unrelated topics.</li>
-            <li>• Avoid repetition. Summarize if asked again.</li>
-            <li>• Always reply in the user’s language; follow if they switch.</li>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
+          <div className="text-sm font-semibold text-zinc-100">{t("guardrails.title")}</div>
+          <ul className="text-xs text-zinc-400 space-y-1">
+            <li>• {t("guardrails.items.scope")}</li>
+            <li>• {t("guardrails.items.repetition")}</li>
+            <li>• {t("guardrails.items.language")}</li>
           </ul>
+          <p className="text-[11px] text-zinc-500">{t("guardrails.note")}</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">Tone</label>
+            <label className="block text-xs text-zinc-400 mb-2">{t("tone.label")}</label>
             <div className="flex flex-wrap gap-2">
               {(["friendly", "professional", "concise"] as PresetTone[]).map((opt) => (
                 <button
@@ -470,14 +587,14 @@ export default function SettingsAssistantPage() {
                   onClick={() => setForm((f) => ({ ...f, tone: opt }))}
                   className={`${opt === form.tone ? btnBrand : btnNeutral}`}
                 >
-                  {opt === "friendly" ? "Friendly" : opt === "professional" ? "Professional" : "Concise"}
+                  {t(`tone.options.${opt}`)}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">Primary goal</label>
+            <label className="block text-xs text-zinc-400 mb-2">{t("goal.label")}</label>
             <div className="flex flex-wrap gap-2">
               {(["support", "leads", "bookings", "mixed"] as PresetGoal[]).map((opt) => (
                 <button
@@ -486,20 +603,14 @@ export default function SettingsAssistantPage() {
                   onClick={() => setForm((f) => ({ ...f, goal: opt }))}
                   className={`${opt === form.goal ? btnBrand : btnNeutral}`}
                 >
-                  {opt === "support"
-                    ? "Support & FAQs"
-                    : opt === "leads"
-                      ? "Lead capture"
-                      : opt === "bookings"
-                        ? "Bookings"
-                        : "Mixed"}
+                  {t(`goal.options.${opt}`)}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">Handoff behavior</label>
+            <label className="block text-xs text-zinc-400 mb-2">{t("handoff.label")}</label>
             <div className="flex flex-wrap gap-2">
               {(["rare", "balanced", "proactive"] as PresetHandoff[]).map((opt) => (
                 <button
@@ -508,14 +619,14 @@ export default function SettingsAssistantPage() {
                   onClick={() => setForm((f) => ({ ...f, handoff: opt }))}
                   className={`${opt === form.handoff ? btnBrand : btnNeutral}`}
                 >
-                  {opt === "rare" ? "Rare" : opt === "balanced" ? "Balanced" : "Proactive"}
+                  {t(`handoff.options.${opt}`)}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">CTA style</label>
+            <label className="block text-xs text-zinc-400 mb-2">{t("cta.label")}</label>
             <div className="flex flex-wrap gap-2">
               {(["soft", "direct"] as PresetCta[]).map((opt) => (
                 <button
@@ -524,82 +635,97 @@ export default function SettingsAssistantPage() {
                   onClick={() => setForm((f) => ({ ...f, cta: opt }))}
                   className={`${opt === form.cta ? btnBrand : btnNeutral}`}
                 >
-                  {opt === "soft" ? "Soft guidance" : "Direct next step"}
+                  {t(`cta.options.${opt}`)}
                 </button>
               ))}
             </div>
           </div>
         </div>
 
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+          <div className="text-sm font-semibold text-zinc-100 mb-2">{t("preview.title")}</div>
+          <div className="text-xs text-zinc-400 mb-3">{t("preview.subtitle")}</div>
+          <div className="grid gap-3">
+            <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
+              <div className="text-[11px] text-zinc-500 mb-1">{t("preview.userLabel")}</div>
+              {t("preview.userMessage")}
+            </div>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
+              <div className="text-[11px] text-zinc-500 mb-1">{t("preview.assistantLabel")}</div>
+              {previewText}
+            </div>
+          </div>
+        </div>
+
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Introduction (optional)
+            {t("intro.label")}
           </label>
           <textarea
             className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Short greeting or intro (only once). Leave blank to keep it natural."
+            placeholder={t("intro.placeholder")}
             value={form.intro}
             onChange={(e) =>
               setForm((f) => ({ ...f, intro: e.target.value }))
             }
           />
-          <p className="text-[11px] text-zinc-500 mt-1">Optional. Keep it short and friendly.</p>
+          <p className="text-[11px] text-zinc-500 mt-1">{t("intro.help")}</p>
         </div>
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Scope & boundaries (optional)
+            {t("scope.label")}
           </label>
           <textarea
             className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="What the assistant should and should not answer. Any sensitive topics to avoid."
+            placeholder={t("scope.placeholder")}
             value={form.scope}
             onChange={(e) =>
               setForm((f) => ({ ...f, scope: e.target.value }))
             }
           />
-          <p className="text-[11px] text-zinc-500 mt-1">Optional but recommended for clarity.</p>
+          <p className="text-[11px] text-zinc-500 mt-1">{t("scope.help")}</p>
         </div>
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Style rules (optional)
+            {t("style.label")}
           </label>
           <textarea
             className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Response length, formatting preferences, do/don’t..."
+            placeholder={t("style.placeholder")}
             value={form.styleRules}
             onChange={(e) =>
               setForm((f) => ({ ...f, styleRules: e.target.value }))
             }
           />
-          <p className="text-[11px] text-zinc-500 mt-1">Optional. Keep it simple.</p>
+          <p className="text-[11px] text-zinc-500 mt-1">{t("style.help")}</p>
         </div>
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Business summary (required)
+            {t("businessSummary.label")}
           </label>
           <textarea
             className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Who you are and what you do in 1–3 sentences."
+            placeholder={t("businessSummary.placeholder")}
             value={form.businessSummary}
             onChange={(e) =>
               setForm((f) => ({ ...f, businessSummary: e.target.value }))
             }
           />
           <p className="text-[11px] text-zinc-500 mt-1">
-            This anchors how the assistant describes your business.
+            {t("businessSummary.help")}
           </p>
         </div>
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            What you do (services / offers)
+            {t("businessDetails.label")}
           </label>
           <textarea
             className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="List services, products, or key offerings."
+            placeholder={t("businessDetails.placeholder")}
             value={form.businessDetails}
             onChange={(e) =>
               setForm((f) => ({ ...f, businessDetails: e.target.value }))
@@ -609,11 +735,11 @@ export default function SettingsAssistantPage() {
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Key facts (hours, location, pricing policy)
+            {t("keyFacts.label")}
           </label>
           <textarea
             className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Hours, location, service area, booking rules, etc."
+            placeholder={t("keyFacts.placeholder")}
             value={form.keyFacts}
             onChange={(e) =>
               setForm((f) => ({ ...f, keyFacts: e.target.value }))
@@ -623,11 +749,11 @@ export default function SettingsAssistantPage() {
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Policies (cancellations, refunds, limitations)
+            {t("policies.label")}
           </label>
           <textarea
             className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Cancellation windows, refunds, deposit rules, etc."
+            placeholder={t("policies.placeholder")}
             value={form.policies}
             onChange={(e) =>
               setForm((f) => ({ ...f, policies: e.target.value }))
@@ -637,11 +763,11 @@ export default function SettingsAssistantPage() {
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Links (booking, contact, maps)
+            {t("links.label")}
           </label>
           <textarea
             className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="URLs the assistant should share."
+            placeholder={t("links.placeholder")}
             value={form.links}
             onChange={(e) =>
               setForm((f) => ({ ...f, links: e.target.value }))
@@ -651,11 +777,26 @@ export default function SettingsAssistantPage() {
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Additional business info (optional)
+            {t("ctaUrls.label")}
+          </label>
+          <textarea
+            className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+            placeholder={t("ctaUrls.placeholder")}
+            value={form.ctaUrls}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, ctaUrls: e.target.value }))
+            }
+          />
+          <p className="text-[11px] text-zinc-500 mt-1">{t("ctaUrls.help")}</p>
+        </div>
+
+        <div>
+          <label className="block text-xs text-zinc-400 mb-1">
+            {t("additionalBusinessInfo.label")}
           </label>
           <textarea
             className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Anything else visitors should know."
+            placeholder={t("additionalBusinessInfo.placeholder")}
             value={form.additionalBusinessInfo}
             onChange={(e) =>
               setForm((f) => ({ ...f, additionalBusinessInfo: e.target.value }))
@@ -665,28 +806,28 @@ export default function SettingsAssistantPage() {
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Qualification (fit + lead capture)
+            {t("qualification.label")}
           </label>
           <textarea
             className="w-full min-h-[220px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Qualification flow, thresholds, when to ask for email/phone, next-step CTAs…"
+            placeholder={t("qualification.placeholder")}
             value={form.qualificationPrompt}
             onChange={(e) =>
               setForm((f) => ({ ...f, qualificationPrompt: e.target.value }))
             }
           />
           <p className="text-[11px] text-zinc-500 mt-1">
-            This guides how the assistant qualifies and when it should collect contact info.
+            {t("qualification.help")}
           </p>
         </div>
 
         <div>
           <label className="block text-xs text-zinc-400 mb-1">
-            Additional instructions (optional)
+            {t("additionalInstructions.label")}
           </label>
           <textarea
             className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder="Extra rules, nuances, or edge cases."
+            placeholder={t("additionalInstructions.placeholder")}
             value={form.additionalInstructions}
             onChange={(e) =>
               setForm((f) => ({ ...f, additionalInstructions: e.target.value }))
@@ -700,17 +841,40 @@ export default function SettingsAssistantPage() {
             disabled={!dirty || saving}
             className={btnBrand}
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? t("actions.saving") : t("actions.save")}
           </button>
 
           <button
             onClick={() => void load()}
             className={btnNeutral}
           >
-            Reset changes
+            {t("actions.reset")}
           </button>
         </div>
       </section>
+
+      {dirty ? (
+        <div className="fixed bottom-4 left-4 right-4 z-40">
+          <div className="mx-auto max-w-3xl rounded-xl border border-zinc-800 bg-zinc-950/90 backdrop-blur px-4 py-3 flex items-center justify-between gap-3">
+            <div className="text-xs text-zinc-400">{t("actions.unsaved")}</div>
+            <div className="flex gap-2">
+              <button
+                onClick={save}
+                disabled={saving}
+                className={btnBrand}
+              >
+                {saving ? t("actions.saving") : t("actions.save")}
+              </button>
+              <button
+                onClick={() => void load()}
+                className={btnNeutral}
+              >
+                {t("actions.reset")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

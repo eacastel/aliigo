@@ -262,6 +262,151 @@
       "token": "Token generado"
     }
   },
+  "AssistantSettings": {
+    "title": "Asistente",
+    "description": "Configura cómo habla el asistente, qué debe cubrir y qué enlaces compartir. Empieza por lo esencial y añade detalles cuando lo necesites.",
+    "loading": "Cargando…",
+    "loginRequired": {
+      "title": "Inicio de sesión requerido",
+      "body": "Inicia sesión para editar los ajustes del asistente.",
+      "cta": "Iniciar sesión"
+    },
+    "noBusiness": {
+      "title": "Sin negocio vinculado",
+      "body": "No encontramos un negocio vinculado a tu perfil. Recarga la página. Si persiste, intenta registrarte de nuevo.",
+      "cta": "Reintentar"
+    },
+    "guardrails": {
+      "title": "Reglas universales (siempre activas)",
+      "items": {
+        "scope": "Mantente centrado en el negocio. Sin bromas, trivia ni temas ajenos.",
+        "repetition": "Evita la repetición. Resume si te preguntan de nuevo.",
+        "language": "Responde siempre en el idioma del usuario; síguelo si cambia."
+      },
+      "note": "El asistente debe ser preciso y transparente. Si algo no se sabe, debe decirlo y ofrecer el siguiente paso."
+    },
+    "tone": {
+      "label": "Tono",
+      "options": {
+        "friendly": "Cercano",
+        "professional": "Profesional",
+        "concise": "Conciso"
+      }
+    },
+    "goal": {
+      "label": "Objetivo principal",
+      "options": {
+        "support": "Soporte y FAQs",
+        "leads": "Captación de contactos",
+        "bookings": "Reservas",
+        "mixed": "Mixto"
+      }
+    },
+    "handoff": {
+      "label": "Escalado a humano",
+      "options": {
+        "rare": "Raro",
+        "balanced": "Equilibrado",
+        "proactive": "Proactivo"
+      }
+    },
+    "cta": {
+      "label": "Estilo de CTA",
+      "options": {
+        "soft": "Guía suave",
+        "direct": "Siguiente paso directo"
+      }
+    },
+    "intro": {
+      "label": "Introducción (opcional)",
+      "placeholder": "Saludo breve (solo una vez). Déjalo vacío para hacerlo natural.",
+      "help": "Opcional. Mantenlo breve y cercano."
+    },
+    "scope": {
+      "label": "Alcance y límites (opcional)",
+      "placeholder": "Qué puede y qué no puede responder. Temas sensibles a evitar.",
+      "help": "Opcional pero recomendable para dar claridad."
+    },
+    "style": {
+      "label": "Reglas de estilo (opcional)",
+      "placeholder": "Longitud de respuesta, formato preferido, cosas a evitar…",
+      "help": "Opcional. Mantenlo simple."
+    },
+    "businessSummary": {
+      "label": "Resumen del negocio (obligatorio)",
+      "placeholder": "Quién eres y qué haces en 1–3 frases.",
+      "help": "Esto guía cómo el asistente describe tu negocio."
+    },
+    "businessDetails": {
+      "label": "Lo que ofreces (servicios / productos)",
+      "placeholder": "Lista servicios, productos u ofertas principales."
+    },
+    "keyFacts": {
+      "label": "Datos clave (horario, ubicación, política de precios)",
+      "placeholder": "Horario, ubicación, zona de servicio, normas de reserva, etc."
+    },
+    "policies": {
+      "label": "Políticas (cancelaciones, reembolsos, limitaciones)",
+      "placeholder": "Ventanas de cancelación, reembolsos, depósitos, etc."
+    },
+    "links": {
+      "label": "Enlaces (reservas, contacto, mapas)",
+      "placeholder": "URLs que el asistente debe compartir."
+    },
+    "ctaUrls": {
+      "label": "URLs de CTA (registro, demo, precios)",
+      "placeholder": "Pega aquí los enlaces principales de acción.",
+      "help": "Estos enlaces se usan cuando el visitante pregunta cómo empezar."
+    },
+    "additionalBusinessInfo": {
+      "label": "Información adicional del negocio (opcional)",
+      "placeholder": "Cualquier otra cosa que deban saber los visitantes."
+    },
+    "qualification": {
+      "label": "Calificación (fit + captación)",
+      "placeholder": "Flujo de calificación, umbrales, cuándo pedir email/teléfono, CTAs…",
+      "help": "Guía cómo el asistente califica y cuándo recoge datos."
+    },
+    "additionalInstructions": {
+      "label": "Instrucciones adicionales (opcional)",
+      "placeholder": "Reglas extra, matices o casos especiales."
+    },
+    "actions": {
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "reset": "Restablecer cambios",
+      "unsaved": "Tienes cambios sin guardar."
+    },
+    "preview": {
+      "title": "Vista previa del asistente",
+      "subtitle": "Ejemplo rápido de cómo responderá tu asistente.",
+      "userLabel": "Visitante",
+      "assistantLabel": "Asistente",
+      "userMessage": "Hola, ¿trabajáis con pequeños negocios? ¿En qué ayuda?",
+      "businessFallback": "Ayudamos a los clientes con respuestas rápidas y claras.",
+      "tone": {
+        "friendly": "cercano y útil",
+        "professional": "profesional y claro",
+        "concise": "breve y directo"
+      },
+      "goal": {
+        "support": "centrarme en soporte y FAQs",
+        "leads": "centrarme en captar contactos cualificados",
+        "bookings": "centrarme en reservas y agenda",
+        "mixed": "equilibrar soporte y captación"
+      },
+      "handoff": {
+        "rare": "ofrecer ayuda humana solo si la piden",
+        "balanced": "ofrecer ayuda humana cuando realmente haga falta",
+        "proactive": "ofrecer seguimiento humano si hay alta intención"
+      },
+      "cta": {
+        "soft": "guiar con suavidad el siguiente paso",
+        "direct": "sugerir un siguiente paso claro"
+      },
+      "response": "Gracias por preguntar — {business} Seré {tone} y {goal}. Voy a {handoff} y {cta}. ¿Qué tipo de negocio tienes?"
+    }
+  },
   "Landing": {
     "hero": {
       "betaNote": "Ya disponible",

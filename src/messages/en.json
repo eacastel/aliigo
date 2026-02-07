@@ -261,6 +261,151 @@
       "token": "Token generated"
     }
   },
+  "AssistantSettings": {
+    "title": "Assistant",
+    "description": "Configure how your assistant speaks, what it should cover, and which links to share. Start with the essentials, then add details as needed.",
+    "loading": "Loading…",
+    "loginRequired": {
+      "title": "Login required",
+      "body": "Please sign in to edit assistant settings.",
+      "cta": "Sign in"
+    },
+    "noBusiness": {
+      "title": "No linked business",
+      "body": "We didn’t find a business linked to your profile. Reload the page. If it persists, try signup again.",
+      "cta": "Retry"
+    },
+    "guardrails": {
+      "title": "Universal guardrails (always on)",
+      "items": {
+        "scope": "Stay focused on the business. No jokes, trivia, or unrelated topics.",
+        "repetition": "Avoid repetition. Summarize if asked again.",
+        "language": "Always reply in the user’s language; follow if they switch."
+      },
+      "note": "The assistant should be accurate and transparent. If something is unknown, it should say so and offer the next best step."
+    },
+    "tone": {
+      "label": "Tone",
+      "options": {
+        "friendly": "Friendly",
+        "professional": "Professional",
+        "concise": "Concise"
+      }
+    },
+    "goal": {
+      "label": "Primary goal",
+      "options": {
+        "support": "Support & FAQs",
+        "leads": "Lead capture",
+        "bookings": "Bookings",
+        "mixed": "Mixed"
+      }
+    },
+    "handoff": {
+      "label": "Handoff behavior",
+      "options": {
+        "rare": "Rare",
+        "balanced": "Balanced",
+        "proactive": "Proactive"
+      }
+    },
+    "cta": {
+      "label": "CTA style",
+      "options": {
+        "soft": "Soft guidance",
+        "direct": "Direct next step"
+      }
+    },
+    "intro": {
+      "label": "Introduction (optional)",
+      "placeholder": "Short greeting or intro (only once). Leave blank to keep it natural.",
+      "help": "Optional. Keep it short and friendly."
+    },
+    "scope": {
+      "label": "Scope & boundaries (optional)",
+      "placeholder": "What the assistant should and should not answer. Any sensitive topics to avoid.",
+      "help": "Optional but recommended for clarity."
+    },
+    "style": {
+      "label": "Style rules (optional)",
+      "placeholder": "Response length, formatting preferences, do/don’t…",
+      "help": "Optional. Keep it simple."
+    },
+    "businessSummary": {
+      "label": "Business summary (required)",
+      "placeholder": "Who you are and what you do in 1–3 sentences.",
+      "help": "This anchors how the assistant describes your business."
+    },
+    "businessDetails": {
+      "label": "What you do (services / offers)",
+      "placeholder": "List services, products, or key offerings."
+    },
+    "keyFacts": {
+      "label": "Key facts (hours, location, pricing policy)",
+      "placeholder": "Hours, location, service area, booking rules, etc."
+    },
+    "policies": {
+      "label": "Policies (cancellations, refunds, limitations)",
+      "placeholder": "Cancellation windows, refunds, deposit rules, etc."
+    },
+    "links": {
+      "label": "Links (booking, contact, maps)",
+      "placeholder": "URLs the assistant should share."
+    },
+    "ctaUrls": {
+      "label": "CTA URLs (signup, demo, pricing)",
+      "placeholder": "Paste any primary call-to-action URLs here.",
+      "help": "These links should be used when the visitor asks how to get started."
+    },
+    "additionalBusinessInfo": {
+      "label": "Additional business info (optional)",
+      "placeholder": "Anything else visitors should know."
+    },
+    "qualification": {
+      "label": "Qualification (fit + lead capture)",
+      "placeholder": "Qualification flow, thresholds, when to ask for email/phone, next-step CTAs…",
+      "help": "This guides how the assistant qualifies and when it should collect contact info."
+    },
+    "additionalInstructions": {
+      "label": "Additional instructions (optional)",
+      "placeholder": "Extra rules, nuances, or edge cases."
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving…",
+      "reset": "Reset changes",
+      "unsaved": "You have unsaved changes."
+    },
+    "preview": {
+      "title": "Assistant preview",
+      "subtitle": "A quick example of how your assistant will respond.",
+      "userLabel": "Visitor",
+      "assistantLabel": "Assistant",
+      "userMessage": "Hi! Do you work with small businesses? How does this help?",
+      "businessFallback": "We help customers with friendly, fast answers.",
+      "tone": {
+        "friendly": "warm and helpful",
+        "professional": "professional and clear",
+        "concise": "brief and direct"
+      },
+      "goal": {
+        "support": "focus on support and FAQs",
+        "leads": "focus on capturing qualified leads",
+        "bookings": "focus on bookings and scheduling",
+        "mixed": "balance support and lead capture"
+      },
+      "handoff": {
+        "rare": "offer human help only if they ask",
+        "balanced": "offer human help when it’s genuinely needed",
+        "proactive": "offer a human follow‑up when intent is high"
+      },
+      "cta": {
+        "soft": "guide gently toward the next step",
+        "direct": "suggest a clear next step"
+      },
+      "response": "Thanks for asking — {business} I’ll be {tone} and {goal}. I’ll {handoff} and {cta}. What kind of business do you run?"
+    }
+  },
   "Landing": {
     "hero": {
       "betaNote": "Now live",
