@@ -579,14 +579,14 @@ export default function SettingsAssistantPage() {
         </div>
       )}
 
-      <section className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 space-y-6">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <div className="space-y-4">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-4">
-              <div className="text-sm font-semibold text-zinc-100">{t("sections.presets.title")}</div>
-              <p className="text-xs text-zinc-400">{t("sections.presets.desc")}</p>
+      <section className="space-y-6">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <div className="text-sm font-semibold text-zinc-100">{t("sections.presets.title")}</div>
+          <p className="text-xs text-zinc-400 mb-4">{t("sections.presets.desc")}</p>
 
-              <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+            <div className="space-y-4">
+              <div className="grid gap-4 lg:grid-cols-2">
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
                   <label className="block text-xs text-zinc-400 mb-2">{t("tone.label")}</label>
                   <div className="flex flex-wrap gap-2">
@@ -685,9 +685,26 @@ export default function SettingsAssistantPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
-              <div className="text-sm font-semibold text-zinc-100">{t("sections.business.title")}</div>
-              <p className="text-xs text-zinc-400">{t("sections.business.desc")}</p>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit">
+              <div className="text-sm font-semibold text-zinc-100 mb-2">{t("preview.title")}</div>
+              <div className="text-xs text-zinc-400 mb-3">{t("preview.subtitle")}</div>
+              <div className="grid gap-3">
+                <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
+                  <div className="text-[11px] text-zinc-500 mb-1">{t("preview.userLabel")}</div>
+                  {t("preview.userMessage")}
+                </div>
+                <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
+                  <div className="text-[11px] text-zinc-500 mb-1">{t("preview.assistantLabel")}</div>
+                  {previewText}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+          <div className="text-sm font-semibold text-zinc-100">{t("sections.business.title")}</div>
+          <p className="text-xs text-zinc-400">{t("sections.business.desc")}</p>
 
               <div>
                 <label className="block text-xs text-zinc-400 mb-1">
@@ -780,9 +797,11 @@ export default function SettingsAssistantPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
-              <div className="text-sm font-semibold text-zinc-100">{t("sections.behavior.title")}</div>
-              <p className="text-xs text-zinc-400">{t("sections.behavior.desc")}</p>
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+          <div className="text-sm font-semibold text-zinc-100">{t("sections.behavior.title")}</div>
+          <p className="text-xs text-zinc-400">{t("sections.behavior.desc")}</p>
 
               <div>
                 <label className="block text-xs text-zinc-400 mb-1">
@@ -845,39 +864,24 @@ export default function SettingsAssistantPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
-              <div className="text-sm font-semibold text-zinc-100">{t("sections.qualification.title")}</div>
-              <p className="text-xs text-zinc-400">{t("sections.qualification.desc")}</p>
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1">
-                  {t("qualification.label")}
-                </label>
-                <p className="text-[11px] text-zinc-500 mb-2">{t("qualification.help")}</p>
-                <textarea
-                  className="w-full min-h-[220px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                  placeholder={t("qualification.placeholder")}
-                  value={form.qualificationPrompt}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, qualificationPrompt: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-          </div>
+        </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
-            <div className="text-sm font-semibold text-zinc-100 mb-2">{t("preview.title")}</div>
-            <div className="text-xs text-zinc-400 mb-3">{t("preview.subtitle")}</div>
-            <div className="grid gap-3">
-              <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
-                <div className="text-[11px] text-zinc-500 mb-1">{t("preview.userLabel")}</div>
-                {t("preview.userMessage")}
-              </div>
-              <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
-                <div className="text-[11px] text-zinc-500 mb-1">{t("preview.assistantLabel")}</div>
-                {previewText}
-              </div>
-            </div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+          <div className="text-sm font-semibold text-zinc-100">{t("sections.qualification.title")}</div>
+          <p className="text-xs text-zinc-400">{t("sections.qualification.desc")}</p>
+          <div>
+            <label className="block text-xs text-zinc-400 mb-1">
+              {t("qualification.label")}
+            </label>
+            <p className="text-[11px] text-zinc-500 mb-2">{t("qualification.help")}</p>
+            <textarea
+              className="w-full min-h-[220px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+              placeholder={t("qualification.placeholder")}
+              value={form.qualificationPrompt}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, qualificationPrompt: e.target.value }))
+              }
+            />
           </div>
         </div>
 
