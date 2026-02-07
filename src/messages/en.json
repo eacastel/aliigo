@@ -275,16 +275,6 @@
       "body": "We didn’t find a business linked to your profile. Reload the page. If it persists, try signup again.",
       "cta": "Retry"
     },
-    "guardrails": {
-      "title": "Universal guardrails (always on)",
-      "items": {
-        "scope": "Stay focused on the business. No jokes, trivia, or unrelated topics.",
-        "repetition": "Avoid repetition. Summarize if asked again.",
-        "language": "Always reply in the user’s language; follow if they switch."
-      },
-      "inline": "Stay focused on the business. No jokes, trivia, or unrelated topics. Avoid repetition. Summarize if asked again. Always reply in the user’s language; follow if they switch.",
-      "note": "The assistant should be accurate and transparent. If something is unknown, it should say so and offer the next best step."
-    },
     "sections": {
       "presets": {
         "title": "Quick setup",
@@ -401,6 +391,11 @@
       "label": "Additional instructions (optional)",
       "placeholder": "Extra rules, nuances, or edge cases.",
       "help": "Only include what really matters."
+    },
+    "rawPreview": {
+      "title": "Raw prompt preview",
+      "desc": "This is exactly what the assistant receives, combined into one document.",
+      "empty": "Nothing to preview yet."
     },
     "actions": {
       "save": "Save",

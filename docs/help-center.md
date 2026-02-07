@@ -14,6 +14,7 @@ It ships with EN/ES content and is intended for authenticated users only.
 2) Install the Widget  
 3) Customize the Assistant  
 5) Billing & Plans
+6) Partners & Affiliates
 
 ## Screenshot placeholders
 

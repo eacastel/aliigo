@@ -276,16 +276,6 @@
       "body": "No encontramos un negocio vinculado a tu perfil. Recarga la página. Si persiste, intenta registrarte de nuevo.",
       "cta": "Reintentar"
     },
-    "guardrails": {
-      "title": "Reglas universales (siempre activas)",
-      "items": {
-        "scope": "Mantente centrado en el negocio. Sin bromas, trivia ni temas ajenos.",
-        "repetition": "Evita la repetición. Resume si te preguntan de nuevo.",
-        "language": "Responde siempre en el idioma del usuario; síguelo si cambia."
-      },
-      "inline": "Mantente centrado en el negocio. Sin bromas, trivia ni temas ajenos. Evita la repetición. Resume si te preguntan de nuevo. Responde siempre en el idioma del usuario; síguelo si cambia.",
-      "note": "El asistente debe ser preciso y transparente. Si algo no se sabe, debe decirlo y ofrecer el siguiente paso."
-    },
     "sections": {
       "presets": {
         "title": "Configuración rápida",
@@ -402,6 +392,11 @@
       "label": "Instrucciones adicionales (opcional)",
       "placeholder": "Reglas extra, matices o casos especiales.",
       "help": "Añade solo lo que realmente importe."
+    },
+    "rawPreview": {
+      "title": "Vista previa del prompt completo",
+      "desc": "Esto es exactamente lo que recibe el asistente, todo junto en un solo documento.",
+      "empty": "Todavía no hay contenido para previsualizar."
     },
     "actions": {
       "save": "Guardar",

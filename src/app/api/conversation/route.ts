@@ -707,6 +707,13 @@ IMPORTANT:
 Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.`;
 
     let sys = (bizRes.data?.system_prompt ?? "").trim() || defaultSys;
+    sys += `
+
+Universal guardrails (always on):
+- Stay focused on the business.
+- No jokes, trivia, or unrelated topics.
+- Avoid repetition. Summarize if asked again.
+- Always reply in the user’s language; follow if they switch.`;
 
     const knowledge = (bizRes.data?.knowledge ?? "").trim();
     if (knowledge) {

@@ -44,6 +44,7 @@ type JoinedBusiness = {
   system_prompt?: string | null;
   qualification_prompt?: string | null;
   knowledge?: string | null;
+  assistant_settings?: AssistantSettings | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -58,6 +59,77 @@ function isProfileJoinRow(x: unknown): x is ProfileJoinRow {
 }
 
 const SECTION_HEADER = (title: string) => `## ${title}`;
+
+type AssistantSettings = {
+  system?: {
+    tone?: PresetTone;
+    goal?: PresetGoal;
+    handoff?: PresetHandoff;
+    cta?: PresetCta;
+    intro?: string;
+    scope?: string;
+    styleRules?: string;
+    additionalInstructions?: string;
+  };
+  knowledge?: {
+    businessSummary?: string;
+    businessDetails?: string;
+    keyFacts?: string;
+    policies?: string;
+    links?: string;
+    ctaUrls?: string;
+    supportEmail?: string;
+    additionalBusinessInfo?: string;
+  };
+};
+
+const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "");
+
+const sanitizeMarkdown = (value: string) =>
+  stripHtml(value)
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+const sanitizeForm = (form: AssistantForm): AssistantForm => ({
+  ...form,
+  supportEmail: sanitizeMarkdown(form.supportEmail),
+  intro: sanitizeMarkdown(form.intro),
+  scope: sanitizeMarkdown(form.scope),
+  styleRules: sanitizeMarkdown(form.styleRules),
+  additionalInstructions: sanitizeMarkdown(form.additionalInstructions),
+  businessSummary: sanitizeMarkdown(form.businessSummary),
+  businessDetails: sanitizeMarkdown(form.businessDetails),
+  keyFacts: sanitizeMarkdown(form.keyFacts),
+  policies: sanitizeMarkdown(form.policies),
+  links: sanitizeMarkdown(form.links),
+  ctaUrls: sanitizeMarkdown(form.ctaUrls),
+  additionalBusinessInfo: sanitizeMarkdown(form.additionalBusinessInfo),
+  qualificationPrompt: sanitizeMarkdown(form.qualificationPrompt),
+});
+
+const toAssistantSettings = (form: AssistantForm): AssistantSettings => ({
+  system: {
+    tone: form.tone,
+    goal: form.goal,
+    handoff: form.handoff,
+    cta: form.cta,
+    intro: form.intro,
+    scope: form.scope,
+    styleRules: form.styleRules,
+    additionalInstructions: form.additionalInstructions,
+  },
+  knowledge: {
+    businessSummary: form.businessSummary,
+    businessDetails: form.businessDetails,
+    keyFacts: form.keyFacts,
+    policies: form.policies,
+    links: form.links,
+    ctaUrls: form.ctaUrls,
+    supportEmail: form.supportEmail,
+    additionalBusinessInfo: form.additionalBusinessInfo,
+  },
+});
 
 function extractSection(raw: string, title: string): string | null {
   const re = new RegExp(
@@ -266,7 +338,8 @@ export default function SettingsAssistantPage() {
             id,
             system_prompt,
             qualification_prompt,
-            knowledge
+            knowledge,
+            assistant_settings
           )
         `,
         )
@@ -297,47 +370,64 @@ export default function SettingsAssistantPage() {
 
         const parsedSystem = parseSystemPrompt(next.system_prompt);
         const parsedKnowledge = parseKnowledge(next.knowledge);
+        const settings = biz.assistant_settings ?? null;
+        const systemFromSettings = settings?.system ?? {};
+        const knowledgeFromSettings = settings?.knowledge ?? {};
 
         setAssistant(next);
         setForm((f) => ({
           ...f,
-          tone: parsedSystem.tone,
-          goal: parsedSystem.goal,
-          handoff: parsedSystem.handoff,
-          cta: parsedSystem.cta,
-          intro: parsedSystem.intro,
-          scope: parsedSystem.scope,
-          styleRules: parsedSystem.styleRules,
-          additionalInstructions: parsedSystem.additionalInstructions,
-          businessSummary: parsedKnowledge.businessSummary,
-          businessDetails: parsedKnowledge.businessDetails,
-          keyFacts: parsedKnowledge.keyFacts,
-          policies: parsedKnowledge.policies,
-          links: parsedKnowledge.links,
-          ctaUrls: parsedKnowledge.ctaUrls,
-          supportEmail: parsedKnowledge.supportEmail,
-          additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
+          tone: systemFromSettings.tone ?? parsedSystem.tone,
+          goal: systemFromSettings.goal ?? parsedSystem.goal,
+          handoff: systemFromSettings.handoff ?? parsedSystem.handoff,
+          cta: systemFromSettings.cta ?? parsedSystem.cta,
+          intro: systemFromSettings.intro ?? parsedSystem.intro,
+          scope: systemFromSettings.scope ?? parsedSystem.scope,
+          styleRules: systemFromSettings.styleRules ?? parsedSystem.styleRules,
+          additionalInstructions:
+            systemFromSettings.additionalInstructions ??
+            parsedSystem.additionalInstructions,
+          businessSummary:
+            knowledgeFromSettings.businessSummary ?? parsedKnowledge.businessSummary,
+          businessDetails:
+            knowledgeFromSettings.businessDetails ?? parsedKnowledge.businessDetails,
+          keyFacts: knowledgeFromSettings.keyFacts ?? parsedKnowledge.keyFacts,
+          policies: knowledgeFromSettings.policies ?? parsedKnowledge.policies,
+          links: knowledgeFromSettings.links ?? parsedKnowledge.links,
+          ctaUrls: knowledgeFromSettings.ctaUrls ?? parsedKnowledge.ctaUrls,
+          supportEmail:
+            knowledgeFromSettings.supportEmail ?? parsedKnowledge.supportEmail,
+          additionalBusinessInfo:
+            knowledgeFromSettings.additionalBusinessInfo ??
+            parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
         }));
 
         initialAssistant.current = next;
         lastSavedForm.current = {
-          tone: parsedSystem.tone,
-          goal: parsedSystem.goal,
-          handoff: parsedSystem.handoff,
-          cta: parsedSystem.cta,
-          intro: parsedSystem.intro,
-          scope: parsedSystem.scope,
-          styleRules: parsedSystem.styleRules,
-          additionalInstructions: parsedSystem.additionalInstructions,
-          businessSummary: parsedKnowledge.businessSummary,
-          businessDetails: parsedKnowledge.businessDetails,
-          keyFacts: parsedKnowledge.keyFacts,
-          policies: parsedKnowledge.policies,
-          links: parsedKnowledge.links,
-          ctaUrls: parsedKnowledge.ctaUrls,
-          supportEmail: parsedKnowledge.supportEmail,
-          additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
+          tone: systemFromSettings.tone ?? parsedSystem.tone,
+          goal: systemFromSettings.goal ?? parsedSystem.goal,
+          handoff: systemFromSettings.handoff ?? parsedSystem.handoff,
+          cta: systemFromSettings.cta ?? parsedSystem.cta,
+          intro: systemFromSettings.intro ?? parsedSystem.intro,
+          scope: systemFromSettings.scope ?? parsedSystem.scope,
+          styleRules: systemFromSettings.styleRules ?? parsedSystem.styleRules,
+          additionalInstructions:
+            systemFromSettings.additionalInstructions ??
+            parsedSystem.additionalInstructions,
+          businessSummary:
+            knowledgeFromSettings.businessSummary ?? parsedKnowledge.businessSummary,
+          businessDetails:
+            knowledgeFromSettings.businessDetails ?? parsedKnowledge.businessDetails,
+          keyFacts: knowledgeFromSettings.keyFacts ?? parsedKnowledge.keyFacts,
+          policies: knowledgeFromSettings.policies ?? parsedKnowledge.policies,
+          links: knowledgeFromSettings.links ?? parsedKnowledge.links,
+          ctaUrls: knowledgeFromSettings.ctaUrls ?? parsedKnowledge.ctaUrls,
+          supportEmail:
+            knowledgeFromSettings.supportEmail ?? parsedKnowledge.supportEmail,
+          additionalBusinessInfo:
+            knowledgeFromSettings.additionalBusinessInfo ??
+            parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
         };
       } else {
@@ -403,6 +493,26 @@ export default function SettingsAssistantPage() {
     });
   }, [form.tone, form.goal, form.handoff, form.cta, t]);
 
+  const rawPromptPreview = useMemo(() => {
+    const sanitized = sanitizeForm(form);
+    const system = composeSystemPrompt(sanitized).trim();
+    const knowledge = composeKnowledge(sanitized).trim();
+    const qualification = sanitized.qualificationPrompt.trim();
+
+    return [
+      "### System Prompt",
+      system,
+      "",
+      "### Business Knowledge",
+      knowledge,
+      "",
+      "### Qualification",
+      qualification,
+    ]
+      .join("\n")
+      .trim();
+  }, [form]);
+
   const autosavePresets = async () => {
     const saved = lastSavedForm.current;
     if (!saved) return;
@@ -417,8 +527,10 @@ export default function SettingsAssistantPage() {
       cta: form.cta,
     };
 
-    const composedSystem = composeSystemPrompt(nextForm);
-    const composedKnowledge = composeKnowledge(nextForm);
+    const sanitizedForm = sanitizeForm(nextForm);
+    const composedSystem = composeSystemPrompt(sanitizedForm);
+    const composedKnowledge = composeKnowledge(sanitizedForm);
+    const assistantSettings = toAssistantSettings(sanitizedForm);
 
     try {
       const { data: sess } = await supabase.auth.getSession();
@@ -434,8 +546,9 @@ export default function SettingsAssistantPage() {
         body: JSON.stringify({
           business: {
             system_prompt: composedSystem,
-            qualification_prompt: nextForm.qualificationPrompt,
+            qualification_prompt: sanitizedForm.qualificationPrompt,
             knowledge: composedKnowledge,
+            assistant_settings: assistantSettings,
           },
         }),
       });
@@ -447,20 +560,21 @@ export default function SettingsAssistantPage() {
           system_prompt?: string | null;
           qualification_prompt?: string | null;
           knowledge?: string | null;
+          assistant_settings?: AssistantSettings | null;
         };
       } = await res.json().catch(() => ({}));
 
       const next: AssistantState = {
         system_prompt: (j.business?.system_prompt ?? composedSystem).trim(),
         qualification_prompt: (
-          j.business?.qualification_prompt ?? nextForm.qualificationPrompt
+          j.business?.qualification_prompt ?? sanitizedForm.qualificationPrompt
         ).trim(),
         knowledge: (j.business?.knowledge ?? composedKnowledge).trim(),
       };
 
       initialAssistant.current = next;
       setAssistant(next);
-      lastSavedForm.current = nextForm;
+      lastSavedForm.current = sanitizedForm;
       setMsg(null);
     } catch (e) {
       console.error("[settings-assistant] autosave presets failed", e);
@@ -500,14 +614,17 @@ export default function SettingsAssistantPage() {
       }
 
       // IMPORTANT: only send assistant fields; do not touch domains/locale/etc
-      const composedSystem = composeSystemPrompt(form);
-      const composedKnowledge = composeKnowledge(form);
+      const sanitizedForm = sanitizeForm(form);
+      const composedSystem = composeSystemPrompt(sanitizedForm);
+      const composedKnowledge = composeKnowledge(sanitizedForm);
+      const assistantSettings = toAssistantSettings(sanitizedForm);
 
       const payload = {
         business: {
           system_prompt: composedSystem,
-          qualification_prompt: form.qualificationPrompt,
+          qualification_prompt: sanitizedForm.qualificationPrompt,
           knowledge: composedKnowledge,
+          assistant_settings: assistantSettings,
         },
       };
 
@@ -526,6 +643,7 @@ export default function SettingsAssistantPage() {
           system_prompt?: string | null;
           qualification_prompt?: string | null;
           knowledge?: string | null;
+          assistant_settings?: AssistantSettings | null;
         };
       } = await res.json().catch(() => ({}));
 
@@ -536,17 +654,17 @@ export default function SettingsAssistantPage() {
 
       const next: AssistantState = {
         system_prompt: (
-          j.business?.system_prompt ?? composeSystemPrompt(form)
+          j.business?.system_prompt ?? composeSystemPrompt(sanitizedForm)
         ).trim(),
         qualification_prompt: (
-          j.business?.qualification_prompt ?? form.qualificationPrompt
+          j.business?.qualification_prompt ?? sanitizedForm.qualificationPrompt
         ).trim(),
-        knowledge: (j.business?.knowledge ?? composeKnowledge(form)).trim(),
+        knowledge: (j.business?.knowledge ?? composeKnowledge(sanitizedForm)).trim(),
       };
 
       initialAssistant.current = next;
       setAssistant(next);
-      lastSavedForm.current = form;
+      lastSavedForm.current = sanitizedForm;
       setMsg("Saved.");
     } catch (e: unknown) {
       console.error(e);
@@ -595,13 +713,6 @@ export default function SettingsAssistantPage() {
     <div className="max-w-3xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       <p className="mb-6 text-sm text-zinc-400">{t("description")}</p>
-      <p className="mb-6 text-xs text-zinc-500">
-        <span className="font-medium text-zinc-300">
-          {t("guardrails.title")}
-        </span>{" "}
-        {t("guardrails.inline")}
-      </p>
-
       {msg && (
         <div
           className={`mb-4 text-sm ${
@@ -975,6 +1086,16 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, qualificationPrompt: e.target.value }))
               }
             />
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+          <div className="text-sm font-semibold text-zinc-100">
+            {t("rawPreview.title")}
+          </div>
+          <p className="text-xs text-zinc-400">{t("rawPreview.desc")}</p>
+          <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 text-xs text-zinc-200 whitespace-pre-wrap">
+            {rawPromptPreview || t("rawPreview.empty")}
           </div>
         </div>
 

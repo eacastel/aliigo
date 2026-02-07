@@ -22,6 +22,7 @@ type JoinedBusiness = {
   slug?: string | null;
   system_prompt?: string | null;
   knowledge?: string | null;
+  assistant_settings?: Record<string, unknown> | null;
   allowed_domains?: string[] | null;
   default_locale?: string | null;
 } | null;
@@ -70,6 +71,7 @@ export const SETTINGS_SELECT = `
     slug,
     system_prompt,
     knowledge,
+    assistant_settings,
     allowed_domains,
     default_locale
   )
