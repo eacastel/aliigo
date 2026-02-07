@@ -5,12 +5,22 @@ import { ProContactForm } from "@/components/ProContactForm";
 import { cookies } from "next/headers";
 import { getCurrencyFromCookies, type AliigoCurrency } from "@/lib/currency";
 
-export default async function PricingPage() {
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams?: { currency?: string | string[] };
+}) {
   const t = useTranslations("Landing");
   const p = useTranslations("PricingPage");
   const locale = useLocale();
   const cookieStore = await cookies();
-  const currency = (getCurrencyFromCookies(cookieStore) ?? "EUR") as AliigoCurrency;
+  const paramCurrency = Array.isArray(searchParams?.currency)
+    ? searchParams?.currency[0]
+    : searchParams?.currency;
+  const currency =
+    (paramCurrency?.toUpperCase() === "USD" || paramCurrency?.toUpperCase() === "EUR"
+      ? (paramCurrency.toUpperCase() as AliigoCurrency)
+      : getCurrencyFromCookies(cookieStore)) ?? "EUR";
   const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
   const starterPrice = priceFmt.format(99);
   const growthPrice = priceFmt.format(149);

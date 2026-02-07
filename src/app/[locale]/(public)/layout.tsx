@@ -8,14 +8,14 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
 import { getCurrencyFromCookies } from "@/lib/currency";
 
-export default function PublicLayout({
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const t = useTranslations('Navigation');
   const locale = useLocale();
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const currency = getCurrencyFromCookies(cookieStore) ?? "EUR";
   const debugCountry = cookieStore.get("aliigo_country_debug")?.value;
 

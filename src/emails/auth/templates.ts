@@ -75,7 +75,7 @@ function wrapHtml(content: string, locale: Locale) {
   <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color:#111; background:#ffffff;">
     <div style="max-width:560px; margin:0 auto; padding:24px;">
       <div style="margin-bottom:16px;">
-        <img src="${logoUrl}" alt="${strings.brand}" width="120" height="32" style="display:block;" />
+        <img src="${logoUrl}" alt="${strings.brand}" width="120" style="display:block; max-width:120px; height:auto;" />
       </div>
       ${content}
       <p style="font-size:12px; color:#666; margin-top:24px;">${strings.footer}</p>
