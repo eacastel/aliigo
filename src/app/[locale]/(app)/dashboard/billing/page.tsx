@@ -162,6 +162,9 @@ export default function BillingPage() {
     !!jwt &&
     (status === "trialing" || status === "active" || status === "past_due");
 
+  const showStatusCard =
+    Boolean(portalError) || showConfirmStep || (emailConfirmed && canManage);
+
   type BillingAction = "change_plan" | "cancel" | "resume";
 
 async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
@@ -255,6 +258,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
             </div>
           ) : null}
 
+          {showStatusCard ? (
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-5 space-y-3 text-sm text-zinc-200">
             {portalError ? (
               <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
@@ -441,6 +445,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
             ) : null}
 
           </div>
+          ) : null}
 
           {/* Only show checkout when payment is actually needed */}
           {showCheckout ? (
