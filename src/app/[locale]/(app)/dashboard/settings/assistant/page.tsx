@@ -710,44 +710,10 @@ export default function SettingsAssistantPage() {
                   </div>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1">
-                  {t("supportEmail.label")}
-                </label>
-                <p className="text-[11px] text-zinc-500 mb-2">
-                  {t("supportEmail.help")}
-                </p>
-                <input
-                  className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                  placeholder={t("supportEmail.placeholder")}
-                  value={form.supportEmail}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, supportEmail: e.target.value }))
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1">
-                  {t("ctaUrls.label")}
-                </label>
-                <p className="text-[11px] text-zinc-500 mb-2">
-                  {t("ctaUrls.help")}
-                </p>
-                <textarea
-                  className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                  placeholder={t("ctaUrls.placeholder")}
-                  value={form.ctaUrls}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, ctaUrls: e.target.value }))
-                  }
-                />
-              </div>
             </div>
           </div>
 
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
             <div className="text-sm font-semibold text-zinc-100 mb-2">
               {t("preview.title")}
             </div>
@@ -790,6 +756,40 @@ export default function SettingsAssistantPage() {
               value={form.businessSummary}
               onChange={(e) =>
                 setForm((f) => ({ ...f, businessSummary: e.target.value }))
+              }
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-zinc-400 mb-1">
+              {t("supportEmail.label")}
+            </label>
+            <p className="text-[11px] text-zinc-500 mb-2">
+              {t("supportEmail.help")}
+            </p>
+            <input
+              className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+              placeholder={t("supportEmail.placeholder")}
+              value={form.supportEmail}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, supportEmail: e.target.value }))
+              }
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-zinc-400 mb-1">
+              {t("ctaUrls.label")}
+            </label>
+            <p className="text-[11px] text-zinc-500 mb-2">
+              {t("ctaUrls.help")}
+            </p>
+            <textarea
+              className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+              placeholder={t("ctaUrls.placeholder")}
+              value={form.ctaUrls}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, ctaUrls: e.target.value }))
               }
             />
           </div>
