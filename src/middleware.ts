@@ -31,7 +31,6 @@ function getCountryLocale(req: NextRequest): "en" | "es" | null {
   const country =
     req.headers.get("x-vercel-ip-country") ||
     req.headers.get("cf-ipcountry") ||
-    req.geo?.country ||
     null;
   if (!country) return null;
   const code = country.toUpperCase();
