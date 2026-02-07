@@ -118,6 +118,7 @@ function parseKnowledge(raw: string) {
   const keyFacts = extractSection(raw, "Key Facts") || "";
   const policies = extractSection(raw, "Policies") || "";
   const links = extractSection(raw, "Links") || "";
+  const ctaUrls = extractSection(raw, "CTA URLs") || "";
   const supportEmail = extractSection(raw, "Support Email") || "";
   const additional = extractSection(raw, "Additional Business Info") || "";
 
@@ -127,6 +128,7 @@ function parseKnowledge(raw: string) {
     keyFacts,
     policies,
     links,
+    ctaUrls,
     supportEmail,
     additionalBusinessInfo:
       additional || (hasStructuredSections(raw) ? "" : raw.trim()),
@@ -312,7 +314,7 @@ export default function SettingsAssistantPage() {
           keyFacts: parsedKnowledge.keyFacts,
           policies: parsedKnowledge.policies,
           links: parsedKnowledge.links,
-          ctaUrls: "",
+          ctaUrls: parsedKnowledge.ctaUrls,
           supportEmail: parsedKnowledge.supportEmail,
           additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
@@ -333,7 +335,7 @@ export default function SettingsAssistantPage() {
           keyFacts: parsedKnowledge.keyFacts,
           policies: parsedKnowledge.policies,
           links: parsedKnowledge.links,
-          ctaUrls: "",
+          ctaUrls: parsedKnowledge.ctaUrls,
           supportEmail: parsedKnowledge.supportEmail,
           additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
