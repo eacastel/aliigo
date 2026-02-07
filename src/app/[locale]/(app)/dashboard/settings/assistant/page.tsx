@@ -102,6 +102,7 @@ function parseKnowledge(raw: string) {
   const keyFacts = extractSection(raw, "Key Facts") || "";
   const policies = extractSection(raw, "Policies") || "";
   const links = extractSection(raw, "Links") || "";
+  const supportEmail = extractSection(raw, "Support Email") || "";
   const additional = extractSection(raw, "Additional Business Info") || "";
 
   return {
@@ -110,6 +111,7 @@ function parseKnowledge(raw: string) {
     keyFacts,
     policies,
     links,
+    supportEmail,
     additionalBusinessInfo: additional || (hasStructuredSections(raw) ? "" : raw.trim()),
   };
 }
@@ -296,6 +298,7 @@ export default function SettingsAssistantPage() {
           policies: parsedKnowledge.policies,
           links: parsedKnowledge.links,
           ctaUrls: "",
+          supportEmail: parsedKnowledge.supportEmail,
           additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
         }));
@@ -317,6 +320,7 @@ export default function SettingsAssistantPage() {
           policies: parsedKnowledge.policies,
           links: parsedKnowledge.links,
           ctaUrls: "",
+          supportEmail: parsedKnowledge.supportEmail,
           additionalBusinessInfo: parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
         };
@@ -579,107 +583,291 @@ export default function SettingsAssistantPage() {
 
       <section className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 space-y-6">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-                <label className="block text-xs text-zinc-400 mb-2">{t("tone.label")}</label>
-                <div className="flex flex-wrap gap-2">
-                  {(["friendly", "professional", "concise"] as PresetTone[]).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setForm((f) => ({ ...f, tone: opt }))}
-                      className={`${opt === form.tone ? btnBrand : btnNeutral}`}
-                    >
-                      {t(`tone.options.${opt}`)}
-                    </button>
-                  ))}
+          <div className="space-y-4">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-4">
+              <div className="text-sm font-semibold text-zinc-100">{t("sections.presets.title")}</div>
+              <p className="text-xs text-zinc-400">{t("sections.presets.desc")}</p>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                  <label className="block text-xs text-zinc-400 mb-2">{t("tone.label")}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {(["friendly", "professional", "concise"] as PresetTone[]).map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, tone: opt }))}
+                        className={`${opt === form.tone ? btnBrand : btnNeutral}`}
+                      >
+                        {t(`tone.options.${opt}`)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                  <label className="block text-xs text-zinc-400 mb-2">{t("goal.label")}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {(["support", "leads", "bookings", "mixed"] as PresetGoal[]).map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, goal: opt }))}
+                        className={`${opt === form.goal ? btnBrand : btnNeutral}`}
+                      >
+                        {t(`goal.options.${opt}`)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                  <label className="block text-xs text-zinc-400 mb-2">{t("handoff.label")}</label>
+                  <p className="text-[11px] text-zinc-500 mb-2">{t("handoff.help")}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(["balanced", "proactive"] as PresetHandoff[]).map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, handoff: opt }))}
+                        className={`${opt === form.handoff ? btnBrand : btnNeutral}`}
+                      >
+                        {t(`handoff.options.${opt}`)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                  <label className="block text-xs text-zinc-400 mb-2">{t("cta.label")}</label>
+                  <p className="text-[11px] text-zinc-500 mb-2">{t("cta.help")}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(["soft", "direct"] as PresetCta[]).map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, cta: opt }))}
+                        className={`${opt === form.cta ? btnBrand : btnNeutral}`}
+                      >
+                        {t(`cta.options.${opt}`)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-                <label className="block text-xs text-zinc-400 mb-2">{t("goal.label")}</label>
-                <div className="flex flex-wrap gap-2">
-                  {(["support", "leads", "bookings", "mixed"] as PresetGoal[]).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setForm((f) => ({ ...f, goal: opt }))}
-                      className={`${opt === form.goal ? btnBrand : btnNeutral}`}
-                    >
-                      {t(`goal.options.${opt}`)}
-                    </button>
-                  ))}
-                </div>
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("supportEmail.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("supportEmail.help")}</p>
+                <input
+                  className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("supportEmail.placeholder")}
+                  value={form.supportEmail}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, supportEmail: e.target.value }))
+                  }
+                />
               </div>
 
-              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-                <label className="block text-xs text-zinc-400 mb-2">{t("handoff.label")}</label>
-                <div className="flex flex-wrap gap-2">
-                  {(["rare", "balanced", "proactive"] as PresetHandoff[]).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setForm((f) => ({ ...f, handoff: opt }))}
-                      className={`${opt === form.handoff ? btnBrand : btnNeutral}`}
-                    >
-                      {t(`handoff.options.${opt}`)}
-                    </button>
-                  ))}
-                </div>
-                <p className="mt-2 text-[11px] text-zinc-500">{t("handoff.help")}</p>
-              </div>
-
-              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-                <label className="block text-xs text-zinc-400 mb-2">{t("cta.label")}</label>
-                <div className="flex flex-wrap gap-2">
-                  {(["soft", "direct"] as PresetCta[]).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setForm((f) => ({ ...f, cta: opt }))}
-                      className={`${opt === form.cta ? btnBrand : btnNeutral}`}
-                    >
-                      {t(`cta.options.${opt}`)}
-                    </button>
-                  ))}
-                </div>
-                <p className="mt-2 text-[11px] text-zinc-500">{t("cta.help")}</p>
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("ctaUrls.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("ctaUrls.help")}</p>
+                <textarea
+                  className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("ctaUrls.placeholder")}
+                  value={form.ctaUrls}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, ctaUrls: e.target.value }))
+                  }
+                />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs text-zinc-400 mb-1">
-                {t("supportEmail.label")}
-              </label>
-              <input
-                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder={t("supportEmail.placeholder")}
-                value={form.supportEmail}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, supportEmail: e.target.value }))
-                }
-              />
-              <p className="text-[11px] text-zinc-500 mt-1">{t("supportEmail.help")}</p>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
+              <div className="text-sm font-semibold text-zinc-100">{t("sections.business.title")}</div>
+              <p className="text-xs text-zinc-400">{t("sections.business.desc")}</p>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("businessSummary.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("businessSummary.help")}</p>
+                <textarea
+                  className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("businessSummary.placeholder")}
+                  value={form.businessSummary}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, businessSummary: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("businessDetails.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("businessDetails.help")}</p>
+                <textarea
+                  className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("businessDetails.placeholder")}
+                  value={form.businessDetails}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, businessDetails: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("keyFacts.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("keyFacts.help")}</p>
+                <textarea
+                  className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("keyFacts.placeholder")}
+                  value={form.keyFacts}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, keyFacts: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("policies.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("policies.help")}</p>
+                <textarea
+                  className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("policies.placeholder")}
+                  value={form.policies}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, policies: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("links.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("links.help")}</p>
+                <textarea
+                  className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("links.placeholder")}
+                  value={form.links}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, links: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("additionalBusinessInfo.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("additionalBusinessInfo.help")}</p>
+                <textarea
+                  className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("additionalBusinessInfo.placeholder")}
+                  value={form.additionalBusinessInfo}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, additionalBusinessInfo: e.target.value }))
+                  }
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs text-zinc-400 mb-1">
-                {t("ctaUrls.label")}
-              </label>
-              <textarea
-                className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder={t("ctaUrls.placeholder")}
-                value={form.ctaUrls}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, ctaUrls: e.target.value }))
-                }
-              />
-              <p className="text-[11px] text-zinc-500 mt-1">{t("ctaUrls.help")}</p>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
+              <div className="text-sm font-semibold text-zinc-100">{t("sections.behavior.title")}</div>
+              <p className="text-xs text-zinc-400">{t("sections.behavior.desc")}</p>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("intro.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("intro.help")}</p>
+                <textarea
+                  className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("intro.placeholder")}
+                  value={form.intro}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, intro: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("scope.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("scope.help")}</p>
+                <textarea
+                  className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("scope.placeholder")}
+                  value={form.scope}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, scope: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("style.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("style.help")}</p>
+                <textarea
+                  className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("style.placeholder")}
+                  value={form.styleRules}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, styleRules: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("additionalInstructions.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("additionalInstructions.help")}</p>
+                <textarea
+                  className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("additionalInstructions.placeholder")}
+                  value={form.additionalInstructions}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, additionalInstructions: e.target.value }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
+              <div className="text-sm font-semibold text-zinc-100">{t("sections.qualification.title")}</div>
+              <p className="text-xs text-zinc-400">{t("sections.qualification.desc")}</p>
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("qualification.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("qualification.help")}</p>
+                <textarea
+                  className="w-full min-h-[220px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("qualification.placeholder")}
+                  value={form.qualificationPrompt}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, qualificationPrompt: e.target.value }))
+                  }
+                />
+              </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
             <div className="text-sm font-semibold text-zinc-100 mb-2">{t("preview.title")}</div>
             <div className="text-xs text-zinc-400 mb-3">{t("preview.subtitle")}</div>
             <div className="grid gap-3">
@@ -693,169 +881,6 @@ export default function SettingsAssistantPage() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("intro.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("intro.placeholder")}
-            value={form.intro}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, intro: e.target.value }))
-            }
-          />
-          <p className="text-[11px] text-zinc-500 mt-1">{t("intro.help")}</p>
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("scope.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("scope.placeholder")}
-            value={form.scope}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, scope: e.target.value }))
-            }
-          />
-          <p className="text-[11px] text-zinc-500 mt-1">{t("scope.help")}</p>
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("style.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("style.placeholder")}
-            value={form.styleRules}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, styleRules: e.target.value }))
-            }
-          />
-          <p className="text-[11px] text-zinc-500 mt-1">{t("style.help")}</p>
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("businessSummary.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("businessSummary.placeholder")}
-            value={form.businessSummary}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, businessSummary: e.target.value }))
-            }
-          />
-          <p className="text-[11px] text-zinc-500 mt-1">
-            {t("businessSummary.help")}
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("businessDetails.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("businessDetails.placeholder")}
-            value={form.businessDetails}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, businessDetails: e.target.value }))
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("keyFacts.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("keyFacts.placeholder")}
-            value={form.keyFacts}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, keyFacts: e.target.value }))
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("policies.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("policies.placeholder")}
-            value={form.policies}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, policies: e.target.value }))
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("links.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("links.placeholder")}
-            value={form.links}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, links: e.target.value }))
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("additionalBusinessInfo.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("additionalBusinessInfo.placeholder")}
-            value={form.additionalBusinessInfo}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, additionalBusinessInfo: e.target.value }))
-            }
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("qualification.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[220px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("qualification.placeholder")}
-            value={form.qualificationPrompt}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, qualificationPrompt: e.target.value }))
-            }
-          />
-          <p className="text-[11px] text-zinc-500 mt-1">
-            {t("qualification.help")}
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("additionalInstructions.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("additionalInstructions.placeholder")}
-            value={form.additionalInstructions}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, additionalInstructions: e.target.value }))
-            }
-          />
         </div>
 
         <div className="flex gap-2">

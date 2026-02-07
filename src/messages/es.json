@@ -286,10 +286,28 @@
       "inline": "Mantente centrado en el negocio. Sin bromas, trivia ni temas ajenos. Evita la repetición. Resume si te preguntan de nuevo. Responde siempre en el idioma del usuario; síguelo si cambia.",
       "note": "El asistente debe ser preciso y transparente. Si algo no se sabe, debe decirlo y ofrecer el siguiente paso."
     },
+    "sections": {
+      "presets": {
+        "title": "Configuración rápida",
+        "desc": "Elige cómo debe sonar el asistente y cómo guiar a los visitantes."
+      },
+      "business": {
+        "title": "Esenciales del negocio",
+        "desc": "Dale al asistente información clara y factual sobre tu negocio."
+      },
+      "behavior": {
+        "title": "Comportamiento del asistente",
+        "desc": "Define el alcance, el estilo y cómo se presenta."
+      },
+      "qualification": {
+        "title": "Calificación",
+        "desc": "Controla cómo recoge datos de contacto y deriva a atención."
+      }
+    },
     "tone": {
       "label": "Tono",
       "options": {
-        "friendly": "Cercano",
+        "friendly": "Familiar",
         "professional": "Profesional",
         "concise": "Conciso"
       }
@@ -342,19 +360,23 @@
     },
     "businessDetails": {
       "label": "Lo que ofreces (servicios / productos)",
-      "placeholder": "Lista servicios, productos u ofertas principales."
+      "placeholder": "Lista servicios, productos u ofertas principales.",
+      "help": "Puedes usar viñetas o líneas cortas."
     },
     "keyFacts": {
       "label": "Datos clave (horario, ubicación, política de precios)",
-      "placeholder": "Horario, ubicación, zona de servicio, normas de reserva, etc."
+      "placeholder": "Horario, ubicación, zona de servicio, normas de reserva, etc.",
+      "help": "Solo datos factuales que el asistente debe decir bien."
     },
     "policies": {
       "label": "Políticas (cancelaciones, reembolsos, limitaciones)",
-      "placeholder": "Ventanas de cancelación, reembolsos, depósitos, etc."
+      "placeholder": "Ventanas de cancelación, reembolsos, depósitos, etc.",
+      "help": "Incluye solo políticas que quieras que comunique."
     },
     "links": {
       "label": "Enlaces (reservas, contacto, mapas)",
-      "placeholder": "URLs que el asistente debe compartir."
+      "placeholder": "URLs que el asistente debe compartir.",
+      "help": "Enlaces generales que puede compartir cuando sea útil."
     },
     "ctaUrls": {
       "label": "URLs de CTA (registro, demo, precios)",
@@ -368,7 +390,8 @@
     },
     "additionalBusinessInfo": {
       "label": "Información adicional del negocio (opcional)",
-      "placeholder": "Cualquier otra cosa que deban saber los visitantes."
+      "placeholder": "Cualquier otra cosa que deban saber los visitantes.",
+      "help": "Detalles opcionales que no encajan arriba."
     },
     "qualification": {
       "label": "Calificación (fit + captación)",
@@ -377,7 +400,8 @@
     },
     "additionalInstructions": {
       "label": "Instrucciones adicionales (opcional)",
-      "placeholder": "Reglas extra, matices o casos especiales."
+      "placeholder": "Reglas extra, matices o casos especiales.",
+      "help": "Añade solo lo que realmente importe."
     },
     "actions": {
       "save": "Guardar",

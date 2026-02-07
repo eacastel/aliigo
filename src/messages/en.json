@@ -285,6 +285,24 @@
       "inline": "Stay focused on the business. No jokes, trivia, or unrelated topics. Avoid repetition. Summarize if asked again. Always reply in the user’s language; follow if they switch.",
       "note": "The assistant should be accurate and transparent. If something is unknown, it should say so and offer the next best step."
     },
+    "sections": {
+      "presets": {
+        "title": "Quick setup",
+        "desc": "Choose how the assistant should sound and how it should guide visitors."
+      },
+      "business": {
+        "title": "Business essentials",
+        "desc": "Give the assistant clear, factual information about your business."
+      },
+      "behavior": {
+        "title": "Assistant behavior",
+        "desc": "Define scope, style, and how the assistant introduces itself."
+      },
+      "qualification": {
+        "title": "Qualification",
+        "desc": "Control how the assistant collects contact details and routes to support."
+      }
+    },
     "tone": {
       "label": "Tone",
       "options": {
@@ -341,19 +359,23 @@
     },
     "businessDetails": {
       "label": "What you do (services / offers)",
-      "placeholder": "List services, products, or key offerings."
+      "placeholder": "List services, products, or key offerings.",
+      "help": "Write this as bullet points or short lines."
     },
     "keyFacts": {
       "label": "Key facts (hours, location, pricing policy)",
-      "placeholder": "Hours, location, service area, booking rules, etc."
+      "placeholder": "Hours, location, service area, booking rules, etc.",
+      "help": "Stick to factual details the assistant must get right."
     },
     "policies": {
       "label": "Policies (cancellations, refunds, limitations)",
-      "placeholder": "Cancellation windows, refunds, deposit rules, etc."
+      "placeholder": "Cancellation windows, refunds, deposit rules, etc.",
+      "help": "Only include policies you want the assistant to state."
     },
     "links": {
       "label": "Links (booking, contact, maps)",
-      "placeholder": "URLs the assistant should share."
+      "placeholder": "URLs the assistant should share.",
+      "help": "General links the assistant can share when relevant."
     },
     "ctaUrls": {
       "label": "CTA URLs (signup, demo, pricing)",
@@ -367,7 +389,8 @@
     },
     "additionalBusinessInfo": {
       "label": "Additional business info (optional)",
-      "placeholder": "Anything else visitors should know."
+      "placeholder": "Anything else visitors should know.",
+      "help": "Optional details that don't fit above."
     },
     "qualification": {
       "label": "Qualification (fit + lead capture)",
@@ -376,7 +399,8 @@
     },
     "additionalInstructions": {
       "label": "Additional instructions (optional)",
-      "placeholder": "Extra rules, nuances, or edge cases."
+      "placeholder": "Extra rules, nuances, or edge cases.",
+      "help": "Only include what really matters."
     },
     "actions": {
       "save": "Save",
