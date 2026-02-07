@@ -283,6 +283,7 @@
         "repetition": "Evita la repetición. Resume si te preguntan de nuevo.",
         "language": "Responde siempre en el idioma del usuario; síguelo si cambia."
       },
+      "inline": "Mantente centrado en el negocio. Sin bromas, trivia ni temas ajenos. Evita la repetición. Resume si te preguntan de nuevo. Responde siempre en el idioma del usuario; síguelo si cambia.",
       "note": "El asistente debe ser preciso y transparente. Si algo no se sabe, debe decirlo y ofrecer el siguiente paso."
     },
     "tone": {
@@ -303,19 +304,21 @@
       }
     },
     "handoff": {
-      "label": "Escalado a humano",
+      "label": "Atención al cliente",
       "options": {
         "rare": "Raro",
         "balanced": "Equilibrado",
         "proactive": "Proactivo"
-      }
+      },
+      "help": "Define cuándo el asistente debe sugerir seguimiento humano o atención al cliente."
     },
     "cta": {
-      "label": "Estilo de CTA",
+      "label": "Confirmación de compra",
       "options": {
         "soft": "Guía suave",
         "direct": "Siguiente paso directo"
-      }
+      },
+      "help": "Define cómo el asistente confirma intención y guía al usuario al enlace correcto."
     },
     "intro": {
       "label": "Introducción (opcional)",
@@ -357,6 +360,11 @@
       "label": "URLs de CTA (registro, demo, precios)",
       "placeholder": "Pega aquí los enlaces principales de acción.",
       "help": "Estos enlaces se usan cuando el visitante pregunta cómo empezar."
+    },
+    "supportEmail": {
+      "label": "Email de atención al cliente (opcional)",
+      "placeholder": "soporte@tudominio.com, ventas@tudominio.com",
+      "help": "Se usa si el asistente necesita derivar a atención al cliente. Separa varios correos con comas."
     },
     "additionalBusinessInfo": {
       "label": "Información adicional del negocio (opcional)",

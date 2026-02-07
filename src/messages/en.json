@@ -282,6 +282,7 @@
         "repetition": "Avoid repetition. Summarize if asked again.",
         "language": "Always reply in the user’s language; follow if they switch."
       },
+      "inline": "Stay focused on the business. No jokes, trivia, or unrelated topics. Avoid repetition. Summarize if asked again. Always reply in the user’s language; follow if they switch.",
       "note": "The assistant should be accurate and transparent. If something is unknown, it should say so and offer the next best step."
     },
     "tone": {
@@ -302,19 +303,21 @@
       }
     },
     "handoff": {
-      "label": "Handoff behavior",
+      "label": "Customer support",
       "options": {
         "rare": "Rare",
         "balanced": "Balanced",
         "proactive": "Proactive"
-      }
+      },
+      "help": "Controls when the assistant should suggest a human follow‑up or customer support."
     },
     "cta": {
-      "label": "CTA style",
+      "label": "Purchase confirmation",
       "options": {
         "soft": "Soft guidance",
         "direct": "Direct next step"
-      }
+      },
+      "help": "Defines how the assistant confirms intent and guides the user to the right link."
     },
     "intro": {
       "label": "Introduction (optional)",
@@ -356,6 +359,11 @@
       "label": "CTA URLs (signup, demo, pricing)",
       "placeholder": "Paste any primary call-to-action URLs here.",
       "help": "These links should be used when the visitor asks how to get started."
+    },
+    "supportEmail": {
+      "label": "Customer support email (optional)",
+      "placeholder": "support@yourbusiness.com, sales@yourbusiness.com",
+      "help": "Used if the assistant needs to route someone to customer support. Separate multiple emails with commas."
     },
     "additionalBusinessInfo": {
       "label": "Additional business info (optional)",

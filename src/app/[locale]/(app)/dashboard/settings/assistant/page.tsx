@@ -24,6 +24,7 @@ type AssistantForm = {
   goal: PresetGoal;
   handoff: PresetHandoff;
   cta: PresetCta;
+  supportEmail: string;
   intro: string;
   scope: string;
   styleRules: string;
@@ -162,6 +163,9 @@ function composeKnowledge(form: AssistantForm) {
     SECTION_HEADER("CTA URLs"),
     form.ctaUrls || "",
     "",
+    SECTION_HEADER("Support Email"),
+    form.supportEmail || "",
+    "",
     SECTION_HEADER("Additional Business Info"),
     form.additionalBusinessInfo || "",
   ]
@@ -186,13 +190,14 @@ export default function SettingsAssistantPage() {
   const [form, setForm] = useState<AssistantForm>({
     tone: "friendly",
     goal: "mixed",
-    handoff: "balanced",
-    cta: "soft",
-    intro: "",
-    scope: "",
-    styleRules: "",
-    additionalInstructions: "",
-    businessSummary: "",
+      handoff: "balanced",
+      cta: "soft",
+      supportEmail: "",
+      intro: "",
+      scope: "",
+      styleRules: "",
+      additionalInstructions: "",
+      businessSummary: "",
     businessDetails: "",
     keyFacts: "",
     policies: "",
@@ -280,6 +285,7 @@ export default function SettingsAssistantPage() {
           goal: parsedSystem.goal,
           handoff: parsedSystem.handoff,
           cta: parsedSystem.cta,
+          supportEmail: "",
           intro: parsedSystem.intro,
           scope: parsedSystem.scope,
           styleRules: parsedSystem.styleRules,
@@ -322,6 +328,7 @@ export default function SettingsAssistantPage() {
           goal: "mixed",
           handoff: "balanced",
           cta: "soft",
+          supportEmail: "",
           intro: "",
           scope: "",
           styleRules: "",
@@ -554,6 +561,10 @@ export default function SettingsAssistantPage() {
       <p className="mb-6 text-sm text-zinc-400">
         {t("description")}
       </p>
+      <p className="mb-6 text-xs text-zinc-500">
+        <span className="font-medium text-zinc-300">{t("guardrails.title")}</span>{" "}
+        {t("guardrails.inline")}
+      </p>
 
       {msg && (
         <div
@@ -566,93 +577,119 @@ export default function SettingsAssistantPage() {
       )}
 
       <section className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 space-y-6">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-3">
-          <div className="text-sm font-semibold text-zinc-100">{t("guardrails.title")}</div>
-          <ul className="text-xs text-zinc-400 space-y-1">
-            <li>• {t("guardrails.items.scope")}</li>
-            <li>• {t("guardrails.items.repetition")}</li>
-            <li>• {t("guardrails.items.language")}</li>
-          </ul>
-          <p className="text-[11px] text-zinc-500">{t("guardrails.note")}</p>
-        </div>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4 space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <label className="block text-xs text-zinc-400 mb-2">{t("tone.label")}</label>
+                <div className="flex flex-wrap gap-2">
+                  {(["friendly", "professional", "concise"] as PresetTone[]).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, tone: opt }))}
+                      className={`${opt === form.tone ? btnBrand : btnNeutral}`}
+                    >
+                      {t(`tone.options.${opt}`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">{t("tone.label")}</label>
-            <div className="flex flex-wrap gap-2">
-              {(["friendly", "professional", "concise"] as PresetTone[]).map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, tone: opt }))}
-                  className={`${opt === form.tone ? btnBrand : btnNeutral}`}
-                >
-                  {t(`tone.options.${opt}`)}
-                </button>
-              ))}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <label className="block text-xs text-zinc-400 mb-2">{t("goal.label")}</label>
+                <div className="flex flex-wrap gap-2">
+                  {(["support", "leads", "bookings", "mixed"] as PresetGoal[]).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, goal: opt }))}
+                      className={`${opt === form.goal ? btnBrand : btnNeutral}`}
+                    >
+                      {t(`goal.options.${opt}`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <label className="block text-xs text-zinc-400 mb-2">{t("handoff.label")}</label>
+                <div className="flex flex-wrap gap-2">
+                  {(["rare", "balanced", "proactive"] as PresetHandoff[]).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, handoff: opt }))}
+                      className={`${opt === form.handoff ? btnBrand : btnNeutral}`}
+                    >
+                      {t(`handoff.options.${opt}`)}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] text-zinc-500">{t("handoff.help")}</p>
+              </div>
+
+              <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+                <label className="block text-xs text-zinc-400 mb-2">{t("cta.label")}</label>
+                <div className="flex flex-wrap gap-2">
+                  {(["soft", "direct"] as PresetCta[]).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, cta: opt }))}
+                      className={`${opt === form.cta ? btnBrand : btnNeutral}`}
+                    >
+                      {t(`cta.options.${opt}`)}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] text-zinc-500">{t("cta.help")}</p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">
+                {t("supportEmail.label")}
+              </label>
+              <input
+                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                placeholder={t("supportEmail.placeholder")}
+                value={form.supportEmail}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, supportEmail: e.target.value }))
+                }
+              />
+              <p className="text-[11px] text-zinc-500 mt-1">{t("supportEmail.help")}</p>
+            </div>
+
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">
+                {t("ctaUrls.label")}
+              </label>
+              <textarea
+                className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                placeholder={t("ctaUrls.placeholder")}
+                value={form.ctaUrls}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, ctaUrls: e.target.value }))
+                }
+              />
+              <p className="text-[11px] text-zinc-500 mt-1">{t("ctaUrls.help")}</p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">{t("goal.label")}</label>
-            <div className="flex flex-wrap gap-2">
-              {(["support", "leads", "bookings", "mixed"] as PresetGoal[]).map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, goal: opt }))}
-                  className={`${opt === form.goal ? btnBrand : btnNeutral}`}
-                >
-                  {t(`goal.options.${opt}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">{t("handoff.label")}</label>
-            <div className="flex flex-wrap gap-2">
-              {(["rare", "balanced", "proactive"] as PresetHandoff[]).map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, handoff: opt }))}
-                  className={`${opt === form.handoff ? btnBrand : btnNeutral}`}
-                >
-                  {t(`handoff.options.${opt}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-            <label className="block text-xs text-zinc-400 mb-2">{t("cta.label")}</label>
-            <div className="flex flex-wrap gap-2">
-              {(["soft", "direct"] as PresetCta[]).map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, cta: opt }))}
-                  className={`${opt === form.cta ? btnBrand : btnNeutral}`}
-                >
-                  {t(`cta.options.${opt}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-          <div className="text-sm font-semibold text-zinc-100 mb-2">{t("preview.title")}</div>
-          <div className="text-xs text-zinc-400 mb-3">{t("preview.subtitle")}</div>
-          <div className="grid gap-3">
-            <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
-              <div className="text-[11px] text-zinc-500 mb-1">{t("preview.userLabel")}</div>
-              {t("preview.userMessage")}
-            </div>
-            <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
-              <div className="text-[11px] text-zinc-500 mb-1">{t("preview.assistantLabel")}</div>
-              {previewText}
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit">
+            <div className="text-sm font-semibold text-zinc-100 mb-2">{t("preview.title")}</div>
+            <div className="text-xs text-zinc-400 mb-3">{t("preview.subtitle")}</div>
+            <div className="grid gap-3">
+              <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
+                <div className="text-[11px] text-zinc-500 mb-1">{t("preview.userLabel")}</div>
+                {t("preview.userMessage")}
+              </div>
+              <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
+                <div className="text-[11px] text-zinc-500 mb-1">{t("preview.assistantLabel")}</div>
+                {previewText}
+              </div>
             </div>
           </div>
         </div>
@@ -773,21 +810,6 @@ export default function SettingsAssistantPage() {
               setForm((f) => ({ ...f, links: e.target.value }))
             }
           />
-        </div>
-
-        <div>
-          <label className="block text-xs text-zinc-400 mb-1">
-            {t("ctaUrls.label")}
-          </label>
-          <textarea
-            className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-            placeholder={t("ctaUrls.placeholder")}
-            value={form.ctaUrls}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, ctaUrls: e.target.value }))
-            }
-          />
-          <p className="text-[11px] text-zinc-500 mt-1">{t("ctaUrls.help")}</p>
         </div>
 
         <div>
