@@ -68,6 +68,8 @@ export default function BillingPage() {
   const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
   const priceForPlan = (p: BillingPlan) =>
     p === "starter" ? priceFmt.format(99) : p === "growth" ? priceFmt.format(149) : "—";
+  const starterPrice = priceForPlan("starter");
+  const growthPrice = priceForPlan("growth");
 
   const perMonth = safeT("perMonth", undefined, "/month");
 
@@ -327,7 +329,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           {safeT("planStarter", undefined, "Aliigo Starter")}
                         </div>
                         <div className="text-sm text-zinc-300">
-                          {PRICE_STARTER} <span className="text-zinc-500">{perMonth}</span>
+                          {starterPrice} <span className="text-zinc-500">{perMonth}</span>
                         </div>
                       </div>
 
@@ -345,7 +347,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           {safeT("planGrowth", undefined, "Aliigo Growth")}
                         </div>
                         <div className="text-sm text-zinc-300">
-                          {PRICE_GROWTH} <span className="text-zinc-500">{perMonth}</span>
+                          {growthPrice} <span className="text-zinc-500">{perMonth}</span>
                         </div>
                       </div>
 
@@ -386,7 +388,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           : safeT(
                               "upgradeToGrowth",
                               undefined,
-                              `Upgrade to Growth (${PRICE_GROWTH} ${perMonth})`
+                              `Upgrade to Growth (${growthPrice} ${perMonth})`
                             )}
                       </button>
                     ) : billing?.plan === "growth" ? (
@@ -401,7 +403,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           : safeT(
                               "switchToStarter",
                               undefined,
-                              `Switch to Starter (${PRICE_STARTER} ${perMonth})`
+                              `Switch to Starter (${starterPrice} ${perMonth})`
                             )}
                       </button>
 
