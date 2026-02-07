@@ -5,10 +5,18 @@ type Plan = "starter" | "growth";
 export default function PlanSelector({
   value,
   onChange,
+  locale,
+  currency,
 }: {
   value: Plan;
   onChange: (p: Plan) => void;
+  locale: string;
+  currency: "EUR" | "USD";
 }) {
+  const fmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
+  const starter = fmt.format(99);
+  const growth = fmt.format(149);
+
   return (
     <div className="grid gap-3">
       <button
@@ -19,7 +27,7 @@ export default function PlanSelector({
         }`}
       >
         <div className="font-medium text-zinc-100">Aliigo Starter</div>
-        <div className="text-sm text-zinc-400">€99 / month after trial</div>
+        <div className="text-sm text-zinc-400">{starter} / month after trial</div>
       </button>
 
       <button
@@ -30,7 +38,7 @@ export default function PlanSelector({
         }`}
       >
         <div className="font-medium text-zinc-100">Aliigo Growth</div>
-        <div className="text-sm text-zinc-400">€149 / month after trial</div>
+        <div className="text-sm text-zinc-400">{growth} / month after trial</div>
       </button>
 
       <div className="text-sm text-zinc-500">

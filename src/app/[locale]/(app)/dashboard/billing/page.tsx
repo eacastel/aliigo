@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
+import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
 import BillingCheckout from "@/components/billing/BillingCheckout";
 
 type BillingStatus = "incomplete" | "trialing" | "active" | "canceled" | "past_due";
@@ -62,12 +63,11 @@ export default function BillingPage() {
   const btnNeutralStrong =
     `${btnBase} bg-zinc-950/40 text-zinc-200 ring-zinc-700/60 hover:bg-zinc-900/50`;
 
-      // --- pricing (display only; keep in sync with Stripe) ---
-  const PRICE_STARTER = "€99";
-  const PRICE_GROWTH = "€149";
-
+  // --- pricing (display only; keep in sync with Stripe) ---
+  const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
+  const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
   const priceForPlan = (p: BillingPlan) =>
-    p === "starter" ? PRICE_STARTER : p === "growth" ? PRICE_GROWTH : "—";
+    p === "starter" ? priceFmt.format(99) : p === "growth" ? priceFmt.format(149) : "—";
 
   const perMonth = safeT("perMonth", undefined, "/month");
 

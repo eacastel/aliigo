@@ -48,6 +48,25 @@ export default function AuthCallbackPage() {
 
         if (type === "signup") {
           try {
+            const trackedKey = "aliigo_account_confirmed_tracked";
+            const alreadyTracked =
+              typeof window !== "undefined" && window.sessionStorage.getItem(trackedKey) === "1";
+            if (!alreadyTracked) {
+              const { data } = await supabase.auth.getSession();
+              if (data.session) {
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                  event: "account_confirmed",
+                  locale,
+                });
+                window.sessionStorage.setItem(trackedKey, "1");
+              }
+            }
+          } catch (e) {
+            console.warn("Account confirmed tracking failed:", e);
+          }
+
+          try {
             const { data } = await supabase.auth.getSession();
             const token = data.session?.access_token;
             if (token) {

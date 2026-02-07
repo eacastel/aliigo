@@ -4,10 +4,11 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import HeroRotator from "@/components/HeroRotator";
 import { HomepageAssistantDemo } from "@/components/HomepageAssistantDemo";
 import { AliigoSupportWidget } from "@/components/AliigoSupportWidget";
+import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
 import {
   HelpCircle,
   Layers,
@@ -81,6 +82,12 @@ function HomeFloatingWidgetGate() {
 // --- MAIN PAGE COMPONENT ---
 export default function HomePage() {
   const t = useTranslations("Landing");
+  const locale = useLocale();
+  const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
+  const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
+  const starterPrice = priceFmt.format(99);
+  const growthPrice = priceFmt.format(149);
+  const proPrice = priceFmt.format(349);
 
   const industries = [
     { id: "preContact", icon: HelpCircle },
@@ -555,7 +562,7 @@ export default function HomePage() {
               </p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold text-white">€99</span>
+                <span className="text-4xl font-bold text-white">{starterPrice}</span>
                 <span className="text-zinc-500"> {t("pricing.period")}</span>
               </div>
 
@@ -614,7 +621,7 @@ export default function HomePage() {
               </p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold text-white">€149</span>
+                <span className="text-4xl font-bold text-white">{growthPrice}</span>
                 <span className="text-zinc-500"> {t("pricing.period")}</span>
               </div>
 
@@ -671,7 +678,7 @@ export default function HomePage() {
                   <span className="text-2xl font-semibold text-zinc-400 mr-1">
                     {t("pricing.from")}
                   </span>
-                  <span className="text-4xl font-bold text-white">€349</span>
+                  <span className="text-4xl font-bold text-white">{proPrice}</span>
                 </div>
               </div>
 

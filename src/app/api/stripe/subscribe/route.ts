@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe, assertPlanPrice, isAliigoPlan, type AliigoPlan } from "@/lib/stripe";
+import { normalizeCurrency, type AliigoCurrency } from "@/lib/currency";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { requireBusiness } from "@/lib/server/auth";
 
@@ -47,6 +48,7 @@ export async function POST(req: Request) {
     if (action === "start") {
       const plan = body.plan as unknown;
       const setupIntentId = body.setup_intent_id as unknown;
+      const currency = normalizeCurrency(body.currency as string | undefined) ?? "EUR";
 
       if (!isAliigoPlan(plan)) {
         return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
@@ -79,11 +81,11 @@ export async function POST(req: Request) {
 
       const sub = (await stripe.subscriptions.create({
         customer: customerId,
-        items: [{ price: assertPlanPrice(plan as AliigoPlan) }],
+        items: [{ price: assertPlanPrice(plan as AliigoPlan, currency as AliigoCurrency) }],
         trial_period_days: 30,
         default_payment_method: paymentMethodId,
         payment_settings: { save_default_payment_method: "on_subscription" },
-        metadata: { business_id: businessId, plan: plan as AliigoPlan },
+        metadata: { business_id: businessId, plan: plan as AliigoPlan, currency },
       })) as unknown as AliigoStripeSub;
 
       const patch = {
@@ -166,11 +168,18 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Subscription has no items" }, { status: 400 });
       }
 
+      const existingCurrency =
+        typeof existing.items?.data?.[0]?.price?.currency === "string"
+          ? existing.items.data[0].price.currency
+          : null;
+      const currency =
+        normalizeCurrency(existingCurrency) ?? normalizeCurrency(body.currency as string | undefined) ?? "EUR";
+
       const updated = (await stripe.subscriptions.update(subscriptionId, {
-        items: [{ id: firstItemId, price: assertPlanPrice(plan as AliigoPlan) }],
+        items: [{ id: firstItemId, price: assertPlanPrice(plan as AliigoPlan, currency as AliigoCurrency) }],
         // Avoid surprise immediate charges; it will take effect on next invoice / trial end.
         proration_behavior: "none",
-        metadata: { business_id: businessId, plan: plan as AliigoPlan },
+        metadata: { business_id: businessId, plan: plan as AliigoPlan, currency },
       })) as unknown as AliigoStripeSub;
 
       const patch = {

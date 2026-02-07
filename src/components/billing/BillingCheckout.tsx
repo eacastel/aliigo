@@ -6,6 +6,8 @@ import { Elements } from "@stripe/react-stripe-js";
 import type { StripeElementsOptionsClientSecret } from "@stripe/stripe-js";
 import PlanSelector from "./PlanSelector";
 import PaymentForm from "./PaymentForm";
+import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
+import { useLocale } from "next-intl";
 
 export type Plan = "starter" | "growth";
 
@@ -15,6 +17,8 @@ export default function BillingCheckout({ jwt }: { jwt: string }) {
   const [plan, setPlan] = useState<Plan>("starter");
   const [clientSecret, setClientSecret] = useState<string>("");
   const [err, setErr] = useState<string>("");
+  const locale = useLocale();
+  const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
 
   useEffect(() => {
     if (!jwt) return;
@@ -97,10 +101,10 @@ export default function BillingCheckout({ jwt }: { jwt: string }) {
 
   return (
     <div className="space-y-5">
-      <PlanSelector value={plan} onChange={setPlan} />
+      <PlanSelector value={plan} onChange={setPlan} locale={locale} currency={currency} />
 
       <Elements stripe={stripePromise} options={options}>
-        <PaymentForm jwt={jwt} plan={plan} />
+        <PaymentForm jwt={jwt} plan={plan} currency={currency} />
       </Elements>
 
       <div className="text-xs text-zinc-500">30-day free trial. Cancel anytime before the trial ends.</div>

@@ -1,7 +1,7 @@
 // src/app/api/stripe/webhook/route.ts
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { stripe, PLAN_TO_PRICE, type AliigoPlan } from "@/lib/stripe";
+import { stripe, planFromPriceId, type AliigoPlan } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
@@ -36,13 +36,6 @@ function mapStripeStatus(status: Stripe.Subscription.Status): BillingStatus {
     default:
       return "incomplete";
   }
-}
-
-function planFromPriceId(priceId?: string | null): AliigoPlan | null {
-  if (!priceId) return null;
-  if (priceId === PLAN_TO_PRICE.starter) return "starter";
-  if (priceId === PLAN_TO_PRICE.growth) return "growth";
-  return null;
 }
 
 async function resolveBusinessIdFromSubscription(sub: Stripe.Subscription): Promise<string | null> {

@@ -1,11 +1,19 @@
 import { Link } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { CheckCircle2, Sparkles, Building2, Store, Zap } from "lucide-react";
 import { ProContactForm } from "@/components/ProContactForm";
+import { cookies } from "next/headers";
+import { getCurrencyFromCookies, type AliigoCurrency } from "@/lib/currency";
 
 export default function PricingPage() {
   const t = useTranslations("Landing");
   const p = useTranslations("PricingPage");
+  const locale = useLocale();
+  const currency = (getCurrencyFromCookies(cookies()) ?? "EUR") as AliigoCurrency;
+  const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
+  const starterPrice = priceFmt.format(99);
+  const growthPrice = priceFmt.format(149);
+  const proPrice = priceFmt.format(349);
 
   return (
     <div className="bg-zinc-950 text-white">
@@ -57,7 +65,7 @@ export default function PricingPage() {
               </p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold text-white">€99</span>
+                <span className="text-4xl font-bold text-white">{starterPrice}</span>
                 <span className="text-zinc-500"> {t("pricing.period")}</span>
               </div>
 
@@ -115,7 +123,7 @@ export default function PricingPage() {
               </p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold text-white">€149</span>
+                <span className="text-4xl font-bold text-white">{growthPrice}</span>
                 <span className="text-zinc-500"> {t("pricing.period")}</span>
               </div>
 
@@ -170,7 +178,7 @@ export default function PricingPage() {
                 <span className="mr-1 text-2xl font-semibold text-zinc-400">
                   {t("pricing.from")}
                 </span>
-                <span className="text-4xl font-bold text-white">€349</span>
+                <span className="text-4xl font-bold text-white">{proPrice}</span>
               </div>
 
               <Link

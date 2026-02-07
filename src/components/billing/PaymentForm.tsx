@@ -3,8 +3,17 @@
 import { useState } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import type { Plan } from "./BillingCheckout";
+import type { AliigoCurrency } from "@/lib/currency";
 
-export default function PaymentForm({ jwt, plan }: { jwt: string; plan: Plan }) {
+export default function PaymentForm({
+  jwt,
+  plan,
+  currency,
+}: {
+  jwt: string;
+  plan: Plan;
+  currency: AliigoCurrency;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -40,7 +49,7 @@ export default function PaymentForm({ jwt, plan }: { jwt: string; plan: Plan }) 
           "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
         },
-        body: JSON.stringify({ plan, setup_intent_id: setupIntentId }),
+        body: JSON.stringify({ plan, setup_intent_id: setupIntentId, currency }),
       });
 
       const j = (await res.json().catch(() => ({}))) as { error?: string };

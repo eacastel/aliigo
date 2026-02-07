@@ -9,6 +9,7 @@ import {
   type BillingStatus,
 } from "@/lib/billingUsage";
 import { buildLeadNotification, normalizeLocale as normalizeLeadLocale } from "@/emails/lead/notification";
+import { normalizeCurrency, type AliigoCurrency } from "@/lib/currency";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -601,6 +602,15 @@ export async function POST(req: NextRequest) {
     const localeRaw = requestedLocale || (bizRes.data.default_locale || "en").toLowerCase().trim();
     const locale = supported.has(localeRaw) ? localeRaw : "en";
 
+    const cookieHeader = req.headers.get("cookie") || "";
+    const currencyCookie = cookieHeader
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("aliigo_currency="))
+      ?.split("=")[1];
+    const currency =
+      normalizeCurrency(currencyCookie ? decodeURIComponent(currencyCookie) : null) ?? "EUR";
+
     // ensure conversation (reuse by business_id + external_ref)
     let conversationId = safeInputConvId ?? null;
 
@@ -704,6 +714,28 @@ Timezone: ${bizRes.data?.timezone ?? "Europe/Madrid"}.`;
 
 Business knowledge (authoritative):
 ${knowledge}`;
+    }
+
+    const isAliigoSite = host === aliigoHost() || bizSlug === "aliigo";
+    if (isAliigoSite) {
+      const priceFmt = new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: currency as AliigoCurrency,
+        maximumFractionDigits: 0,
+      });
+      const starter = priceFmt.format(99);
+      const growth = priceFmt.format(149);
+      const pro = priceFmt.format(349);
+      sys += `
+
+Aliigo pricing (authoritative, aliigo.com only):
+- Starter: ${starter} / month
+- Growth: ${growth} / month
+- Pro: ${pro}+ / month (custom)
+
+Rules:
+- Only share pricing when asked or when the user explicitly requests it.
+- Use the pricing above and the visitor's language.`;
     }
 
     // NEW: inject qualification criteria
