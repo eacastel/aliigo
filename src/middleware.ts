@@ -15,6 +15,14 @@ const SPANISH_COUNTRIES = new Set([
   "NI", "CR", "PR", "UY", "PA",
 ]);
 
+function getCountryCode(req: NextRequest): string | null {
+  const country =
+    req.headers.get("x-vercel-ip-country") ||
+    req.headers.get("cf-ipcountry") ||
+    null;
+  return country ? country.toUpperCase() : null;
+}
+
 function getCookieLocale(req: NextRequest): "en" | "es" | null {
   const v = (req.cookies.get(LOCALE_COOKIE)?.value || "").toLowerCase();
   return LOCALES.has(v) ? (v as "en" | "es") : null;
@@ -28,10 +36,7 @@ function getBrowserLocale(req: NextRequest): "en" | "es" | null {
 }
 
 function getCountryLocale(req: NextRequest): "en" | "es" | null {
-  const country =
-    req.headers.get("x-vercel-ip-country") ||
-    req.headers.get("cf-ipcountry") ||
-    null;
+  const country = getCountryCode(req);
   if (!country) return null;
   const code = country.toUpperCase();
   if (SPANISH_COUNTRIES.has(code)) return "es";
@@ -95,12 +100,18 @@ export default function middleware(req: NextRequest) {
   if (queryCurrency) {
     setCurrencyCookie(res, queryCurrency);
   } else if (!cookieCurrency) {
-    const country =
-      req.headers.get("x-vercel-ip-country") ||
-      req.headers.get("cf-ipcountry") ||
-      null;
+    const country = getCountryCode(req);
     const inferred = currencyForCountry(country);
     setCurrencyCookie(res, inferred);
+  }
+
+  const debugCountry = getCountryCode(req);
+  if (debugCountry) {
+    res.cookies.set("aliigo_country_debug", debugCountry, {
+      path: "/",
+      maxAge: ONE_MONTH,
+      sameSite: "lax",
+    });
   }
 
   // 4) If locale IS in path, sync cookie to match it (nice-to-have)

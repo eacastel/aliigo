@@ -2,9 +2,11 @@
 
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { cookies } from "next/headers";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
+import { getCurrencyFromCookies } from "@/lib/currency";
 
 export default function PublicLayout({
   children,
@@ -12,6 +14,10 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   const t = useTranslations('Navigation');
+  const locale = useLocale();
+  const cookieStore = cookies();
+  const currency = getCurrencyFromCookies(cookieStore) ?? "EUR";
+  const debugCountry = cookieStore.get("aliigo_country_debug")?.value;
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-[#84c9ad]/30">
@@ -87,6 +93,11 @@ export default function PublicLayout({
              <p className="text-xs leading-5 text-zinc-600">
                &copy; {new Date().getFullYear()} Aliigo — {t('footer')}
              </p>
+            {debugCountry ? (
+              <p className="mt-2 text-[11px] text-zinc-500">
+                Locale: {locale.toUpperCase()} · Country: {debugCountry} · Currency: {currency}
+              </p>
+            ) : null}
           </div>
         </div>
       </footer>
