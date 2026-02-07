@@ -306,6 +306,7 @@ export default function SettingsAssistantPage() {
           goal: parsedSystem.goal,
           handoff: parsedSystem.handoff,
           cta: parsedSystem.cta,
+          supportEmail: "",
           intro: parsedSystem.intro,
           scope: parsedSystem.scope,
           styleRules: parsedSystem.styleRules,
