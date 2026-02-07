@@ -392,16 +392,14 @@ export default function SettingsAssistantPage() {
   }, [assistant, form]);
 
   const previewText = useMemo(() => {
-    const business =
-      form.businessSummary.trim() || t("preview.businessFallback");
     return t("preview.response", {
       tone: t(`preview.tone.${form.tone}`),
       goal: t(`preview.goal.${form.goal}`),
       handoff: t(`preview.handoff.${form.handoff}`),
       cta: t(`preview.cta.${form.cta}`),
-      business,
+      business: t("preview.businessFallback"),
     });
-  }, [form, t]);
+  }, [form.tone, form.goal, form.handoff, form.cta, t]);
 
   const autosavePresets = async () => {
     const saved = lastSavedForm.current;
@@ -709,29 +707,28 @@ export default function SettingsAssistantPage() {
                     ))}
                   </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
-            <div className="text-sm font-semibold text-zinc-100 mb-2">
-              {t("preview.title")}
-            </div>
-            <div className="text-xs text-zinc-400 mb-3">
-              {t("preview.subtitle")}
-            </div>
-            <div className="grid gap-3">
-              <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
-                <div className="text-[11px] text-zinc-500 mb-1">
-                  {t("preview.userLabel")}
-                </div>
-                {t("preview.userMessage")}
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
+              <div className="text-sm font-semibold text-zinc-100 mb-2">
+                {t("preview.title")}
               </div>
-              <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
-                <div className="text-[11px] text-zinc-500 mb-1">
-                  {t("preview.assistantLabel")}
+              <div className="text-xs text-zinc-400 mb-3">
+                {t("preview.subtitle")}
+              </div>
+              <div className="grid gap-3">
+                <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
+                  <div className="text-[11px] text-zinc-500 mb-1">
+                    {t("preview.userLabel")}
+                  </div>
+                  {t("preview.userMessage")}
                 </div>
-                {previewText}
+                <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
+                  <div className="text-[11px] text-zinc-500 mb-1">
+                    {t("preview.assistantLabel")}
+                  </div>
+                  {previewText}
+                </div>
               </div>
             </div>
           </div>
