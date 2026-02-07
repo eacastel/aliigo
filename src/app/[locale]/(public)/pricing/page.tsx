@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/routing";
-import { useTranslations, useLocale } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import { CheckCircle2, Sparkles, Building2, Store, Zap } from "lucide-react";
 import { ProContactForm } from "@/components/ProContactForm";
 import { cookies } from "next/headers";
@@ -10,9 +10,9 @@ export default async function PricingPage({
 }: {
   searchParams?: { currency?: string | string[] };
 }) {
-  const t = useTranslations("Landing");
-  const p = useTranslations("PricingPage");
-  const locale = useLocale();
+  const t = await getTranslations("Landing");
+  const p = await getTranslations("PricingPage");
+  const locale = await getLocale();
   const cookieStore = await cookies();
   const paramCurrency = Array.isArray(searchParams?.currency)
     ? searchParams?.currency[0]
