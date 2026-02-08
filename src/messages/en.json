@@ -26,7 +26,7 @@
       "logout": "Log out",
       "loggingOut": "Logging out…",
       "sidebarTitle": "Dashboard",
-      "getStarted": "Get started"
+      "getStarted": "Start free trial"
     },
     "footer": "All rights reserved.",
     "footerLinks": {
@@ -436,24 +436,29 @@
   "Landing": {
     "hero": {
       "betaNote": "Now live",
-      "title": "Give your website",
-      "titleHighlight": "a voice.",
-      "subtitle": "Aliigo is an AI assistant that lives on your website. It answers questions, understands intent, and turns real conversations into qualified leads automatically.",
-      "ctaPrimary": "Get started",
+      "title": "Turn website visitors",
+      "titleHighlight": "into qualified leads.",
+      "subtitle": "Aliigo is the AI assistant for your website. It answers questions instantly, captures contact details, and guides visitors to the right next step.",
+      "ctaPrimary": "Start free trial",
       "ctaSecondary": "See it in action",
-      "qualifier": "Best for businesses with consistent website traffic or a high volume of repetitive customer questions."
+      "qualifier": ""
 
     },
     "demo": {
       "badge": "Live interactive demo",
       "headlineLine1": "Don’t just read about it.",
       "headlineEmphasis": "Try it right now.",
-      "subtitle": "Type a question below. See how Aliigo answers complex questions, qualifies contacts, and books meetings in seconds—without a human agent.",
+      "subtitle": "Type a question below. See how Aliigo answers complex questions, qualifies contacts, and guides visitors to book a demo or contact you—without your team needing to reply instantly.",
 
       "feature1": "Instant AI replies",
       "feature2": "Automatic contact qualification",
 
       "cta": "Start free trial →",
+      "worksWith": {
+        "label": "Works with",
+        "note": "Install with one script tag",
+        "items": "WordPress · Webflow · Shopify · Wix · Squarespace · Custom sites"
+      },
 
       "phone": {
         "time": "9:41",
@@ -499,7 +504,7 @@
 
       "card3": {
         "title": "Drives the next step",
-        "desc": "More than text. It can show action buttons to book meetings, start trials, or open the right page.",
+        "desc": "More than text. It can guide visitors to book a demo, start a trial, or open the right page.",
         "cta": "Book a demo"
       },
 
@@ -586,11 +591,15 @@
       "q4": {
         "q": "How hard is setup?",
         "a": "Simple. We provide a small snippet for your website. Most businesses can go live the same day."
+      },
+      "q5": {
+        "q": "Is Aliigo worth it with low traffic?",
+        "a": "Yes. Even a few missed inquiries can be expensive. Aliigo helps you respond instantly and capture every opportunity."
       }
     },
     "finalCta": {
       "title": "Turn visitors into qualified leads",
-      "button": "Get started"
+      "button": "Start free trial"
     }
   },
   "Auth": {
