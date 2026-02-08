@@ -224,7 +224,11 @@ class AliigoWidget extends HTMLElement {
     }
 
     // If client embed (fixed mode), move to <body> so it's truly viewport-fixed.
-    if (this.getVariant() === "floating" && this.getFloatingMode() === "fixed") {
+    if (
+      this.getVariant() === "floating" &&
+      this.getFloatingMode() === "fixed" &&
+      !this.hasAttribute("data-no-teleport")
+    ) {
       const host = document.body;
       if (this.parentElement !== host) host.appendChild(this);
     }

@@ -72,6 +72,7 @@ export function AliigoSupportWidget() {
     <AliigoWidgetElement
       key={locale}
       dataOwner="support"
+      noTeleport
       variant="floating"
       floatingMode="fixed"
       locale={locale}

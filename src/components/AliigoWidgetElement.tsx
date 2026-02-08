@@ -27,6 +27,7 @@ export function AliigoWidgetElement({
   apiBase,
   embedKey,
   dataOwner,
+  noTeleport,
 }: {
   sessionToken?: string | null;
   locale: "en" | "es";
@@ -39,6 +40,7 @@ export function AliigoWidgetElement({
   apiBase?: string; // optional override
   embedKey?: string; // optional for real installs
   dataOwner?: string; // optional scoping for cleanup
+  noTeleport?: boolean;
 }) {
   const elRef = useRef<HTMLElement | null>(null);
 
@@ -101,6 +103,7 @@ export function AliigoWidgetElement({
     <aliigo-widget
       ref={elRef}
       data-owner={dataOwner}
+      data-no-teleport={noTeleport ? "true" : undefined}
       variant={variant}
       floating-mode={floatingMode}
       api-base={apiBase}
