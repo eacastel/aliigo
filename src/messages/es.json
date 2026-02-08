@@ -640,7 +640,7 @@
       "introText": "Confirma tu email para continuar. Después inicia sesión y accede a tu panel de control.",
       "emailPlaceholder": "Email de contacto *",
       "namePlaceholder": "Tu nombre *",
-      "businessPlaceholder": "Nombre de la organización (opcional)",
+      "businessPlaceholder": "Nombre de la organización *",
       "googleUrlPlaceholder": "Web o ficha de Google",
       "phonePlaceholder": "Teléfono (opcional)",
       "passwordPlaceholder": "Contraseña *",

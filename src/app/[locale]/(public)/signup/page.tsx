@@ -137,9 +137,6 @@ export default function SignupPage() {
     const normalizedName = name.trim();
     const normalizedBiz = businessName.trim();
     const normalizedPhone = phone.trim();
-    const fallbackBusiness =
-      locale === "es" ? "Mi negocio" : "My business";
-    const finalBusiness = normalizedBiz || fallbackBusiness;
 
     // Honeypot: if filled, silently pretend success (do not create account)
     if (fax.trim().length > 0) {
@@ -149,7 +146,7 @@ export default function SignupPage() {
     setError(null);
 
     // Validation
-    if (!normalizedEmail || !password || !normalizedName) {
+    if (!normalizedEmail || !password || !normalizedName || !normalizedBiz) {
       setError(t("errorValidation"));
       return;
     }
@@ -171,7 +168,7 @@ export default function SignupPage() {
           emailRedirectTo: `${window.location.origin}/${locale}/auth/callback?type=signup&next=/dashboard`,
           data: {
             full_name: normalizedName,
-            business_name: finalBusiness,
+            business_name: normalizedBiz,
             phone: normalizedPhone || undefined,
             locale,
           },
@@ -194,7 +191,7 @@ export default function SignupPage() {
         id: userId,
         email: normalizedEmail,
         name: normalizedName,
-        businessName: finalBusiness,
+        businessName: normalizedBiz,
         phone: normalizedPhone || undefined,
       });
 
@@ -206,7 +203,7 @@ export default function SignupPage() {
       // Local marker
       localStorage.setItem(
         "aliigo_pending_signup",
-      JSON.stringify({ email: normalizedEmail, businessName: finalBusiness })
+      JSON.stringify({ email: normalizedEmail, businessName: normalizedBiz })
       );
 
       router.push("/check-email");

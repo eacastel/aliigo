@@ -640,7 +640,7 @@
       "introText": "Confirm your email to continue. Then log in to activate and access your workspace.",
       "emailPlaceholder": "Contact email *",
       "namePlaceholder": "Your name *",
-      "businessPlaceholder": "Business name (Optional)",
+      "businessPlaceholder": "Organization Name *",
       "googleUrlPlaceholder": "Website or Google Business Profile",
       "phonePlaceholder": "Phone (Optional)",
       "passwordPlaceholder": "Password *",
