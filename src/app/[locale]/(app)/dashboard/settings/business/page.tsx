@@ -224,8 +224,6 @@ export default function SettingsBusinessPage() {
     );
   }, [profile, business]);
 
-  const domainInvalid =
-    business.allowed_domain.trim().length > 0 && !normalizedDomain;
   const normalizedDomain = useMemo(
     () => normalizeDomainInput(business.allowed_domain),
     [business.allowed_domain]
