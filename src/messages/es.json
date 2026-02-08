@@ -116,6 +116,16 @@
     "growthF2": "Flujos de equipo + analítica (próximamente)",
     "growthF3": "Soporte prioritario"
   },
+  "DashboardBusiness": {
+    "domains": {
+      "label": "Dominio permitido",
+      "placeholder": "ejemplo.com",
+      "help": "Introduce el dominio raíz sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
+      "invalid": "Introduce un dominio válido como ejemplo.com (o localhost para pruebas locales).",
+      "previewLabel": "Dominios permitidos",
+      "previewEmpty": "Introduce un dominio para ver lo que se permitirá."
+    }
+  },
   "Dashboard": {
     "help": {
       "title": "Centro de ayuda",
@@ -626,8 +636,8 @@
       "msgResendError": "Error al reenviar. Inténtalo más tarde."
     },
     "signup": {
-      "introTitle": "Crea tu cuenta de Aliigo",
-      "introText": "Confirma tu email para continuar. Después inicia sesión para activar la facturación y acceder a tu panel.",
+      "introTitle": "Empieza una prueba gratis",
+      "introText": "Confirma tu email para continuar. Después inicia sesión y accede a tu panel de control.",
       "emailPlaceholder": "Email de contacto *",
       "namePlaceholder": "Tu nombre *",
       "businessPlaceholder": "Nombre del negocio *",

@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useTranslations } from "next-intl";
 
 /* ---------- Types ---------- */
 type ProfileState = {
@@ -16,7 +17,7 @@ type ProfileState = {
 type BusinessState = {
   name: string;
   timezone: string;
-  allowed_domains: string; // textarea (one per line)
+  allowed_domain: string;
   default_locale: "en" | "es";
 };
 
@@ -49,19 +50,40 @@ function isProfileJoinRow(x: unknown): x is ProfileJoinRow {
   );
 }
 
-function domainsToText(domains: string[] | null | undefined): string {
-  return (domains ?? []).join("\n");
+function normalizeDomainInput(value: string): string | null {
+  const raw = value.trim().toLowerCase();
+  if (!raw) return null;
+  let host = raw;
+  try {
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
+      host = new URL(raw).hostname.toLowerCase();
+    }
+  } catch {
+    host = raw;
+  }
+  host = host.split("/")[0].split(":")[0].trim();
+  if (host.startsWith("www.")) host = host.slice(4);
+  if (host === "localhost" || host === "127.0.0.1") return host;
+  if (!host || !host.includes(".")) return null;
+  if (!/^[a-z0-9.-]+$/.test(host)) return null;
+  if (host.startsWith(".") || host.endsWith(".") || host.includes("..")) return null;
+  return host;
 }
-function textToDomains(text: string): string[] {
-  return text
-    .split("\n")
-    .map((s) => s.trim().toLowerCase())
+
+function domainsToBase(domains: string[] | null | undefined): string {
+  const list = (domains ?? []).filter(Boolean);
+  if (list.length === 0) return "";
+  const normalized = list
+    .map((d) => (typeof d === "string" ? d.trim().toLowerCase() : ""))
     .filter(Boolean)
-    .filter((d, i, a) => a.indexOf(d) === i);
+    .map((d) => (d.startsWith("www.") ? d.slice(4) : d));
+  const base = normalized[0] ?? "";
+  return base;
 }
 
 export default function SettingsBusinessPage() {
   const router = useRouter();
+  const t = useTranslations("DashboardBusiness");
 
   const [loading, setLoading] = useState(true);
   const [unauth, setUnauth] = useState(false);
@@ -76,7 +98,7 @@ export default function SettingsBusinessPage() {
   const [business, setBusiness] = useState<BusinessState>({
     name: "",
     timezone: "Europe/Madrid",
-    allowed_domains: "",
+    allowed_domain: "",
     default_locale: "en",
   });
 
@@ -159,7 +181,7 @@ export default function SettingsBusinessPage() {
         const nextBusiness: BusinessState = {
           name: biz.name ?? "",
           timezone: biz.timezone ?? "Europe/Madrid",
-          allowed_domains: domainsToText(biz.allowed_domains),
+          allowed_domain: domainsToBase(biz.allowed_domains),
           default_locale: biz.default_locale === "es" ? "es" : "en",
         };
 
@@ -170,7 +192,7 @@ export default function SettingsBusinessPage() {
         const empty: BusinessState = {
           name: "",
           timezone: "Europe/Madrid",
-          allowed_domains: "",
+          allowed_domain: "",
           default_locale: "en",
         };
         setBusiness(empty);
@@ -197,12 +219,27 @@ export default function SettingsBusinessPage() {
       profile.telefono.trim() !== ip.telefono.trim() ||
       business.name.trim() !== ib.name.trim() ||
       business.timezone.trim() !== ib.timezone.trim() ||
-      business.allowed_domains.trim() !== ib.allowed_domains.trim() ||
+      business.allowed_domain.trim() !== ib.allowed_domain.trim() ||
       business.default_locale !== ib.default_locale
     );
   }, [profile, business]);
 
-  const valid = useMemo(() => business.name.trim().length > 0, [business.name]);
+  const domainInvalid =
+    business.allowed_domain.trim().length > 0 && !normalizedDomain;
+  const valid = useMemo(
+    () => business.name.trim().length > 0 && !domainInvalid,
+    [business.name, domainInvalid]
+  );
+  const normalizedDomain = useMemo(
+    () => normalizeDomainInput(business.allowed_domain),
+    [business.allowed_domain]
+  );
+  const allowedDomainList = useMemo(() => {
+    if (!normalizedDomain) return [];
+    if (normalizedDomain === "localhost") return ["localhost", "127.0.0.1"];
+    if (normalizedDomain === "127.0.0.1") return ["127.0.0.1", "localhost"];
+    return [normalizedDomain, `www.${normalizedDomain}`];
+  }, [normalizedDomain]);
 
   const save = async () => {
     setMsg(null);
@@ -225,7 +262,7 @@ export default function SettingsBusinessPage() {
         business: {
           name: business.name,
           timezone: business.timezone,
-          allowed_domains: textToDomains(business.allowed_domains),
+          allowed_domains: allowedDomainList,
           default_locale: business.default_locale,
         },
       };
@@ -260,7 +297,7 @@ export default function SettingsBusinessPage() {
         const nextBusiness: BusinessState = {
           name: j.business.name ?? business.name,
           timezone: j.business.timezone ?? business.timezone,
-          allowed_domains: domainsToText(j.business.allowed_domains),
+          allowed_domain: domainsToBase(j.business.allowed_domains),
           default_locale:
             j.business.default_locale === "es" ? "es" : business.default_locale,
         };
@@ -431,19 +468,45 @@ export default function SettingsBusinessPage() {
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                Allowed domains (one per line)
+                {t("domains.label")}
               </label>
-              <textarea
-                className="w-full min-h-[120px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder={"example.com\nwww.example.com"}
-                value={business.allowed_domains}
+              <input
+                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                placeholder={t("domains.placeholder")}
+                value={business.allowed_domain}
                 onChange={(e) =>
-                  setBusiness((b) => ({ ...b, allowed_domains: e.target.value }))
+                  setBusiness((b) => ({ ...b, allowed_domain: e.target.value }))
                 }
               />
-              <p className="text-[11px] text-zinc-500 mt-1">
-                Widget requests are accepted only from these hostnames (and subdomains).
+              <p className="text-[11px] text-zinc-500 mt-2">
+                {t("domains.help")}
               </p>
+              {domainInvalid && (
+                <p className="text-[11px] text-red-400 mt-1">
+                  {t("domains.invalid")}
+                </p>
+              )}
+              <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2 text-xs text-zinc-300">
+                <div className="text-[11px] text-zinc-500 mb-1">
+                  {t("domains.previewLabel")}
+                </div>
+                {allowedDomainList.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {allowedDomainList.map((d) => (
+                      <span
+                        key={d}
+                        className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2 py-1 text-[11px]"
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-[11px] text-zinc-500">
+                    {t("domains.previewEmpty")}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>

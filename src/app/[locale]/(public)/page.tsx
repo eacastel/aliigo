@@ -521,7 +521,7 @@ export default function HomePage() {
 
       {/* CTA BAND */}
       <section className="border-t border-b border-white/5 bg-zinc-950/70">
-        <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="max-w-2xl mx-auto px-4 py-10">
           <div className="rounded-2xl border border-white/10 bg-zinc-900/50 px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-lg font-semibold text-white text-center sm:text-left">
               {t("ctaBand.title")}

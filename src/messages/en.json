@@ -115,6 +115,16 @@
     "growthF2": "Team workflows + analytics (coming)",
     "growthF3": "Priority support"
   },
+  "DashboardBusiness": {
+    "domains": {
+      "label": "Allowed domain",
+      "placeholder": "example.com",
+      "help": "Enter your root domain without http(s) or www. We will automatically allow both versions.",
+      "invalid": "Please enter a valid domain like example.com (or localhost for local testing).",
+      "previewLabel": "Domains allowed",
+      "previewEmpty": "Enter a domain to see what will be allowed."
+    }
+  },
   "Dashboard": {
     "help": {
       "title": "Help Center",
@@ -626,8 +636,8 @@
       "msgResendError": "Error resending. Try again later."
     },
     "signup": {
-      "introTitle": "Create your Aliigo account",
-      "introText": "Confirm your email to continue. Then log in to activate billing and access your workspace.",
+      "introTitle": "Start free trial",
+      "introText": "Confirm your email to continue. Then log in to activate and access your workspace.",
       "emailPlaceholder": "Contact email *",
       "namePlaceholder": "Your name *",
       "businessPlaceholder": "Business name *",

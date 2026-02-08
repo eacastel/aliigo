@@ -26,13 +26,35 @@ type BusinessPayload = {
 const nonEmpty = (v: unknown) =>
   typeof v === "string" ? (v.trim().length > 0 ? v.trim() : null) : v ?? null;
 
+function normalizeHostname(input: string): string | null {
+  const raw = input.trim().toLowerCase();
+  if (!raw) return null;
+  let host = raw;
+  try {
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
+      host = new URL(raw).hostname.toLowerCase();
+    }
+  } catch {
+    host = raw;
+  }
+  host = host.split("/")[0].split(":")[0].trim();
+  if (host.startsWith("www.")) host = host.slice(4);
+  if (host === "localhost" || host === "127.0.0.1") return host;
+  if (!host || !host.includes(".")) return null;
+  if (!/^[a-z0-9.-]+$/.test(host)) return null;
+  if (host.startsWith(".") || host.endsWith(".") || host.includes("..")) return null;
+  return host;
+}
+
 function normalizeDomains(domains: unknown): string[] | null {
   if (!Array.isArray(domains)) return null;
-  const cleaned = domains
-    .map((d) => (typeof d === "string" ? d.trim().toLowerCase() : ""))
-    .filter(Boolean);
-  // unique
-  return Array.from(new Set(cleaned));
+  const first = domains.find((d) => typeof d === "string" && d.trim().length > 0);
+  if (!first || typeof first !== "string") return [];
+  const base = normalizeHostname(first);
+  if (!base) return [];
+  if (base === "localhost") return ["localhost", "127.0.0.1"];
+  if (base === "127.0.0.1") return ["127.0.0.1", "localhost"];
+  return [base, `www.${base}`];
 }
 
 export async function POST(req: NextRequest) {
