@@ -66,8 +66,8 @@ export function AliigoWidgetElement({
   useEffect(() => {
     return () => {
       const el = elRef.current;
-      if (el && el.parentElement) {
-        el.parentElement.removeChild(el);
+      if (el && el.isConnected) {
+        el.remove();
       }
     };
   }, []);
@@ -79,8 +79,8 @@ export function AliigoWidgetElement({
     const selector = `aliigo-widget[data-owner="${dataOwner}"]`;
     const nodes = Array.from(document.querySelectorAll(selector));
     nodes.forEach((node) => {
-      if (node !== el && node.parentElement) {
-        node.parentElement.removeChild(node);
+      if (node !== el && (node as Element).isConnected) {
+        (node as Element).remove();
       }
     });
   }, [dataOwner]);
