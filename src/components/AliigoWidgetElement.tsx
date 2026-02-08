@@ -26,6 +26,7 @@ export function AliigoWidgetElement({
   hideHeader,
   apiBase,
   embedKey,
+  dataOwner,
 }: {
   sessionToken?: string | null;
   locale: "en" | "es";
@@ -37,6 +38,7 @@ export function AliigoWidgetElement({
   hideHeader?: boolean;
   apiBase?: string; // optional override
   embedKey?: string; // optional for real installs
+  dataOwner?: string; // optional scoping for cleanup
 }) {
   const elRef = useRef<HTMLElement | null>(null);
 
@@ -70,6 +72,19 @@ export function AliigoWidgetElement({
     };
   }, []);
 
+  useEffect(() => {
+    if (!dataOwner) return;
+    const el = elRef.current;
+    if (!el) return;
+    const selector = `aliigo-widget[data-owner="${dataOwner}"]`;
+    const nodes = Array.from(document.querySelectorAll(selector));
+    nodes.forEach((node) => {
+      if (node !== el && node.parentElement) {
+        node.parentElement.removeChild(node);
+      }
+    });
+  }, [dataOwner]);
+
   // If token missing, don’t render the element (your current behavior).
   if (!sessionToken && !embedKey) return null;
 
@@ -78,6 +93,7 @@ export function AliigoWidgetElement({
   return (
     <aliigo-widget
       ref={elRef}
+      data-owner={dataOwner}
       variant={variant}
       floating-mode={floatingMode}
       api-base={apiBase}

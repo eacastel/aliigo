@@ -690,6 +690,13 @@ class AliigoWidget extends HTMLElement {
         bottom: 20px;
         z-index: 99999;
       }
+      @media (max-width: 640px) {
+        .floating.fixed {
+          right: 16px;
+          left: auto;
+          bottom: 16px;
+        }
+      }
       .floating.absolute {
         position: absolute;
         inset: 0;

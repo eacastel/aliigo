@@ -69,15 +69,15 @@ export function AliigoSupportWidget() {
   if (!cfg?.token) return null;
 
   return (
-    <div id="aliigo-widget">
-      <AliigoWidgetElement
-        variant="floating"
-        floatingMode="fixed"
-        locale={locale}
-        brand={cfg.brand}
-        sessionToken={cfg.token}
-        theme={cfg.theme ?? undefined}
-      />
-    </div>
+    <AliigoWidgetElement
+      key={locale}
+      dataOwner="support"
+      variant="floating"
+      floatingMode="fixed"
+      locale={locale}
+      brand={cfg.brand}
+      sessionToken={cfg.token}
+      theme={cfg.theme ?? undefined}
+    />
   );
 }

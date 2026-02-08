@@ -74,9 +74,7 @@ function HomeFloatingWidgetGate() {
   if (!show) return null;
 
   return (
-    <div id="aliigo-widget">
-      <AliigoSupportWidget />
-    </div>
+    <AliigoSupportWidget />
   );
 }
 

@@ -17,24 +17,22 @@ export function WorksWithRow({ className }: WorksWithRowProps) {
 
   return (
     <div className={className}>
-      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+      <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
         {t("demo.worksWith.label")}
       </div>
-      <div className="mt-3 flex flex-wrap gap-3">
+      <div className="mt-4 flex flex-wrap gap-3">
         {logos.map((logo) => (
           <span
             key={logo.key}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-300"
+            className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-zinc-300 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
           >
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-zinc-800/60">
-              <img
-                src={logo.file}
-                alt={`${logo.key} logo`}
-                className="h-4 w-4 object-contain"
-                loading="lazy"
-              />
-            </span>
-            <span>{logo.key}</span>
+            <img
+              src={logo.file}
+              alt={`${logo.key} logo`}
+              className="h-5 w-5 md:h-6 md:w-6 object-contain opacity-80"
+              loading="lazy"
+            />
+            <span className="font-medium">{logo.key}</span>
           </span>
         ))}
       </div>
