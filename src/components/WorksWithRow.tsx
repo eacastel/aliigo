@@ -21,19 +21,21 @@ export function WorksWithRow({ className }: WorksWithRowProps) {
       <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-zinc-500/80 text-center">
         {t("demo.worksWith.label")}
       </div>
-      <div className="mt-6 flex flex-wrap justify-center gap-8 md:gap-10">
+      <div className="mt-6 flex flex-wrap justify-center gap-8 md:gap-12">
         {logos.map((logo) => (
           <span
             key={logo.key}
-            className="inline-flex flex-col items-center gap-2 px-2 py-1 text-[13px] text-zinc-400/90"
+            className="group inline-flex flex-col items-center gap-2 px-2 py-1 text-[13px] text-zinc-300/90 transition-transform duration-200 hover:-translate-y-0.5"
           >
             <img
               src={logo.file}
               alt={`${logo.key} logo`}
-              className="h-9 w-9 md:h-12 md:w-12 object-contain opacity-90"
+              className="h-9 w-9 md:h-12 md:w-12 object-contain opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:scale-[1.06] drop-shadow-[0_0_12px_rgba(148,163,184,0.25)]"
               loading="lazy"
             />
-            <span className="font-medium">{logo.key}</span>
+            <span className="font-medium text-zinc-300/90 group-hover:text-zinc-200">
+              {logo.key}
+            </span>
           </span>
         ))}
       </div>

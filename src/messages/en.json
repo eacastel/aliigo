@@ -444,6 +444,10 @@
       "qualifier": ""
 
     },
+    "ctaBand": {
+      "title": "Ready to try Aliigo?",
+      "button": "Start free trial"
+    },
     "demo": {
       "badge": "Live interactive demo",
       "headlineLine1": "Don’t just read about it.",

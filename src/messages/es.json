@@ -445,6 +445,10 @@
       "qualifier": ""
 
     },
+    "ctaBand": {
+      "title": "¿Listo para probar Aliigo?",
+      "button": "Empieza una prueba gratis"
+    },
     "demo": {
       "badge": "Demo interactiva en vivo",
       "headlineLine1": "No te quedes solo con la teoría.",
