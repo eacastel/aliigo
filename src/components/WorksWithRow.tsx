@@ -6,7 +6,6 @@ type WorksWithRowProps = {
 
 export function WorksWithRow({ className }: WorksWithRowProps) {
   const t = useTranslations("Landing");
-  const items = t("demo.worksWith.items");
   const logos = [
     { key: "WordPress", file: "/brands/wordpress.svg" },
     { key: "Webflow", file: "/brands/webflow.svg" },
@@ -21,17 +20,7 @@ export function WorksWithRow({ className }: WorksWithRowProps) {
       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
         {t("demo.worksWith.label")}
       </div>
-      <div className="mt-2 flex flex-wrap gap-2 text-sm text-zinc-300">
-        {items.split("·").map((item) => (
-          <span
-            key={item.trim()}
-            className="rounded-full border border-white/10 bg-zinc-900/60 px-3 py-1"
-          >
-            {item.trim()}
-          </span>
-        ))}
-      </div>
-      <div className="mt-4 flex flex-wrap gap-3">
+      <div className="mt-3 flex flex-wrap gap-3">
         {logos.map((logo) => (
           <span
             key={logo.key}

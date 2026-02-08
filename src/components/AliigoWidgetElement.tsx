@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -38,6 +38,8 @@ export function AliigoWidgetElement({
   apiBase?: string; // optional override
   embedKey?: string; // optional for real installs
 }) {
+  const elRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.__aliigoWidgetV1Loaded) return;
@@ -59,6 +61,15 @@ export function AliigoWidgetElement({
     document.head.appendChild(s);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      const el = elRef.current;
+      if (el && el.parentElement) {
+        el.parentElement.removeChild(el);
+      }
+    };
+  }, []);
+
   // If token missing, don’t render the element (your current behavior).
   if (!sessionToken && !embedKey) return null;
 
@@ -66,6 +77,7 @@ export function AliigoWidgetElement({
 
   return (
     <aliigo-widget
+      ref={elRef}
       variant={variant}
       floating-mode={floatingMode}
       api-base={apiBase}

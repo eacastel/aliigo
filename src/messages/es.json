@@ -26,7 +26,7 @@
       "logout": "Cerrar sesión",
       "loggingOut": "Saliendo…",
       "sidebarTitle": "Panel",
-      "getStarted": "Empieza la prueba gratis"
+      "getStarted": "Empieza una prueba gratis"
     },
     "footer": "Todos los derechos reservados.",
     "footerLinks": {
@@ -41,7 +41,7 @@
     "title": "Precios que crecen con tu negocio",
     "subtitle": "Empieza con Starter o Growth. Para Pro, hablemos.",
     "description": "Todos los planes incluyen la experiencia Aliigo, el widget seguro y soporte multilingüe. Inicia la prueba gratuita de 30 días y cambia de plan cuando quieras.",
-    "ctaPrimary": "Iniciar prueba gratis",
+    "ctaPrimary": "Empieza una prueba gratis",
     "ctaSecondary": "Hablar con ventas",
     "contactTitle": "Contacta con nosotros sobre Aliigo Pro",
     "contactSubtitle": "Cuéntanos tu volumen, canales y flujos para adaptar el plan.",
@@ -437,10 +437,10 @@
   "Landing": {
     "hero": {
       "betaNote": "Ya disponible",
-      "title": "Convierte visitantes",
-      "titleHighlight": "en oportunidades reales.",
+      "title": "Convierte tus visitas",
+      "titleHighlight": "en clientes.",
       "subtitle": "Aliigo es el asistente de IA para tu web. Responde al instante, capta contactos y guía a cada visitante al siguiente paso.",
-      "ctaPrimary": "Empieza la prueba gratis",
+      "ctaPrimary": "Empieza una prueba gratis",
       "ctaSecondary": "Ver en acción",
       "qualifier": ""
 
@@ -452,7 +452,7 @@
       "subtitle": "Escribe tu pregunta. Observa cómo Aliigo responde consultas complejas, cualifica contactos y guía a los visitantes a reservar una demo o contactarte—sin que tu equipo tenga que responder al instante.",
       "feature1": "Respuestas instantáneas con IA",
       "feature2": "Cualificación automática de contactos",
-      "cta": "Empieza tu prueba gratis",
+      "cta": "Empieza una prueba gratis",
       "worksWith": {
         "label": "Funciona con",
         "note": "Instalación con un solo script",
@@ -521,7 +521,7 @@
       "starter": {
         "name": "Starter",
         "subtitle": "Ideal para pequeños negocios locales.",
-        "cta": "Empieza la prueba gratis",
+        "cta": "Empieza una prueba gratis",
         "features": {
           "f1": "Asistente de chat inteligente en tu web",
           "f2": "Amplio volumen mensual de conversaciones",
@@ -535,7 +535,7 @@
         "name": "Growth",
         "subtitle": "Ideal para clínicas, agencias y negocios de servicios.",
         "tag": "Mejor opción",
-        "cta": "Empieza la prueba gratis",
+        "cta": "Empieza una prueba gratis",
         "plusLabel": "Todo lo de Starter, y además:",
         "features": {
           "f1": "Más volumen de conversaciones",
@@ -599,7 +599,7 @@
     },
     "finalCta": {
       "title": "Convierte visitas en oportunidades cualificadas",
-      "button": "Empieza la prueba gratis"
+      "button": "Empieza una prueba gratis"
     }
   },
   "Auth": {

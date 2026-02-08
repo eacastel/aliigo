@@ -147,7 +147,6 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <WorksWithRow className="mt-6" />
             </div>
 
             <div className="relative">
@@ -157,6 +156,13 @@ export default function HomePage() {
               <div className="absolute -inset-1 -z-10 bg-gradient-to-tr from-[#84c9ad] to-blue-600 opacity-20 blur-xl rounded-2xl" />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* WORKS WITH STRIP */}
+      <section className="border-b border-white/5 bg-zinc-950/60">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <WorksWithRow />
         </div>
       </section>
 
