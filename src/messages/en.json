@@ -500,7 +500,7 @@
       "subtitle": "Aliigo doesn’t just “chat.” It understands your business logic to drive real results.",
 
       "card1": {
-        "title": "Trains on your data instantly",
+        "title": "Learns from your content instantly",
         "desc": "No manual flowcharting. Aliigo scans your website, PDFs, and docs to build a knowledge base that answers accurately from day one.",
         "syncLabel": "SYNC_STATUS: ACTIVE",
         "tagUrl": "URL",
@@ -612,7 +612,7 @@
       }
     },
     "finalCta": {
-      "title": "Turn visitors into qualified leads",
+      "title": "Turn visitors into customers",
       "button": "Start free trial"
     }
   },
@@ -640,9 +640,9 @@
       "introText": "Confirm your email to continue. Then log in to activate and access your workspace.",
       "emailPlaceholder": "Contact email *",
       "namePlaceholder": "Your name *",
-      "businessPlaceholder": "Business name *",
+      "businessPlaceholder": "Business name (Optional)",
       "googleUrlPlaceholder": "Website or Google Business Profile",
-      "phonePlaceholder": "Phone *",
+      "phonePlaceholder": "Phone (Optional)",
       "passwordPlaceholder": "Password *",
       "submitButton": "Create account",
       "disclaimer": "We use this information to create your workspace and help you onboard. You control what you share with visitors.",

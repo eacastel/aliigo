@@ -2,7 +2,7 @@
   "Metadata": {
     "title": "Aliigo — Asistente IA para tu Web",
     "titleTemplate": "%s | Aliigo",
-    "description": "Un asistente de IA controlado por tu organización para tu sitio web y canales de comunicación digital, que responde al instante, comparte información fiable, acompaña y guía a los visitantes al siguiente paso adecuado — diseñado tanto para empresas como para organizaciones sin ánimo de lucro y centros educativos."
+    "description": "Un asistente de IA, bajo el control de tu organización, para tu web: responde al instante, comparte información fiable y guía a cada visitante al siguiente paso. Para empresas, ONGs y centros educativos."
   },
   "Navigation": {
     "brand": "Aliigo",
@@ -26,7 +26,7 @@
       "logout": "Cerrar sesión",
       "loggingOut": "Saliendo…",
       "sidebarTitle": "Panel",
-      "getStarted": "Empieza una prueba gratis"
+      "getStarted": "Empieza tu prueba gratis"
     },
     "footer": "Todos los derechos reservados.",
     "footerLinks": {
@@ -41,10 +41,10 @@
     "title": "Precios que crecen con tu negocio",
     "subtitle": "Empieza con Starter o Growth. Para Pro, hablemos.",
     "description": "Todos los planes incluyen la experiencia Aliigo, el widget seguro y soporte multilingüe. Inicia la prueba gratuita de 30 días y cambia de plan cuando quieras.",
-    "ctaPrimary": "Empieza una prueba gratis",
-    "ctaSecondary": "Hablar con ventas",
-    "contactTitle": "Contacta con nosotros sobre Aliigo Pro",
-    "contactSubtitle": "Cuéntanos tu volumen, canales y flujos para adaptar el plan.",
+    "ctaPrimary": "Empieza tu prueba gratis",
+    "ctaSecondary": "Hablar con el equipo comercial",
+    "contactTitle": "Consulta Aliigo Pro",
+    "contactSubtitle": "Cuéntanos tu volumen, tus canales y tus flujos de trabajo para ajustarlo a medida.",
     "contactNote": "Respondemos en 1 día laborable.",
     "form": {
       "name": "Nombre y apellidos",
@@ -449,15 +449,15 @@
       "betaNote": "Ya disponible",
       "title": "Convierte tus visitas",
       "titleHighlight": "en clientes.",
-      "subtitle": "Aliigo es el asistente de IA para tu web. Responde al instante, capta contactos y guía a cada visitante al siguiente paso.",
-      "ctaPrimary": "Empieza una prueba gratis",
+      "subtitle": "Escribe tu pregunta. Observa cómo Aliigo responde consultas complejas, cualifica contactos y guía a los visitantes a pedir una demo o a contactarte—sin que tu equipo tenga que responder al instante.",
+      "ctaPrimary": "Empieza tu prueba gratis",
       "ctaSecondary": "Ver en acción",
       "qualifier": ""
 
     },
     "ctaBand": {
       "title": "¿Listo para probar Aliigo?",
-      "button": "Empieza una prueba gratis"
+      "button": "Empieza tu prueba gratis"
     },
     "demo": {
       "badge": "Demo interactiva en vivo",
@@ -466,7 +466,7 @@
       "subtitle": "Escribe tu pregunta. Observa cómo Aliigo responde consultas complejas, cualifica contactos y guía a los visitantes a reservar una demo o contactarte—sin que tu equipo tenga que responder al instante.",
       "feature1": "Respuestas instantáneas con IA",
       "feature2": "Cualificación automática de contactos",
-      "cta": "Empieza una prueba gratis",
+      "cta": "Empieza tu prueba gratis",
       "worksWith": {
         "label": "Funciona con",
         "note": "Instalación con un solo script",
@@ -498,7 +498,7 @@
 
       "card1": {
         "title": "Aprende de tu contenido al instante",
-        "desc": "Sin diagramas ni flujos manuales. Aliigo analiza tu web, PDFs y documentos para crear una base de conocimiento que responde bien desde el primer día.",
+        "desc": "Sin diagramas ni flujos a mano. Aliigo analiza tu web, PDFs y documentos para crear una base de conocimiento que responde bien desde el primer día.",
         "syncLabel": "ESTADO_SYNC: ACTIVO",
         "tagUrl": "URL",
         "tagPdf": "PDF",
@@ -515,7 +515,7 @@
 
       "card3": {
         "title": "Guía el siguiente paso",
-        "desc": "Más que texto. Puede guiar a reservar una demo, iniciar una prueba o abrir la página correcta.",
+        "desc": "Más que texto. Puede guiar a pedir una demo, iniciar una prueba o abrir la página correcta.",
         "cta": "Agenda una cita"
       },
 
@@ -535,7 +535,7 @@
       "starter": {
         "name": "Starter",
         "subtitle": "Ideal para pequeños negocios locales.",
-        "cta": "Empieza una prueba gratis",
+        "cta": "Empieza tu prueba gratis",
         "features": {
           "f1": "Asistente de chat inteligente en tu web",
           "f2": "Amplio volumen mensual de conversaciones",
@@ -549,7 +549,7 @@
         "name": "Growth",
         "subtitle": "Ideal para clínicas, agencias y negocios de servicios.",
         "tag": "Mejor opción",
-        "cta": "Empieza una prueba gratis",
+        "cta": "Empieza tu prueba gratis",
         "plusLabel": "Todo lo de Starter, y además:",
         "features": {
           "f1": "Más volumen de conversaciones",
@@ -585,7 +585,7 @@
       },
       "step3": {
         "title": "Publícalo en tu web",
-        "desc": "Añade un pequeño snippet y el asistente estará activo al instante."
+        "desc": "Añade un pequeño fragmento de código a tu web y el asistente estará activo al instante."
       }
     },
     "faq": {
@@ -613,7 +613,7 @@
     },
     "finalCta": {
       "title": "Convierte visitas en oportunidades cualificadas",
-      "button": "Empieza una prueba gratis"
+      "button": "Empieza tu prueba gratis"
     }
   },
   "Auth": {
@@ -636,13 +636,13 @@
       "msgResendError": "Error al reenviar. Inténtalo más tarde."
     },
     "signup": {
-      "introTitle": "Empieza una prueba gratis",
+      "introTitle": "Empieza tu prueba gratis",
       "introText": "Confirma tu email para continuar. Después inicia sesión y accede a tu panel de control.",
       "emailPlaceholder": "Email de contacto *",
       "namePlaceholder": "Tu nombre *",
-      "businessPlaceholder": "Nombre del negocio *",
+      "businessPlaceholder": "Nombre de la organización (opcional)",
       "googleUrlPlaceholder": "Web o ficha de Google",
-      "phonePlaceholder": "Teléfono *",
+      "phonePlaceholder": "Teléfono (opcional)",
       "passwordPlaceholder": "Contraseña *",
       "submitButton": "Crear cuenta",
       "disclaimer": "Usaremos esta información para crear tu panel y ayudarte con el onboarding. Tú decides qué se muestra a los visitantes.",
@@ -660,7 +660,7 @@
       "list1": "Confirma tu email",
       "list2": "Inicia sesión en tu cuenta",
       "list3": "Activa la facturación para publicar",
-      "footer": "Si no ves el email, revisa spam o promociones e inténtalo de nuevo en un minuto. Si ya estás dado de alta con esta misma cuenta te enviaremos un nuevo correo de confirmación o reestablece tu contraseña.",
+      "footer": "Si no ves el email, revisa spam o promociones y vuelve a intentarlo en un minuto. Si ya te registraste con este correo, puedes reenviar el email de confirmación o restablecer tu contraseña.",
       "backLink": "Volver al login"
     },
     "reset": {
