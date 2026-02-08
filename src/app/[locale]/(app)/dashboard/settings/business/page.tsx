@@ -226,13 +226,15 @@ export default function SettingsBusinessPage() {
 
   const domainInvalid =
     business.allowed_domain.trim().length > 0 && !normalizedDomain;
-  const valid = useMemo(
-    () => business.name.trim().length > 0 && !domainInvalid,
-    [business.name, domainInvalid]
-  );
   const normalizedDomain = useMemo(
     () => normalizeDomainInput(business.allowed_domain),
     [business.allowed_domain]
+  );
+  const domainInvalid =
+    business.allowed_domain.trim().length > 0 && !normalizedDomain;
+  const valid = useMemo(
+    () => business.name.trim().length > 0 && !domainInvalid,
+    [business.name, domainInvalid]
   );
   const allowedDomainList = useMemo(() => {
     if (!normalizedDomain) return [];
