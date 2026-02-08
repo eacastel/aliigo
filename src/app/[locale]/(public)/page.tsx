@@ -83,8 +83,15 @@ export default function HomePage() {
   const t = useTranslations("Landing");
   const locale = useLocale();
   const heroQualifier = t("hero.qualifier");
-  const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
-  const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
+  const [currency, setCurrency] = useState<AliigoCurrency>("EUR");
+
+  useEffect(() => {
+    const next = (getClientCurrency() ?? "EUR") as AliigoCurrency;
+    setCurrency(next);
+  }, []);
+
+  const displayLocale = currency === "USD" ? "en-US" : locale;
+  const priceFmt = new Intl.NumberFormat(displayLocale, { style: "currency", currency, maximumFractionDigits: 0 });
   const starterPrice = priceFmt.format(99);
   const growthPrice = priceFmt.format(149);
   const proPrice = priceFmt.format(349);

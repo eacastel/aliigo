@@ -94,11 +94,9 @@ export default async function PublicLayout({
              <p className="text-xs leading-5 text-zinc-600">
                &copy; {new Date().getFullYear()} Aliigo — {t('footer')}
              </p>
-            {debugCountry ? (
-              <p className="mt-2 text-[11px] text-zinc-500">
-                Locale: {locale.toUpperCase()} · Country: {debugCountry} · Currency: {currency}
-              </p>
-            ) : null}
+            <p className="mt-2 text-[11px] text-zinc-500">
+              Locale: {locale.toUpperCase()} · Country: {debugCountry ?? "Unknown"} · Currency: {currency}
+            </p>
           </div>
         </div>
       </footer>

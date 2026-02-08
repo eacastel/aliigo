@@ -65,7 +65,8 @@ export default function BillingPage() {
 
   // --- pricing (display only; keep in sync with Stripe) ---
   const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
-  const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
+  const displayLocale = currency === "USD" ? "en-US" : locale;
+  const priceFmt = new Intl.NumberFormat(displayLocale, { style: "currency", currency, maximumFractionDigits: 0 });
   const priceForPlan = (p: BillingPlan) =>
     p === "starter" ? priceFmt.format(99) : p === "growth" ? priceFmt.format(149) : "—";
   const starterPrice = priceForPlan("starter");

@@ -12,6 +12,9 @@ We set a cookie named `aliigo_currency` via middleware:
 - EU/EEA → `EUR`
 - US/other → `USD`
 - Manual override: `?currency=EUR` or `?currency=USD`
+- If country is unavailable (e.g., localhost), we fall back to locale:
+  - `es` → `EUR`
+  - `en` → `USD`
 
 This cookie is used for:
 - Pricing display on public pages

@@ -21,7 +21,8 @@ export default async function PricingPage({
     (paramCurrency?.toUpperCase() === "USD" || paramCurrency?.toUpperCase() === "EUR"
       ? (paramCurrency.toUpperCase() as AliigoCurrency)
       : getCurrencyFromCookies(cookieStore)) ?? "EUR";
-  const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
+  const displayLocale = currency === "USD" ? "en-US" : locale;
+  const priceFmt = new Intl.NumberFormat(displayLocale, { style: "currency", currency, maximumFractionDigits: 0 });
   const starterPrice = priceFmt.format(99);
   const growthPrice = priceFmt.format(149);
   const proPrice = priceFmt.format(349);

@@ -64,6 +64,13 @@ function setCurrencyCookie(res: NextResponse, currency: string) {
   });
 }
 
+function inferredCurrency(req: NextRequest): "EUR" | "USD" {
+  const country = getCountryCode(req);
+  if (country) return currencyForCountry(country);
+  const locale = getPathLocale(req.nextUrl.pathname) || getCookieLocale(req) || getBrowserLocale(req);
+  return locale === "es" ? "EUR" : "USD";
+}
+
 export default function middleware(req: NextRequest) {
   // 1) Keep your www redirect
   const host = req.headers.get("host") || "";
@@ -100,8 +107,7 @@ export default function middleware(req: NextRequest) {
   if (queryCurrency) {
     setCurrencyCookie(res, queryCurrency);
   } else {
-    const country = getCountryCode(req);
-    const inferred = currencyForCountry(country);
+    const inferred = inferredCurrency(req);
     if (!cookieCurrency || cookieCurrency !== inferred) {
       setCurrencyCookie(res, inferred);
     }
