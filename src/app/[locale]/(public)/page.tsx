@@ -8,6 +8,7 @@ import { useTranslations, useLocale } from "next-intl";
 import HeroRotator from "@/components/HeroRotator";
 import { HomepageAssistantDemo } from "@/components/HomepageAssistantDemo";
 import { AliigoSupportWidget } from "@/components/AliigoSupportWidget";
+import { WorksWithRow } from "@/components/WorksWithRow";
 import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
 import {
   HelpCircle,
@@ -83,6 +84,7 @@ function HomeFloatingWidgetGate() {
 export default function HomePage() {
   const t = useTranslations("Landing");
   const locale = useLocale();
+  const heroQualifier = t("hero.qualifier");
   const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
   const priceFmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
   const starterPrice = priceFmt.format(99);
@@ -124,9 +126,11 @@ export default function HomePage() {
                 {t("hero.subtitle")}
               </p>
 
-              <p className="mt-3 text-sm text-zinc-500 leading-relaxed max-w-lg">
-                {t("hero.qualifier")}
-              </p>
+              {heroQualifier?.trim() ? (
+                <p className="mt-3 text-sm text-zinc-500 leading-relaxed max-w-lg">
+                  {heroQualifier}
+                </p>
+              ) : null}
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
@@ -142,6 +146,8 @@ export default function HomePage() {
                   {t("hero.ctaSecondary")}
                 </Link>
               </div>
+
+              <WorksWithRow className="mt-6" />
             </div>
 
             <div className="relative">
@@ -725,7 +731,7 @@ export default function HomePage() {
             {t("faq.title")}
           </h2>
           <div className="space-y-4">
-            {["q1", "q2", "q3", "q4"].map((q) => (
+            {["q1", "q2", "q3", "q4", "q5"].map((q) => (
               <div
                 key={q}
                 className="rounded-2xl border border-white/5 bg-zinc-900/20 p-6 hover:bg-zinc-900/40 transition-colors"

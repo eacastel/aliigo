@@ -26,7 +26,7 @@
       "logout": "Cerrar sesión",
       "loggingOut": "Saliendo…",
       "sidebarTitle": "Panel",
-      "getStarted": "Empezar"
+      "getStarted": "Empieza la prueba gratis"
     },
     "footer": "Todos los derechos reservados.",
     "footerLinks": {
@@ -437,22 +437,27 @@
   "Landing": {
     "hero": {
       "betaNote": "Ya disponible",
-      "title": "Dale a tu web",
-      "titleHighlight": "una voz.",
-      "subtitle": "Aliigo es un asistente de IA integrado en tu sitio web. Responde preguntas, entiende la intención y convierte conversaciones en oportunidades cualificadas de forma automática.",
-      "ctaPrimary": "Empezar",
+      "title": "Convierte visitantes",
+      "titleHighlight": "en oportunidades reales.",
+      "subtitle": "Aliigo es el asistente de IA para tu web. Responde al instante, capta contactos y guía a cada visitante al siguiente paso.",
+      "ctaPrimary": "Empieza la prueba gratis",
       "ctaSecondary": "Ver en acción",
-      "qualifier": "Ideal si tu web recibe tráfico constante o si recibes muchas consultas repetidas."
+      "qualifier": ""
 
     },
     "demo": {
       "badge": "Demo interactiva en vivo",
       "headlineLine1": "No te quedes solo con la teoría.",
       "headlineEmphasis": "Pruébalo ahora mismo.",
-      "subtitle": "Escribe tu pregunta. Y observa cómo Aliigo responde consultas complejas, cualifica contactos y reserva reuniones en segundos—sin un agente humano.",
+      "subtitle": "Escribe tu pregunta. Observa cómo Aliigo responde consultas complejas, cualifica contactos y guía a los visitantes a reservar una demo o contactarte—sin que tu equipo tenga que responder al instante.",
       "feature1": "Respuestas instantáneas con IA",
       "feature2": "Cualificación automática de contactos",
-      "cta": "Empieza la prueba gratis →",
+      "cta": "Empieza tu prueba gratis",
+      "worksWith": {
+        "label": "Funciona con",
+        "note": "Instalación con un solo script",
+        "items": "WordPress · Webflow · Shopify · Wix · Squarespace · Sitios a medida"
+      },
       "phone": {
         "time": "9:41",
         "statusConnection": "Conexión",
@@ -496,7 +501,7 @@
 
       "card3": {
         "title": "Guía el siguiente paso",
-        "desc": "No se queda en el texto. Muestra acciones para reservar, iniciar una prueba o abrir la página correcta.",
+        "desc": "Más que texto. Puede guiar a reservar una demo, iniciar una prueba o abrir la página correcta.",
         "cta": "Agenda una cita"
       },
 
@@ -586,11 +591,15 @@
       "q4": {
         "q": "¿La instalación es complicada?",
         "a": "No. Te damos un pequeño snippet para tu web. La mayoría de negocios pueden estar activos el mismo día."
+      },
+      "q5": {
+        "q": "¿Merece la pena si tengo poco tráfico?",
+        "a": "Sí. Incluso unas pocas consultas perdidas pueden costar caro. Aliigo responde al instante y aprovecha cada oportunidad."
       }
     },
     "finalCta": {
       "title": "Convierte visitas en oportunidades cualificadas",
-      "button": "Empezar"
+      "button": "Empieza la prueba gratis"
     }
   },
   "Auth": {
