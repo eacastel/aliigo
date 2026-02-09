@@ -39,6 +39,8 @@ export default function SignupPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [fax, setFax] = useState(""); // honeypot
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptMarketing, setAcceptMarketing] = useState(false);
 
   // UI State
   const [loading, setLoading] = useState(false);
@@ -130,7 +132,7 @@ export default function SignupPage() {
 
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
     // Normalize once
     const normalizedEmail = email.trim().toLowerCase();
@@ -152,6 +154,10 @@ export default function SignupPage() {
     }
     if (password.length < 6) {
       setError(t("errorPassword"));
+      return;
+    }
+    if (!acceptTerms) {
+      setError(t("errorAcceptTerms"));
       return;
     }
 
@@ -195,6 +201,20 @@ export default function SignupPage() {
         phone: normalizedPhone || undefined,
       });
 
+      const acceptanceRes = await fetch("/api/legal/acceptance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          termsVersion: "legal-v4",
+          locale,
+          agreement: "subscription_agreement",
+          marketingOptIn: acceptMarketing,
+        }),
+      });
+      if (!acceptanceRes.ok) {
+        throw new Error("No se pudo registrar la aceptación legal.");
+      }
 
       // Analytics
       void fireLeadCAPIEvent(normalizedEmail);
@@ -358,6 +378,51 @@ export default function SignupPage() {
               required
             />
           </div>
+        </div>
+
+        <div className="space-y-3">
+          <label className="flex items-start gap-3 text-xs text-zinc-400 leading-relaxed">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-zinc-950/50 text-[#84c9ad] focus:ring-[#84c9ad]"
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              required
+            />
+            <span>
+              {t("acceptTermsPrefix")}{" "}
+              <Link
+                href="/legal/subscription-agreement"
+                className="text-[#84c9ad] hover:text-white transition-colors font-medium"
+              >
+                {t("acceptTermsAgreement")}
+              </Link>
+              ,{" "}
+              <Link
+                href="/legal/terminos"
+                className="text-[#84c9ad] hover:text-white transition-colors font-medium"
+              >
+                {t("acceptTermsTerms")}
+              </Link>{" "}
+              {t("acceptTermsAnd")}{" "}
+              <Link
+                href="/legal/privacidad"
+                className="text-[#84c9ad] hover:text-white transition-colors font-medium"
+              >
+                {t("acceptTermsPrivacy")}
+              </Link>
+              .
+            </span>
+          </label>
+          <label className="flex items-start gap-3 text-xs text-zinc-400 leading-relaxed">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-zinc-950/50 text-[#84c9ad] focus:ring-[#84c9ad]"
+              checked={acceptMarketing}
+              onChange={(e) => setAcceptMarketing(e.target.checked)}
+            />
+            <span>{t("marketingOptIn")}</span>
+          </label>
         </div>
 
         {/* CTA Button */}

@@ -34,6 +34,7 @@
       "privacidad": "Privacidad",
       "cookies": "Cookies",
       "terminos": "Términos de Uso",
+      "subscriptionAgreement": "Acuerdo de Suscripción",
       "dpa": "DPA",
       "subprocessors": "Subencargados y terceros"
     }
@@ -649,6 +650,13 @@
       "passwordPlaceholder": "Contraseña *",
       "submitButton": "Crear cuenta",
       "disclaimer": "Usaremos esta información para crear tu panel y ayudarte con el onboarding. Tú decides qué se muestra a los visitantes.",
+      "acceptTermsPrefix": "Acepto el",
+      "acceptTermsAgreement": "Acuerdo de Suscripción de Aliigo",
+      "acceptTermsTerms": "Términos de Uso",
+      "acceptTermsAnd": "y la",
+      "acceptTermsPrivacy": "Política de Privacidad",
+      "marketingOptIn": "Quiero recibir novedades del producto y emails de marketing.",
+      "errorAcceptTerms": "Debes aceptar el Acuerdo de Suscripción, los Términos de Uso y la Política de Privacidad.",
       "alreadyAccount": "¿Ya tienes cuenta?",
       "signInLink": "Inicia sesión",
       "errorValidation": "Completa los campos obligatorios.",
@@ -1040,6 +1048,93 @@
         "gtm": "Google Tag Manager — gestor de etiquetas (puede cargar otras etiquetas)",
         "meta": "Meta Pixel — medición publicitaria (opcional; con consentimiento cuando proceda)",
         "searchConsole": "Google Search Console — diagnóstico del sitio (normalmente sin cookies de visitante)"
+      }
+    }
+  },
+  "LegalV4": {
+    "subscriptionAgreement": {
+      "title": "Acuerdo de Suscripción de Aliigo",
+      "lastUpdated": "Última actualización: {date}",
+      "intro": "Este Acuerdo de Suscripción de Aliigo (el “Acuerdo”) regula el acceso de prueba y de pago al servicio software de Aliigo (el “Servicio”). Está pensado para uso profesional (empresas, entidades y organizaciones). Al marcar la casilla de aceptación en el registro/checkout, crear una cuenta, iniciar una prueba o suscribirte, aceptas este Acuerdo.",
+      "section1": {
+        "title": "1. Datos del prestador",
+        "content": "Prestador: Emilio Castellanos Abis (nombre comercial: Aliigo)\nNIF: 55448913F\nDomicilio: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València, España\nEmail: legal@aliigo.com"
+      },
+      "section2": {
+        "title": "2. Estructura del Acuerdo",
+        "content": "Este Acuerdo es el contrato de suscripción aceptado mediante clickwrap. Los siguientes documentos se incorporan por referencia y forman parte del acuerdo:\n- Términos de Uso (condiciones generales del sitio/servicio)\n- Política de Privacidad\n- Política de Cookies\n- Anexo de Tratamiento de Datos (DPA), cuando proceda\n- Lista de Subencargados y Terceros\nEn caso de conflicto, este Acuerdo prevalece en materia de suscripción y facturación, y el DPA prevalece en materia de tratamiento de datos."
+      },
+      "section3": {
+        "title": "3. El Servicio",
+        "content": "Aliigo ofrece un asistente de chat para tu web que puede responder a visitantes usando la información configurada por el cliente, captar contactos cuando se activa y guiar al visitante al siguiente paso (por ejemplo, contactar con el negocio o iniciar una prueba). Las funcionalidades pueden evolucionar e incluir funciones beta o en vista previa."
+      },
+      "section4": {
+        "title": "4. Cuentas y responsabilidades del cliente",
+        "content": "Debes facilitar información de cuenta y facturación veraz y mantenerla actualizada. Eres responsable de:\n- toda actividad bajo tu cuenta\n- mantener la confidencialidad de tus credenciales\n- configurar el contenido del asistente (datos del negocio, políticas, enlaces)\n- asegurar que tu uso del Servicio cumple la normativa aplicable (incluida protección de datos, marketing/anti‑spam, consumo, normativa sectorial y requisitos de consentimiento)\nAliigo no actúa como tu agente comercial, distribuidor ni empleador, y no presta asesoramiento legal."
+      },
+      "section5": {
+        "title": "5. Prueba",
+        "content": "Aliigo puede ofrecer una prueba gratis de 30 días. Durante la prueba, el Servicio es funcional y puede instalarse en una web en producción. Puedes cancelar en cualquier momento antes de que termine la prueba para evitar cargos. Tras la prueba, la suscripción continúa en el plan seleccionado salvo cancelación."
+      },
+      "section6": {
+        "title": "6. Cuotas, cobro por adelantado e impuestos",
+        "content": "Las suscripciones se cobran por adelantado de forma recurrente (normalmente mensual), salvo que se indique otra cosa en el checkout. Las cuotas y detalles del plan se muestran en la página de precios y/o en el checkout y pueden variar para Pro/personalizado.\nLas cuotas no incluyen impuestos salvo indicación expresa. Eres responsable de los impuestos, tasas o gravámenes aplicables, salvo los impuestos sobre los ingresos de Aliigo."
+      },
+      "section7": {
+        "title": "7. Pagos fallidos, estado vencido y suspensión",
+        "content": "Si un pago falla, nosotros (o el proveedor de pagos) podemos reintentar el cobro. Si tu cuenta queda vencida, podemos suspender o limitar el acceso al Servicio hasta regularizar el pago.\nPodemos cancelar cuentas por impago persistente. Sigues siendo responsable de los importes pendientes."
+      },
+      "section8": {
+        "title": "8. Intereses de demora (B2B)",
+        "content": "Cuando la ley lo permita para cuentas profesionales, los importes vencidos pueden devengar intereses de demora hasta el máximo permitido por la ley y/o costes razonables de recobro. Podemos utilizar servicios de terceros para recuperar importes impagados."
+      },
+      "section9": {
+        "title": "9. Límites de uso, cuotas del plan y uso razonable",
+        "content": "Los planes incluyen una cuota mensual de uso pensada para un uso normal de negocio. Los límites exactos (por ejemplo, mensajes/conversaciones incluidas) se muestran en la página de precios, en tu panel o en la documentación del plan.\nSi el uso es excesivo, abusivo o supera de forma material lo previsto en el plan, podemos aplicar limitaciones (rate limits), reducir la capacidad, solicitar una mejora de plan u ofrecer un plan personalizado. No garantizamos el procesamiento o entrega de todos los mensajes bajo carga elevada."
+      },
+      "section10": {
+        "title": "10. Contenido del cliente, leads y salidas de IA",
+        "content": "“Contenido del Cliente” incluye la información del negocio que aportas, la configuración del asistente y el contenido recogido por el widget (incluyendo mensajes de visitantes y datos de contacto captados).\nEres responsable de contar con derechos y permisos para aportar Contenido del Cliente y para recoger datos de visitantes.\nEl Servicio puede generar respuestas asistidas por IA. Las salidas de IA pueden ser inexactas, incompletas o inapropiadas. Eres responsable de revisarlas y decidir si y cómo usarlas."
+      },
+      "section11": {
+        "title": "11. Servicios de terceros y cambios fuera de nuestro control",
+        "content": "El Servicio depende de infraestructura y proveedores de terceros (p. ej., hosting, envío de emails, procesamiento IA, pagos). No somos responsables de caídas, retrasos, fallos de entrega o cambios causados por terceros fuera de nuestro control razonable.\nPlataformas web, navegadores, bloqueadores de anuncios o herramientas de seguridad pueden interferir con la carga del widget; no siempre es posible evitarlo."
+      },
+      "section12": {
+        "title": "12. Sin garantías",
+        "content": "EL SERVICIO SE PRESTA “TAL CUAL” Y “SEGÚN DISPONIBILIDAD”. EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, ALIIGO EXCLUYE TODAS LAS GARANTÍAS, INCLUIDAS LAS IMPLÍCITAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN Y NO INFRACCIÓN. NO GARANTIZAMOS QUE EL SERVICIO SEA SEGURO, ININTERRUMPIDO O LIBRE DE ERRORES, NI QUE LOS ERRORES SE CORRIJAN SIEMPRE."
+      },
+      "section13": {
+        "title": "13. Limitación de responsabilidad",
+        "content": "EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, ALIIGO NO SERÁ RESPONSABLE DE DAÑOS INDIRECTOS, INCIDENTALES, ESPECIALES, CONSECUENTES O PUNITIVOS, NI DE PÉRDIDA DE BENEFICIOS, INGRESOS, DATOS O REPUTACIÓN.\nLA RESPONSABILIDAD TOTAL DE ALIIGO POR CUALQUIER RECLAMACIÓN RELATIVA AL SERVICIO SE LIMITA A LAS CANTIDADES PAGADAS POR TI A ALIIGO EN LOS 12 MESES ANTERIORES AL HECHO QUE ORIGINE LA RECLAMACIÓN."
+      },
+      "section14": {
+        "title": "14. Indemnidad",
+        "content": "Te comprometes a defender, indemnizar y mantener indemne a Aliigo frente a reclamaciones, daños, responsabilidades y gastos (incluidos honorarios razonables) derivados de: (a) tu Contenido del Cliente; (b) tu uso del Servicio; (c) tu incumplimiento de la ley; o (d) la infracción de derechos de terceros."
+      },
+      "section15": {
+        "title": "15. Modificaciones en la web del cliente y asistencia técnica",
+        "content": "Aliigo no es responsable de cambios en tu web o integraciones realizados por ti o por terceros que afecten al funcionamiento del widget.\nSi solicitas asistencia de instalación, troubleshooting o servicios profesionales más allá del soporte estándar, podrá ofrecerse como servicio de pago bajo un alcance (SOW) o presupuesto por escrito."
+      },
+      "section16": {
+        "title": "16. Duración, cancelación y terminación",
+        "content": "Este Acuerdo entra en vigor cuando lo aceptas y continúa mientras uses el Servicio.\nPuedes cancelar tu suscripción en cualquier momento. Salvo obligación legal, las cuotas no son reembolsables y el acceso continúa hasta el final del periodo facturado.\nPodemos suspender o cancelar el acceso si incumples este Acuerdo, si lo exige la ley o si tu uso supone un riesgo de seguridad u operativo."
+      },
+      "section17": {
+        "title": "17. Fuerza mayor",
+        "content": "Aliigo no será responsable por retrasos o incumplimientos causados por eventos fuera de control razonable, incluyendo desastres naturales, grandes caídas de infraestructura, epidemias, conflictos laborales, acciones gubernamentales o fallos generalizados de proveedores."
+      },
+      "section18": {
+        "title": "18. Notificaciones",
+        "content": "Las notificaciones legales a Aliigo deben enviarse a legal@aliigo.com. Podemos enviarte avisos al email asociado a tu cuenta."
+      },
+      "section19": {
+        "title": "19. Nulidad parcial y acuerdo íntegro",
+        "content": "Si alguna cláusula resulta inaplicable, el resto seguirá vigente. Este Acuerdo y los documentos incorporados constituyen el acuerdo íntegro relativo al Servicio y sustituyen acuerdos previos sobre la misma materia."
+      },
+      "section20": {
+        "title": "20. Legislación aplicable y jurisdicción",
+        "content": "Este Acuerdo se rige por la legislación española. Las partes se someten a los juzgados y tribunales de València, salvo norma imperativa en contrario."
       }
     }
   }

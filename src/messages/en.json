@@ -34,6 +34,7 @@
       "privacidad": "Privacy",
       "cookies": "Cookies",
       "terminos": "Terms of Use",
+      "subscriptionAgreement": "Subscription Agreement",
       "dpa": "DPA",
       "subprocessors": "Subprocessors"
     }
@@ -646,6 +647,13 @@
       "passwordPlaceholder": "Password *",
       "submitButton": "Create account",
       "disclaimer": "We use this information to create your workspace and help you onboard. You control what the assistant shares with visitors.",
+      "acceptTermsPrefix": "I agree to the",
+      "acceptTermsAgreement": "Aliigo Subscription Agreement",
+      "acceptTermsTerms": "Terms of Use",
+      "acceptTermsAnd": "and",
+      "acceptTermsPrivacy": "Privacy Policy",
+      "marketingOptIn": "I’d like to receive product updates and marketing emails.",
+      "errorAcceptTerms": "Please accept the Subscription Agreement, Terms of Use, and Privacy Policy.",
       "alreadyAccount": "Already have an account?",
       "signInLink": "Log in",
       "errorValidation": "Please complete all required fields.",

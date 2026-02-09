@@ -88,6 +88,9 @@ export default async function PublicLayout({
             <Link href="/legal/terminos" className="hover:text-zinc-300 transition-colors">
               {t('footerLinks.terminos')}
             </Link>
+            <Link href="/legal/subscription-agreement" className="hover:text-zinc-300 transition-colors">
+              {t('footerLinks.subscriptionAgreement')}
+            </Link>
             <Link href="/legal/dpa" className="hover:text-zinc-300 transition-colors">
               {t('footerLinks.dpa')}
             </Link>
