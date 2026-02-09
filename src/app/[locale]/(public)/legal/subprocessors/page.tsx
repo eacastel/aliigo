@@ -1,11 +1,8 @@
 import { useTranslations } from "next-intl";
 
-export default function TerminosPage() {
-  const t = useTranslations("LegalV3.terms");
-  const sections = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16, 17,
-  ];
+export default function SubprocessorsPage() {
+  const t = useTranslations("LegalV3.subprocessors");
+  const items = t.raw("items") as Record<string, string>;
 
   return (
     <div className="bg-zinc-950 min-h-screen py-20 px-4 sm:px-6 lg:px-8">
@@ -18,16 +15,15 @@ export default function TerminosPage() {
           <p className="mt-4 text-lg">{t("intro")}</p>
         </div>
 
-        {sections.map((num) => (
-          <section key={num}>
-            <h2 className="text-xl font-semibold text-white mb-4">
-              {t(`section${num}.title`)}
-            </h2>
-            <p className="text-sm text-zinc-400 whitespace-pre-line">
-              {t(`section${num}.content`)}
-            </p>
-          </section>
-        ))}
+        <section>
+          <ul className="space-y-3 text-sm text-zinc-400">
+            {Object.entries(items).map(([key, value]) => (
+              <li key={key} className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                {value}
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </div>
   );

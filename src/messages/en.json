@@ -33,7 +33,9 @@
       "avisoLegal": "Legal Notice",
       "privacidad": "Privacy",
       "cookies": "Cookies",
-      "terminos": "Terms of Use"
+      "terminos": "Terms of Use",
+      "dpa": "DPA",
+      "subprocessors": "Subprocessors"
     }
   },
   "PricingPage": {
@@ -464,8 +466,8 @@
       "headlineEmphasis": "Try it right now.",
       "subtitle": "Ask a question below. See how Aliigo answers clearly using your business info, captures leads only when intent is real, and guides visitors to the right next step — without your team needing to reply immediately.",
       "feature1": "Instant, helpful replies",
-      "feature2": "Knowledge and branding control.",
-      "feature3": "Lead capture only on intent.",
+      "feature2": "Lead capture only on intent",
+      "feature3": "Clear next-step guidance",
       "cta": "Start free trial",
       "worksWith": {
         "label": "Works with",
@@ -811,6 +813,230 @@
       "section9": {
         "title": "9. Applicable Law",
         "content": "These terms are governed by the laws of Spain. For disputes, the parties submit to the courts of the Owner's domicile, unless mandatory law provides otherwise."
+      }
+    }
+  },
+  "LegalV3": {
+    "legalNotice": {
+      "title": "Legal Notice",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "This Legal Notice governs access to and use of the website aliigo.com (the “Website”) and the Aliigo software service (the “Service”).",
+      "section1": {
+        "title": "1. Operator identification",
+        "content": "Legal owner: Emilio Castellanos Abis\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (Spain)\nEmail: legal@aliigo.com\nCommercial name: Aliigo"
+      },
+      "section2": {
+        "title": "2. Purpose of the Website",
+        "content": "The Website provides information about Aliigo and enables users to create an account and subscribe to the Service."
+      },
+      "section3": {
+        "title": "3. Acceptable use",
+        "content": "You agree not to misuse the Website or Service, including by attempting unauthorized access, disrupting operations, distributing malicious code, or using the Service in violation of applicable laws."
+      },
+      "section4": {
+        "title": "4. Intellectual property",
+        "content": "The Website and Service, including text, design, logos, software, and content (excluding Customer Content), are protected by intellectual property laws and owned by Aliigo or its licensors."
+      },
+      "section5": {
+        "title": "5. Disclaimer",
+        "content": "The Website and Service are provided on an “as is” and “as available” basis. We do not guarantee uninterrupted operation or that the Service will be error-free."
+      },
+      "section6": {
+        "title": "6. Governing law and jurisdiction",
+        "content": "This Legal Notice is governed by Spanish law. Any disputes shall be submitted to the courts of València, Spain, unless mandatory law provides otherwise."
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "This Privacy Policy explains how Aliigo collects and processes personal data for the Website and the Service. Where Aliigo processes personal data on behalf of a business customer as a processor, the Data Processing Addendum (DPA) applies.",
+      "section1": {
+        "title": "1. Data controller",
+        "content": "Controller: Emilio Castellanos Abis (Aliigo)\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (Spain)\nContact: legal@aliigo.com"
+      },
+      "section2": {
+        "title": "2. Data we collect",
+        "content": "Depending on how you use the Website or Service, we may collect:\n- Account data: name, email, password hash (not your raw password), business name, and optional phone/website\n- Billing data: subscription status and payment metadata (payments are handled by our payment processor)\n- Service data: configuration content you provide (business info/knowledge), conversation history, and leads captured through the widget (when enabled)\n- Technical data: log data and device/browser information (e.g., IP address, timestamps, user agent) for security and reliability\n- Analytics/marketing data (only when enabled via consent where required)"
+      },
+      "section3": {
+        "title": "3. Purposes and legal bases",
+        "content": "We process data for:\nA) Providing the Service and operating your account (contract)\nB) Billing, payments, fraud prevention, and account administration (contract / legitimate interests)\nC) Security, abuse prevention, debugging, and service improvement (legitimate interests)\nD) Customer support and service communications (contract / legitimate interests)\nE) Analytics and measurement (consent where required)\nF) Marketing (consent where required)\nWe do not sell personal data."
+      },
+      "section4": {
+        "title": "4. Sharing and recipients",
+        "content": "We share data with vendors (processors) only as needed to provide the Service, including:\n- Hosting and infrastructure: Vercel\n- Security/CDN: Cloudflare\n- Database and authentication: Supabase\n- Transactional email: Resend\n- Payments and billing: Stripe\n- AI processing to generate responses: OpenAI\nWe may also use analytics and advertising tools (e.g., Google Analytics 4 via Google Tag Manager; Meta Pixel). Depending on configuration, these providers may act as processors or independent controllers.\nFor transparency and updates, see our “Subprocessors & Third‑Party Services” page."
+      },
+      "section5": {
+        "title": "5. International transfers",
+        "content": "Some vendors may process data outside the European Economic Area (EEA), including in the United States. Where required, we rely on appropriate safeguards such as Standard Contractual Clauses (SCCs) and other measures provided by those vendors."
+      },
+      "section6": {
+        "title": "6. Data retention",
+        "content": "We retain personal data for as long as necessary to provide the Service, comply with legal obligations, resolve disputes, and enforce agreements. If you close your account, we will delete or anonymize data within a reasonable period, unless we are legally required to retain it."
+      },
+      "section7": {
+        "title": "7. Security",
+        "content": "We use reasonable technical and organizational measures designed to protect personal data, including access controls, encryption in transit, and operational monitoring. No method of transmission or storage is 100% secure."
+      },
+      "section8": {
+        "title": "8. Your rights",
+        "content": "Depending on your location, you may have rights to access, rectify, erase, restrict, object, and port your personal data. To exercise rights, contact legal@aliigo.com.\nIf you are in Spain, you may also lodge a complaint with the Spanish Data Protection Authority (AEPD)."
+      },
+      "section9": {
+        "title": "9. Service data and business customers",
+        "content": "If you use Aliigo as a business customer, you may upload business information and receive visitor conversations/leads. In that context, you are typically the data controller for your visitor data, and Aliigo acts as a processor. Our Data Processing Addendum (DPA) describes these obligations."
+      },
+      "section10": {
+        "title": "10. Cookies and tracking",
+        "content": "We use cookies and similar technologies. In the EEA/UK, analytics and marketing cookies are enabled only with your consent. See our Cookie Policy for details."
+      }
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "This Cookie Policy explains what cookies are, what we use them for, and how you can manage your choices.",
+      "section1": {
+        "title": "1. What are cookies?",
+        "content": "Cookies are small text files stored on your device that help websites function, remember preferences, and measure usage."
+      },
+      "section2": {
+        "title": "2. Cookies we may use",
+        "content": "We use the following categories:\nA) Strictly necessary cookies: required for security, authentication, and core site functionality (e.g., session/auth cookies; security cookies from Cloudflare).\nB) Preferences cookies: remember settings like language.\nC) Analytics cookies (optional): measure usage and improve the product (e.g., Google Analytics 4).\nD) Marketing cookies (optional): measure ad performance and build audiences (e.g., Meta Pixel).\nNote: Google Tag Manager is a tag deployment tool and may load other tags that set cookies."
+      },
+      "section3": {
+        "title": "3. Typical cookie identifiers (examples)",
+        "content": "Depending on your settings, cookies may include:\n- Google Analytics: _ga, _ga_*, _gid (names and durations can vary)\n- Meta: _fbp\n- Cloudflare: __cf_bm and similar security cookies\nThese examples may change as vendors update their systems."
+      },
+      "section4": {
+        "title": "4. Managing consent",
+        "content": "Where required by law (e.g., in Spain/EU), analytics and marketing cookies are disabled by default until you opt in. You can change your choices anytime via the cookie settings banner (if enabled) or your browser settings."
+      },
+      "section5": {
+        "title": "5. Third-party services",
+        "content": "Some cookies are set by third parties (e.g., Google, Meta). Their processing may be governed by their own privacy policies."
+      }
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "These Terms of Use (“Terms”) govern access to and use of the Aliigo website and the Aliigo SaaS service (“Service”). By creating an account, starting a trial, subscribing, or otherwise using the Service, you agree to these Terms.",
+      "section1": {
+        "title": "1. Who we are",
+        "content": "Aliigo is operated by Emilio Castellanos Abis (València, Spain). Contact: legal@aliigo.com."
+      },
+      "section2": {
+        "title": "2. How you accept these Terms",
+        "content": "If the Service presents a checkbox at signup/checkout, you accept these Terms by checking it and continuing. We may store a record of your acceptance (e.g., timestamp and Terms version). If you do not agree, do not use the Service."
+      },
+      "section3": {
+        "title": "3. The Service",
+        "content": "Aliigo provides a website chat assistant that helps answer visitor questions, capture leads when appropriate, and guide visitors to the next step. Features may evolve over time. Some features may be labeled beta or preview."
+      },
+      "section4": {
+        "title": "4. Accounts",
+        "content": "You are responsible for maintaining the confidentiality of your login credentials and for all activity under your account. You must provide accurate information and keep it updated."
+      },
+      "section5": {
+        "title": "5. Plans, free trial, and billing",
+        "content": "Aliigo offers paid plans (e.g., Starter, Growth, and Pro) and may offer a 30-day free trial. Trials are cancellable at any time before they end. After the trial, your subscription renews automatically unless cancelled.\nPlan details and included usage allowances are described on the pricing page and/or in your dashboard. Excessive or abusive usage may require an upgrade or may be throttled."
+      },
+      "section6": {
+        "title": "6. Fees, taxes, and payments",
+        "content": "Fees are shown at checkout. Taxes may apply. Payments are processed by our payment processor (e.g., Stripe). If payment fails or becomes overdue, we may suspend or cancel access to the Service until payment is resolved."
+      },
+      "section7": {
+        "title": "7. Customer content and AI outputs",
+        "content": "You are responsible for all content you provide to configure the assistant and for any content collected or displayed through your use of the Service (“Customer Content”).\nThe Service may generate AI-assisted outputs. AI outputs may be inaccurate, incomplete, or inappropriate. You are responsible for reviewing outputs and deciding whether and how to use them, including compliance with applicable law and your own policies."
+      },
+      "section8": {
+        "title": "8. Acceptable use",
+        "content": "You must not use the Service to: (a) break the law; (b) send spam or unlawful marketing; (c) infringe third-party rights; (d) distribute malware; (e) attempt unauthorized access; (f) misuse the Service in a way that harms others or the platform."
+      },
+      "section9": {
+        "title": "9. Third-party services",
+        "content": "The Service may depend on third-party infrastructure and providers. We are not responsible for outages or failures caused by third-party services outside our reasonable control."
+      },
+      "section10": {
+        "title": "10. Support",
+        "content": "Support channels and response-time targets may vary by plan. We do not guarantee any specific response time unless expressly agreed in writing."
+      },
+      "section11": {
+        "title": "11. Suspension and termination",
+        "content": "You may cancel your subscription at any time. We may suspend or terminate access if you violate these Terms, if required by law, or if your use creates security or operational risk. Upon termination, access may continue until the end of the billing period unless terminated for cause."
+      },
+      "section12": {
+        "title": "12. Intellectual property",
+        "content": "Aliigo and its licensors own the Service, software, and related intellectual property. You retain rights to your Customer Content."
+      },
+      "section13": {
+        "title": "13. Disclaimers",
+        "content": "THE SERVICE IS PROVIDED “AS IS” AND “AS AVAILABLE.” TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE DISCLAIM ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE DO NOT GUARANTEE THAT THE SERVICE WILL BE UNINTERRUPTED OR ERROR-FREE."
+      },
+      "section14": {
+        "title": "14. Limitation of liability",
+        "content": "TO THE MAXIMUM EXTENT PERMITTED BY LAW, ALIIGO SHALL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR LOST PROFITS, REVENUE, DATA, OR GOODWILL.\nOUR TOTAL LIABILITY FOR ANY CLAIM RELATING TO THE SERVICE IS LIMITED TO THE AMOUNTS PAID BY YOU TO ALIIGO FOR THE SERVICE IN THE 12 MONTHS BEFORE THE EVENT GIVING RISE TO THE CLAIM."
+      },
+      "section15": {
+        "title": "15. Indemnification",
+        "content": "You agree to defend, indemnify, and hold harmless Aliigo from claims, damages, liabilities, and expenses (including reasonable legal fees) arising from your Customer Content, your use of the Service, or your violation of law or third-party rights."
+      },
+      "section16": {
+        "title": "16. Governing law and jurisdiction",
+        "content": "These Terms are governed by Spanish law. The parties submit to the courts of València, Spain, unless mandatory law provides otherwise."
+      },
+      "section17": {
+        "title": "17. Contact",
+        "content": "Legal inquiries: legal@aliigo.com."
+      }
+    },
+    "dpa": {
+      "title": "Data Processing Addendum (DPA)",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "This DPA applies when Aliigo processes personal data on behalf of a business customer (“Customer”) as a processor in connection with the Service.",
+      "section1": {
+        "title": "1. Roles",
+        "content": "Customer is the controller of personal data submitted to or collected via the Service (e.g., website visitor messages and leads). Aliigo acts as a processor and will process such data only to provide and improve the Service and as documented by Customer instructions."
+      },
+      "section2": {
+        "title": "2. Processing details",
+        "content": "Subject matter: providing the website assistant service.\nDuration: for the term of the subscription.\nCategories of data subjects: Customer website visitors; Customer staff/users.\nTypes of personal data: names, emails, phone numbers (if collected), message content, metadata.\nProcessing operations: collecting, storing, analyzing to generate responses, transmitting to Customer, and supporting product operations."
+      },
+      "section3": {
+        "title": "3. Processor obligations",
+        "content": "Aliigo will: (a) process data only on documented instructions; (b) ensure confidentiality; (c) implement reasonable security measures; (d) assist Customer with data subject requests where applicable; (e) notify Customer of personal data breaches without undue delay after becoming aware."
+      },
+      "section4": {
+        "title": "4. Subprocessors",
+        "content": "Customer authorizes Aliigo to use subprocessors to provide the Service. Key subprocessors may include:\n- Supabase (database/auth)\n- Vercel (hosting)\n- Cloudflare (security/CDN)\n- Resend (transactional email)\n- Stripe (payments)\n- OpenAI (AI processing)\nAliigo may update subprocessors over time. A current list may be provided via a Subprocessors page."
+      },
+      "section5": {
+        "title": "5. International transfers",
+        "content": "Where processing involves transfers outside the EEA, Aliigo relies on appropriate safeguards such as SCCs and vendor-provided transfer mechanisms where applicable."
+      },
+      "section6": {
+        "title": "6. Deletion or return",
+        "content": "Upon termination, Aliigo will delete or return Customer personal data within a reasonable time, unless retention is required by law."
+      },
+      "section7": {
+        "title": "7. Audit",
+        "content": "Upon reasonable request, Aliigo will provide information necessary to demonstrate compliance with this DPA, subject to confidentiality and security constraints."
+      }
+    },
+    "subprocessors": {
+      "title": "Subprocessors & Third‑Party Services",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "This page lists key vendors we use to operate Aliigo. This list may change as we improve the Service.",
+      "items": {
+        "vercel": "Vercel — hosting and deployment",
+        "cloudflare": "Cloudflare — security, CDN, and performance",
+        "supabase": "Supabase — database and authentication",
+        "resend": "Resend — transactional email delivery",
+        "stripe": "Stripe — payments and billing",
+        "openai": "OpenAI — AI processing for assistant responses",
+        "ga4": "Google Analytics 4 — analytics (optional; consent-based where required)",
+        "gtm": "Google Tag Manager — tag management (may load other tags)",
+        "meta": "Meta Pixel — marketing/ads measurement (optional; consent-based where required)",
+        "searchConsole": "Google Search Console — site diagnostics (typically does not set visitor cookies)"
       }
     }
   }

@@ -1,11 +1,8 @@
 import { useTranslations } from "next-intl";
 
-export default function TerminosPage() {
-  const t = useTranslations("LegalV3.terms");
-  const sections = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16, 17,
-  ];
+export default function DpaPage() {
+  const t = useTranslations("LegalV3.dpa");
+  const sections = [1, 2, 3, 4, 5, 6, 7];
 
   return (
     <div className="bg-zinc-950 min-h-screen py-20 px-4 sm:px-6 lg:px-8">
