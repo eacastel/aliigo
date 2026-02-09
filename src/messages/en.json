@@ -2,7 +2,7 @@
   "Metadata": {
     "title": "Aliigo — Your Business-Owned AI Assistant",
     "titleTemplate": "%s | Aliigo",
-    "description": "A business-owned AI concierge for websites and messaging channels that answers questions instantly, shares trusted information, supports visitors, and guides them to the appropriate next step — for businesses, nonprofits, and educational institutions alike."
+    "description": "A business-owned AI assistant for your website that answers questions instantly, shares trusted information, supports visitors, and guides them to the right next step — without feeling like a generic bot."
   },
   "Navigation": {
     "brand": "Aliigo",
@@ -40,7 +40,7 @@
     "badge": "Simple, transparent plans",
     "title": "Pricing that scales with your business",
     "subtitle": "Launch with confidence on Starter or Growth. Talk to us for Pro.",
-    "description": "All plans include the Aliigo concierge experience, secure embed, and multi-language support. Start your 30-day free trial and upgrade anytime.",
+    "description": "All plans include the Aliigo concierge experience, secure embed, and multi-language support. Start your 30-day free trial and upgrade or cancel anytime.",
     "ctaPrimary": "Start free trial",
     "ctaSecondary": "Talk to sales",
     "contactTitle": "Contact us about Aliigo Pro",
@@ -77,7 +77,7 @@
     "trialBullet2": "Upgrade, downgrade, or cancel anytime from this page.",
     "trialBullet3": "You’ll keep access until the end of your current period.",
     "step1": "1) Confirm your email (required).",
-    "step2": "2) Activate billing to access the dashboard (Stripe is not enabled yet in this build).",
+    "step2": "2) Activate billing to access the dashboard.",
     "step3": "3) Until billing is active, you will remain on this page.",
     "contact": "Contact support",
     "logout": "Log out",
@@ -448,10 +448,10 @@
       "betaNote": "Now live",
       "title": "Turn visitors",
       "titleHighlight": "into customers.",
-      "subtitle": "Aliigo is the AI assistant for your website. It answers questions instantly, captures contact details, and guides visitors to the right next step.",
+      "subtitle": "Aliigo is the AI assistant for your website. It answers questions instantly, captures contact details when intent is real, and guides visitors to the right next step.",
       "ctaPrimary": "Start free trial",
       "ctaSecondary": "See it in action",
-      "qualifier": ""
+      "qualifier": "30-day free trial · Cancel anytime"
 
     },
     "ctaBand": {
@@ -462,11 +462,10 @@
       "badge": "Live interactive demo",
       "headlineLine1": "Don’t just read about it.",
       "headlineEmphasis": "Try it right now.",
-      "subtitle": "Type a question below. See how Aliigo answers complex questions, qualifies contacts, and guides visitors to book a demo or contact you—without your team needing to reply instantly.",
-
-      "feature1": "Instant AI replies",
-      "feature2": "Automatic contact qualification",
-
+      "subtitle": "Ask a question below. See how Aliigo answers clearly using your business info, captures leads only when intent is real, and guides visitors to the right next step — without your team needing to reply immediately.",
+      "feature1": "Instant, helpful replies",
+      "feature2": "Knowledge and branding control.",
+      "feature3": "Lead capture only on intent.",
       "cta": "Start free trial",
       "worksWith": {
         "label": "Works with",
@@ -480,28 +479,27 @@
         "statusWifi": "WiFi",
         "statusBattery": "Batt",
 
-        "agentName": "Support Agent",
-        "agentSub": "Typically replies instantly"
+        "agentName": "Aliigo Assistant",
+        "agentSub": "Replies instantly when possible"
       }
     },
     "socialProof": {
-      "title": "WHERE A CONVERSATION CHANGES EVERYTHING",
+      "title": "WHERE A CONVERSATION MAKES THE DIFFERENCE",
       "industries": {
-        "preContact": "Answer questions before they reach out",
-        "complexServices": "Explain complex services clearly",
-        "qualifyIntent": "Qualify real intent automatically",
-        "reduceNoise": "Reduce unnecessary calls and emails",
-        "highValue": "Guide high-value decisions",
+        "preContact": "Answer key questions before they reach out",
+        "complexServices": "Explain complex services in plain language",
+        "qualifyIntent": "Spot real intent and capture leads naturally",
+        "reduceNoise": "Reduce low-value calls and emails",
+        "highValue": "Support high-value decisions with clarity",
         "nextStep": "Drive the next step: call, book, or contact"
       }
     },
     "featuresGrid": {
       "title": "More than just a chat window.",
-      "subtitle": "Aliigo doesn’t just “chat.” It understands your business logic to drive real results.",
-
+      "subtitle": "Aliigo doesn’t just chat. It uses your business information to answer accurately and guide the next step.",
       "card1": {
-        "title": "Learns from your content instantly",
-        "desc": "No manual flowcharting. Aliigo scans your website, PDFs, and docs to build a knowledge base that answers accurately from day one.",
+        "title": "Uses your content from day one",
+        "desc": "No manual flowcharts. Aliigo scans your website, PDFs, and docs to build a knowledge base that answers consistently from day one.",
         "syncLabel": "SYNC_STATUS: ACTIVE",
         "tagUrl": "URL",
         "tagPdf": "PDF",
@@ -512,7 +510,7 @@
 
       "card2": {
         "title": "Captures contacts naturally",
-        "desc": "It detects intent and asks for details only when someone is genuinely interested.",
+        "desc": "Aliigo detects intent and asks for contact details only when someone is genuinely interested.",
         "notifTitle": "New contact captured"
       },
 
@@ -524,7 +522,7 @@
 
       "card4": {
         "title": "Full visibility into conversations",
-        "desc": "See what customers ask, spot content gaps, and watch your conversion rate improve over time.",
+        "desc": "See what visitors ask, spot content gaps, and improve your conversion rate over time.",
         "chartMon": "Mon",
         "chartSun": "Sun"
       }
@@ -596,7 +594,7 @@
       },
       "q2": {
         "q": "Is this a chatbot?",
-        "a": "It is an assistant, not a script. It uses your business knowledge and adapts to each conversation."
+        "a": "It’s a website assistant, not a script. It uses your business knowledge and adapts to each conversation."
       },
       "q3": {
         "q": "Does it replace my staff?",
@@ -608,7 +606,7 @@
       },
       "q5": {
         "q": "Is Aliigo worth it with low traffic?",
-        "a": "Yes. Even a few missed inquiries can be expensive. Aliigo helps you respond instantly and capture every opportunity."
+        "a": "Yes. Even a few missed inquiries can be expensive. Aliigo helps you respond instantly and capture opportunities you’d otherwise lose."
       }
     },
     "finalCta": {
@@ -645,7 +643,7 @@
       "phonePlaceholder": "Phone (Optional)",
       "passwordPlaceholder": "Password *",
       "submitButton": "Create account",
-      "disclaimer": "We use this information to create your workspace and help you onboard. You control what you share with visitors.",
+      "disclaimer": "We use this information to create your workspace and help you onboard. You control what the assistant shares with visitors.",
       "alreadyAccount": "Already have an account?",
       "signInLink": "Log in",
       "errorValidation": "Please complete all required fields.",

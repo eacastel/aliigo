@@ -212,7 +212,7 @@ export default function HomePage() {
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg shadow-sm border border-zinc-100 text-emerald-600">
-                    <Zap size={18} />
+                    <Layers size={18} />
                   </div>
                   <span className="text-zinc-700 font-medium">
                     {t("demo.feature1")}
@@ -221,10 +221,19 @@ export default function HomePage() {
 
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg shadow-sm border border-zinc-100 text-emerald-600">
-                    <Target size={18} />
+                    <CheckCircle2 size={18} />
                   </div>
                   <span className="text-zinc-700 font-medium">
                     {t("demo.feature2")}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white rounded-lg shadow-sm border border-zinc-100 text-emerald-600">
+                    <MailMinus size={18} />
+                  </div>
+                  <span className="text-zinc-700 font-medium">
+                    {t("demo.feature3")}
                   </span>
                 </div>
               </div>
