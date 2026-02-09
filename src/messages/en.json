@@ -1039,5 +1039,92 @@
         "searchConsole": "Google Search Console — site diagnostics (typically does not set visitor cookies)"
       }
     }
+  },
+  "LegalV4": {
+    "subscriptionAgreement": {
+      "title": "Aliigo Subscription Agreement",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "This Aliigo Subscription Agreement (the “Agreement”) governs paid and trial access to the Aliigo software service (the “Service”). It is intended for business and organizational use. By checking the acceptance box at signup/checkout, creating an account, starting a trial, or subscribing, you agree to this Agreement.",
+      "section1": {
+        "title": "1. Provider details",
+        "content": "Provider: Emilio Castellanos Abis (commercial name: Aliigo)\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València, Spain\nEmail: legal@aliigo.com"
+      },
+      "section2": {
+        "title": "2. Structure of the agreement",
+        "content": "This Agreement is the clickwrap subscription contract. The following documents are incorporated by reference and form part of the agreement:\n- Terms of Use (general website/service terms)\n- Privacy Policy\n- Cookie Policy\n- Data Processing Addendum (DPA), when applicable\n- Subprocessors & Third‑Party Services list\nIf there is a conflict, this Agreement controls for subscription and billing terms, and the DPA controls for data processing terms."
+      },
+      "section3": {
+        "title": "3. The Service",
+        "content": "Aliigo provides a website chat assistant that can answer visitor questions using information configured by the customer, capture leads when enabled, and guide visitors to a next step (such as contacting the business or starting a trial). Features may evolve over time and may include beta/preview functionality."
+      },
+      "section4": {
+        "title": "4. Accounts and customer responsibilities",
+        "content": "You must provide accurate account and billing information and keep it updated. You are responsible for:\n- all activity under your account\n- maintaining the confidentiality of credentials\n- configuring your assistant content (business facts, policies, links)\n- ensuring your use of the Service complies with applicable laws (including data protection, marketing/anti‑spam rules, consumer rules, sector rules, and any consent requirements)\nAliigo is not your sales agent, distributor, or employer, and does not provide legal advice."
+      },
+      "section5": {
+        "title": "5. Trial",
+        "content": "Aliigo may offer a 30‑day free trial. During the trial, the Service is functional and can be installed on a live site. You can cancel at any time before the trial ends to avoid charges. After the trial, the subscription continues on the selected plan unless cancelled."
+      },
+      "section6": {
+        "title": "6. Fees, billing in advance, and taxes",
+        "content": "Subscriptions are billed in advance on a recurring basis (typically monthly) unless otherwise stated at checkout. Fees and plan details are shown on the pricing page and/or at checkout and may differ for Pro/custom plans.\nFees are exclusive of taxes unless stated otherwise. You are responsible for any applicable taxes, levies, or duties, except taxes based on Aliigo’s income."
+      },
+      "section7": {
+        "title": "7. Failed payments, past due status, and suspension",
+        "content": "If a payment fails, we (or our payment processor) may retry the charge. If your account becomes past due, we may suspend or limit access to the Service until payment is resolved.\nWe may terminate accounts for persistent non‑payment. You remain responsible for any outstanding amounts."
+      },
+      "section8": {
+        "title": "8. Late fees (B2B)",
+        "content": "Where permitted by applicable law for business accounts, overdue amounts may accrue late interest at the maximum rate permitted by law and/or reasonable recovery costs. We may use third‑party services to recover unpaid amounts."
+      },
+      "section9": {
+        "title": "9. Usage limits, plan allowances, and fair use",
+        "content": "Plans include a monthly usage allowance intended for normal business use. Exact limits (such as message/conversation allowances) are shown on the pricing page, in your dashboard, or in plan documentation.\nIf usage is excessive, abusive, or materially exceeds plan expectations, we may throttle traffic, apply rate limits, require an upgrade, or offer a custom plan. We do not guarantee that every message will be delivered or processed under heavy load."
+      },
+      "section10": {
+        "title": "10. Customer content, leads, and outputs",
+        "content": "“Customer Content” includes business information you provide, assistant configuration, and content collected through your widget (including visitor messages and lead details when captured).\nYou are responsible for ensuring you have the rights and permissions to provide Customer Content and to collect visitor data.\nThe Service may generate AI‑assisted outputs. AI outputs may be inaccurate, incomplete, or inappropriate. You are responsible for reviewing outputs and deciding whether and how to use them."
+      },
+      "section11": {
+        "title": "11. Third‑party services and changes outside our control",
+        "content": "The Service relies on third‑party infrastructure and providers (e.g., hosting, email delivery, AI processing, payment processing). We are not responsible for outages, delays, delivery failures, or changes caused by third‑party services outside our reasonable control.\nWeb platforms, browsers, ad blockers, or security tools may interfere with widget loading; this is not guaranteed to be preventable in all cases."
+      },
+      "section12": {
+        "title": "12. No warranties",
+        "content": "THE SERVICE IS PROVIDED “AS IS” AND “AS AVAILABLE.” TO THE MAXIMUM EXTENT PERMITTED BY LAW, ALIIGO DISCLAIMS ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON‑INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE SECURE, UNINTERRUPTED, OR ERROR‑FREE, OR THAT ERRORS WILL ALWAYS BE CORRECTED."
+      },
+      "section13": {
+        "title": "13. Limitation of liability",
+        "content": "TO THE MAXIMUM EXTENT PERMITTED BY LAW, ALIIGO WILL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR LOST PROFITS, REVENUE, DATA, OR GOODWILL.\nALIIGO’S TOTAL LIABILITY FOR ANY CLAIM RELATING TO THE SERVICE IS LIMITED TO THE AMOUNTS PAID BY YOU TO ALIIGO FOR THE SERVICE IN THE 12 MONTHS BEFORE THE EVENT GIVING RISE TO THE CLAIM."
+      },
+      "section14": {
+        "title": "14. Indemnification",
+        "content": "You agree to defend, indemnify, and hold harmless Aliigo from claims, damages, liabilities, and expenses (including reasonable legal fees) arising out of: (a) your Customer Content; (b) your use of the Service; (c) your violation of law; or (d) your infringement of third‑party rights."
+      },
+      "section15": {
+        "title": "15. Customer site modifications and troubleshooting",
+        "content": "Aliigo is not responsible for changes made to your website or integrations by you or third parties that affect widget performance.\nIf you request custom troubleshooting, installation assistance, or professional services beyond standard support, it may be offered as paid professional services under a separate written scope (SOW) or quote."
+      },
+      "section16": {
+        "title": "16. Term, cancellation, and termination",
+        "content": "This Agreement begins when you accept it and continues while you use the Service.\nYou may cancel your subscription at any time. Unless required by law, fees are non‑refundable and access continues until the end of the current billing period.\nWe may suspend or terminate access if you violate this Agreement, if required by law, or if your use creates security or operational risk."
+      },
+      "section17": {
+        "title": "17. Force majeure",
+        "content": "Aliigo is not liable for delays or failures caused by events beyond reasonable control, including natural disasters, severe outages, epidemics, labor disruptions, government actions, or widespread infrastructure failures."
+      },
+      "section18": {
+        "title": "18. Notices",
+        "content": "Legal notices to Aliigo must be sent to legal@aliigo.com. We may send notices to the email address associated with your account."
+      },
+      "section19": {
+        "title": "19. Severability and entire agreement",
+        "content": "If any provision is held unenforceable, the remainder will remain in effect. This Agreement and the incorporated documents constitute the entire agreement relating to the Service and supersede prior agreements on the same subject."
+      },
+      "section20": {
+        "title": "20. Governing law and jurisdiction",
+        "content": "This Agreement is governed by Spanish law. The parties submit to the courts of València, Spain, unless mandatory law provides otherwise."
+      }
+    }
   }
 }

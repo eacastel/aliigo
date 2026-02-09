@@ -8,7 +8,7 @@ const withNextIntl = createNextIntlPlugin(
 
 const NEXT_PUBLIC_EMBED_ALLOW =
   process.env.NEXT_PUBLIC_EMBED_ALLOW ??
-  "https://horchatalabs.com https://www.horchatalabs.com http://localhost:3000";
+  "https://aliigo.com https://www.aliigo.com http://localhost:3000";
 
 // 2. Your existing config stays exactly the same
 const nextConfig: NextConfig = {
