@@ -221,31 +221,25 @@
       "closedStatus": "Closed"
     },
     "loading": "Loading…",
-
     "welcome": "Welcome, {name}",
     "welcomeGeneric": "Welcome",
-
     "trialDays": "{days} days left in your trial",
-
     "businessInfo": {
       "defaultName": "Your business",
       "contactLabel": "Contact:",
       "phoneLabel": "Phone:"
     },
-
     "businessOverview": {
       "title": "Business overview",
       "contactLine": "Contact: {name} · Phone: {phone}",
       "emailLine": "Email: {email}",
       "edit": "Edit"
     },
-
     "verifyTitle": "Verify your email",
     "verifyMessage": "Please confirm your email address to activate your assistant. We sent a verification link to {email}.",
     "resendButton": "Resend email",
     "resendSuccess": "Verification email sent.",
     "resendError": "Could not resend: {error}",
-
     "onboarding": {
       "title": "Onboarding",
       "subtitle": "Complete the required steps to activate your assistant and widget.",
@@ -256,13 +250,11 @@
       "done": "Done",
       "requiredTag": "(required)"
     },
-
     "groups": {
       "business": "Business",
       "assistant": "Assistant",
       "widget": "Widget"
     },
-
     "items": {
       "allowed_domains": "Allowed domains configured",
       "default_locale": "Default language selected",
@@ -455,11 +447,67 @@
       "ctaPrimary": "Start free trial",
       "ctaSecondary": "See it in action",
       "qualifier": "30-day free trial · Cancel anytime"
-
     },
     "ctaBand": {
       "title": "Ready to try Aliigo?",
       "button": "Start free trial"
+    },
+    "clarity": {
+      "title": "For businesses that transform visits into customers",
+      "card1": {
+        "title": "Get repetitive website questions",
+        "benefit": "Answer instantly and keep visitors moving."
+      },
+      "card2": {
+        "title": "Want to capture more qualified leads",
+        "benefit": "Spot real intent and collect the right details."
+      },
+      "card3": {
+        "title": "Don’t respond instantly after hours",
+        "benefit": "Stay helpful 24/7 without staying online."
+      },
+      "note": "Aliigo acts like a digital front desk — without replacing your team."
+    },
+    "impact": {
+      "title": "Beyond just a chatbot: A growth engine",
+      "subtitle": "Clear answers, better intent, and a smoother path to the next step.",
+      "card1": {
+        "title": "Actionable insights",
+        "desc": "See what visitors ask and improve your site over time."
+      },
+      "card2": {
+        "title": "Higher‑intent leads",
+        "desc": "Capture contacts only when interest is real."
+      },
+      "card3": {
+        "title": "Confident next steps",
+        "desc": "Guide visitors to book, trial, or contact without friction."
+      }
+    },
+    "integrations": {
+      "title": "Integrates with your existing workflow in minutes",
+      "note": "Install with one script tag."
+    },
+    "fitFilter": {
+      "ideal": {
+        "title": "Aliigo is ideal if:",
+        "item1": "You sell services or consultations",
+        "item2": "A new client is worth €500+",
+        "item3": "You receive regular inquiries through your website"
+      },
+      "notIdeal": {
+        "title": "Probably not for you if:",
+        "item1": "You just want a fun AI chatbot",
+        "item2": "You have no website traffic at all",
+        "item3": "You don’t respond to leads"
+      }
+    },
+    "credibility": {
+      "item1": "24/7 instant replies",
+      "item2": "30-day free trial",
+      "item3": "Cancel anytime",
+      "item4": "No training required",
+      "item5": "Install with one script"
     },
     "demo": {
       "badge": "Live interactive demo",
@@ -475,13 +523,11 @@
         "note": "Install with one script tag",
         "items": "WordPress · Webflow · Shopify · Wix · Squarespace · Custom sites"
       },
-
       "phone": {
         "time": "9:41",
         "statusConnection": "Connection",
         "statusWifi": "WiFi",
         "statusBattery": "Batt",
-
         "agentName": "Aliigo Assistant",
         "agentSub": "Replies instantly when possible"
       }
@@ -510,19 +556,16 @@
         "imported": "Imported",
         "scanning": "Scanning…"
       },
-
       "card2": {
         "title": "Captures contacts naturally",
         "desc": "Aliigo detects intent and asks for contact details only when someone is genuinely interested.",
         "notifTitle": "New contact captured"
       },
-
       "card3": {
         "title": "Drives the next step",
         "desc": "More than text. It can guide visitors to book a demo, start a trial, or open the right page.",
         "cta": "Book a demo"
       },
-
       "card4": {
         "title": "Full visibility into conversations",
         "desc": "See what visitors ask, spot content gaps, and improve your conversion rate over time.",
@@ -533,6 +576,7 @@
     "pricing": {
       "title": "Invest in conversations that convert",
       "badge": "30-day free trial on all plans",
+      "badgeNote": "No charge until the trial ends.",
       "period": "/month",
       "from": "from",
       "starter": {
@@ -872,7 +916,7 @@
       },
       "section4": {
         "title": "4. Sharing and recipients",
-        "content": "We share data with vendors (processors) only as needed to provide the Service, including:\n- Hosting and infrastructure: Vercel\n- Security/CDN: Cloudflare\n- Database and authentication: Supabase\n- Transactional email: Resend\n- Payments and billing: Stripe\n- AI processing to generate responses: OpenAI\nWe may also use analytics and advertising tools (e.g., Google Analytics 4 via Google Tag Manager; Meta Pixel). Depending on configuration, these providers may act as processors or independent controllers.\nFor transparency and updates, see our “Subprocessors & Third‑Party Services” page."
+        "content": "We share data with vendors (processors) only as needed to provide the Service, including:\n- Hosting and infrastructure: Vercel\n- Security/CDN: Cloudflare\n- Database and authentication: Supabase\n- Transactional email: Resend\n- Payments and billing: Stripe\n- AI processing to generate responses: OpenAI\n- Microsoft Clarity — session analytics and heatmaps\nWe may also use analytics and advertising tools (e.g., Google Analytics 4 via Google Tag Manager; Meta Pixel). Depending on configuration, these providers may act as processors or independent controllers.\nFor transparency and updates, see our “Subprocessors & Third‑Party Services” page."
       },
       "section5": {
         "title": "5. International transfers",
@@ -909,11 +953,11 @@
       },
       "section2": {
         "title": "2. Cookies we may use",
-        "content": "We use the following categories:\nA) Strictly necessary cookies: required for security, authentication, and core site functionality (e.g., session/auth cookies; security cookies from Cloudflare).\nB) Preferences cookies: remember settings like language.\nC) Analytics cookies (optional): measure usage and improve the product (e.g., Google Analytics 4).\nD) Marketing cookies (optional): measure ad performance and build audiences (e.g., Meta Pixel).\nNote: Google Tag Manager is a tag deployment tool and may load other tags that set cookies."
+        "content": "We use the following categories:\nA) Strictly necessary cookies: required for security, authentication, and core site functionality (e.g., session/auth cookies; security cookies from Cloudflare).\nB) Preferences cookies: remember settings like language.\nC) Analytics cookies (optional): measure usage and improve the product (e.g., Google Analytics 4, Microsoft Clarity).\nD) Marketing cookies (optional): measure ad performance and build audiences (e.g., Meta Pixel).\nNote: Google Tag Manager is a tag deployment tool and may load other tags that set cookies."
       },
       "section3": {
         "title": "3. Typical cookie identifiers (examples)",
-        "content": "Depending on your settings, cookies may include:\n- Google Analytics: _ga, _ga_*, _gid (names and durations can vary)\n- Meta: _fbp\n- Cloudflare: __cf_bm and similar security cookies\nThese examples may change as vendors update their systems."
+        "content": "Depending on your settings, cookies may include:\n- Google Analytics: _ga, _ga_*, _gid (names and durations can vary)\n- Microsoft Clarity: _clck, _clsk (names and durations can vary)\n- Meta: _fbp\n- Cloudflare: __cf_bm and similar security cookies\nThese examples may change as vendors update their systems."
       },
       "section4": {
         "title": "4. Managing consent",
@@ -1044,7 +1088,8 @@
         "ga4": "Google Analytics 4 — analytics (optional; consent-based where required)",
         "gtm": "Google Tag Manager — tag management (may load other tags)",
         "meta": "Meta Pixel — marketing/ads measurement (optional; consent-based where required)",
-        "searchConsole": "Google Search Console — site diagnostics (typically does not set visitor cookies)"
+        "searchConsole": "Google Search Console — site diagnostics (typically does not set visitor cookies)",
+        "clarity": "Microsoft Clarity — session analytics (optional; consent-based where required)"
       }
     }
   },

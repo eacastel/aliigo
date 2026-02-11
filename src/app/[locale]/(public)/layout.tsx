@@ -58,7 +58,7 @@ export default async function PublicLayout({
             {/* Compact button on mobile */}
             <Link
               href="/signup"
-              className="bg-white text-black px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-md hover:bg-zinc-200 transition-colors whitespace-nowrap"
+              className="bg-white text-black px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-md hover:bg-[#84c9ad] transition-colors whitespace-nowrap"
             >
               {t('actions.getStarted')}
             </Link>

@@ -944,16 +944,18 @@ class AliigoWidget extends HTMLElement {
       }
 
       @media (max-width: 480px) {
-      .floating.fixed { left: 0; right: 0; bottom: 0; }
+        .floating.fixed { right: 16px; left: auto; bottom: 16px; }
 
-      /* Only go fullscreen if explicitly enabled */
-      :host([mobile-fullscreen="true"]) .floating.fixed .panel {
-        width: 100%;
-        height: 100%;
-        max-height: 100%;
-        border-radius: 0;
+        :host([mobile-fullscreen="true"]) .floating.fixed { left: 0; right: 0; bottom: 0; }
+
+        /* Only go fullscreen if explicitly enabled */
+        :host([mobile-fullscreen="true"]) .floating.fixed .panel {
+          width: 100%;
+          height: 100%;
+          max-height: 100%;
+          border-radius: 0;
+        }
       }
-    }
     `;
   }
 

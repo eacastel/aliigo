@@ -9,9 +9,12 @@ import HeroRotator from "@/components/HeroRotator";
 import { HomepageAssistantDemo } from "@/components/HomepageAssistantDemo";
 import { AliigoSupportWidget } from "@/components/AliigoSupportWidget";
 import { WorksWithRow } from "@/components/WorksWithRow";
+import { ClaritySection } from "@/components/ClaritySection";
+import { FitFilterSection } from "@/components/FitFilterSection";
+import { CredibilityStrip } from "@/components/CredibilityStrip";
+import { BusinessImpactSection } from "@/components/BusinessImpactSection";
 import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
 import {
-  HelpCircle,
   Layers,
   Target,
   MailMinus,
@@ -96,15 +99,6 @@ export default function HomePage() {
   const growthPrice = priceFmt.format(149);
   const proPrice = priceFmt.format(349);
 
-  const industries = [
-    { id: "preContact", icon: HelpCircle },
-    { id: "complexServices", icon: Layers },
-    { id: "qualifyIntent", icon: Target },
-    { id: "reduceNoise", icon: MailMinus },
-    { id: "highValue", icon: Compass },
-    { id: "nextStep", icon: MousePointerClick },
-  ];
-
   return (
     <div className="bg-zinc-950 overflow-hidden selection:bg-[#84c9ad]/30">
       {/* 1. HERO SECTION */}
@@ -164,12 +158,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* WORKS WITH STRIP */}
-      <section className="border-b border-white/5 bg-zinc-950/60">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <WorksWithRow />
-        </div>
-      </section>
+      <ClaritySection />
+      <FitFilterSection />
 
       {/* 2. SUPERCHARGED LIVE DEMO SECTION */}
       <section
@@ -295,33 +285,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. INDUSTRY/SOCIAL PROOF */}
-      <section className="border-b border-white/5 bg-zinc-900/30">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <p className="text-center text-xs font-bold text-zinc-500 mb-8 uppercase tracking-widest">
-            {t("socialProof.title")}
-          </p>
+      <BusinessImpactSection />
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {industries.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  href="/signup"
-                  key={item.id}
-                  className="group flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-950/50 border border-white/5 hover:border-[#84c9ad]/50 hover:bg-[#84c9ad]/10 transition-all duration-300 cursor-pointer"
-                >
-                  <Icon
-                    className="w-6 h-6 mb-3 text-zinc-400 group-hover:text-[#84c9ad] group-hover:scale-110 transition-all duration-300"
-                    strokeWidth={1.5}
-                  />
-                  <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors text-center">
-                    {t(`socialProof.industries.${item.id}`)}
-                  </span>
-                </Link>
-              );
-            })}
+      <CredibilityStrip />
+
+      {/* WORKS WITH STRIP */}
+      <section className="border-b border-white/5 bg-zinc-950/60">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="text-center mb-8">
+            <p className="text-xl md:text-2xl font-semibold text-white">
+              {t("integrations.title")}
+            </p>
+            <p className="mt-2 text-sm text-zinc-500">
+              {t("integrations.note")}
+            </p>
           </div>
+          <WorksWithRow />
         </div>
       </section>
 
@@ -331,7 +310,9 @@ export default function HomePage() {
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-20">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              {t("featuresGrid.title")}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+                {t("featuresGrid.title")}
+              </span>
             </h2>
             <p className="text-zinc-400 text-lg">
               {t("featuresGrid.subtitle")}
@@ -553,7 +534,9 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">
-              {t("howItWorks.title")}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+                {t("howItWorks.title")}
+              </span>
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -579,13 +562,18 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              {t("pricing.title")}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+                {t("pricing.title")}
+              </span>
             </h2>
 
             <div className="inline-flex items-center gap-2 bg-[#84c9ad]/10 border border-[#84c9ad]/20 px-4 py-2 rounded-full text-[#84c9ad] text-sm font-semibold">
               <Sparkles size={16} className="fill-[#84c9ad]" />
               {t("pricing.badge")}
             </div>
+            <p className="mt-2 text-xs text-zinc-500">
+              {t("pricing.badgeNote")}
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
@@ -765,7 +753,9 @@ export default function HomePage() {
       <section className="py-24 bg-zinc-950">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-white mb-12 text-center">
-            {t("faq.title")}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+              {t("faq.title")}
+            </span>
           </h2>
           <div className="space-y-4">
             {["q1", "q2", "q3", "q4", "q5"].map((q) => (
@@ -789,11 +779,13 @@ export default function HomePage() {
       {/* FINAL CTA */}
       <section className="py-20 text-center border-t border-white/5 bg-gradient-to-b from-zinc-950 to-zinc-900">
         <h2 className="text-3xl font-bold text-white mb-6">
-          {t("finalCta.title")}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+            {t("finalCta.title")}
+          </span>
         </h2>
         <Link
           href="/signup"
-          className="inline-flex items-center justify-center rounded-lg bg-white text-black px-8 py-4 text-base font-bold hover:bg-zinc-200 transition-all"
+          className="inline-flex items-center justify-center rounded-lg bg-[#84c9ad] text-black px-8 py-4 text-base font-bold hover:bg-[#73bba0] transition-all shadow-[0_0_20px_rgba(132,201,173,0.25)]"
         >
           {t("finalCta.button")}
         </Link>

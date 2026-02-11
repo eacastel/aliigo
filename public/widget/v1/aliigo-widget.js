@@ -274,16 +274,18 @@
       }
 
       @media (max-width: 480px) {
-      .floating.fixed { left: 0; right: 0; bottom: 0; }
+        .floating.fixed { right: 16px; left: auto; bottom: 16px; }
 
-      /* Only go fullscreen if explicitly enabled */
-      :host([mobile-fullscreen="true"]) .floating.fixed .panel {
-        width: 100%;
-        height: 100%;
-        max-height: 100%;
-        border-radius: 0;
+        :host([mobile-fullscreen="true"]) .floating.fixed { left: 0; right: 0; bottom: 0; }
+
+        /* Only go fullscreen if explicitly enabled */
+        :host([mobile-fullscreen="true"]) .floating.fixed .panel {
+          width: 100%;
+          height: 100%;
+          max-height: 100%;
+          border-radius: 0;
+        }
       }
-    }
     `}render(){var U;this.ensureRoot();let e=this.getVariant();if(!!this.getEmbedKey()&&!this.getThemeOverride()&&!this.cachedTheme&&!((U=this.state.session)!=null&&U.theme)&&!this.sessionHydrated){let b=e==="floating"?`wrap floating ${this.getFloatingMode()}`:e==="hero"?"wrap hero":"wrap inline",c=e==="hero"?"panel hero":e==="inline"?"panel inline":"panel";this.root.innerHTML=`
           <style>${this.css()}</style>
           <div class="${b}">

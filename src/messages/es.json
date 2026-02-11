@@ -222,31 +222,25 @@
       "closedStatus": "Cerrada"
     },
     "loading": "Cargando…",
-
     "welcome": "Bienvenido, {name}",
     "welcomeGeneric": "Bienvenido",
-
     "trialDays": "Te quedan {days} días de prueba",
-
     "businessInfo": {
       "defaultName": "Tu negocio",
       "contactLabel": "Contacto:",
       "phoneLabel": "Teléfono:"
     },
-
     "businessOverview": {
       "title": "Resumen del negocio",
       "contactLine": "Contacto: {name} · Teléfono: {phone}",
       "emailLine": "Email: {email}",
       "edit": "Editar"
     },
-
     "verifyTitle": "Verifica tu email",
     "verifyMessage": "Confirma tu email para activar el asistente. Te hemos enviado un enlace de verificación a {email}.",
     "resendButton": "Reenviar email",
     "resendSuccess": "Email de verificación enviado.",
     "resendError": "No se pudo reenviar: {error}",
-
     "onboarding": {
       "title": "Puesta en marcha",
       "subtitle": "Completa los pasos obligatorios para activar tu asistente y el widget.",
@@ -257,13 +251,11 @@
       "done": "Hecho",
       "requiredTag": "(obligatorio)"
     },
-
     "groups": {
       "business": "Negocio",
       "assistant": "Asistente",
       "widget": "Widget"
     },
-
     "items": {
       "allowed_domains": "Dominios permitidos configurados",
       "default_locale": "Idioma predeterminado seleccionado",
@@ -452,15 +444,71 @@
       "betaNote": "Ya disponible",
       "title": "Convierte tus visitas",
       "titleHighlight": "en clientes.",
-      "subtitle": "Aliigo es el asistente de IA para tu web. Responde al instante, capta contactos y guía a cada visitante al siguiente paso.",      
+      "subtitle": "Aliigo es el asistente de IA para tu web. Responde al instante, capta contactos y guía a cada visitante al siguiente paso.",
       "ctaPrimary": "Empieza tu prueba gratis",
       "ctaSecondary": "Ver en acción",
       "qualifier": ""
-
     },
     "ctaBand": {
       "title": "¿Listo para probar Aliigo?",
       "button": "Empieza tu prueba gratis"
+    },
+    "clarity": {
+      "title": "Para negocios que transforman visitas en clientes",
+      "card1": {
+        "title": "Reciben preguntas repetitivas en su web",
+        "benefit": "Responde al instante y evita perder oportunidades."
+      },
+      "card2": {
+        "title": "Quieren captar más contactos cualificados",
+        "benefit": "Detecta intención real y pide lo justo."
+      },
+      "card3": {
+        "title": "No responden al instante fuera del horario",
+        "benefit": "Atiende 24/7 sin estar conectado."
+      },
+      "note": "Aliigo actúa como un mostrador digital — sin sustituir a tu equipo."
+    },
+    "impact": {
+      "title": "Más que un chatbot: un motor de crecimiento",
+      "subtitle": "Respuestas claras, mejor intención y un camino más fácil al siguiente paso.",
+      "card1": {
+        "title": "Insights accionables",
+        "desc": "Descubre qué preguntan tus visitantes y mejora tu web."
+      },
+      "card2": {
+        "title": "Leads de mayor intención",
+        "desc": "Capta contactos solo cuando hay interés real."
+      },
+      "card3": {
+        "title": "Siguiente paso con confianza",
+        "desc": "Guía a los visitantes a reservar, probar o contactar."
+      }
+    },
+    "integrations": {
+      "title": "Se integra con tu flujo actual en minutos",
+      "note": "Instalación con un solo script."
+    },
+    "fitFilter": {
+      "ideal": {
+        "title": "Aliigo es ideal si:",
+        "item1": "Vendes servicios o consultas",
+        "item2": "Un nuevo cliente vale más de 500 €",
+        "item3": "Recibes consultas con frecuencia en tu web"
+      },
+      "notIdeal": {
+        "title": "Probablemente no es para ti si:",
+        "item1": "Solo buscas un chatbot “divertido”",
+        "item2": "No tienes tráfico en tu web",
+        "item3": "No haces seguimiento de contactos"
+      }
+    },
+    "credibility": {
+      "item1": "Respuestas al instante 24/7",
+      "item2": "Prueba gratis de 30 días",
+      "item3": "Cancela cuando quieras",
+      "item4": "Sin formación técnica",
+      "item5": "Instalación con un solo script"
     },
     "demo": {
       "badge": "Demo interactiva en vivo",
@@ -499,7 +547,6 @@
     "featuresGrid": {
       "title": "Mucho más que un simple chat.",
       "subtitle": "Aliigo no solo responde. Entiende tu negocio y convierte conversaciones en resultados.",
-
       "card1": {
         "title": "Aprende de tu contenido al instante",
         "desc": "Sin diagramas ni flujos a mano. Aliigo analiza tu web, PDFs y documentos para crear una base de conocimiento que responde bien desde el primer día.",
@@ -510,19 +557,16 @@
         "imported": "Importado",
         "scanning": "Analizando…"
       },
-
       "card2": {
         "title": "Capta contactos de forma natural",
         "desc": "Detecta la intención y solo pide datos cuando hay interés real.",
         "notifTitle": "Nuevo contacto captado"
       },
-
       "card3": {
         "title": "Guía el siguiente paso",
         "desc": "Más que texto. Puede guiar a pedir una demo, iniciar una prueba o abrir la página correcta.",
         "cta": "Agenda una cita"
       },
-
       "card4": {
         "title": "Visibilidad total de las conversaciones",
         "desc": "Descubre qué preguntan tus clientes, detecta oportunidades de mejora y aumenta la conversión con el tiempo.",
@@ -533,9 +577,9 @@
     "pricing": {
       "title": "Transforma tus conversaciones en clientes",
       "badge": "Prueba gratis de 30 días en todos los planes",
+      "badgeNote": "No se cobra hasta que termine la prueba.",
       "period": "/mes",
       "from": "desde",
-
       "starter": {
         "name": "Starter",
         "subtitle": "Ideal para pequeños negocios locales.",
@@ -548,7 +592,6 @@
           "f5": "Soporte en español e inglés"
         }
       },
-
       "growth": {
         "name": "Growth",
         "subtitle": "Ideal para clínicas, agencias y negocios de servicios.",
@@ -562,7 +605,6 @@
           "f4": "Prioridad para visitantes con alta intención"
         }
       },
-
       "pro": {
         "name": "Pro",
         "subtitle": "Ideal para negocios con mucho tráfico o alto valor.",
@@ -875,7 +917,7 @@
       },
       "section4": {
         "title": "4. Destinatarios y proveedores",
-        "content": "Compartimos datos con proveedores (encargados) solo cuando es necesario para prestar el Servicio, incluyendo:\n- Hosting e infraestructura: Vercel\n- Seguridad/CDN: Cloudflare\n- Base de datos y autenticación: Supabase\n- Email transaccional: Resend\n- Pagos y facturación: Stripe\n- Procesamiento de IA para generar respuestas: OpenAI\nTambién podemos utilizar herramientas de analítica y publicidad (por ejemplo, Google Analytics 4 mediante Google Tag Manager; Meta Pixel). Según la configuración, estos proveedores pueden actuar como encargados o como responsables independientes.\nPara transparencia y actualizaciones, consulta la página “Subencargados y terceros”."
+        "content": "Compartimos datos con proveedores (encargados) solo cuando es necesario para prestar el Servicio, incluyendo:\n- Hosting e infraestructura: Vercel\n- Seguridad/CDN: Cloudflare\n- Base de datos y autenticación: Supabase\n- Email transaccional: Resend\n- Pagos y facturación: Stripe\n- Procesamiento de IA para generar respuestas: OpenAI\n- Microsoft Clarity — analítica de sesiones y mapas de calor\nTambién podemos utilizar herramientas de analítica y publicidad (por ejemplo, Google Analytics 4 mediante Google Tag Manager; Meta Pixel). Según la configuración, estos proveedores pueden actuar como encargados o como responsables independientes.\nPara transparencia y actualizaciones, consulta la página “Subencargados y terceros”."
       },
       "section5": {
         "title": "5. Transferencias internacionales",
@@ -912,11 +954,11 @@
       },
       "section2": {
         "title": "2. Cookies que podemos usar",
-        "content": "Usamos estas categorías:\nA) Cookies técnicas (necesarias): seguridad, autenticación y funcionamiento básico (por ejemplo, cookies de sesión y cookies de seguridad de Cloudflare).\nB) Cookies de preferencias: recordar ajustes como el idioma.\nC) Cookies de analítica (opcionales): medir uso y mejorar el producto (por ejemplo, Google Analytics 4).\nD) Cookies de marketing (opcionales): medir campañas y audiencias (por ejemplo, Meta Pixel).\nNota: Google Tag Manager es un gestor de etiquetas y puede cargar otras etiquetas que establezcan cookies."
+        "content": "Usamos estas categorías:\nA) Cookies técnicas (necesarias): seguridad, autenticación y funcionamiento básico (por ejemplo, cookies de sesión y cookies de seguridad de Cloudflare).\nB) Cookies de preferencias: recordar ajustes como el idioma.\nC) Cookies de analítica (opcionales): medir uso y mejorar el producto (por ejemplo, Google Analytics 4, Microsoft Clarity).\nD) Cookies de marketing (opcionales): medir campañas y audiencias (por ejemplo, Meta Pixel).\nNota: Google Tag Manager es un gestor de etiquetas y puede cargar otras etiquetas que establezcan cookies."
       },
       "section3": {
         "title": "3. Identificadores típicos (ejemplos)",
-        "content": "Según la configuración, pueden existir cookies como:\n- Google Analytics: _ga, _ga_*, _gid (nombres y duraciones pueden variar)\n- Meta: _fbp\n- Cloudflare: __cf_bm y otras cookies de seguridad\nEstos ejemplos pueden cambiar con el tiempo."
+        "content": "Según la configuración, pueden existir cookies como:\n- Google Analytics: _ga, _ga_*, _gid (nombres y duraciones pueden variar)\n- Microsoft Clarity: _clck, _clsk (nombres y duraciones pueden variar)\n- Meta: _fbp\n- Cloudflare: __cf_bm y otras cookies de seguridad\nEstos ejemplos pueden cambiar con el tiempo."
       },
       "section4": {
         "title": "4. Gestión del consentimiento",
@@ -1047,7 +1089,8 @@
         "ga4": "Google Analytics 4 — analítica (opcional; con consentimiento cuando proceda)",
         "gtm": "Google Tag Manager — gestor de etiquetas (puede cargar otras etiquetas)",
         "meta": "Meta Pixel — medición publicitaria (opcional; con consentimiento cuando proceda)",
-        "searchConsole": "Google Search Console — diagnóstico del sitio (normalmente sin cookies de visitante)"
+        "searchConsole": "Google Search Console — diagnóstico del sitio (normalmente sin cookies de visitante)",
+        "clarity": "Microsoft Clarity — analítica de sesiones (opcional; con consentimiento cuando proceda)"
       }
     }
   },
