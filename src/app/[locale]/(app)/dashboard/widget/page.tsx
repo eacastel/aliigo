@@ -434,21 +434,11 @@ export default function WidgetSettingsPage() {
     const script = `<script src="https://aliigo.com/widget/v1/aliigo-widget.js" defer></script>`;
 
     const floating = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="floating"></aliigo-widget>`;
-    const inline = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="inline"></aliigo-widget>`;
-    const hero = `<aliigo-widget embed-key="${key}" api-base="https://aliigo.com" variant="hero"></aliigo-widget>`;
-
-
     return [
       script,
       "",
       "<!-- Floating (bottom-right pill) -->",
       floating,
-      "",
-      "<!-- Inline (embed in a section) -->",
-      inline,
-      "",
-      "<!-- Hero (component-style) -->",
-      hero,
     ].join("\n");
   }, [biz?.public_embed_key]);
 
