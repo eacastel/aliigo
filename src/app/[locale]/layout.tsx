@@ -94,7 +94,7 @@ export default async function RootLayout({
   const messages = await getMessages();
   
   const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const taggingSetting = cookieStore.get("aliigo_tagging")?.value;
   const allowTagging = taggingSetting !== "off";
 
