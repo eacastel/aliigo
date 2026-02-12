@@ -1184,7 +1184,9 @@ class AliigoWidget extends HTMLElement {
       const v = (input?.value || "").trim();
       if (!v) return;
       if (input) input.value = "";
-      input?.blur();
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        input?.blur();
+      }
       this.pendingFocus = true;
       void this.send(v);
     });
@@ -1204,8 +1206,10 @@ class AliigoWidget extends HTMLElement {
         if (!lead.name && !lead.email && !lead.phone) return;
         if (!lead.consent) return;
 
-        const active = document.activeElement as HTMLElement | null;
-        active?.blur();
+        if (window.matchMedia("(max-width: 768px)").matches) {
+          const active = document.activeElement as HTMLElement | null;
+          active?.blur();
+        }
         formEl.classList.add("sent");
         const btn = formEl.querySelector(".lead-submit") as HTMLButtonElement | null;
         if (btn) btn.textContent = t.lead.sent;
