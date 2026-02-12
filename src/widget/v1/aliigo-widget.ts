@@ -81,6 +81,12 @@ const UI = {
     welcome: "Ask a question and we’ll help right away.",
     placeholder: "Type your question…",
     send: "Send",
+    errors: {
+      sessionRefreshed: "Session refreshed. Please try again.",
+      session: "Session error",
+      network: "Network error",
+      generic: "Something went wrong. Please try again.",
+    },
     lead: {
       title: "Share your details",
       name: "Name",
@@ -102,6 +108,12 @@ const UI = {
     welcome: "Haz tu consulta y te ayudamos al momento.",
     placeholder: "Escribe tu consulta…",
     send: "Enviar",
+    errors: {
+      sessionRefreshed: "Sesión actualizada. Inténtalo de nuevo.",
+      session: "Error de sesión",
+      network: "Error de red",
+      generic: "Algo salió mal. Inténtalo de nuevo.",
+    },
     lead: {
       title: "Déjanos tus datos",
       name: "Nombre",
@@ -617,7 +629,9 @@ class AliigoWidget extends HTMLElement {
 
       if (!res.ok || !data.token) {
         this.state.session = null;
-        this.renderError(data.error || "Session error");
+        const localeOverride = this.getLocaleOverride() || this.state.locale;
+        const t = UI[localeOverride];
+        this.renderError(data.error || t.errors.session);
         return null;
       }
 
@@ -639,7 +653,9 @@ class AliigoWidget extends HTMLElement {
       this.render();
       return this.state.session;
     } catch {
-      this.renderError("Network error");
+      const localeOverride = this.getLocaleOverride() || this.state.locale;
+      const t = UI[localeOverride];
+      this.renderError(t.errors.network);
       return null;
     }
   }
@@ -664,12 +680,14 @@ class AliigoWidget extends HTMLElement {
 
   private renderError(msg: string) {
     this.ensureRoot();
+    const locale = this.getLocaleOverride() || this.state.locale;
+    const t = UI[locale];
     this.root.innerHTML = `
       <style>${this.css()}</style>
       <div class="wrap inline">
         <div class="panel">
           <div class="header">Aliigo</div>
-          <div class="body"><div class="bubble bot">${msg}</div></div>
+          <div class="body"><div class="bubble bot">${msg || t.errors.session}</div></div>
         </div>
       </div>
     `;
@@ -943,8 +961,16 @@ class AliigoWidget extends HTMLElement {
         100% { opacity: 1; transform: translateY(0) scale(1); }
       }
 
-      @media (max-width: 480px) {
+      @media (max-width: 640px) {
         .floating.fixed { right: 16px; left: auto; bottom: 16px; }
+        .floating.fixed.open {
+          left: 0;
+          right: 0;
+          display: flex;
+          justify-content: center;
+          padding: 0 16px;
+        }
+        .floating.fixed.open .panel { width: min(420px, 100%); }
 
         :host([mobile-fullscreen="true"]) .floating.fixed { left: 0; right: 0; bottom: 0; }
 
@@ -1028,7 +1054,7 @@ class AliigoWidget extends HTMLElement {
     const floatingMode = this.getFloatingMode();
     const wrapperClass =
       variant === "floating"
-        ? `wrap floating ${floatingMode}`
+        ? `wrap floating ${floatingMode}${openNow ? " open" : ""}`
         : variant === "hero"
           ? "wrap hero"
           : "wrap inline";
@@ -1341,11 +1367,64 @@ class AliigoWidget extends HTMLElement {
               return;
             }
 
+            // If retry failed due to session expiry, drop conversationId and try once more
+            if ((raw2.error || "").toLowerCase().includes("session expired")) {
+              this.state.conversationId = null;
+              const retry2 = await fetch(`${apiBase}/api/conversation`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  token: fresh,
+                  conversationId: null,
+                  externalRef: this.state.visitorSessionId,
+                  message: content,
+                  locale: this.state.locale,
+                  channel: "web",
+                  ...(lead ? { lead } : {}),
+                }),
+              });
+
+              const raw3 = (await retry2.json().catch(() => ({}))) as {
+                conversationId?: string;
+                reply?: string;
+                error?: string;
+                locale?: string;
+                actions?: unknown;
+              };
+
+              if (retry2.ok) {
+                if (raw3.conversationId) this.state.conversationId = raw3.conversationId;
+                const nextActions3 = mapServerActionsToWidget(raw3.actions);
+                const cleanedActions3 = lead
+                  ? nextActions3?.filter((a) => a.type !== "lead_form")
+                  : nextActions3;
+
+                if (!opts?.suppressReply) {
+                  this.state.msgs = [
+                    ...this.state.msgs,
+                    { role: "assistant", content: raw3.reply || "", actions: cleanedActions3 },
+                  ];
+                }
+                if (postReply) {
+                  this.state.msgs = [
+                    ...this.state.msgs,
+                    { role: "assistant", content: postReply },
+                  ];
+                }
+                this.pendingFocus = true;
+                this.state.busy = false;
+                this.savePersisted(true);
+                this.pendingScroll = "lastAssistantStart";
+                this.render();
+                return;
+              }
+            }
+
             // retry failed
             const friendly =
               (raw2.error || "").toLowerCase().includes("session expired")
-                ? "Session refreshed. Please try again."
-                : (raw2.error || "Error");
+                ? t.errors.sessionRefreshed
+                : (raw2.error || t.errors.generic);
             this.state.msgs = [...this.state.msgs, { role: "assistant", content: friendly }];
             this.pendingFocus = true;
             this.state.busy = false;
@@ -1357,8 +1436,7 @@ class AliigoWidget extends HTMLElement {
         }
 
         // default error path
-        const friendly =
-          isExpired ? "Session refreshed. Please try again." : (raw.error || "Error");
+        const friendly = isExpired ? t.errors.sessionRefreshed : (raw.error || t.errors.generic);
         this.state.msgs = [...this.state.msgs, { role: "assistant", content: friendly }];
         this.pendingFocus = true;
         this.state.busy = false;

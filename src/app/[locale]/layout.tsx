@@ -7,6 +7,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { GoogleTagManager } from '@next/third-parties/google'; 
+import { cookies } from "next/headers";
 
 import "../globals.css";
 
@@ -93,6 +94,9 @@ export default async function RootLayout({
   const messages = await getMessages();
   
   const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+  const cookieStore = cookies();
+  const taggingSetting = cookieStore.get("aliigo_tagging")?.value;
+  const allowTagging = taggingSetting !== "off";
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -101,7 +105,7 @@ export default async function RootLayout({
 
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-background text-foreground`}>
         
-        {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
+        {GTM_ID && allowTagging && <GoogleTagManager gtmId={GTM_ID} />}
         
         <NextIntlClientProvider messages={messages}>
           {children}
