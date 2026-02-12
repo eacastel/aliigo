@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import type { Plan } from "./BillingCheckout";
 import type { AliigoCurrency } from "@/lib/currency";
+import { useTranslations } from "next-intl";
 
 export default function PaymentForm({
   jwt,
@@ -18,6 +19,7 @@ export default function PaymentForm({
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string>("");
+  const t = useTranslations("Billing");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,7 +79,7 @@ export default function PaymentForm({
         disabled={!stripe || !elements || loading}
         className="w-full bg-[#84c9ad] text-zinc-950 py-3.5 rounded-xl font-bold hover:bg-[#73bba0] disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(132,201,173,0.15)] hover:shadow-[0_0_25px_rgba(132,201,173,0.3)]"
       >
-        {loading ? "Processing…" : "Start free trial"}
+        {loading ? t("checkoutProcessing") : t("checkoutCta")}
       </button>
     </form>
   );

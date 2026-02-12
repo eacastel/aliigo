@@ -7,7 +7,7 @@ import type { StripeElementsOptionsClientSecret } from "@stripe/stripe-js";
 import PlanSelector from "./PlanSelector";
 import PaymentForm from "./PaymentForm";
 import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export type Plan = "starter" | "growth";
 
@@ -18,6 +18,7 @@ export default function BillingCheckout({ jwt }: { jwt: string }) {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [err, setErr] = useState<string>("");
   const locale = useLocale();
+  const t = useTranslations("Billing");
   const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function BillingCheckout({ jwt }: { jwt: string }) {
 
     return {
       clientSecret,
+      locale: locale === "es" ? "es" : "en",
       // Keep it clean + dark and avoid the huge “wallet list”
       paymentMethodOrder: ["card"],
       appearance: {
@@ -94,7 +96,7 @@ export default function BillingCheckout({ jwt }: { jwt: string }) {
   if (!options) {
     return (
       <div className="text-sm text-zinc-300">
-        {err ? <span className="text-red-400">{err}</span> : "Preparing secure payment form…"}
+        {err ? <span className="text-red-400">{err}</span> : t("checkoutLoading", undefined, { default: "Preparing secure payment form…" } as never)}
       </div>
     );
   }
@@ -107,7 +109,7 @@ export default function BillingCheckout({ jwt }: { jwt: string }) {
         <PaymentForm jwt={jwt} plan={plan} currency={currency} />
       </Elements>
 
-      <div className="text-xs text-zinc-500">30-day free trial. Cancel anytime before the trial ends.</div>
+      <div className="text-xs text-zinc-500">{t("checkoutFooter")}</div>
     </div>
   );
 }
