@@ -1,4 +1,6 @@
-import { cookies } from "next/headers";
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 
 export default function UntagMePage({
@@ -6,13 +8,11 @@ export default function UntagMePage({
 }: {
   params: { locale: string };
 }) {
-  const cookieStore = cookies();
-  cookieStore.set("aliigo_tagging", "off", {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365 * 2,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+  useEffect(() => {
+    const maxAge = 60 * 60 * 24 * 365 * 2;
+    const secure = window.location.protocol === "https:" ? " Secure;" : "";
+    document.cookie = `aliigo_tagging=off; Path=/; Max-Age=${maxAge}; SameSite=Lax;${secure}`;
+  }, []);
 
   const isEs = params.locale === "es";
 

@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing"; 
 import { supabase } from "@/lib/supabaseClient";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { BillingGateProvider } from "@/components/BillingGateContext";
 
 export default function DashboardLayout({
   children,
@@ -16,9 +17,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const t = useTranslations('Navigation');
+  const billingT = useTranslations("Billing");
   const path = usePathname();
   const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
+  const [billingStatus, setBillingStatus] = useState<"loading" | "active" | "inactive">("loading");
 
   const nav = [
     { href: "/dashboard", label: t('links.dashboard') },
@@ -54,9 +57,8 @@ export default function DashboardLayout({
       const j = await res.json().catch(() => ({}));
 
       const ok = res.ok && (j.status === "trialing" || j.status === "active");
-
-      if (!ok && !cancelled) {
-        router.replace("/dashboard/billing");
+      if (!cancelled) {
+        setBillingStatus(ok ? "active" : "inactive");
       }
     })();
 
@@ -70,6 +72,10 @@ export default function DashboardLayout({
     await supabase.auth.signOut();
     router.push('/login'); 
   };
+
+  const billingActive = billingStatus === "active";
+  const showBillingBanner =
+    billingStatus === "inactive" && path !== "/dashboard/billing";
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
@@ -150,9 +156,41 @@ export default function DashboardLayout({
 
         {/* MAIN */}
         <main className="col-span-12 sm:col-span-9 lg:col-span-10">
-          <div className="max-w-6xl mx-auto px-4 py-6">
-            {children}
-          </div>
+          <BillingGateProvider value={{ status: billingStatus, isActive: billingActive }}>
+            <div className="max-w-6xl mx-auto px-4 py-6">
+              {showBillingBanner && (
+                <div className="mb-6 rounded-2xl border border-emerald-900/40 bg-emerald-950/20 p-4">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="space-y-2">
+                      <div className="text-sm text-zinc-300">
+                        {billingT("pending")}
+                      </div>
+                      <div className="font-semibold text-white">
+                        {billingT("trialTitle")}
+                      </div>
+                      <div className="text-sm text-zinc-300">
+                        {billingT("trialSubtitle")}
+                      </div>
+                      <ul className="mt-2 list-disc pl-5 text-sm text-zinc-300 space-y-1">
+                        <li>{billingT("trialBullet1")}</li>
+                        <li>{billingT("trialBullet2")}</li>
+                        <li>{billingT("trialBullet3")}</li>
+                      </ul>
+                    </div>
+                    <div className="shrink-0">
+                      <Link
+                        href="/dashboard/billing"
+                        className="inline-flex items-center justify-center rounded-xl bg-[#84c9ad] px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-[#73bba0] transition-colors"
+                      >
+                        {billingT("activateCta")}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {children}
+            </div>
+          </BillingGateProvider>
         </main>
       </div>
 

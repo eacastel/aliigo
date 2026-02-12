@@ -4,6 +4,8 @@
 import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useBillingGate } from "@/components/BillingGateContext";
+import { useTranslations } from "next-intl";
 
 type Theme = {
   headerBg: string;
@@ -139,6 +141,9 @@ function safeHex(v: string) {
 }
 
 export default function WidgetSettingsPage() {
+  const t = useTranslations("DashboardWidget");
+  const billingGate = useBillingGate();
+  const widgetLocked = billingGate.status === "inactive";
   const [biz, setBiz] = useState<BizLocal | null>(null);
 
   // dev-only convenience token (preview)
@@ -736,6 +741,7 @@ export default function WidgetSettingsPage() {
             <button
               className={btnNeutralStrong}
               onClick={rotateToken}
+              disabled={widgetLocked}
             >
               Generate token
             </button>
@@ -743,6 +749,7 @@ export default function WidgetSettingsPage() {
             <button
               className={btnNeutralStrong}
               onClick={rotatePublicKey}
+              disabled={widgetLocked}
             >
               Rotate public key
             </button>
@@ -752,11 +759,17 @@ export default function WidgetSettingsPage() {
 
       <section className="mt-8">
         <h2 className="font-semibold mb-2">Embed snippet</h2>
+        {widgetLocked && (
+          <div className="mb-2 text-xs text-amber-400">
+            {t("lockedHint")}
+          </div>
+        )}
         <textarea
-          className="w-full border border-zinc-800 bg-zinc-950 text-zinc-200 rounded px-3 py-2 text-xs"
+          className="w-full border border-zinc-800 bg-zinc-950 text-zinc-200 rounded px-3 py-2 text-xs disabled:opacity-60 disabled:cursor-not-allowed"
           rows={14}
           value={embedCode}
           readOnly
+          disabled={widgetLocked}
         />
       </section>
     </div>

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useTranslations } from "next-intl";
+import { useBillingGate } from "@/components/BillingGateContext";
 
 /* ---------- Types ---------- */
 type ProfileState = {
@@ -84,6 +85,8 @@ function domainsToBase(domains: string[] | null | undefined): string {
 export default function SettingsBusinessPage() {
   const router = useRouter();
   const t = useTranslations("DashboardBusiness");
+  const billingGate = useBillingGate();
+  const domainLocked = billingGate.status === "inactive";
 
   const [loading, setLoading] = useState(true);
   const [unauth, setUnauth] = useState(false);
@@ -471,16 +474,22 @@ export default function SettingsBusinessPage() {
                 {t("domains.label")}
               </label>
               <input
-                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                 placeholder={t("domains.placeholder")}
                 value={business.allowed_domain}
                 onChange={(e) =>
                   setBusiness((b) => ({ ...b, allowed_domain: e.target.value }))
                 }
+                disabled={domainLocked}
               />
               <p className="text-[11px] text-zinc-500 mt-2">
                 {t("domains.help")}
               </p>
+              {domainLocked && (
+                <p className="text-[11px] text-amber-400 mt-1">
+                  {t("domains.locked")}
+                </p>
+              )}
               {domainInvalid && (
                 <p className="text-[11px] text-red-400 mt-1">
                   {t("domains.invalid")}

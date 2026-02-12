@@ -79,6 +79,7 @@
     "trialBullet1": "Sin cargos si cancelas antes de que termine la prueba.",
     "trialBullet2": "Puedes subir, bajar o cancelar el plan desde esta misma página.",
     "trialBullet3": "Mantendrás el acceso hasta el final del periodo actual.",
+    "activateCta": "Activar Cuenta",
     "checkoutLoading": "Preparando el formulario de pago seguro…",
     "checkoutFooter": "Prueba gratis de 30 días. Cancela cuando quieras antes de que termine.",
     "checkoutCta": "Empieza una prueba gratis",
@@ -128,10 +129,14 @@
       "label": "Dominio permitido",
       "placeholder": "ejemplo.com",
       "help": "Introduce el dominio raíz sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
+      "locked": "Activa la facturación para desbloquear la lista de dominios.",
       "invalid": "Introduce un dominio válido como ejemplo.com (o localhost para pruebas locales).",
       "previewLabel": "Dominios permitidos",
       "previewEmpty": "Introduce un dominio para ver lo que se permitirá."
     }
+  },
+  "DashboardWidget": {
+    "lockedHint": "Activa la facturación para desbloquear el código del widget."
   },
   "Dashboard": {
     "help": {
