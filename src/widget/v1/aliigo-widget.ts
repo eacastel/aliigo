@@ -1271,6 +1271,7 @@ class AliigoWidget extends HTMLElement {
     postReply?: string,
     opts?: { silentUser?: boolean; suppressReply?: boolean }
   ) {
+    const t = UI[this.state.locale] ?? UI.en;
     await this.refreshSessionIfStale();
     const session = this.state.session;
     if (!session?.token) return;
