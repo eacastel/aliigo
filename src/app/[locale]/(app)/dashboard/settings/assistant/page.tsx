@@ -1089,16 +1089,6 @@ export default function SettingsAssistantPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
-          <div className="text-sm font-semibold text-zinc-100">
-            {t("rawPreview.title")}
-          </div>
-          <p className="text-xs text-zinc-400">{t("rawPreview.desc")}</p>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 text-xs text-zinc-200 whitespace-pre-wrap">
-            {rawPromptPreview || t("rawPreview.empty")}
-          </div>
-        </div>
-
         <div className="flex gap-2">
           <button
             onClick={save}

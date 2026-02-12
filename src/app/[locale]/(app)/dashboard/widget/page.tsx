@@ -757,21 +757,22 @@ export default function WidgetSettingsPage() {
         </section>
       </div>
 
-      <section className="mt-8">
-        <h2 className="font-semibold mb-2">Embed snippet</h2>
-        {widgetLocked && (
-          <div className="mb-2 text-xs text-amber-400">
-            {t("lockedHint")}
-          </div>
-        )}
-        <textarea
-          className="w-full border border-zinc-800 bg-zinc-950 text-zinc-200 rounded px-3 py-2 text-xs disabled:opacity-60 disabled:cursor-not-allowed"
-          rows={14}
-          value={embedCode}
-          readOnly
-          disabled={widgetLocked}
-        />
-      </section>
+      {widgetLocked ? (
+        <section className="mt-8">
+          <h2 className="font-semibold mb-2">Embed snippet</h2>
+          <div className="text-xs text-amber-400">{t("lockedHint")}</div>
+        </section>
+      ) : (
+        <section className="mt-8">
+          <h2 className="font-semibold mb-2">Embed snippet</h2>
+          <textarea
+            className="w-full border border-zinc-800 bg-zinc-950 text-zinc-200 rounded px-3 py-2 text-xs"
+            rows={14}
+            value={embedCode}
+            readOnly
+          />
+        </section>
+      )}
     </div>
   );
 }
