@@ -107,18 +107,18 @@
     "planGrowth": "Aliigo Growth",
     "planUnknown": "Plan no definido",
     "planStarterDesc": "Ideal para pequeños negocios locales.",
-    "starterF1": "Asistente de chat inteligente en tu web",
-    "starterF2": "Amplio volumen mensual de conversaciones",
-    "starterF3": "Configuración básica del negocio",
+    "starterF1": "Widget de chat + bandeja de entrada",
+    "starterF2": "Asistente básico + verificación de dominio",
+    "starterF3": "Historial de conversaciones",
     "starterF4": "Captura de leads (nombre, email y teléfono)",
     "starterF5": "Soporte en español e inglés",
     "planGrowthDesc": "Ideal para clínicas, agencias y negocios de servicios.",
     "growthIntro": "Todo lo de Starter, y además:",
-    "growthF1": "Más volumen de conversaciones",
-    "growthF2": "Personalización más avanzada",
-    "growthF3": "Cualificación de contactos más precisa",
+    "growthF1": "Controles avanzados del asistente",
+    "growthF2": "Flujos de equipo + analítica (próximamente)",
+    "growthF3": "Soporte prioritario",
     "growthF4": "Prioridad para visitantes con alta intención",
-    "planProDesc": "Ideal para negocios con mucho tráfico o alto valor.",
+    "planProDesc": "Personalizado. Contacta soporte para configurarlo.",
     "planProPrice": "349 € +",
     "planProIntro": "Todo lo de Growth, y además:",
     "proF1": "Personalización a medida",
@@ -136,14 +136,7 @@
     "resumeMembership": "Mantener suscripción",
     "cancelMembership": "Cancelar suscripción",
     "planProTitle": "Aliigo Pro",
-    "planProDesc": "Personalizado. Contacta soporte para configurarlo.",
-    "planProCta": "Contactar ventas",
-    "starterF1": "Widget de chat + bandeja de entrada",
-    "starterF2": "Asistente básico + verificación de dominio",
-    "starterF3": "Historial de conversaciones",
-    "growthF1": "Controles avanzados del asistente",
-    "growthF2": "Flujos de equipo + analítica (próximamente)",
-    "growthF3": "Soporte prioritario"
+    "planProCta": "Contactar ventas"
   },
   "DashboardBusiness": {
     "domains": {
@@ -1217,6 +1210,133 @@
       "section20": {
         "title": "20. Legislación aplicable y jurisdicción",
         "content": "Este Acuerdo se rige por la legislación española. Las partes se someten a los juzgados y tribunales de València, salvo norma imperativa en contrario."
+      }
+    }
+  },
+  "pages": {
+    "whyAliigo": {
+      "metaTitle": "Por qué Aliigo — Conversaciones bajo tu control",
+      "metaDescription": "Aliigo es un asistente de IA para tu web, pensado para empresas reales. Responde con tus fuentes aprobadas, capta leads solo cuando hay intención y guía al siguiente paso sin poner en riesgo tu marca.",
+      "hero": {
+        "headline": "Por qué Aliigo",
+        "subheadline": "Conversaciones bajo tu control — para empresas reales, no para chatbots genéricos.",
+        "ctaPrimary": "Empezar prueba gratis",
+        "ctaSecondary": "Ver demo en vivo"
+      },
+      "sections": [
+        {
+          "id": "problem",
+          "title": "El problema (en claro)",
+          "body": "Muchas empresas pierden oportunidades por un motivo sencillo: no responden al instante, sobre todo fuera de horario. Y cuando añaden un chatbot, aparece otro riesgo: respuestas genéricas que dañan la confianza.\n\nAliigo existe para resolver ambas cosas:\n- Responder al instante, 24/7\n- Mantener respuestas coherentes con tu negocio, tu tono y tus estándares"
+        },
+        {
+          "id": "principle",
+          "title": "El principio",
+          "body": "La IA es potente. Pero las empresas necesitan control.\n\nEso significa:\n- Respuestas basadas en conocimiento aprobado (tu web, documentos, FAQs)\n- Una voz de marca que tú defines (tono, estilo, qué decir / qué no decir)\n- Derivación segura cuando la conversación requiere una persona o toca temas sensibles"
+        },
+        {
+          "id": "difference",
+          "title": "En qué se diferencia Aliigo (sin humo)",
+          "bullets": [
+            "Responde desde tus fuentes: usa tu contenido aprobado, no suposiciones.",
+            "Capta leads solo con intención: pide datos solo cuando el visitante está listo de verdad.",
+            "Guía al siguiente paso: llamada, reserva, formulario, ubicación—lo que tú decidas.",
+            "Traspaso con visibilidad: control y seguimiento de conversaciones y resultados.",
+            "Enfoque GDPR-first para clientes de UE/EEE (DPA disponible)."
+          ]
+        },
+        {
+          "id": "dayOne",
+          "title": "Lo que tienes desde el primer día",
+          "bullets": [
+            "Instalación con un solo script (WordPress, Webflow, Shopify, Wix, Squarespace y web a medida)",
+            "Sin formación complicada: añades tu info y lo activas",
+            "Una atención más consistente y escalable sin saturar tu equipo"
+          ]
+        },
+        {
+          "id": "fit",
+          "title": "Para quién es / Para quién no es",
+          "body": "**Aliigo es ideal si:**\n- Vendes servicios (o productos de decisión importante)\n- Un cliente nuevo vale 500€+ (o similar)\n- Recibes consultas repetidas cada semana\n- Quieres crecer sin perder confianza\n\n**Aliigo no es ideal si:**\n- Buscas un chatbot “creativo” sin límites\n- Necesitas respuestas 100% humanas en todo momento\n- Quieres sustituir al equipo sin reglas claras ni supervisión"
+        },
+        {
+          "id": "founderNote",
+          "title": "Nota del fundador",
+          "body": "Aliigo lo construye alguien que lleva dos décadas creando soluciones digitales y obsesionado con una cosa: comunicación clara que convierte atención en acción—sin romper la confianza.\n\nCreo que la IA debe usarse para mejorar el acceso digital de los negocios: responder más rápido, atender mejor y competir sin necesitar presupuesto de gran empresa."
+        },
+        {
+          "id": "commitment",
+          "title": "Ventaja por ser early-stage (y nuestro compromiso)",
+          "body": "Aliigo crece con clientes. Si entras ahora, no solo “usas software”: ayudas a decidir el rumbo.\n\nEscuchamos. Construimos. Mejoramos.\nY priorizamos control, claridad y seguridad por encima del hype."
+        },
+        {
+          "id": "trust",
+          "title": "Confianza y políticas",
+          "body": "Por transparencia, mantenemos estos documentos públicos:\n- Aviso legal\n- Política de privacidad\n- Política de cookies\n- Términos de uso\n- Acuerdo de suscripción\n- DPA\n- Subprocesadores\n\nContacto: legal@aliigo.com"
+        }
+      ],
+      "finalCta": {
+        "headline": "¿Listo para probar Aliigo?",
+        "ctaPrimary": "Empezar prueba gratis",
+        "ctaSecondary": "Ver demo en vivo"
+      }
+    },
+    "founder": {
+      "metaTitle": "Emilio Castellanos Abis — Fundador de Aliigo",
+      "metaDescription": "Conoce al fundador de Aliigo y por qué está diseñado con claridad, control y confianza—para que las empresas crezcan sin poner en riesgo su voz.",
+      "hero": {
+        "headline": "Hecho para empresas que no pueden permitirse “genéricos”.",
+        "subheadline": "Soy Emilio Castellanos Abis, fundador de Aliigo. Creo herramientas para responder más rápido, convertir mejor y proteger la confianza.",
+        "ctaPrimary": "Empezar prueba gratis",
+        "ctaSecondary": "Por qué Aliigo"
+      },
+      "sections": [
+        {
+          "id": "why",
+          "title": "Por qué creé Aliigo",
+          "body": "Llevo más de 20 años ayudando a empresas a mejorar su presencia digital: web, analítica, mensajes y conversión. Y veía siempre el mismo patrón:\n\n- Los visitantes preguntan cuando menos conviene (fuera de horario, fines de semana).\n- La respuesta llega tarde y se pierde el lead.\n- Los chatbots genéricos responden al instante… pero a veces dicen lo incorrecto.\n\nAliigo nace para dar a las empresas la velocidad de la IA con el control de una marca real."
+        },
+        {
+          "id": "principles",
+          "title": "En qué creo (principios)",
+          "bullets": [
+            "La claridad gana: respuestas simples y correctas convierten mejor que “sonar inteligente”.",
+            "El control es obligatorio: el asistente debe seguir conocimiento y reglas aprobadas.",
+            "La confianza es el producto: si algo daña la confianza, no ayuda a crecer.",
+            "Nunca dejar de aprender: la tecnología cambia; hay que adaptarse con responsabilidad.",
+            "Herramientas para el bien: sistemas que ayuden al cliente y reduzcan el caos del equipo."
+          ]
+        },
+        {
+          "id": "personalized",
+          "title": "Qué significa “personalizado” en Aliigo",
+          "bullets": [
+            "Tu información y tus fuentes aprobadas",
+            "Tu tono y estilo (profesional, cercano, conciso, etc.)",
+            "Derivación segura cuando no conviene responder (traspaso a una persona)",
+            "El siguiente paso adecuado para tu negocio (llamar, reservar, email, visita)"
+          ]
+        },
+        {
+          "id": "buildWithCustomers",
+          "title": "Construido con clientes (ventaja early-stage)",
+          "body": "Aliigo se construye con clientes, no aislado. Si entras ahora, puedes influir en:\n\n- Controles de voz y reglas de seguridad\n- Preguntas de cualificación (qué preguntar / cuándo preguntar)\n- Informes e insights de conversaciones\n- Integraciones realmente útiles\n\nSi quieres influir en el roadmap, escríbeme.\n\nContacto: legal@aliigo.com"
+        },
+        {
+          "id": "links",
+          "title": "Enlaces y transparencia",
+          "bullets": [
+            "Política de privacidad",
+            "DPA",
+            "Subprocesadores",
+            "Términos de uso",
+            "Acuerdo de suscripción"
+          ]
+        }
+      ],
+      "finalCta": {
+        "headline": "Prueba Aliigo en tu web hoy.",
+        "ctaPrimary": "Empezar prueba gratis"
       }
     }
   }
