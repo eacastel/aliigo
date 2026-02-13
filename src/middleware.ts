@@ -85,14 +85,6 @@ export default function middleware(req: NextRequest) {
 
   const pathLocale = getPathLocale(pathname);
 
-  // US landing shortcut: /en-us -> /en (force locale + USD)
-  if (pathname === "/en-us") {
-    url.pathname = "/en";
-    const res = NextResponse.redirect(url, 308);
-    setLocaleCookie(res, "en");
-    setCurrencyCookie(res, "USD");
-    return res;
-  }
 
   const ES_SLUG_REDIRECTS: Record<string, string> = {
     "/es/pricing": "/es/precios",
@@ -141,18 +133,9 @@ export default function middleware(req: NextRequest) {
   // 3) Let next-intl do the routing (defaultLocale fallback etc.)
   const res = handleI18nRouting(req);
 
-  // 3.5) Currency detection (EU => EUR, US/other => USD), allow manual override
-  const queryCurrency = normalizeCurrency(req.nextUrl.searchParams.get("currency"));
-  const cookieCurrency = normalizeCurrency(req.cookies.get(CURRENCY_COOKIE)?.value || "");
-
-  if (queryCurrency) {
-    setCurrencyCookie(res, queryCurrency);
-  } else {
-    const inferred = inferredCurrency(req);
-    if (!cookieCurrency || cookieCurrency !== inferred) {
-      setCurrencyCookie(res, inferred);
-    }
-  }
+  // 3.5) Currency detection (always by country; never by cookie or query)
+  const inferred = inferredCurrency(req);
+  setCurrencyCookie(res, inferred);
 
   const debugCountry = getCountryCode(req);
   if (debugCountry) {
