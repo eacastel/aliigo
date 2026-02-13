@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
 import BillingCheckout from "@/components/billing/BillingCheckout";
@@ -343,6 +343,29 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                         <li>• {safeT("starterF2", undefined, "Basic assistant + domain verification")}</li>
                         <li>• {safeT("starterF3", undefined, "Conversation history")}</li>
                       </ul>
+
+                      <div className="mt-4">
+                        {billing?.plan === "starter" ? (
+                          <button type="button" disabled className={btnNeutralStrong}>
+                            {safeT("currentPlan", undefined, "Current plan")}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => runBillingAction("change_plan", "starter")}
+                            disabled={portalLoading !== null}
+                            className={btnNeutral}
+                          >
+                            {portalLoading === "change_plan"
+                              ? safeT("loading", undefined, "Loading…")
+                              : safeT(
+                                  "switchToStarter",
+                                  undefined,
+                                  `Switch to Starter (${starterPrice} ${perMonth})`
+                                )}
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {/* Growth card */}
@@ -361,6 +384,29 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                         <li>• {safeT("growthF2", undefined, "Team workflows + analytics (coming)")}</li>
                         <li>• {safeT("growthF3", undefined, "Priority support")}</li>
                       </ul>
+
+                      <div className="mt-4">
+                        {billing?.plan === "growth" ? (
+                          <button type="button" disabled className={btnNeutralStrong}>
+                            {safeT("currentPlan", undefined, "Current plan")}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => runBillingAction("change_plan", "growth")}
+                            disabled={portalLoading !== null}
+                            className={btnBrand}
+                          >
+                            {portalLoading === "change_plan"
+                              ? safeT("loading", undefined, "Loading…")
+                              : safeT(
+                                  "upgradeToGrowth",
+                                  undefined,
+                                  `Upgrade to Growth (${growthPrice} ${perMonth})`
+                                )}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -369,8 +415,10 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                     <div className="text-sm font-semibold text-zinc-100">
                       {safeT("planProTitle", undefined, "Aliigo Pro")}
                     </div>
-                    <div className="mt-1 text-xs text-zinc-400">
-                      {safeT("planProDesc", undefined, "Custom. Contact support to set it up.")}
+                    <div className="mt-4">
+                      <Link href="/pricing#pro-contact" className={btnNeutral}>
+                        {safeT("planProCta", undefined, "Contact sales")}
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -380,40 +428,6 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                 {/* (3) Self-serve actions: upgrade / cancel / resume (no portal, no logout) */}
                 {canManage ? (
                   <div className="pt-2 flex flex-wrap gap-3">
-                    {/* Upgrade / downgrade */}
-                    {billing?.plan === "starter" ? (
-                      <button
-                        type="button"
-                        onClick={() => runBillingAction("change_plan", "growth")}
-                        disabled={portalLoading !== null}
-                        className={btnBrand}
-                      >
-                        {portalLoading === "change_plan"
-                          ? safeT("loading", undefined, "Loading…")
-                          : safeT(
-                              "upgradeToGrowth",
-                              undefined,
-                              `Upgrade to Growth (${growthPrice} ${perMonth})`
-                            )}
-                      </button>
-                    ) : billing?.plan === "growth" ? (
-                      <button
-                        type="button"
-                        onClick={() => runBillingAction("change_plan", "starter")}
-                        disabled={portalLoading !== null}
-                        className={btnNeutral}
-                      >
-                        {portalLoading === "change_plan"
-                          ? safeT("loading", undefined, "Loading…")
-                          : safeT(
-                              "switchToStarter",
-                              undefined,
-                              `Switch to Starter (${starterPrice} ${perMonth})`
-                            )}
-                      </button>
-
-                    ) : null}
-
                     {/* Cancel / Resume */}
                     {billing?.cancel_at_period_end ? (
                       <button
@@ -457,12 +471,12 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
 
           {/* ✅ keep support only */}
           <div className="mt-6">
-            <a
-              href="mailto:support@aliigo.com"
+            <Link
+              href="/pricing#pro-contact"
               className="inline-flex px-4 py-2 rounded-lg border border-zinc-800 text-sm text-zinc-200 hover:bg-zinc-900/60"
             >
               {safeT("contact", undefined, "Contact support")}
-            </a>
+            </Link>
           </div>
         </>
       )}
