@@ -41,7 +41,10 @@ export default function DashboardLayout({
       const s = data.session;
 
       if (!s?.user) {
-        router.replace("/login?redirect=/dashboard");
+        router.replace({
+          pathname: "/login",
+          query: { redirect: "/dashboard" },
+        });
         return;
       }
 
