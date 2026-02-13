@@ -337,11 +337,16 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           {starterPrice} <span className="text-zinc-500">{perMonth}</span>
                         </div>
                       </div>
+                      <div className="mt-1 text-xs text-zinc-400">
+                        {safeT("planStarterDesc", undefined, "Ideal for small local businesses.")}
+                      </div>
 
                       <ul className="mt-3 space-y-1 text-xs text-zinc-400">
-                        <li>• {safeT("starterF1", undefined, "Website chat widget + inbox")}</li>
-                        <li>• {safeT("starterF2", undefined, "Basic assistant + domain verification")}</li>
-                        <li>• {safeT("starterF3", undefined, "Conversation history")}</li>
+                        <li>• {safeT("starterF1", undefined, "Smart website chat assistant")}</li>
+                        <li>• {safeT("starterF2", undefined, "Generous monthly conversation volume")}</li>
+                        <li>• {safeT("starterF3", undefined, "Basic business setup")}</li>
+                        <li>• {safeT("starterF4", undefined, "Lead capture (name, email, phone)")}</li>
+                        <li>• {safeT("starterF5", undefined, "Support in Spanish and English")}</li>
                       </ul>
 
                       <div className="mt-4">
@@ -378,11 +383,18 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           {growthPrice} <span className="text-zinc-500">{perMonth}</span>
                         </div>
                       </div>
+                      <div className="mt-1 text-xs text-zinc-400">
+                        {safeT("planGrowthDesc", undefined, "Ideal for clinics, agencies, and service businesses.")}
+                      </div>
 
-                      <ul className="mt-3 space-y-1 text-xs text-zinc-400">
-                        <li>• {safeT("growthF1", undefined, "Advanced assistant controls")}</li>
-                        <li>• {safeT("growthF2", undefined, "Team workflows + analytics (coming)")}</li>
-                        <li>• {safeT("growthF3", undefined, "Priority support")}</li>
+                      <div className="mt-3 text-xs text-zinc-400">
+                        {safeT("growthIntro", undefined, "Everything in Starter, plus:")}
+                      </div>
+                      <ul className="mt-2 space-y-1 text-xs text-zinc-400">
+                        <li>• {safeT("growthF1", undefined, "Higher conversation volume")}</li>
+                        <li>• {safeT("growthF2", undefined, "More advanced customization")}</li>
+                        <li>• {safeT("growthF3", undefined, "More precise lead qualification")}</li>
+                        <li>• {safeT("growthF4", undefined, "Priority for high‑intent visitors")}</li>
                       </ul>
 
                       <div className="mt-4">
@@ -415,6 +427,21 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                     <div className="text-sm font-semibold text-zinc-100">
                       {safeT("planProTitle", undefined, "Aliigo Pro")}
                     </div>
+                    <div className="mt-1 text-xs text-zinc-400">
+                      {safeT("planProDesc", undefined, "Ideal for high‑traffic or high‑value businesses.")}
+                    </div>
+                    <div className="mt-2 text-sm text-zinc-300">
+                      {safeT("planProPrice", undefined, "from 349 €")}
+                    </div>
+                    <div className="mt-3 text-xs text-zinc-400">
+                      {safeT("planProIntro", undefined, "Everything in Growth, plus:")}
+                    </div>
+                    <ul className="mt-2 space-y-1 text-xs text-zinc-400">
+                      <li>• {safeT("proF1", undefined, "Tailored customization")}</li>
+                      <li>• {safeT("proF2", undefined, "Higher or unlimited message volume")}</li>
+                      <li>• {safeT("proF3", undefined, "Custom behaviors and flows")}</li>
+                      <li>• {safeT("proF4", undefined, "Built for high‑volume teams")}</li>
+                    </ul>
                     <div className="mt-4">
                       <Link href="/pricing#pro-contact" className={btnNeutral}>
                         {safeT("planProCta", undefined, "Contact sales")}
