@@ -97,6 +97,29 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const taggingSetting = cookieStore.get("aliigo_tagging")?.value;
   const allowTagging = taggingSetting !== "off";
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com").replace(/\/$/, "");
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Aliigo",
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
+    description: "Website AI assistant for businesses to answer questions, capture leads, and guide visitors.",
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        email: "legal@aliigo.com",
+        contactType: "legal",
+      },
+    ],
+  };
+  const siteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Aliigo",
+    url: siteUrl,
+    inLanguage: locale,
+  };
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -106,6 +129,14 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-background text-foreground`}>
         
         {GTM_ID && allowTagging && <GoogleTagManager gtmId={GTM_ID} />}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
+        />
         
         <NextIntlClientProvider messages={messages}>
           {children}
