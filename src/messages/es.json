@@ -465,7 +465,7 @@
   "Landing": {
     "founder": {
       "photoAlt": "Foto del fundador",
-      "name": "Emilio Castellanos Abis",
+      "name": "Emilio Castellanos",
       "role": "Fundador",
       "headline": "Para empresas que no pueden permitirse respuestas vagas.",
       "body": "Llevo más de 20 años creando sistemas digitales que ayudan a las empresas a ser encontradas, generar confianza y convertir clientes. Aliigo es mi respuesta a la era de la IA: un asistente web que utiliza tu información aprobada para guiar a los visitantes hacia acciones reales—sin poner en riesgo tu reputación.",
@@ -908,7 +908,7 @@
       "intro": "Este Aviso Legal regula el acceso y uso del sitio web aliigo.com (el “Sitio Web”) y del servicio software de Aliigo (el “Servicio”).",
       "section1": {
         "title": "1. Datos identificativos",
-        "content": "Titular: Emilio Castellanos Abis\nNIF: 55448913F\nDomicilio: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (España)\nEmail: legal@aliigo.com\nNombre comercial: Aliigo"
+        "content": "Titular: Emilio Castellanos\nNIF: 55448913F\nDomicilio: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (España)\nEmail: legal@aliigo.com\nNombre comercial: Aliigo"
       },
       "section2": {
         "title": "2. Objeto",
@@ -937,7 +937,7 @@
       "intro": "Esta Política de Privacidad explica cómo Aliigo trata datos personales en el Sitio Web y en el Servicio. Cuando Aliigo trate datos personales por cuenta de un cliente empresarial como encargado del tratamiento, será de aplicación el Anexo de Tratamiento de Datos (DPA).",
       "section1": {
         "title": "1. Responsable del tratamiento",
-        "content": "Responsable: Emilio Castellanos Abis (Aliigo)\nNIF: 55448913F\nDomicilio: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (España)\nContacto: legal@aliigo.com"
+        "content": "Responsable: Emilio Castellanos (Aliigo)\nNIF: 55448913F\nDomicilio: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (España)\nContacto: legal@aliigo.com"
       },
       "section2": {
         "title": "2. Datos que recopilamos",
@@ -1007,7 +1007,7 @@
       "intro": "Estos Términos de Uso (“Términos”) regulan el acceso y uso del sitio web de Aliigo y del servicio SaaS de Aliigo (“Servicio”). Al crear una cuenta, iniciar una prueba, suscribirte o usar el Servicio, aceptas estos Términos.",
       "section1": {
         "title": "1. Identidad",
-        "content": "Aliigo está operado por Emilio Castellanos Abis (València, España). Contacto: legal@aliigo.com."
+        "content": "Aliigo está operado por Emilio Castellanos (València, España). Contacto: legal@aliigo.com."
       },
       "section2": {
         "title": "2. Cómo aceptas estos Términos",
@@ -1133,7 +1133,7 @@
       "intro": "Este Acuerdo de Suscripción de Aliigo (el “Acuerdo”) regula el acceso de prueba y de pago al servicio software de Aliigo (el “Servicio”). Está pensado para uso profesional (empresas, entidades y organizaciones). Al marcar la casilla de aceptación en el registro/checkout, crear una cuenta, iniciar una prueba o suscribirte, aceptas este Acuerdo.",
       "section1": {
         "title": "1. Datos del prestador",
-        "content": "Prestador: Emilio Castellanos Abis (nombre comercial: Aliigo)\nNIF: 55448913F\nDomicilio: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València, España\nEmail: legal@aliigo.com"
+        "content": "Prestador: Emilio Castellanos (nombre comercial: Aliigo)\nNIF: 55448913F\nDomicilio: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València, España\nEmail: legal@aliigo.com"
       },
       "section2": {
         "title": "2. Estructura del Acuerdo",
@@ -1282,11 +1282,11 @@
       }
     },
     "founder": {
-      "metaTitle": "Emilio Castellanos Abis — Fundador de Aliigo",
+      "metaTitle": "Emilio Castellanos — Fundador de Aliigo",
       "metaDescription": "Conoce al fundador de Aliigo y por qué está diseñado con claridad, control y confianza—para que las empresas crezcan sin poner en riesgo su voz.",
       "hero": {
         "headline": "Hecho para empresas que no pueden permitirse “genéricos”.",
-        "subheadline": "Soy Emilio Castellanos Abis, fundador de Aliigo. Creo herramientas para responder más rápido, convertir mejor y proteger la confianza.",
+        "subheadline": "Soy Emilio Castellanos, fundador de Aliigo. Creo herramientas para responder más rápido, convertir mejor y proteger la confianza.",
         "ctaPrimary": "Empezar prueba gratis",
         "ctaSecondary": "Por qué Aliigo"
       },

@@ -8,7 +8,6 @@ export const routing = defineRouting({
   defaultLocale: 'es',
 
   localeDetection: true,
-  localeCookie: { name: 'NEXT_LOCALE' },
   pathnames: {
     '/': '/',
     '/pricing': {

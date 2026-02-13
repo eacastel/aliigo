@@ -15,8 +15,6 @@ export default async function PublicLayout({
 }) {
   const t = await getTranslations("Navigation");
   const cookieStore = await cookies();
-  const localeCookie = cookieStore.get("NEXT_LOCALE")?.value || "en";
-  const locale = localeCookie.toUpperCase();
   const currency = getCurrencyFromCookies(cookieStore) ?? "EUR";
   const debugCountry = cookieStore.get("aliigo_country_debug")?.value;
 

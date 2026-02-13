@@ -6,8 +6,6 @@ import { CURRENCY_COOKIE, currencyForCountry, normalizeCurrency } from "@/lib/cu
 const handleI18nRouting = createMiddleware(routing);
 
 const LOCALES = new Set(["en", "es"]);
-const LOCALE_COOKIE = "NEXT_LOCALE";
-const ONE_YEAR = 60 * 60 * 24 * 365;
 const ONE_MONTH = 60 * 60 * 24 * 30;
 const SPANISH_COUNTRIES = new Set([
   "ES", // Spain
@@ -21,11 +19,6 @@ function getCountryCode(req: NextRequest): string | null {
     req.headers.get("cf-ipcountry") ||
     null;
   return country ? country.toUpperCase() : null;
-}
-
-function getCookieLocale(req: NextRequest): "en" | "es" | null {
-  const v = (req.cookies.get(LOCALE_COOKIE)?.value || "").toLowerCase();
-  return LOCALES.has(v) ? (v as "en" | "es") : null;
 }
 
 function getBrowserLocale(req: NextRequest): "en" | "es" | null {
@@ -48,14 +41,6 @@ function getPathLocale(pathname: string): "en" | "es" | null {
   return LOCALES.has(seg1) ? (seg1 as "en" | "es") : null;
 }
 
-function setLocaleCookie(res: NextResponse, locale: "en" | "es") {
-  res.cookies.set(LOCALE_COOKIE, locale, {
-    path: "/",
-    maxAge: ONE_YEAR,
-    sameSite: "lax",
-  });
-}
-
 function setCurrencyCookie(res: NextResponse, currency: string) {
   res.cookies.set(CURRENCY_COOKIE, currency, {
     path: "/",
@@ -67,7 +52,7 @@ function setCurrencyCookie(res: NextResponse, currency: string) {
 function inferredCurrency(req: NextRequest): "EUR" | "USD" {
   const country = getCountryCode(req);
   if (country) return currencyForCountry(country);
-  const locale = getPathLocale(req.nextUrl.pathname) || getCookieLocale(req) || getBrowserLocale(req);
+  const locale = getPathLocale(req.nextUrl.pathname) || getBrowserLocale(req);
   return locale === "es" ? "EUR" : "USD";
 }
 
@@ -109,14 +94,12 @@ export default function middleware(req: NextRequest) {
   };
 
   // 2) If NO locale in path, redirect using:
-  //    cookie first -> country -> browser -> (let next-intl defaultLocale handle)
+  //    country -> browser -> (let next-intl defaultLocale handle)
   if (!pathLocale) {
-    const desired = getCookieLocale(req) || getCountryLocale(req) || getBrowserLocale(req);
+    const desired = getCountryLocale(req) || getBrowserLocale(req);
     if (desired) {
       url.pathname = `/${desired}${pathname === "/" ? "" : pathname}`;
-      const res = NextResponse.redirect(url);
-      setLocaleCookie(res, desired); // keep cookie consistent
-      return res;
+      return NextResponse.redirect(url);
     }
   }
 
@@ -144,14 +127,6 @@ export default function middleware(req: NextRequest) {
       maxAge: ONE_MONTH,
       sameSite: "lax",
     });
-  }
-
-  // 4) If locale IS in path, sync cookie to match it (nice-to-have)
-  if (pathLocale) {
-    const cookieLocale = getCookieLocale(req);
-    if (cookieLocale !== pathLocale) {
-      setLocaleCookie(res, pathLocale);
-    }
   }
 
   return res;

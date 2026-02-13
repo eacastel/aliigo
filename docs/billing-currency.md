@@ -11,10 +11,11 @@ This document describes how Aliigo handles currency for pricing display and Stri
 We set a cookie named `aliigo_currency` via middleware:
 - EU/EEA → `EUR`
 - US/other → `USD`
-- Manual override: `?currency=EUR` or `?currency=USD`
-- If country is unavailable (e.g., localhost), we fall back to locale:
+- If country is unavailable (e.g., localhost), we fall back to **path locale**:
   - `es` → `EUR`
   - `en` → `USD`
+
+**Important:** Locale is **not** stored in cookies anymore. Locale is determined by URL path (e.g., `/es`, `/en`) and browser language when no locale is present in the path. We removed `NEXT_LOCALE` usage to avoid stale locale issues.
 
 This cookie is used for:
 - Pricing display on public pages

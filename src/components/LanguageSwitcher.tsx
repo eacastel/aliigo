@@ -4,15 +4,6 @@ import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useTransition } from "react";
 
-
-const LOCALE_COOKIE = "NEXT_LOCALE";
-const ONE_YEAR = 60 * 60 * 24 * 365;
-
-function setLocaleCookie(nextLocale: "en" | "es") {
-  // Persist preference for future visits
-  document.cookie = `${LOCALE_COOKIE}=${nextLocale}; Path=/; Max-Age=${ONE_YEAR}; SameSite=Lax`;
-}
-
 export default function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
@@ -21,8 +12,6 @@ export default function LanguageSwitcher() {
 
   const toggleLanguage = () => {
     const nextLocale = (locale === "es" ? "en" : "es") as "en" | "es";
-
-    setLocaleCookie(nextLocale);
 
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });

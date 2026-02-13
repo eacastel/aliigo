@@ -464,7 +464,7 @@
   "Landing": {
     "founder": {
       "photoAlt": "Founder photo",
-      "name": "Emilio Castellanos Abis",
+      "name": "Emilio Castellanos",
       "role": "Founder",
       "headline": "Built for businesses that can’t afford vague answers.",
       "body": "I’ve spent 20+ years building digital systems that help businesses get found, earn trust, and convert customers. Aliigo is my answer to the AI era: a website assistant that uses your approved business knowledge to guide visitors to real outcomes—without risking your reputation.",
@@ -907,7 +907,7 @@
       "intro": "This Legal Notice governs access to and use of the website aliigo.com (the “Website”) and the Aliigo software service (the “Service”).",
       "section1": {
         "title": "1. Operator identification",
-        "content": "Legal owner: Emilio Castellanos Abis\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (Spain)\nEmail: legal@aliigo.com\nCommercial name: Aliigo"
+        "content": "Legal owner: Emilio Castellanos\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (Spain)\nEmail: legal@aliigo.com\nCommercial name: Aliigo"
       },
       "section2": {
         "title": "2. Purpose of the Website",
@@ -936,7 +936,7 @@
       "intro": "This Privacy Policy explains how Aliigo collects and processes personal data for the Website and the Service. Where Aliigo processes personal data on behalf of a business customer as a processor, the Data Processing Addendum (DPA) applies.",
       "section1": {
         "title": "1. Data controller",
-        "content": "Controller: Emilio Castellanos Abis (Aliigo)\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (Spain)\nContact: legal@aliigo.com"
+        "content": "Controller: Emilio Castellanos (Aliigo)\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València (Spain)\nContact: legal@aliigo.com"
       },
       "section2": {
         "title": "2. Data we collect",
@@ -1006,7 +1006,7 @@
       "intro": "These Terms of Use (“Terms”) govern access to and use of the Aliigo website and the Aliigo SaaS service (“Service”). By creating an account, starting a trial, subscribing, or otherwise using the Service, you agree to these Terms.",
       "section1": {
         "title": "1. Who we are",
-        "content": "Aliigo is operated by Emilio Castellanos Abis (València, Spain). Contact: legal@aliigo.com."
+        "content": "Aliigo is operated by Emilio Castellanos (València, Spain). Contact: legal@aliigo.com."
       },
       "section2": {
         "title": "2. How you accept these Terms",
@@ -1132,7 +1132,7 @@
       "intro": "This Aliigo Subscription Agreement (the “Agreement”) governs paid and trial access to the Aliigo software service (the “Service”). It is intended for business and organizational use. By checking the acceptance box at signup/checkout, creating an account, starting a trial, or subscribing, you agree to this Agreement.",
       "section1": {
         "title": "1. Provider details",
-        "content": "Provider: Emilio Castellanos Abis (commercial name: Aliigo)\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València, Spain\nEmail: legal@aliigo.com"
+        "content": "Provider: Emilio Castellanos (commercial name: Aliigo)\nTax ID (NIF): 55448913F\nAddress: C/ de Dalt, 37 · Bajo derecha, Ciutat Vella · 46003 València, Spain\nEmail: legal@aliigo.com"
       },
       "section2": {
         "title": "2. Structure of the agreement",
@@ -1281,11 +1281,11 @@
       }
     },
     "founder": {
-      "metaTitle": "Emilio Castellanos Abis — Founder of Aliigo",
+      "metaTitle": "Emilio Castellanos — Founder of Aliigo",
       "metaDescription": "Meet the founder behind Aliigo and why the product is built around clarity, control, and trust—so businesses can grow without risking their voice.",
       "hero": {
         "headline": "Built for businesses that can’t afford “generic.”",
-        "subheadline": "I’m Emilio Castellanos Abis, founder of Aliigo. I build tools that help businesses respond faster, convert better, and protect trust.",
+        "subheadline": "I’m Emilio Castellanos, founder of Aliigo. I build tools that help businesses respond faster, convert better, and protect trust.",
         "ctaPrimary": "Start free trial",
         "ctaSecondary": "Why Aliigo"
       },
