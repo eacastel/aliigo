@@ -9,6 +9,16 @@ type Section = {
   bullets?: string[];
 };
 
+function renderInlineWithBold(text: string) {
+  const parts = text.split(/(\*\*.+?\*\*)/g).filter(Boolean);
+  return parts.map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={idx}>{part.slice(2, -2)}</strong>;
+    }
+    return <span key={idx}>{part}</span>;
+  });
+}
+
 function renderBody(body: string) {
   const blocks = body.split("\n\n").map((b) => b.trim()).filter(Boolean);
   return blocks.map((block, i) => {
@@ -18,20 +28,20 @@ function renderBody(body: string) {
       return (
         <ul key={i} className="mt-3 space-y-2 text-sm text-zinc-300 list-disc pl-5">
           {lines.map((l) => (
-            <li key={l}>{l.replace(/^-\\s*/, "")}</li>
+            <li key={l}>{renderInlineWithBold(l.replace(/^-\\s*/, ""))}</li>
           ))}
         </ul>
       );
     }
-    const html = lines
-      .join("<br/>")
-      .replace(/\\*\\*(.+?)\\*\\*/g, "<strong>$1</strong>");
     return (
-      <p
-        key={i}
-        className="mt-3 text-sm text-zinc-300 leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <p key={i} className="mt-3 text-sm text-zinc-300 leading-relaxed">
+        {lines.map((line, idx) => (
+          <span key={idx}>
+            {renderInlineWithBold(line)}
+            {idx < lines.length - 1 ? <br /> : null}
+          </span>
+        ))}
+      </p>
     );
   });
 }
@@ -57,9 +67,35 @@ export default async function WhyAliigoPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.whyAliigo" });
   const sections = (t.raw("sections") as Section[]) || [];
+  const siteUrl =
+    (process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com").replace(/\/$/, "");
+  const pageUrl = `${siteUrl}/${locale}/why-aliigo`;
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: t("hero.headline"),
+    description: t("metaDescription"),
+    url: pageUrl,
+    inLanguage: locale,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Aliigo",
+      url: siteUrl,
+    },
+    about: {
+      "@type": "Organization",
+      name: "Aliigo",
+      url: siteUrl,
+      logo: `${siteUrl}/logo.png`,
+    },
+  };
 
   return (
     <main className="bg-zinc-950 text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       <section className="border-b border-white/5">
         <div className="max-w-4xl mx-auto px-4 py-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -76,7 +112,7 @@ export default async function WhyAliigoPage({
               {t("hero.ctaPrimary")}
             </Link>
             <Link
-              href="/#assistant-demo"
+              href={{ pathname: "/", hash: "assistant-demo" }}
               className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
             >
               {t("hero.ctaSecondary")}
@@ -114,7 +150,7 @@ export default async function WhyAliigoPage({
               {t("finalCta.ctaPrimary")}
             </Link>
             <Link
-              href="/#assistant-demo"
+              href={{ pathname: "/", hash: "assistant-demo" }}
               className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
             >
               {t("finalCta.ctaSecondary")}

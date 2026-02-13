@@ -85,6 +85,28 @@ export default function middleware(req: NextRequest) {
 
   const pathLocale = getPathLocale(pathname);
 
+  const ES_SLUG_REDIRECTS: Record<string, string> = {
+    "/es/pricing": "/es/precios",
+    "/es/signup": "/es/registro",
+    "/es/login": "/es/iniciar-sesion",
+    "/es/reset-password": "/es/restablecer-contrasena",
+    "/es/update-password": "/es/actualizar-contrasena",
+    "/es/check-email": "/es/revisar-correo",
+    "/es/why-aliigo": "/es/por-que-aliigo",
+    "/es/founder": "/es/fundador",
+  };
+
+  const EN_SLUG_REDIRECTS: Record<string, string> = {
+    "/en/precios": "/en/pricing",
+    "/en/registro": "/en/signup",
+    "/en/iniciar-sesion": "/en/login",
+    "/en/restablecer-contrasena": "/en/reset-password",
+    "/en/actualizar-contrasena": "/en/update-password",
+    "/en/revisar-correo": "/en/check-email",
+    "/en/por-que-aliigo": "/en/why-aliigo",
+    "/en/fundador": "/en/founder",
+  };
+
   // 2) If NO locale in path, redirect using:
   //    cookie first -> country -> browser -> (let next-intl defaultLocale handle)
   if (!pathLocale) {
@@ -95,6 +117,16 @@ export default function middleware(req: NextRequest) {
       setLocaleCookie(res, desired); // keep cookie consistent
       return res;
     }
+  }
+
+  // 2.5) Redirect legacy/alternate slugs to localized SEO slugs
+  if (pathLocale === "es" && ES_SLUG_REDIRECTS[pathname]) {
+    url.pathname = ES_SLUG_REDIRECTS[pathname];
+    return NextResponse.redirect(url, 308);
+  }
+  if (pathLocale === "en" && EN_SLUG_REDIRECTS[pathname]) {
+    url.pathname = EN_SLUG_REDIRECTS[pathname];
+    return NextResponse.redirect(url, 308);
   }
 
   // 3) Let next-intl do the routing (defaultLocale fallback etc.)
