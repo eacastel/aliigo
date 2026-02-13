@@ -470,6 +470,15 @@
     }
   },
   "Landing": {
+    "founder": {
+      "photoAlt": "Foto del fundador",
+      "name": "Emilio Castellanos Abis",
+      "role": "Fundador",
+      "headline": "Para empresas que no pueden permitirse respuestas vagas.",
+      "body": "Llevo más de 20 años creando sistemas digitales que ayudan a las empresas a ser encontradas, generar confianza y convertir clientes. Aliigo es mi respuesta a la era de la IA: un asistente web que utiliza tu información aprobada para guiar a los visitantes hacia acciones reales—sin poner en riesgo tu reputación.",
+      "trust": "Los primeros clientes tienen acceso directo a mí para la configuración y la optimización.",
+      "cta": "Por qué creé Aliigo"
+    },
     "hero": {
       "betaNote": "Ya disponible",
       "title": "Convierte tus visitas",
