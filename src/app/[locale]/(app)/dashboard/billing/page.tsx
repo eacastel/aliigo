@@ -95,7 +95,10 @@ export default function BillingPage() {
         const s = data.session;
 
         if (!s?.user) {
-          router.replace("/login?redirect=/dashboard/billing");
+          router.replace({
+            pathname: "/login",
+            query: { redirect: "/dashboard/billing" },
+          });
           return;
         }
 
