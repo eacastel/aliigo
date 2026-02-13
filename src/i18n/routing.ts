@@ -42,6 +42,34 @@ export const routing = defineRouting({
     '/founder': {
       en: '/founder',
       es: '/fundador'
+    },
+    '/dashboard': {
+      en: '/dashboard',
+      es: '/dashboard'
+    },
+    '/dashboard/widget': {
+      en: '/dashboard/widget',
+      es: '/dashboard/widget'
+    },
+    '/dashboard/messages': {
+      en: '/dashboard/messages',
+      es: '/dashboard/messages'
+    },
+    '/dashboard/help': {
+      en: '/dashboard/help',
+      es: '/dashboard/help'
+    },
+    '/dashboard/billing': {
+      en: '/dashboard/billing',
+      es: '/dashboard/billing'
+    },
+    '/dashboard/settings/business': {
+      en: '/dashboard/settings/business',
+      es: '/dashboard/settings/business'
+    },
+    '/dashboard/settings/assistant': {
+      en: '/dashboard/settings/assistant',
+      es: '/dashboard/settings/assistant'
     }
   }
 });
