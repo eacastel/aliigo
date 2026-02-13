@@ -83,6 +83,16 @@ export default function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const pathname = url.pathname;
 
+  // US landing: serve /en content at /en-us and force EN + USD
+  if (pathname === "/en-us" || pathname.startsWith("/en-us/")) {
+    const rest = pathname.slice("/en-us".length);
+    url.pathname = `/en${rest || ""}`;
+    const res = NextResponse.rewrite(url);
+    setLocaleCookie(res, "en");
+    setCurrencyCookie(res, "USD");
+    return res;
+  }
+
   const pathLocale = getPathLocale(pathname);
 
 
