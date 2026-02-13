@@ -1,6 +1,8 @@
 import { Link } from "@/i18n/routing";
+import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
+import { getCurrencyFromCookies, type AliigoCurrency } from "@/lib/currency";
 
 type Section = {
   id: string;
@@ -66,7 +68,22 @@ export default async function WhyAliigoPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.whyAliigo" });
-  const sections = (t.raw("sections") as Section[]) || [];
+  const cookieStore = await cookies();
+  const currency = (getCurrencyFromCookies(cookieStore) ?? "EUR") as AliigoCurrency;
+  const displayLocale = currency === "USD" ? "en-US" : locale;
+  const value = new Intl.NumberFormat(displayLocale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(500);
+  const interpolate = (input?: string) =>
+    input ? input.replace(/\{value\}/g, value) : input;
+  const sections = ((t.raw("sections") as Section[]) || []).map((section) => ({
+    ...section,
+    title: interpolate(section.title) ?? section.title,
+    body: interpolate(section.body),
+    bullets: section.bullets?.map((b) => interpolate(b) ?? b),
+  }));
   const siteUrl =
     (process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com").replace(/\/$/, "");
   const pageUrl = `${siteUrl}/${locale}/why-aliigo`;

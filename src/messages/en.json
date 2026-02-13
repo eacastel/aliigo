@@ -119,7 +119,7 @@
     "growthF3": "Priority support",
     "growthF4": "Priority for high‑intent visitors",
     "planProDesc": "Custom. Contact support to set it up.",
-    "planProPrice": "from €349",
+    "planProPrice": "from {price}",
     "planProIntro": "Everything in Growth, plus:",
     "proF1": "Tailored customization",
     "proF2": "Higher or unlimited message volume",
@@ -524,7 +524,7 @@
       "ideal": {
         "title": "Aliigo is ideal if:",
         "item1": "You sell services or consultations",
-        "item2": "A new client is worth €500+",
+        "item2": "A new client is worth {value}+",
         "item3": "You receive regular inquiries through your website"
       },
       "notIdeal": {
@@ -1256,7 +1256,7 @@
         {
           "id": "fit",
           "title": "Who it’s for / Who it’s not for",
-          "body": "**Aliigo is ideal if:**\n- You sell services (or high-consideration products)\n- One new customer is worth €500+ (or similar)\n- You get recurring questions and inquiries every week\n- You want growth without sacrificing trust\n\n**Aliigo is not ideal if:**\n- You want a “fun” chatbot with open-ended creativity\n- Your business requires fully human-only responses for every interaction\n- You expect AI to replace your team without clear rules and oversight"
+          "body": "**Aliigo is ideal if:**\n- You sell services (or high-consideration products)\n- One new customer is worth {value}+ (or similar)\n- You get recurring questions and inquiries every week\n- You want growth without sacrificing trust\n\n**Aliigo is not ideal if:**\n- You want a “fun” chatbot with open-ended creativity\n- Your business requires fully human-only responses for every interaction\n- You expect AI to replace your team without clear rules and oversight"
         },
         {
           "id": "founderNote",

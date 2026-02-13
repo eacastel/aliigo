@@ -119,7 +119,7 @@
     "growthF3": "Soporte prioritario",
     "growthF4": "Prioridad para visitantes con alta intención",
     "planProDesc": "Personalizado. Contacta soporte para configurarlo.",
-    "planProPrice": "349 € +",
+    "planProPrice": "desde {price}",
     "planProIntro": "Todo lo de Growth, y además:",
     "proF1": "Personalización a medida",
     "proF2": "Mayor volumen de mensajes o ilimitado",
@@ -525,7 +525,7 @@
       "ideal": {
         "title": "Aliigo es ideal si:",
         "item1": "Vendes servicios o consultas",
-        "item2": "Un nuevo cliente vale más de 500 €",
+        "item2": "Un nuevo cliente vale más de {value}",
         "item3": "Recibes consultas con frecuencia en tu web"
       },
       "notIdeal": {
@@ -1257,7 +1257,7 @@
         {
           "id": "fit",
           "title": "Para quién es / Para quién no es",
-          "body": "**Aliigo es ideal si:**\n- Vendes servicios (o productos de decisión importante)\n- Un cliente nuevo vale 500€+ (o similar)\n- Recibes consultas repetidas cada semana\n- Quieres crecer sin perder confianza\n\n**Aliigo no es ideal si:**\n- Buscas un chatbot “creativo” sin límites\n- Necesitas respuestas 100% humanas en todo momento\n- Quieres sustituir al equipo sin reglas claras ni supervisión"
+          "body": "**Aliigo es ideal si:**\n- Vendes servicios (o productos de decisión importante)\n- Un cliente nuevo vale {value}+ (o similar)\n- Recibes consultas repetidas cada semana\n- Quieres crecer sin perder confianza\n\n**Aliigo no es ideal si:**\n- Buscas un chatbot “creativo” sin límites\n- Necesitas respuestas 100% humanas en todo momento\n- Quieres sustituir al equipo sin reglas claras ni supervisión"
         },
         {
           "id": "founderNote",

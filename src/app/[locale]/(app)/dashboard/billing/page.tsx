@@ -71,6 +71,7 @@ export default function BillingPage() {
     p === "starter" ? priceFmt.format(99) : p === "growth" ? priceFmt.format(149) : "—";
   const starterPrice = priceForPlan("starter");
   const growthPrice = priceForPlan("growth");
+  const proPrice = priceFmt.format(349);
 
   const perMonth = safeT("perMonth", undefined, "/month");
 
@@ -434,7 +435,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                       {safeT("planProDesc", undefined, "Ideal for high‑traffic or high‑value businesses.")}
                     </div>
                     <div className="mt-2 text-sm text-zinc-300">
-                      {safeT("planProPrice", undefined, "from 349 €")}
+                      {safeT("planProPrice", { price: proPrice }, `from ${proPrice}`)}
                     </div>
                     <div className="mt-3 text-xs text-zinc-400">
                       {safeT("planProIntro", undefined, "Everything in Growth, plus:")}
