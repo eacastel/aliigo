@@ -446,7 +446,10 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                       <li>• {safeT("proF4", undefined, "Built for high‑volume teams")}</li>
                     </ul>
                     <div className="mt-4">
-                      <Link href="/pricing#pro-contact" className={btnNeutral}>
+                      <Link
+                        href={{ pathname: "/pricing", hash: "pro-contact" }}
+                        className={btnNeutral}
+                      >
                         {safeT("planProCta", undefined, "Contact sales")}
                       </Link>
                     </div>
@@ -502,7 +505,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
           {/* ✅ keep support only */}
           <div className="mt-6">
             <Link
-              href="/pricing#pro-contact"
+              href={{ pathname: "/pricing", hash: "pro-contact" }}
               className="inline-flex px-4 py-2 rounded-lg border border-zinc-800 text-sm text-zinc-200 hover:bg-zinc-900/60"
             >
               {safeT("contact", undefined, "Contact support")}
