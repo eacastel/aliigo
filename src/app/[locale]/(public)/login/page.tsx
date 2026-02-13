@@ -107,7 +107,11 @@ function LoginWithSearchParams() {
       const ok = res.ok && (j.status === "trialing" || j.status === "active");
 
       // 3) Route based on billing gate
-      router.push(ok ? redirect : "/dashboard/billing");
+      if (ok && redirect.startsWith("/")) {
+        window.location.assign(redirect);
+      } else {
+        router.push("/dashboard/billing");
+      }
     } finally {
       setLoading(false);
     }

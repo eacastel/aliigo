@@ -50,7 +50,7 @@ export default async function PricingPage({
               {p("ctaPrimary")}
             </Link>
             <Link
-              href="#pro-contact"
+              href={{ pathname: "/pricing", hash: "pro-contact" }}
               className="rounded-lg border border-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/30"
             >
               {p("ctaSecondary")}
@@ -82,7 +82,7 @@ export default async function PricingPage({
               </div>
 
               <Link
-                href="/signup?plan=starter"
+                href={{ pathname: "/signup", query: { plan: "starter" } }}
                 className="block w-full rounded-lg border border-white/5 bg-zinc-800 py-3 text-center text-sm font-semibold text-white transition hover:bg-zinc-700"
               >
                 {t("pricing.starter.cta")}
@@ -140,7 +140,7 @@ export default async function PricingPage({
               </div>
 
               <Link
-                href="/signup?plan=growth"
+                href={{ pathname: "/signup", query: { plan: "growth" } }}
                 className="block w-full rounded-lg bg-[#84c9ad] py-3 text-center text-sm font-bold text-zinc-900 shadow-lg shadow-[#84c9ad]/20 transition hover:bg-[#73bba0]"
               >
                 {t("pricing.growth.cta")}
@@ -194,7 +194,7 @@ export default async function PricingPage({
               </div>
 
               <Link
-                href="#pro-contact"
+                href={{ pathname: "/pricing", hash: "pro-contact" }}
                 className="block w-full rounded-lg border border-white/5 bg-zinc-800 py-3 text-center text-sm font-semibold text-white transition hover:bg-zinc-700"
               >
                 {t("pricing.pro.cta")}

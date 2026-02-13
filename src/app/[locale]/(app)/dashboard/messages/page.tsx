@@ -124,7 +124,10 @@ export default function DashboardMessagesPage() {
         const session = data.session;
 
         if (!session?.user) {
-          router.replace("/login?redirect=/dashboard/messages");
+          router.replace({
+            pathname: "/login",
+            query: { redirect: "/dashboard/messages" },
+          });
           return;
         }
 
@@ -236,7 +239,10 @@ export default function DashboardMessagesPage() {
 
   const openConversation = (conversationId: string) => {
     if (!conversationId) return;
-    router.push(`/dashboard/messages?conversationId=${conversationId}`);
+    router.push({
+      pathname: "/dashboard/messages",
+      query: { conversationId },
+    });
   };
 
   const closeConversation = () => {

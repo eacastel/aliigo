@@ -68,8 +68,13 @@ type ChecklistItem = {
   label: string;
   done: boolean;
   required: boolean;
-  href: string;
+  href: DashboardRoute;
 };
+
+type DashboardRoute =
+  | "/dashboard/settings/business"
+  | "/dashboard/settings/assistant"
+  | "/dashboard/widget";
 
 function pct(done: number, total: number) {
   if (total <= 0) return 0;
@@ -515,7 +520,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between px-4 py-3 bg-zinc-950/50">
                   <div className="text-sm font-medium text-zinc-200">{g.group}</div>
                   <Link
-                    href={g.items[0]?.href}
+                    href={g.items[0]?.href ?? "/dashboard"}
                     className="text-sm font-medium text-brand-400 hover:text-brand-300"
                   >
                     {t("onboarding.open")}

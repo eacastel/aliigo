@@ -31,7 +31,7 @@ export default function DashboardLayout({
     { href: "/dashboard/messages", label: t('links.messages') },
     { href: "/dashboard/billing", label: t('links.billing') },
     { href: "/dashboard/help", label: t('links.help') },
-  ];
+  ] as const;
 
   useEffect(() => {
     let cancelled = false;

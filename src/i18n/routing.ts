@@ -70,6 +70,34 @@ export const routing = defineRouting({
     '/dashboard/settings/assistant': {
       en: '/dashboard/settings/assistant',
       es: '/dashboard/settings/assistant'
+    },
+    '/legal/aviso-legal': {
+      en: '/legal/aviso-legal',
+      es: '/legal/aviso-legal'
+    },
+    '/legal/privacidad': {
+      en: '/legal/privacidad',
+      es: '/legal/privacidad'
+    },
+    '/legal/cookies': {
+      en: '/legal/cookies',
+      es: '/legal/cookies'
+    },
+    '/legal/terminos': {
+      en: '/legal/terminos',
+      es: '/legal/terminos'
+    },
+    '/legal/subscription-agreement': {
+      en: '/legal/subscription-agreement',
+      es: '/legal/subscription-agreement'
+    },
+    '/legal/dpa': {
+      en: '/legal/dpa',
+      es: '/legal/dpa'
+    },
+    '/legal/subprocessors': {
+      en: '/legal/subprocessors',
+      es: '/legal/subprocessors'
     }
   }
 });

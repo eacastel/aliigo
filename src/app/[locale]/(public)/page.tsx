@@ -140,7 +140,7 @@ export default function HomePage() {
                   {t("hero.ctaPrimary")}
                 </Link>
                 <Link
-                  href="#assistant-demo"
+                  href={{ pathname: "/", hash: "assistant-demo" }}
                   className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
                 >
                   {t("hero.ctaSecondary")}
@@ -648,7 +648,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/signup?plan=starter"
+                href={{ pathname: "/signup", query: { plan: "starter" } }}
                 className="block w-full py-3 px-4 bg-zinc-800 text-white text-center rounded-lg text-sm font-semibold hover:bg-zinc-700 transition-colors border border-white/5"
               >
                 {t("pricing.starter.cta")}
@@ -707,7 +707,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/signup?plan=growth"
+                href={{ pathname: "/signup", query: { plan: "growth" } }}
                 className="block w-full py-3 px-4 bg-[#84c9ad] text-zinc-900 text-center rounded-lg text-sm font-bold hover:bg-[#73bba0] transition-colors shadow-lg shadow-[#84c9ad]/20"
               >
                 {t("pricing.growth.cta")}
@@ -764,7 +764,7 @@ export default function HomePage() {
               </div>
 
               <Link
-                href="/pricing#pro-contact"
+                href={{ pathname: "/pricing", hash: "pro-contact" }}
                 className="block w-full py-3 px-4 bg-zinc-800 text-white text-center rounded-lg text-sm font-semibold hover:bg-zinc-700 transition-colors border border-white/5"
               >
                 {t("pricing.pro.cta")}

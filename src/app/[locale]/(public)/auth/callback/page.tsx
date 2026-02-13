@@ -85,7 +85,11 @@ export default function AuthCallbackPage() {
         }
 
         // Default: go to whatever caller requested (or login)
-        router.replace({ pathname: next });
+        if (next.startsWith("/")) {
+          window.location.assign(next);
+        } else {
+          router.replace("/login");
+        }
       } catch (e) {
         console.error("Auth callback unexpected error:", e);
         router.replace("/login");
