@@ -1,7 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
-import { CURRENCY_COOKIE, currencyForCountry, normalizeCurrency } from "@/lib/currency";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -41,21 +40,6 @@ function getPathLocale(pathname: string): "en" | "es" | null {
   return LOCALES.has(seg1) ? (seg1 as "en" | "es") : null;
 }
 
-function setCurrencyCookie(res: NextResponse, currency: string) {
-  res.cookies.set(CURRENCY_COOKIE, currency, {
-    path: "/",
-    maxAge: ONE_MONTH,
-    sameSite: "lax",
-  });
-}
-
-function inferredCurrency(req: NextRequest): "EUR" | "USD" {
-  const country = getCountryCode(req);
-  if (country) return currencyForCountry(country);
-  const locale = getPathLocale(req.nextUrl.pathname) || getBrowserLocale(req);
-  return locale === "es" ? "EUR" : "USD";
-}
-
 export default function middleware(req: NextRequest) {
   // 1) Keep your www redirect
   const host = req.headers.get("host") || "";
@@ -69,7 +53,6 @@ export default function middleware(req: NextRequest) {
   const pathname = url.pathname;
 
   const pathLocale = getPathLocale(pathname);
-
 
   const ES_SLUG_REDIRECTS: Record<string, string> = {
     "/es/pricing": "/es/precios",
@@ -115,10 +98,6 @@ export default function middleware(req: NextRequest) {
 
   // 3) Let next-intl do the routing (defaultLocale fallback etc.)
   const res = handleI18nRouting(req);
-
-  // 3.5) Currency detection (always by country; never by cookie or query)
-  const inferred = inferredCurrency(req);
-  setCurrencyCookie(res, inferred);
 
   const debugCountry = getCountryCode(req);
   if (debugCountry) {

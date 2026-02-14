@@ -1,9 +1,5 @@
 // src/lib/currency.ts
-import type { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
-
 export type AliigoCurrency = "EUR" | "USD";
-
-export const CURRENCY_COOKIE = "aliigo_currency";
 
 const EU_COUNTRIES = new Set([
   "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT",
@@ -26,13 +22,10 @@ export function currencyForCountry(countryCode?: string | null): AliigoCurrency 
   return "USD";
 }
 
-export function getCurrencyFromCookies(cookies: ReadonlyRequestCookies): AliigoCurrency | null {
-  const v = cookies.get(CURRENCY_COOKIE)?.value || "";
-  return normalizeCurrency(v);
-}
-
-export function getClientCurrency(): AliigoCurrency | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(new RegExp(`(?:^|; )${CURRENCY_COOKIE}=([^;]+)`));
-  return normalizeCurrency(match?.[1] ?? null);
+export function getCurrencyFromHeaders(headers: Headers): AliigoCurrency {
+  const country =
+    headers.get("x-vercel-ip-country") ||
+    headers.get("cf-ipcountry") ||
+    null;
+  return currencyForCountry(country);
 }

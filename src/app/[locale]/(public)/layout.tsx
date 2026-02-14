@@ -3,10 +3,8 @@
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { cookies } from "next/headers";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
-import { getCurrencyFromCookies } from "@/lib/currency";
 
 export default async function PublicLayout({
   children,
@@ -14,10 +12,6 @@ export default async function PublicLayout({
   children: React.ReactNode;
 }) {
   const t = await getTranslations("Navigation");
-  const cookieStore = await cookies();
-  const currency = getCurrencyFromCookies(cookieStore) ?? "EUR";
-  const debugCountry = cookieStore.get("aliigo_country_debug")?.value;
-
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-[#84c9ad]/30">
       
