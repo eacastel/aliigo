@@ -489,18 +489,18 @@
     "clarity": {
       "title": "Para negocios que transforman visitas en clientes",
       "card1": {
-        "title": "Reciben preguntas repetitivas en su web",
-        "benefit": "Responde al instante y evita perder oportunidades."
+        "title": "Responde preguntas repetitivas",
+        "benefit": "Evita perder oportunidades."
       },
       "card2": {
-        "title": "Quieren captar más contactos cualificados",
+        "title": "Guía el siguiente paso",
         "benefit": "Detecta intención real y pide lo justo."
       },
       "card3": {
-        "title": "No responden al instante fuera del horario",
-        "benefit": "Atiende 24/7 sin estar conectado."
+        "title": "Está disponible a cualquier hora",
+        "benefit": "Atiende apropiadamente 24/7."
       },
-      "note": "Aliigo actúa como un mostrador digital — sin sustituir a tu equipo."
+      "note": "Aliigo actúa como el mostrador digital de tu empresa."
     },
     "impact": {
       "title": "Más que un chatbot: un motor de crecimiento",
@@ -525,7 +525,7 @@
     "fitFilter": {
       "ideal": {
         "title": "Aliigo es ideal si:",
-        "item1": "Vendes servicios o consultas",
+        "item1": "Vendes servicios o productos",
         "item2": "Un nuevo cliente vale más de {value}",
         "item3": "Recibes consultas con frecuencia en tu web"
       },

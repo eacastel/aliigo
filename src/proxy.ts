@@ -6,6 +6,7 @@ const handleI18nRouting = createMiddleware(routing);
 
 const LOCALES = new Set(["en", "es"]);
 const ONE_MONTH = 60 * 60 * 24 * 30;
+const LOCALE_COOKIE = "NEXT_LOCALE";
 const SPANISH_COUNTRIES = new Set([
   "ES", // Spain
   "MX", "AR", "CO", "CL", "PE", "VE", "EC", "GT", "CU", "BO", "DO", "HN", "PY", "SV",
@@ -40,6 +41,20 @@ function getPathLocale(pathname: string): "en" | "es" | null {
   return LOCALES.has(seg1) ? (seg1 as "en" | "es") : null;
 }
 
+function setLocaleCookie(res: NextResponse, locale: "en" | "es") {
+  res.cookies.set(LOCALE_COOKIE, locale, {
+    path: "/",
+    maxAge: ONE_MONTH,
+    sameSite: "lax",
+  });
+}
+
+function getLocaleCookie(req: NextRequest): "en" | "es" | null {
+  const v = req.cookies.get(LOCALE_COOKIE)?.value;
+  if (!v) return null;
+  return v === "en" || v === "es" ? v : null;
+}
+
 export default function middleware(req: NextRequest) {
   // 1) Keep your www redirect
   const host = req.headers.get("host") || "";
@@ -53,6 +68,7 @@ export default function middleware(req: NextRequest) {
   const pathname = url.pathname;
 
   const pathLocale = getPathLocale(pathname);
+  const cookieLocale = getLocaleCookie(req);
 
   const ES_SLUG_REDIRECTS: Record<string, string> = {
     "/es/pricing": "/es/precios",
@@ -76,28 +92,44 @@ export default function middleware(req: NextRequest) {
     "/en/fundador": "/en/founder",
   };
 
-  // 2) If NO locale in path, redirect using:
-  //    country -> browser -> (let next-intl defaultLocale handle)
+  // 2) If locale cookie exists and differs from path locale, redirect to cookie locale path
+  if (pathLocale && cookieLocale && pathLocale !== cookieLocale) {
+    const rest = pathname.replace(/^\/(en|es)/, "");
+    url.pathname = `/${cookieLocale}${rest || ""}`;
+    const res = NextResponse.redirect(url, 308);
+    setLocaleCookie(res, cookieLocale);
+    return res;
+  }
+
+  // 3) If NO locale in path, redirect using:
+  //    locale cookie -> country -> browser -> (let next-intl defaultLocale handle)
   if (!pathLocale) {
-    const desired = getCountryLocale(req) || getBrowserLocale(req);
+    const desired = cookieLocale || getCountryLocale(req) || getBrowserLocale(req);
     if (desired) {
       url.pathname = `/${desired}${pathname === "/" ? "" : pathname}`;
-      return NextResponse.redirect(url);
+      const res = NextResponse.redirect(url);
+      setLocaleCookie(res, desired);
+      return res;
     }
   }
 
-  // 2.5) Redirect legacy/alternate slugs to localized SEO slugs
+  // 4) Redirect legacy/alternate slugs to localized SEO slugs
   if (pathLocale === "es" && ES_SLUG_REDIRECTS[pathname]) {
     url.pathname = ES_SLUG_REDIRECTS[pathname];
-    return NextResponse.redirect(url, 308);
+    const res = NextResponse.redirect(url, 308);
+    setLocaleCookie(res, "es");
+    return res;
   }
   if (pathLocale === "en" && EN_SLUG_REDIRECTS[pathname]) {
     url.pathname = EN_SLUG_REDIRECTS[pathname];
-    return NextResponse.redirect(url, 308);
+    const res = NextResponse.redirect(url, 308);
+    setLocaleCookie(res, "en");
+    return res;
   }
 
   // 3) Let next-intl do the routing (defaultLocale fallback etc.)
   const res = handleI18nRouting(req);
+  if (pathLocale) setLocaleCookie(res, pathLocale);
 
   const debugCountry = getCountryCode(req);
   if (debugCountry) {

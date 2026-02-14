@@ -14,6 +14,7 @@ export default function LanguageSwitcher() {
     const nextLocale = (locale === "es" ? "en" : "es") as "en" | "es";
 
     startTransition(() => {
+      document.cookie = `NEXT_LOCALE=${nextLocale}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax`;
       router.replace(pathname, { locale: nextLocale });
     });
   };

@@ -48,6 +48,10 @@ If using prod keys, mirror with your prod environment values.
   - `src/app/[locale]/(app)/dashboard/billing/page.tsx` → `BillingPageClient`
   - `src/components/billing/PlanSelector.tsx`
 
+## Implementation notes (Feb 2026)
+- `headers()` is async in this Next.js version; server wrappers must `await headers()` before calling `getCurrencyFromHeaders`.
+- Any client components that need currency should receive it via props from a server wrapper (no cookies).
+
 ## Notes
 - Language is **not** tied to Stripe product/prices.
 - Pricing injected into the AI prompt is **aliigo.com only**.

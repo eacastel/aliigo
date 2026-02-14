@@ -26,3 +26,4 @@ This document lists the homepage sections that were moved into `src/components/h
 ## Notes
 - Components were moved without markup changes.
 - Currency formatting is passed into `HomePageClient` and then into `FitFilterSection` and `PricingSection`.
+- `HomePageClient` is now a client-only assembler; `page.tsx` is a server wrapper that injects `initialCurrency`.
