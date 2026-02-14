@@ -26,15 +26,6 @@ export function currencyForCountry(countryCode?: string | null): AliigoCurrency 
   return "USD";
 }
 
-export function getCurrencyFromHeaders(headers: Headers): AliigoCurrency | null {
-  const country =
-    headers.get("x-vercel-ip-country") ||
-    headers.get("cf-ipcountry") ||
-    null;
-  if (!country) return null;
-  return currencyForCountry(country);
-}
-
 export function getCurrencyFromCookies(cookies: ReadonlyRequestCookies): AliigoCurrency | null {
   const v = cookies.get(CURRENCY_COOKIE)?.value || "";
   return normalizeCurrency(v);

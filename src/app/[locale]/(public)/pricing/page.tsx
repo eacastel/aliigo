@@ -2,16 +2,25 @@ import { Link } from "@/i18n/routing";
 import { getLocale, getTranslations } from "next-intl/server";
 import { CheckCircle2, Sparkles, Building2, Store, Zap } from "lucide-react";
 import { ProContactForm } from "@/components/ProContactForm";
-import { headers } from "next/headers";
-import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
+import { cookies } from "next/headers";
+import { getCurrencyFromCookies, type AliigoCurrency } from "@/lib/currency";
 
-export default async function PricingPage() {
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams?: { currency?: string | string[] };
+}) {
   const t = await getTranslations("Landing");
   const p = await getTranslations("PricingPage");
   const locale = await getLocale();
-  const headerStore = await headers();
-  const inferred = getCurrencyFromHeaders(headerStore);
-  const currency = (inferred ?? (locale === "es" ? "EUR" : "USD")) as AliigoCurrency;
+  const cookieStore = await cookies();
+  const paramCurrency = Array.isArray(searchParams?.currency)
+    ? searchParams?.currency[0]
+    : searchParams?.currency;
+  const currency =
+    (paramCurrency?.toUpperCase() === "USD" || paramCurrency?.toUpperCase() === "EUR"
+      ? (paramCurrency.toUpperCase() as AliigoCurrency)
+      : getCurrencyFromCookies(cookieStore)) ?? "EUR";
   const displayLocale = currency === "USD" ? "en-US" : locale;
   const priceFmt = new Intl.NumberFormat(displayLocale, { style: "currency", currency, maximumFractionDigits: 0 });
   const starterPrice = priceFmt.format(99);

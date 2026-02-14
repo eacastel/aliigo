@@ -22,15 +22,6 @@ const supabaseAdmin = createClient(
   { auth: { persistSession: false } }
 );
 
-const DEFAULT_THEME = {
-  headerBg: "#111827 #ffffff",
-  bubbleUser: "#2563eb #ffffff",
-  bubbleBot: "#f3f4f6 #111827",
-  sendBg: "#2563eb #ffffff",
-  panelBg: "#09090b",
-  panelOpacity: 0.72,
-};
-
 export async function GET(req: NextRequest) {
   try {
     // Pull Aliigo’s own business record by slug (change if you want env-based)
@@ -68,9 +59,7 @@ export async function GET(req: NextRequest) {
 
     const locale = (bizRes.data.default_locale || "en").toLowerCase().startsWith("es") ? "es" : "en";
     const brand = (bizRes.data.brand_name || bizRes.data.name || "Aliigo").trim();
-    const theme = (bizRes.data.widget_theme && typeof bizRes.data.widget_theme === "object")
-      ? bizRes.data.widget_theme
-      : DEFAULT_THEME;
+    const theme = bizRes.data.widget_theme ?? null;
 
     return json({ token, locale, brand, theme }, 200);
   } catch (e: unknown) {
