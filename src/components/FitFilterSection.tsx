@@ -1,24 +1,14 @@
 "use client";
 
 import { CheckCircle2, XCircle } from "lucide-react";
-import { useMemo } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { getClientCurrency, type AliigoCurrency } from "@/lib/currency";
+import { useTranslations } from "next-intl";
 
-export function FitFilterSection() {
+type FitFilterSectionProps = {
+  value: string;
+};
+
+export function FitFilterSection({ value }: FitFilterSectionProps) {
   const t = useTranslations("Landing.fitFilter");
-  const locale = useLocale();
-  const currency = (getClientCurrency() ?? "EUR") as AliigoCurrency;
-  const displayLocale = currency === "USD" ? "en-US" : locale;
-  const value = useMemo(
-    () =>
-      new Intl.NumberFormat(displayLocale, {
-        style: "currency",
-        currency,
-        maximumFractionDigits: 0,
-      }).format(500),
-    [displayLocale, currency]
-  );
 
   return (
     <section className="border-b border-white/5 bg-zinc-950">

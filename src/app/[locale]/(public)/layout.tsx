@@ -6,7 +6,6 @@ import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
-import { getCurrencyFromCookies } from "@/lib/currency";
 
 export default async function PublicLayout({
   children,
@@ -15,7 +14,6 @@ export default async function PublicLayout({
 }) {
   const t = await getTranslations("Navigation");
   const cookieStore = await cookies();
-  const currency = getCurrencyFromCookies(cookieStore) ?? "EUR";
   const debugCountry = cookieStore.get("aliigo_country_debug")?.value;
 
   return (

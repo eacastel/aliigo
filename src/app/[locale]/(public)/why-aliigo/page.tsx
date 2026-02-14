@@ -1,8 +1,8 @@
 import { Link } from "@/i18n/routing";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import { getCurrencyFromCookies, type AliigoCurrency } from "@/lib/currency";
+import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
 
 type Section = {
   id: string;
@@ -68,8 +68,9 @@ export default async function WhyAliigoPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.whyAliigo" });
-  const cookieStore = await cookies();
-  const currency = (getCurrencyFromCookies(cookieStore) ?? "EUR") as AliigoCurrency;
+  const headerStore = await headers();
+  const inferred = getCurrencyFromHeaders(headerStore);
+  const currency = (inferred ?? (locale === "es" ? "EUR" : "USD")) as AliigoCurrency;
   const displayLocale = currency === "USD" ? "en-US" : locale;
   const value = new Intl.NumberFormat(displayLocale, {
     style: "currency",
