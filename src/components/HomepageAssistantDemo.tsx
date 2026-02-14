@@ -16,6 +16,15 @@ type SupportCfg = {
   theme: WidgetTheme | null;
 };
 
+const DEFAULT_THEME: WidgetTheme = {
+  headerBg: "#111827 #ffffff",
+  bubbleUser: "#2563eb #ffffff",
+  bubbleBot: "#f3f4f6 #111827",
+  sendBg: "#2563eb #ffffff",
+  panelBg: "#09090b",
+  panelOpacity: 0.72,
+};
+
 function isWidgetTheme(x: unknown): x is WidgetTheme {
   if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
@@ -78,7 +87,7 @@ export function HomepageAssistantDemo() {
         locale={locale}
         brand={cfg.brand}
         sessionToken={cfg.token}
-        theme={cfg.theme ?? undefined}
+        theme={cfg.theme ?? DEFAULT_THEME}
         startOpen
         hideHeader
       />

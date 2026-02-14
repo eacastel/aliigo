@@ -99,6 +99,16 @@ export function AliigoWidgetElement({
 
   const themeAttr = theme ? JSON.stringify(theme) : undefined;
 
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el) return;
+    if (themeAttr) {
+      el.setAttribute("theme", themeAttr);
+    } else {
+      el.removeAttribute("theme");
+    }
+  }, [themeAttr]);
+
   return (
     <aliigo-widget
       ref={elRef}

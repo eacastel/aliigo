@@ -234,8 +234,50 @@ export default function HomePageClient({ initialCurrency }: HomePageClientProps)
               </div>
             </div>
 
-            {/* RIGHT: DEMO COMPONENT */}
-            <HomepageAssistantDemo />
+            {/* RIGHT: THE STAGE */}
+            <div className="relative mx-auto w-full max-w-[420px]">
+              <div className="relative rounded-[3rem] bg-zinc-900 border-[10px] border-zinc-900 shadow-[0_50px_100px_-20px_rgba(50,50,93,0.25)] overflow-hidden ring-1 ring-black/5 z-20 transform transition-transform hover:scale-[1.01] duration-500">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 bg-zinc-900 rounded-b-xl z-30" />
+
+                <div className="bg-white h-[650px] w-full flex flex-col relative pt-8">
+                  {/* Status Bar Fake */}
+                  <div className="px-6 flex justify-between items-center text-[10px] font-bold text-zinc-400 mb-2">
+                    <span>{t("demo.phone.time")}</span>
+                    <div className="flex gap-1">
+                      <span>{t("demo.phone.statusConnection")}</span>
+                      <span>{t("demo.phone.statusWifi")}</span>
+                      <span>{t("demo.phone.statusBattery")}</span>
+                    </div>
+                  </div>
+
+                  {/* Header */}
+                  <div className="px-4 py-3 border-b border-zinc-100 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#84c9ad] to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                        AI
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-zinc-900">
+                          {t("demo.phone.agentName")}
+                        </div>
+                        <div className="text-xs text-emerald-500 font-medium">
+                          {t("demo.phone.agentSub")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Widget Area */}
+                  <div className="flex-1 bg-zinc-700 relative overflow-hidden">
+                    <HomepageAssistantDemo />
+                  </div>
+                </div>
+              </div>
+
+              {/* Decorative elements behind the phone */}
+              <div className="absolute top-20 -right-12 w-24 h-24 bg-[#84c9ad] rounded-2xl rotate-12 blur-sm opacity-20 z-0 animate-pulse" />
+              <div className="absolute bottom-20 -left-12 w-32 h-32 bg-purple-400 rounded-full blur-xl opacity-20 z-0" />
+            </div>
           </div>
         </div>
       </section>
