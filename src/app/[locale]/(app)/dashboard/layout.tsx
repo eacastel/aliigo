@@ -2,26 +2,32 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import "../../../globals.css";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing"; 
 import { supabase } from "@/lib/supabaseClient";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { BillingGateProvider } from "@/components/BillingGateContext";
+
+const UNVERIFIED_LAST_24H_THRESHOLD = 24;
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = useLocale();
   const t = useTranslations('Navigation');
   const billingT = useTranslations("Billing");
+  const dashboardT = useTranslations("Dashboard");
   const path = usePathname();
   const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
   const [billingStatus, setBillingStatus] = useState<"loading" | "active" | "inactive">("loading");
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+  const [verificationDeadline, setVerificationDeadline] = useState<string | null>(null);
 
   const nav = [
     { href: "/dashboard", label: t('links.dashboard') },
@@ -51,6 +57,22 @@ export default function DashboardLayout({
 
       setEmail(s.user.email ?? null);
 
+      const { data: profile, error: profileErr } = await supabase
+        .from("business_profiles")
+        .select("email, email_verified_at, email_verification_deadline")
+        .eq("id", s.user.id)
+        .maybeSingle();
+
+      if (!profileErr && !cancelled) {
+        const profileEmail =
+          typeof profile?.email === "string" ? profile.email.trim() : null;
+        if (!s.user.email && profileEmail) {
+          setEmail(profileEmail);
+        }
+        setIsVerified(Boolean(profile?.email_verified_at));
+        setVerificationDeadline(profile?.email_verification_deadline ?? null);
+      }
+
       const token = s.access_token;
 
       const res = await fetch("/api/billing/status", {
@@ -71,6 +93,37 @@ export default function DashboardLayout({
     };
   }, [router]);
 
+  const unverifiedHoursRemaining = useMemo(() => {
+    if (isVerified !== false || !verificationDeadline) return null;
+    return Math.floor((new Date(verificationDeadline).getTime() - Date.now()) / 3_600_000);
+  }, [isVerified, verificationDeadline]);
+
+  const handleResendVerification = async () => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return;
+
+    const res = await fetch("/api/verification/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ purpose: "signup", locale }),
+    });
+    const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+
+    if (!res.ok || body.ok !== true) {
+      alert(
+        dashboardT("resendError", {
+          error: typeof body.error === "string" ? body.error : "Unexpected error",
+        })
+      );
+      return;
+    }
+    alert(dashboardT("resendSuccess"));
+  };
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -80,6 +133,7 @@ export default function DashboardLayout({
   const billingActive = billingStatus === "active";
   const showBillingBanner =
     billingStatus === "inactive" && path !== "/dashboard/billing";
+  const showVerificationBanner = isVerified === false;
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
@@ -188,6 +242,63 @@ export default function DashboardLayout({
                       >
                         {billingT("activateCta")}
                       </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {showVerificationBanner && (
+                <div className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-amber-300"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-medium text-zinc-100">
+                        {dashboardT("verifyTitle")}
+                      </h3>
+
+                      <div className="mt-1 text-sm text-zinc-300">
+                        <p>{dashboardT("verifyMessage", { email: email ?? "" })}</p>
+                        {unverifiedHoursRemaining !== null &&
+                          unverifiedHoursRemaining > UNVERIFIED_LAST_24H_THRESHOLD && (
+                            <p className="mt-1">
+                              {dashboardT("verifyCountdownDays", { hours: unverifiedHoursRemaining })}
+                            </p>
+                          )}
+                        {unverifiedHoursRemaining !== null &&
+                          unverifiedHoursRemaining > 0 &&
+                          unverifiedHoursRemaining <= UNVERIFIED_LAST_24H_THRESHOLD && (
+                            <p className="mt-1 text-amber-200">
+                              {dashboardT("verifyCountdownLast24h", {
+                                hours: unverifiedHoursRemaining,
+                              })}
+                            </p>
+                          )}
+                        {unverifiedHoursRemaining !== null && unverifiedHoursRemaining <= 0 && (
+                          <p className="mt-1 text-red-200">{dashboardT("verifyCountdownExpired")}</p>
+                        )}
+                      </div>
+
+                      <div className="mt-3">
+                        <button
+                          type="button"
+                          onClick={handleResendVerification}
+                          className="rounded-md bg-amber-300/15 px-3 py-1.5 text-sm font-medium text-amber-200 ring-1 ring-inset ring-amber-300/20 hover:bg-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
+                        >
+                          {dashboardT("resendButton")}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

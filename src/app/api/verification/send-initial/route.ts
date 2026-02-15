@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createVerificationToken, getAppUrl } from "@/lib/emailVerification";
+import {
+  buildVerificationEmail,
+  createVerificationToken,
+  getAppUrl,
+} from "@/lib/emailVerification";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -45,37 +49,6 @@ async function sendResendEmail(opts: {
     const details = await res.text().catch(() => "");
     throw new Error(`Resend error: ${res.status} ${details}`);
   }
-}
-
-function buildVerificationEmail(opts: {
-  locale: "en" | "es";
-  verifyUrl: string;
-}) {
-  const isEs = opts.locale === "es";
-  const title = isEs ? "Confirma tu email" : "Confirm your email";
-  const body = isEs
-    ? "Haz clic en el botón para verificar tu email y mantener activa tu cuenta."
-    : "Click the button to verify your email and keep your account active.";
-  const button = isEs ? "Verificar email" : "Verify email";
-  const subject = isEs ? "Aliigo: confirma tu email" : "Aliigo: confirm your email";
-
-  const html = `
-    <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color:#111; background:#fff;">
-      <div style="max-width:560px; margin:0 auto; padding:24px;">
-        <h2 style="margin:0 0 10px;">${title}</h2>
-        <p style="margin:0 0 16px; color:#333; font-size:14px;">${body}</p>
-        <p style="margin:0 0 16px;">
-          <a href="${opts.verifyUrl}" style="display:inline-block; padding:10px 16px; background:#84C9AD; color:#0b0b0b; text-decoration:none; border-radius:8px; font-size:14px; font-weight:600;">
-            ${button}
-          </a>
-        </p>
-        <p style="font-size:12px; color:#666; margin-top:16px;">${opts.verifyUrl}</p>
-      </div>
-    </div>
-  `;
-
-  const text = [title, body, opts.verifyUrl].join("\n");
-  return { subject, html, text };
 }
 
 export async function POST(req: Request) {
@@ -133,7 +106,11 @@ export async function POST(req: Request) {
     }
 
     const verifyUrl = `${getAppUrl()}/${locale}/verify-email?token=${encodeURIComponent(token)}`;
-    const emailPayload = buildVerificationEmail({ locale, verifyUrl });
+    const emailPayload = buildVerificationEmail({
+      locale,
+      purpose: "signup",
+      verifyUrl,
+    });
     await sendResendEmail({
       to: email,
       subject: emailPayload.subject,
@@ -147,4 +124,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }
-

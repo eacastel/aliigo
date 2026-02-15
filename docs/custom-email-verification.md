@@ -44,10 +44,12 @@ This adds:
   - `/{locale}/verify-email?token=...`
   - Calls `/api/verification/confirm`
   - Tracks `account_confirmed` and redirects to dashboard/login.
-- Dashboard resend button now uses custom send API.
-- Dashboard verification banner countdown is based on:
+- Dashboard resend button uses custom send API.
+- Verification banner is rendered from dashboard layout, so it appears on all dashboard pages.
+- Verification countdown is based on:
   - `email_verification_deadline`
   - `email_verified_at`
+- Verification email template includes Aliigo logo/header (same branded style used in auth emails).
 
 ## Required env vars
 - `RESEND_API_KEY`
@@ -56,7 +58,7 @@ This adds:
 - `CRON_SECRET` (for cleanup endpoint)
 
 ## Recommended cron
-Run cleanup every hour:
+- Pro plan: run cleanup hourly.
+- Hobby plan: run cleanup daily.
 - Endpoint: `POST /api/admin/verification/cleanup`
 - Header: `x-cron-secret: <CRON_SECRET>`
-

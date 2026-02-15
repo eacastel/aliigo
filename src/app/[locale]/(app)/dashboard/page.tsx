@@ -49,7 +49,6 @@ type UsagePayload = {
 };
 
 const DEFAULT_ALLOWED_DOMAINS = new Set(["aliigo.com", "www.aliigo.com"]);
-const UNVERIFIED_LAST_24H_THRESHOLD = 24;
 
 function nonEmpty(v: unknown) {
   return typeof v === "string" && v.trim().length > 0;
@@ -108,21 +107,6 @@ export default function DashboardPage() {
     const daysPassed = Math.floor((Date.now() - start) / 86_400_000);
     return Math.max(30 - daysPassed, 0);
   }, [business, pending]);
-
-  const verificationDeadlineMs = useMemo(() => {
-    if (business?.email_verification_deadline) {
-      return new Date(business.email_verification_deadline).getTime();
-    }
-    if (pending?.createdAtMs) {
-      return pending.createdAtMs + 72 * 60 * 60 * 1000;
-    }
-    return null;
-  }, [business?.email_verification_deadline, pending?.createdAtMs]);
-
-  const unverifiedHoursRemaining = useMemo(() => {
-    if (isVerified || !verificationDeadlineMs) return null;
-    return Math.floor((verificationDeadlineMs - Date.now()) / 3_600_000);
-  }, [isVerified, verificationDeadlineMs]);
 
   useEffect(() => {
     let mounted = true;
@@ -237,32 +221,6 @@ export default function DashboardPage() {
       subscription.unsubscribe();
     };
   }, [router]);
-
-  const handleResend = async () => {
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
-    if (!token) return;
-
-    const res = await fetch("/api/verification/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ purpose: "signup", locale }),
-    });
-    const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-
-    if (!res.ok || body.ok !== true) {
-      alert(
-        t("resendError", {
-          error: typeof body.error === "string" ? body.error : "Unexpected error",
-        })
-      );
-      return;
-    }
-    alert(t("resendSuccess"));
-  };
 
   const trialExpired = daysLeft !== null && daysLeft <= 0;
   const featuresDisabled = !isVerified || trialExpired;
@@ -463,61 +421,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {!isVerified && (
-          <div className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
-            <div className="flex gap-3">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-amber-300"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-
-              <div className="min-w-0">
-                <h3 className="text-sm font-medium text-zinc-100">
-                  {t("verifyTitle")}
-                </h3>
-
-                <div className="mt-1 text-sm text-zinc-300">
-                  <p>{t("verifyMessage", { email: displayEmail ?? "" })}</p>
-                  {unverifiedHoursRemaining !== null &&
-                    unverifiedHoursRemaining > UNVERIFIED_LAST_24H_THRESHOLD && (
-                      <p className="mt-1">
-                        {t("verifyCountdownDays", { hours: unverifiedHoursRemaining })}
-                      </p>
-                    )}
-                  {unverifiedHoursRemaining !== null &&
-                    unverifiedHoursRemaining > 0 &&
-                    unverifiedHoursRemaining <= UNVERIFIED_LAST_24H_THRESHOLD && (
-                      <p className="mt-1 text-amber-200">
-                        {t("verifyCountdownLast24h", { hours: unverifiedHoursRemaining })}
-                      </p>
-                    )}
-                  {unverifiedHoursRemaining !== null && unverifiedHoursRemaining <= 0 && (
-                    <p className="mt-1 text-red-200">{t("verifyCountdownExpired")}</p>
-                  )}
-                </div>
-
-                <div className="mt-3">
-                  <button
-                    type="button"
-                    onClick={handleResend}
-                    className="rounded-md bg-amber-300/15 px-3 py-1.5 text-sm font-medium text-amber-200 ring-1 ring-inset ring-amber-300/20 hover:bg-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
-                  >
-                    {t("resendButton")}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="mb-8 overflow-hidden rounded-xl bg-zinc-900/70 border border-zinc-800 shadow-lg">
