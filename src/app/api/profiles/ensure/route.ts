@@ -162,19 +162,22 @@ export async function POST(req: Request) {
     });
 
     // Rate limit (by IP)
-    // Signup can burst during QA/launch testing, so allow a higher ceiling.
+    // For signup, skip this DB-backed limiter to avoid latency spikes/timeouts
+    // during account creation. Keep limiter for all other sources.
     const isSignupSource = source === "signup";
-    const rl = await enforceRateLimit(supabaseAdmin, req, {
-      bucket: isSignupSource ? "profiles_ensure_signup" : "profiles_ensure",
-      max: isSignupSource ? 30 : 8,
-      windowMs: 10 * 60 * 1000,
-    });
+    if (!isSignupSource) {
+      const rl = await enforceRateLimit(supabaseAdmin, req, {
+        bucket: "profiles_ensure",
+        max: 8,
+        windowMs: 10 * 60 * 1000,
+      });
 
-    if (rl.limited) {
-      return NextResponse.json(
-        { ok: false, where: "rate_limit", error: "Too many requests. Try again later." },
-        { status: 429, headers: CORS }
-      );
+      if (rl.limited) {
+        return NextResponse.json(
+          { ok: false, where: "rate_limit", error: "Too many requests. Try again later." },
+          { status: 429, headers: CORS }
+        );
+      }
     }
 
     // 0) Verify auth user exists (retry handles occasional propagation delay)

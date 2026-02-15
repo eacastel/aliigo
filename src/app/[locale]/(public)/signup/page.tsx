@@ -209,7 +209,7 @@ export default function SignupPage() {
         email: normalizedEmail,
         businessName: normalizedBiz,
       }),
-        20000,
+        45000,
         "Business setup"
       );
 
@@ -244,6 +244,14 @@ export default function SignupPage() {
 
       router.push("/dashboard");
     } catch (err) {
+      if (err instanceof Error && /Business setup timed out/i.test(err.message)) {
+        setError(
+          locale === "es"
+            ? "La configuración está tardando más de lo esperado. Prueba iniciar sesión ahora; es posible que la cuenta ya esté creada."
+            : "Setup is taking longer than expected. Try logging in now; your account may already be created."
+        );
+        return;
+      }
       setError(
         err instanceof Error ? err.message : "No se pudo crear el negocio/perfil."
       );
