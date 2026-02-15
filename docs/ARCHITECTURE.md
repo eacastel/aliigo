@@ -57,6 +57,15 @@
   - growth: 3 seats / 4 domains
   - custom/pro: admin-defined
 
+## Signup flow notes
+- Public signup form now collects only:
+  - email
+  - business name
+  - password
+  - legal acceptance + optional marketing opt-in
+- `name` and `phone` are no longer collected at signup and are no longer required dependencies for profile creation.
+- Business name remains needed for initial workspace creation.
+
 ## Known gaps to close (production hardening)
 - CORS rules should remain strict (no wildcard in production)
 - Token rotation and authenticated token management

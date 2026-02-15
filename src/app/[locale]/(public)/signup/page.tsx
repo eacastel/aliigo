@@ -29,9 +29,7 @@ export default function SignupPage() {
 
   // State
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [businessName, setBusinessName] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [fax, setFax] = useState(""); // honeypot
   const [acceptTerms, setAcceptTerms] = useState(false);
@@ -93,8 +91,8 @@ export default function SignupPage() {
   async function ensureBusinessProfileWithRetry(input: {
     id: string;
     email: string;
-    name: string;
     businessName: string;
+    name?: string;
     phone?: string;
   }) {
     // total ~10s max
@@ -131,9 +129,7 @@ export default function SignupPage() {
 
     // Normalize once
     const normalizedEmail = email.trim().toLowerCase();
-    const normalizedName = name.trim();
     const normalizedBiz = businessName.trim();
-    const normalizedPhone = phone.trim();
 
     // Honeypot: if filled, silently pretend success (do not create account)
     if (fax.trim().length > 0) {
@@ -143,7 +139,7 @@ export default function SignupPage() {
     setError(null);
 
     // Validation
-    if (!normalizedEmail || !password || !normalizedName || !normalizedBiz) {
+    if (!normalizedEmail || !password || !normalizedBiz) {
       setError(t("errorValidation"));
       return;
     }
@@ -168,9 +164,7 @@ export default function SignupPage() {
         options: {
           emailRedirectTo: `${window.location.origin}/${locale}/auth/callback?type=signup&next=/dashboard`,
           data: {
-            full_name: normalizedName,
             business_name: normalizedBiz,
-            phone: normalizedPhone || undefined,
             locale,
           },
         },
@@ -191,9 +185,7 @@ export default function SignupPage() {
       await ensureBusinessProfileWithRetry({
         id: userId,
         email: normalizedEmail,
-        name: normalizedName,
         businessName: normalizedBiz,
-        phone: normalizedPhone || undefined,
       });
 
       const acceptanceRes = await fetch("/api/legal/acceptance", {
@@ -301,24 +293,6 @@ export default function SignupPage() {
           </label>
         </div>
 
-        {/* Name */}
-        <div className="space-y-1.5">
-          <label
-            htmlFor="signup-name"
-            className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
-          >
-            {t("namePlaceholder")}
-          </label>
-          <input
-            id="signup-name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
-            required
-          />
-        </div>
-
         {/* Business Name */}
         <div className="space-y-1.5">
           <label
@@ -335,43 +309,25 @@ export default function SignupPage() {
             className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
             required
           />
+          <p className="ml-1 text-xs text-zinc-500">{t("businessNeededHint")}</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Phone */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="signup-phone"
-              className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
-            >
-              {t("phonePlaceholder")}
-            </label>
-            <input
-              id="signup-phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
-            />
-          </div>
-
-          {/* Password */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="signup-password"
-              className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
-            >
-              {t("passwordPlaceholder")}
-            </label>
-            <input
-              id="signup-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
-              required
-            />
-          </div>
+        {/* Password */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor="signup-password"
+            className="text-xs font-semibold text-zinc-400 ml-1 uppercase tracking-wide"
+          >
+            {t("passwordPlaceholder")}
+          </label>
+          <input
+            id="signup-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-zinc-950/50 text-white px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[#84c9ad] focus:ring-1 focus:ring-[#84c9ad] transition-all placeholder:text-zinc-600"
+            required
+          />
         </div>
 
         <div className="space-y-3">
