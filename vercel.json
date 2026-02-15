@@ -2,8 +2,7 @@
   "crons": [
     {
       "path": "/api/admin/verification/cleanup",
-      "schedule": "0 * * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }
-
