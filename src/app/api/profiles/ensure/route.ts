@@ -140,18 +140,6 @@ export async function POST(req: Request) {
           { status: 400, headers: CORS }
         );
       }
-      if (!nombre_contacto || !String(nombre_contacto).trim()) {
-        return NextResponse.json(
-          { ok: false, where: "input", error: "Missing field: nombre_contacto" },
-          { status: 400, headers: CORS }
-        );
-      }
-      if (!telefono || !String(telefono).trim()) {
-        return NextResponse.json(
-          { ok: false, where: "input", error: "Missing field: telefono" },
-          { status: 400, headers: CORS }
-        );
-      }
     }
 
 

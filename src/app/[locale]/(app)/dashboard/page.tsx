@@ -46,6 +46,8 @@ type UsagePayload = {
 };
 
 const DEFAULT_ALLOWED_DOMAINS = new Set(["aliigo.com", "www.aliigo.com"]);
+const UNVERIFIED_DELETE_HOURS = 72;
+const UNVERIFIED_LAST_24H_THRESHOLD = 24;
 
 function nonEmpty(v: unknown) {
   return typeof v === "string" && v.trim().length > 0;
@@ -104,6 +106,19 @@ export default function DashboardPage() {
     const daysPassed = Math.floor((Date.now() - start) / 86_400_000);
     return Math.max(30 - daysPassed, 0);
   }, [business, pending]);
+
+  const signupTimestampMs = useMemo(() => {
+    if (business?.created_at) {
+      return new Date(business.created_at).getTime();
+    }
+    return pending?.createdAtMs ?? null;
+  }, [business?.created_at, pending?.createdAtMs]);
+
+  const unverifiedHoursRemaining = useMemo(() => {
+    if (isConfirmed || !signupTimestampMs) return null;
+    const elapsedHours = Math.floor((Date.now() - signupTimestampMs) / 3_600_000);
+    return UNVERIFIED_DELETE_HOURS - elapsedHours;
+  }, [isConfirmed, signupTimestampMs]);
 
   useEffect(() => {
     let mounted = true;
@@ -455,6 +470,22 @@ export default function DashboardPage() {
 
                 <div className="mt-1 text-sm text-zinc-300">
                   <p>{t("verifyMessage", { email: displayEmail ?? "" })}</p>
+                  {unverifiedHoursRemaining !== null &&
+                    unverifiedHoursRemaining > UNVERIFIED_LAST_24H_THRESHOLD && (
+                      <p className="mt-1">
+                        {t("verifyCountdownDays", { hours: unverifiedHoursRemaining })}
+                      </p>
+                    )}
+                  {unverifiedHoursRemaining !== null &&
+                    unverifiedHoursRemaining > 0 &&
+                    unverifiedHoursRemaining <= UNVERIFIED_LAST_24H_THRESHOLD && (
+                      <p className="mt-1 text-amber-200">
+                        {t("verifyCountdownLast24h", { hours: unverifiedHoursRemaining })}
+                      </p>
+                    )}
+                  {unverifiedHoursRemaining !== null && unverifiedHoursRemaining <= 0 && (
+                    <p className="mt-1 text-red-200">{t("verifyCountdownExpired")}</p>
+                  )}
                 </div>
 
                 <div className="mt-3">

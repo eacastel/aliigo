@@ -65,6 +65,11 @@
   - legal acceptance + optional marketing opt-in
 - `name` and `phone` are no longer collected at signup and are no longer required dependencies for profile creation.
 - Business name remains needed for initial workspace creation.
+- Signup now routes users to `/dashboard` instead of `/check-email`.
+- Dashboard shows an unverified email banner with a 72-hour countdown:
+  - >24h remaining: standard warning with hours left
+  - <=24h remaining: final warning
+  - <=0h: expired notice (scheduled-for-deletion state)
 
 ## Known gaps to close (production hardening)
 - CORS rules should remain strict (no wildcard in production)

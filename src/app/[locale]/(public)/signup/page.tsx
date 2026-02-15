@@ -133,7 +133,7 @@ export default function SignupPage() {
 
     // Honeypot: if filled, silently pretend success (do not create account)
     if (fax.trim().length > 0) {
-      router.push("/check-email");
+      router.push("/dashboard");
       return;
     }
     setError(null);
@@ -210,10 +210,14 @@ export default function SignupPage() {
       // Local marker
       localStorage.setItem(
         "aliigo_pending_signup",
-      JSON.stringify({ email: normalizedEmail, businessName: normalizedBiz })
+      JSON.stringify({
+        email: normalizedEmail,
+        businessName: normalizedBiz,
+        createdAtMs: Date.now(),
+      })
       );
 
-      router.push("/check-email");
+      router.push("/dashboard");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "No se pudo crear el negocio/perfil."
