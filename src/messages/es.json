@@ -532,6 +532,7 @@
       "subtitle": "Aliigo es el asistente de IA para tu web. Responde al instante, capta contactos y guía a cada visitante al siguiente paso.",
       "ctaPrimary": "Empieza tu prueba gratis",
       "ctaSecondary": "Ver en acción",
+      "trustLine": "Responde desde tu contenido — no de un chatbot genérico.",
       "qualifier": ""
     },
     "ctaBand": {
@@ -552,7 +553,7 @@
         "title": "Está disponible a cualquier hora",
         "benefit": "Atiende apropiadamente 24/7."
       },
-      "note": "Aliigo actúa como el mostrador digital de tu empresa."
+      "note": "Aliigo actúa como un representante digital de tu empresa."
     },
     "impact": {
       "title": "Más que un chatbot: un motor de crecimiento",
@@ -577,15 +578,16 @@
     "fitFilter": {
       "ideal": {
         "title": "Aliigo es ideal si:",
-        "item1": "Vendes servicios o productos",
-        "item2": "Un nuevo cliente vale más de {value}",
-        "item3": "Recibes consultas con frecuencia en tu web"
+        "item1": "Vendes productos o servicios donde la confianza importa (presupuestos, citas, compras de valor).",
+        "item2": "Tus visitantes preguntan antes de comprar (precios, disponibilidad, envíos, políticas, dudas frecuentes).",
+        "item3": "Quieres captar contactos solo cuando hay intención real (sin formularios pesados).",
+        "item4": "Necesitas respuestas consistentes cuando tu equipo no puede contestar al instante (fuera de horario / picos)."
       },
       "notIdeal": {
         "title": "Probablemente no es para ti si:",
-        "item1": "Solo buscas un chatbot “divertido”",
-        "item2": "No tienes tráfico en tu web",
-        "item3": "No haces seguimiento de contactos"
+        "item1": "Buscas un chatbot genérico sin límites.",
+        "item2": "Quieres una IA gratuita para uso personal (entretenimiento / uso privado).",
+        "item3": "Tu web todavía tiene muy poco tráfico (mejor primero SEO/ads y luego Aliigo)."
       }
     },
     "credibility": {

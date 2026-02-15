@@ -18,16 +18,16 @@ export function FitFilterSection({ value }: FitFilterSectionProps) {
             <h3 className="text-lg font-semibold text-white mb-4 md:text-center">
               {t("ideal.title")}
             </h3>
-            <ul className="space-y-3 text-zinc-200 md:mx-auto md:max-w-sm">
-              {[1, 2, 3].map((i) => (
+            <ul className="space-y-4 text-zinc-200 md:mx-auto md:max-w-sm">
+              {[1, 2, 3, 4].map((i) => (
                 <li
                   key={i}
                   className="md:text-center"
                 >
                   <div className="flex justify-center">
-                    <span className="inline-flex items-start md:items-center gap-3 text-center">
+                    <span className="inline-flex items-start md:items-top gap-3 text-center mt-2">
                       <CheckCircle2 className="mt-1 h-5 w-5 text-[#84c9ad] md:mt-0 shrink-0" />
-                      <span className="text-center max-w-[18rem]">
+                      <span className="text-center max-w-[25rem]">
                         {t(`ideal.item${i}`, { value })}
                       </span>
                     </span>

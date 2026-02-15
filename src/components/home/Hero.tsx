@@ -56,6 +56,10 @@ export function HomeHeroSection() {
                 {t("hero.ctaSecondary")}
               </Link>
             </div>
+
+            <p className="mt-3 text-sm text-zinc-500 leading-relaxed max-w-xl">
+              {t("hero.trustLine")}
+            </p>
           </div>
 
           <div className="relative">

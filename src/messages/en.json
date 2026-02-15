@@ -531,6 +531,7 @@
       "subtitle": "Aliigo is the AI assistant for your website. It answers questions instantly, captures contact details when intent is real, and guides visitors to the right next step.",
       "ctaPrimary": "Start free trial",
       "ctaSecondary": "See it in action",
+      "trustLine": "Business-owned answers from your content — not a generic chatbot.",
       "qualifier": "30-day free trial · Cancel anytime"
     },
     "ctaBand": {
@@ -551,7 +552,7 @@
         "title": "It's always available",
         "benefit": "Stay helpful 24/7."
       },
-      "note": "Aliigo acts like your company's front desk."
+      "note": "Aliigo acts as your company's representative."
     },
     "impact": {
       "title": "Beyond just a chatbot: A growth engine",
@@ -576,15 +577,16 @@
     "fitFilter": {
       "ideal": {
         "title": "Aliigo is ideal if:",
-        "item1": "You sell services or consultations",
-        "item2": "A new client is worth {value}+",
-        "item3": "You receive regular inquiries through your website"
+        "item1": "You sell products or services where trust matters (quotes, bookings, high‑value purchases).",
+        "item2": "Visitors ask questions before buying (pricing, availability, shipping, policies, fit).",
+        "item3": "You want to capture leads only when intent is real (not annoying forms).",
+        "item4": "You need a consistent answer when your team can’t reply instantly (after hours / busy times)."
       },
       "notIdeal": {
         "title": "Probably not for you if:",
-        "item1": "You just want a fun AI chatbot",
-        "item2": "You have no website traffic at all",
-        "item3": "You don’t respond to leads"
+        "item1": "You want a general-purpose chatbot with no guardrails.",
+        "item2": "You’re looking for a free consumer AI assistant (personal use / entertainment).",
+        "item3": "Your website gets almost no traffic yet (start with SEO/ads first, then add Aliigo)."
       }
     },
     "credibility": {
