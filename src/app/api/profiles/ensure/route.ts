@@ -180,26 +180,29 @@ export async function POST(req: Request) {
       }
     }
 
-    // 0) Verify auth user exists (retry handles occasional propagation delay)
-    const authUser = await getAuthUserWithRetry(supabaseAdmin, id);
-    if (!authUser) {
-      const host = (() => {
-        try {
-          return new URL(url).host;
-        } catch {
-          return url;
-        }
-      })();
+    // 0) Verify auth user exists (retry handles occasional propagation delay).
+    // Skip this extra call for signup to reduce latency on critical conversion path.
+    if (!isSignupSource) {
+      const authUser = await getAuthUserWithRetry(supabaseAdmin, id);
+      if (!authUser) {
+        const host = (() => {
+          try {
+            return new URL(url).host;
+          } catch {
+            return url;
+          }
+        })();
 
-      return NextResponse.json(
-        {
-          ok: false,
-          where: "auth.admin.getUserById",
-          error: "User not found in auth.users (after retry)",
-          debug: { id, supabaseUrlHost: host },
-        },
-        { status: 409, headers: CORS }
-      );
+        return NextResponse.json(
+          {
+            ok: false,
+            where: "auth.admin.getUserById",
+            error: "User not found in auth.users (after retry)",
+            debug: { id, supabaseUrlHost: host },
+          },
+          { status: 409, headers: CORS }
+        );
+      }
     }
 
     // 1) Ensure business
@@ -247,6 +250,19 @@ export async function POST(req: Request) {
 
     if (profErr) {
       const err = profErr as PostgrestError;
+      const maybeFk = `${err.message} ${err.details ?? ""}`.toLowerCase();
+      if (maybeFk.includes("foreign key") || maybeFk.includes("violates")) {
+        return NextResponse.json(
+          {
+            ok: false,
+            where: "business_profiles.upsert",
+            error: "User not found in auth.users (after retry)",
+            details: err.details,
+            hint: err.hint,
+          },
+          { status: 409, headers: CORS }
+        );
+      }
       return NextResponse.json(
         { ok: false, where: "business_profiles.upsert", error: err.message, details: err.details, hint: err.hint },
         { status: 500, headers: CORS }
