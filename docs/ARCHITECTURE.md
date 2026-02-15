@@ -31,6 +31,7 @@
 - Insert user message
 - Fetch recent message history
 - Build system prompt using business fields (and lead heuristic)
+- Resolve display currency from request country headers (`x-vercel-ip-country` / `cf-ipcountry`) for Aliigo pricing snippets
 - Call OpenAI
 - Insert assistant message
 - Return reply + structured actions
@@ -43,6 +44,18 @@
 - Browser Supabase client uses anon key and relies on Supabase Auth.
 - Server routes use service role key (bypasses RLS). These routes must enforce tenant scoping in code.
 - Domain allowlisting is critical for the widget.
+
+## Billing flow notes
+- Billing setup path: `POST /api/stripe/setup-intent` then `POST /api/stripe/subscribe` (`action=start`).
+- `subscribe` now includes a guarded self-heal for stale Stripe customer IDs:
+  - if SetupIntent customer differs from DB customer, adopt it only when SetupIntent metadata business id matches.
+  - otherwise fail closed with customer mismatch.
+- Plan pricing comes from env-bound currency price IDs in `src/lib/stripe.ts`.
+- Stripe price env vars are validated at startup in `src/lib/stripe.ts` (fail-fast on missing/invalid values).
+- Plan limits are synced from billing plan for starter/growth:
+  - starter: 1 seat / 1 domain
+  - growth: 3 seats / 4 domains
+  - custom/pro: admin-defined
 
 ## Known gaps to close (production hardening)
 - CORS rules should remain strict (no wildcard in production)

@@ -15,7 +15,7 @@ export function FounderTrustCard() {
             <div className="flex items-center gap-4">
               <div className="h-14 w-14 rounded-full bg-zinc-800 ring-1 ring-white/10 overflow-hidden">
                 <Image
-                  src="/founder.png"
+                  src="/founder2.png"
                   alt={t("founder.photoAlt")}
                   width={56}
                   height={56}

@@ -13,6 +13,7 @@
       "widget": "Widget",
       "messages": "Mensajes",
       "billing": "Facturación",
+      "advanced": "Avanzado",
       "help": "Ayuda"
     },
     "publicLinks": {
@@ -92,11 +93,11 @@
     "logout": "Cerrar sesión",
     "loading": "Cargando...",
     "statusPrefix": "Estado:",
-    "activeMessage": "La facturación está activa. Ya tienes acceso al panel.",
+    "activeMessage": "La facturación está activa.",
     "activePanelHint": "Tu suscripción está activa. Ya puedes usar Aliigo.",
     "stepConfirmEmail": "1) Confirma tu email para activar la cuenta.",
     "stepChoosePlan": "Selecciona un plan y añade un método de pago para iniciar la prueba gratuita.",
-    "subscribedIntro": "La facturación está activa. Ya tienes acceso al panel.",
+    "subscribedIntro": "La facturación está activa.",
     "alreadyActiveTitle": "Tu suscripción está activa.",
     "currentPlan": "Plan actual:",
     "trialEnds": "Tu prueba termina el:",
@@ -140,9 +141,12 @@
   },
   "DashboardBusiness": {
     "domains": {
-      "label": "Dominio permitido",
-      "placeholder": "ejemplo.com",
-      "help": "Introduce el dominio raíz sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
+      "label": "Dominios permitidos",
+      "placeholder": "ejemplo.com\\nsegundo-dominio.com",
+      "help": "Introduce un dominio raíz por línea, sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
+      "limit": "Límite del plan: hasta {count} dominio(s).",
+      "used": "{used} / {count} espacios de dominio usados.",
+      "limitExceeded": "Has superado el límite del plan. Máximo permitido: {count} dominio(s).",
       "locked": "Activa la facturación para desbloquear la lista de dominios.",
       "invalid": "Introduce un dominio válido como ejemplo.com (o localhost para pruebas locales).",
       "previewLabel": "Dominios permitidos",
@@ -150,7 +154,55 @@
     }
   },
   "DashboardWidget": {
-    "lockedHint": "Activa la facturación para desbloquear el código del widget."
+    "title": "Widget",
+    "livePreview": "Vista previa en vivo",
+    "loadingPreview": "Cargando vista previa…",
+    "header": "Cabecera",
+    "bgText": "fondo / texto",
+    "userBubble": "Burbuja del usuario",
+    "botBubble": "Burbuja del asistente",
+    "panelBackground": "Fondo del panel",
+    "colorOpacity": "color + opacidad",
+    "sendButton": "Botón enviar",
+    "businessSlug": "Slug del negocio",
+    "defaultLanguage": "Idioma por defecto",
+    "publicEmbedKey": "Clave pública de embed",
+    "previewToken": "Token de vista previa (dev)",
+    "brand": "Marca",
+    "embedSnippet": "Snippet de instalación",
+    "emptyDash": "—",
+    "lockedHint": "Activa la facturación para desbloquear el código del widget.",
+    "noLinkedBusiness": {
+      "title": "No hay negocio vinculado",
+      "body": "No encontramos un negocio asociado a tu perfil. Completa primero Ajustes → Negocio y vuelve aquí."
+    },
+    "messages": {
+      "loadBusinessError": "No se pudo cargar tu negocio.",
+      "loginRequired": "Necesitas iniciar sesión.",
+      "saveError": "Error al guardar",
+      "saved": "Guardado.",
+      "saveNowError": "No se pudo guardar ahora.",
+      "generateTokenError": "No se pudo generar el token.",
+      "tokenGenerated": "Token generado.",
+      "rotatePublicKeyTodo": "TODO: implementar /api/widget/rotate-public-key para rotar businesses.public_embed_key."
+    },
+    "buttons": {
+      "saving": "Guardando…",
+      "saveTheme": "Guardar tema",
+      "reset": "Restablecer",
+      "generateToken": "Generar token",
+      "rotatePublicKey": "Rotar clave pública",
+      "advancedSettings": "Ajustes avanzados"
+    },
+    "advanced": {
+      "title": "Ajustes avanzados del widget",
+      "subtitle": "Herramientas de desarrollo y seguridad. La mayoría de clientes no necesita estos controles.",
+      "backToWidget": "Volver al widget",
+      "generateTokenTitle": "Token de desarrollo",
+      "generateTokenDesc": "Genera un token de vista previa para flujos avanzados o depuración.",
+      "rotatePublicKeyTitle": "Clave pública de embed",
+      "rotatePublicKeyDesc": "Rótala solo si sospechas fuga o abuso de la clave. Esta acción aún no está implementada."
+    }
   },
   "Dashboard": {
     "help": {
@@ -183,7 +235,7 @@
         "desc": "Añade el script a tu web y verifica que el widget aparece y responde.",
         "steps": [
           "Copia el script de instalación en Panel → Widget.",
-          "Pégalo antes de </body> en tu web.",
+          "Pégalo antes de &lt;/body&gt; en tu web.",
           "Publica los cambios y recarga tu sitio.",
           "Inicia una conversación para comprobar que llegan los mensajes."
         ],

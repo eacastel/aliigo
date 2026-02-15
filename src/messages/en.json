@@ -13,6 +13,7 @@
       "widget": "Widget",
       "messages": "Messages",
       "billing": "Billing",
+      "advanced": "Advanced",
       "help": "Help"
     },
     "publicLinks": {
@@ -92,11 +93,11 @@
     "logout": "Log out",
     "loading": "Loading...",
     "statusPrefix": "Status:",
-    "activeMessage": "Billing is active. You now have access to the dashboard.",
+    "activeMessage": "Billing is active.",
     "activePanelHint": "Your subscription is active. You can now use Aliigo.",
     "stepConfirmEmail": "1) Confirm your email to activate your account.",
     "stepChoosePlan": "Choose a plan and add a payment method to start the free trial.",
-    "subscribedIntro": "Billing is active. You already have access to the dashboard.",
+    "subscribedIntro": "Billing is active.",
     "alreadyActiveTitle": "Your subscription is active.",
     "currentPlan": "Current plan:",
     "trialEnds": "Your trial ends on:",
@@ -139,9 +140,12 @@
   },
   "DashboardBusiness": {
     "domains": {
-      "label": "Allowed domain",
-      "placeholder": "example.com",
-      "help": "Enter your root domain without http(s) or www. We will automatically allow both versions.",
+      "label": "Allowed domains",
+      "placeholder": "example.com\\nsecond-domain.com",
+      "help": "Enter one root domain per line, without http(s) or www. We will automatically allow both versions.",
+      "limit": "Plan limit: up to {count} domain(s).",
+      "used": "{used} / {count} domain slots used.",
+      "limitExceeded": "You exceeded your plan limit. Max allowed: {count} domain(s).",
       "locked": "Activate billing to unlock the domain allowlist.",
       "invalid": "Please enter a valid domain like example.com (or localhost for local testing).",
       "previewLabel": "Domains allowed",
@@ -149,7 +153,55 @@
     }
   },
   "DashboardWidget": {
-    "lockedHint": "Activate billing to unlock the widget install code."
+    "title": "Widget",
+    "livePreview": "Live preview",
+    "loadingPreview": "Loading preview…",
+    "header": "Header",
+    "bgText": "bg / text",
+    "userBubble": "User bubble",
+    "botBubble": "Bot bubble",
+    "panelBackground": "Panel background",
+    "colorOpacity": "color + opacity",
+    "sendButton": "Send button",
+    "businessSlug": "Business slug",
+    "defaultLanguage": "Default language",
+    "publicEmbedKey": "Public embed key",
+    "previewToken": "Preview token (dev)",
+    "brand": "Brand",
+    "embedSnippet": "Embed snippet",
+    "emptyDash": "—",
+    "lockedHint": "Activate billing to unlock the widget install code.",
+    "noLinkedBusiness": {
+      "title": "No linked business",
+      "body": "We couldn’t find a business associated with your profile. Complete Settings → Business first, then return here."
+    },
+    "messages": {
+      "loadBusinessError": "Could not load your business.",
+      "loginRequired": "Login required.",
+      "saveError": "Save error",
+      "saved": "Saved.",
+      "saveNowError": "Could not save now.",
+      "generateTokenError": "Could not generate token.",
+      "tokenGenerated": "Token generated.",
+      "rotatePublicKeyTodo": "TODO: implement /api/widget/rotate-public-key to rotate businesses.public_embed_key."
+    },
+    "buttons": {
+      "saving": "Saving…",
+      "saveTheme": "Save theme",
+      "reset": "Reset",
+      "generateToken": "Generate token",
+      "rotatePublicKey": "Rotate public key",
+      "advancedSettings": "Advanced settings"
+    },
+    "advanced": {
+      "title": "Widget advanced settings",
+      "subtitle": "Developer and security tools. Most customers do not need these controls.",
+      "backToWidget": "Back to widget",
+      "generateTokenTitle": "Developer token",
+      "generateTokenDesc": "Generate a preview token for advanced/debug workflows.",
+      "rotatePublicKeyTitle": "Public embed key",
+      "rotatePublicKeyDesc": "Rotate only if you suspect key leakage or abuse. This action is not implemented yet."
+    }
   },
   "Dashboard": {
     "help": {
@@ -182,7 +234,7 @@
         "desc": "Add the script to your website and verify that the widget appears and replies.",
         "steps": [
           "Copy the embed script from Dashboard → Widget.",
-          "Paste it before the closing </body> tag on your site.",
+          "Paste it before the closing &lt;/body&gt; tag on your site.",
           "Publish the changes and refresh your site.",
           "Open a conversation to verify messages arrive."
         ],

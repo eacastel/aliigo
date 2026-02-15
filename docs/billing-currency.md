@@ -9,7 +9,7 @@ This document describes how Aliigo handles currency for pricing display and Stri
 
 ## How currency is selected
 Currency is derived **only** from the request country header:
-- EU/EEA → `EUR`
+- Europe → `EUR`
 - US/other → `USD`
 
 We read from:
@@ -42,6 +42,7 @@ If using prod keys, mirror with your prod environment values.
 - `src/lib/currency.ts` helpers (country → currency)
 - `src/lib/stripe.ts` maps currency → Stripe price IDs
 - `src/app/api/stripe/subscribe/route.ts` creates subscription using currency
+- `src/app/api/conversation/route.ts` uses the same country-based currency for Aliigo pricing snippets
 - Pricing UI:
   - `src/app/[locale]/(public)/page.tsx` → `HomePageClient` (server passes `initialCurrency`)
   - `src/app/[locale]/(public)/pricing/page.tsx`
@@ -51,7 +52,55 @@ If using prod keys, mirror with your prod environment values.
 ## Implementation notes (Feb 2026)
 - `headers()` is async in this Next.js version; server wrappers must `await headers()` before calling `getCurrencyFromHeaders`.
 - Any client components that need currency should receive it via props from a server wrapper (no cookies).
+- Startup guard in `src/lib/stripe.ts` now validates required Stripe price env vars:
+  - `STRIPE_PRICE_STARTER_EUR`
+  - `STRIPE_PRICE_GROWTH_EUR`
+  - `STRIPE_PRICE_STARTER_USD`
+  - `STRIPE_PRICE_GROWTH_USD`
+  - Missing or malformed values fail fast at startup (`price_*` expected).
+- Billing hardening in `src/app/api/stripe/subscribe/route.ts`:
+  - On `start`, if Stripe returns a SetupIntent whose customer differs from `businesses.stripe_customer_id`, we now:
+    - verify `setup_intent.metadata.business_id === current businessId`
+    - update `businesses.stripe_customer_id` to the SetupIntent customer
+    - continue subscription creation (self-heal path)
+  - If metadata does not match, request still fails with `SetupIntent customer mismatch`.
+- Stripe price lookup errors now include currency context:
+  - `Missing Stripe price for plan: <plan> (<currency>)`
 
 ## Notes
 - Language is **not** tied to Stripe product/prices.
 - Pricing injected into the AI prompt is **aliigo.com only**.
+
+## Adding a new market/currency
+When adding a new currency (for example GBP), update these pieces together:
+
+1) Currency mapping
+- `src/lib/currency.ts`
+  - Extend `AliigoCurrency` union with the new code.
+  - Update `normalizeCurrency`.
+  - Update `currencyForCountry` with country -> currency rules.
+
+2) Stripe price map + startup validation
+- `src/lib/stripe.ts`
+  - Add new currency price IDs to `PRICE_TABLE`.
+  - Add required env vars to startup validation.
+  - Keep one Stripe Product per plan, one Price per currency.
+
+3) Environment variables
+- Add new price IDs in all environments (local/staging/prod), e.g.:
+  - `STRIPE_PRICE_STARTER_GBP`
+  - `STRIPE_PRICE_GROWTH_GBP`
+
+4) Formatting on UI
+- Any page formatting money with `Intl.NumberFormat` must handle the new currency locale pairing.
+- Current pages already consume a server-derived currency; only add locale mapping where needed.
+
+5) API compatibility
+- Confirm `POST /api/stripe/subscribe` accepts and uses the new currency via `normalizeCurrency`.
+- Confirm plan change path (`action=change_plan`) resolves existing subscription currency correctly.
+
+6) QA checklist
+- Geo header for a country in the new market returns correct currency.
+- Pricing page, homepage cards, and billing page show correct symbol/code.
+- Checkout succeeds and creates subscription on the new currency prices.
+- Plan upgrade/downgrade works without proration surprises.

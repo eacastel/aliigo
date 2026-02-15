@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useBillingGate } from "@/components/BillingGateContext";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 
 type Theme = {
   headerBg: string;
@@ -146,9 +147,6 @@ export default function WidgetSettingsPage() {
   const widgetLocked = billingGate.status === "inactive";
   const [biz, setBiz] = useState<BizLocal | null>(null);
 
-  // dev-only convenience token (preview)
-  const [token, setToken] = useState<string | null>(null);
-
   const [brand, setBrand] = useState("Aliigo");
 
   const [initialBrand, setInitialBrand] = useState("Aliigo");
@@ -234,7 +232,7 @@ export default function WidgetSettingsPage() {
 
       if (error) {
         console.error("[widget] profile join error:", errMsg(error));
-        setMsg("Could not load your business.");
+        setMsg(t("messages.loadBusinessError"));
         return;
       }
 
@@ -285,15 +283,6 @@ export default function WidgetSettingsPage() {
       setTheme(merged);
       setInitialTheme(merged);
 
-      const { data: t, error: tErr } = await supabase
-        .from("embed_tokens")
-        .select("token")
-        .eq("business_id", data.business_id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (!tErr && t?.token) setToken(t.token);
     })();
   }, []);
 
@@ -338,7 +327,7 @@ export default function WidgetSettingsPage() {
       const { data: sess } = await supabase.auth.getSession();
       const accessToken = sess.session?.access_token;
       if (!accessToken) {
-        setMsg("Login required.");
+        setMsg(t("messages.loginRequired"));
         return;
       }
 
@@ -362,7 +351,7 @@ export default function WidgetSettingsPage() {
       } = await res.json().catch(() => ({}));
 
       if (!res.ok || !j.ok) {
-        setMsg(j.error || "Save error");
+        setMsg(j.error || t("messages.saveError"));
         return;
       }
 
@@ -378,53 +367,13 @@ export default function WidgetSettingsPage() {
       const merged = mergeTheme(j.theme ?? theme);
       setTheme(merged);
       setInitialTheme(merged);
-      setMsg("Saved.");
+      setMsg(t("messages.saved"));
     } catch (e: unknown) {
       console.error(e);
-      setMsg("Could not save now.");
+      setMsg(t("messages.saveNowError"));
     } finally {
       setSaving(false);
     }
-  };
-
-    const rotateToken = async () => {
-      setMsg(null);
-      try {
-        const { data: sess } = await supabase.auth.getSession();
-        const accessToken = sess.session?.access_token;
-        if (!accessToken) {
-          setMsg("Login required.");
-          return;
-        }
-
-        const res = await fetch("/api/widget/rotate-token", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        const j: { token?: string; error?: string } = await res.json().catch(() => ({}));
-        if (!res.ok || !j.token) {
-          setMsg(j.error || "Could not generate token.");
-          return;
-        }
-
-        setToken(j.token);
-        setMsg("Token generated.");
-      } catch (e) {
-        console.error(e);
-        setMsg("Could not generate token.");
-      }
-    };
-
-
-
-
-  const rotatePublicKey = async () => {
-    setMsg(
-      "TODO: implement /api/widget/rotate-public-key to rotate businesses.public_embed_key."
-    );
   };
 
   const embedCode = useMemo(() => {
@@ -445,10 +394,9 @@ export default function WidgetSettingsPage() {
   if (!biz) {
     return (
       <div className="max-w-lg p-4 text-white">
-        <h1 className="text-xl font-semibold mb-2">No linked business</h1>
+        <h1 className="text-xl font-semibold mb-2">{t("noLinkedBusiness.title")}</h1>
         <p className="text-sm text-zinc-400">
-          We couldn’t find a business associated with your profile. Complete
-          Settings → Business first, then return here.
+          {t("noLinkedBusiness.body")}
         </p>
         {msg && <p className="mt-3 text-sm text-red-400">{msg}</p>}
       </div>
@@ -456,12 +404,12 @@ export default function WidgetSettingsPage() {
   }
   return (
     <div className="max-w-5xl text-white">
-      <h1 className="text-2xl font-bold mb-4">Widget</h1>
+      <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
 
       {msg && (
         <div
           className={`mb-4 text-sm ${
-            msg === "Saved." ? "text-green-400" : "text-zinc-300"
+            msg === t("messages.saved") ? "text-green-400" : "text-zinc-300"
           }`}
         >
           {msg}
@@ -471,7 +419,7 @@ export default function WidgetSettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: Preview + Theme */}
         <section className="border border-zinc-800 rounded-xl p-4 bg-zinc-900/40 space-y-4">
-          <h2 className="font-semibold">Live preview</h2>
+          <h2 className="font-semibold">{t("livePreview")}</h2>
 
           <Script src="/widget/v1/aliigo-widget.js" strategy="afterInteractive" />
 
@@ -491,7 +439,7 @@ export default function WidgetSettingsPage() {
                 />
               </div>
             ) : (
-              <div className="p-4 text-sm text-zinc-400">Loading preview…</div>
+              <div className="p-4 text-sm text-zinc-400">{t("loadingPreview")}</div>
             )}
           </div>
 
@@ -500,9 +448,9 @@ export default function WidgetSettingsPage() {
           <div className="space-y-3">
             {/* Header */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="text-sm text-zinc-300 font-medium">Header</div>
+              <div className="text-sm text-zinc-300 font-medium">{t("header")}</div>
               <div className="text-xs text-zinc-500 sm:text-right">
-                bg / text
+                {t("bgText")}
               </div>
 
               <input
@@ -534,10 +482,10 @@ export default function WidgetSettingsPage() {
             {/* User bubble */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="text-sm text-zinc-300 font-medium">
-                User bubble
+                {t("userBubble")}
               </div>
               <div className="text-xs text-zinc-500 sm:text-right">
-                bg / text
+                {t("bgText")}
               </div>
 
               <input
@@ -569,10 +517,10 @@ export default function WidgetSettingsPage() {
             {/* Bot bubble */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="text-sm text-zinc-300 font-medium">
-                Bot bubble
+                {t("botBubble")}
               </div>
               <div className="text-xs text-zinc-500 sm:text-right">
-                bg / text
+                {t("bgText")}
               </div>
 
               <input
@@ -604,8 +552,8 @@ export default function WidgetSettingsPage() {
             {/* Panel background */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-zinc-300 font-medium">Panel background</div>
-                <div className="text-xs text-zinc-500">color + opacity</div>
+                <div className="text-sm text-zinc-300 font-medium">{t("panelBackground")}</div>
+                <div className="text-xs text-zinc-500">{t("colorOpacity")}</div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -642,10 +590,10 @@ export default function WidgetSettingsPage() {
             {/* Send button */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="text-sm text-zinc-300 font-medium">
-                Send button
+                {t("sendButton")}
               </div>
               <div className="text-xs text-zinc-500 sm:text-right">
-                bg / text
+                {t("bgText")}
               </div>
 
               <input
@@ -678,28 +626,8 @@ export default function WidgetSettingsPage() {
 
         {/* RIGHT: Keys + actions */}
         <section className="space-y-4 bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
-          <div className="text-sm text-zinc-400 space-y-1">
-            <div>
-              Business slug: <code className="text-zinc-200">{biz.slug}</code>
-            </div>
-            <div>
-              Default language:{" "}
-              <code className="text-zinc-200">{biz.default_locale}</code>
-            </div>
-            <div>
-              Public embed key:{" "}
-              <code className="text-zinc-200">
-                {biz.public_embed_key || "—"}
-              </code>
-            </div>
-            <div>
-              Preview token (dev):{" "}
-              <code className="text-zinc-200">{token || "—"}</code>
-            </div>
-          </div>
-
           <div>
-            <label className="block text-sm text-zinc-300 mb-1">Brand</label>
+            <label className="block text-sm text-zinc-300 mb-1">{t("brand")}</label>
             <input
               className="w-full border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
               value={brand}
@@ -709,12 +637,12 @@ export default function WidgetSettingsPage() {
 
           {widgetLocked ? (
             <div className="space-y-2">
-              <div className="text-sm font-semibold text-zinc-100">Embed snippet</div>
+              <div className="text-sm font-semibold text-zinc-100">{t("embedSnippet")}</div>
               <div className="text-xs text-amber-400">{t("lockedHint")}</div>
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="text-sm font-semibold text-zinc-100">Embed snippet</div>
+              <div className="text-sm font-semibold text-zinc-100">{t("embedSnippet")}</div>
               <textarea
                 className="w-full border border-zinc-800 bg-zinc-950 text-zinc-200 rounded px-3 py-2 text-xs"
                 rows={10}
@@ -730,7 +658,7 @@ export default function WidgetSettingsPage() {
               onClick={saveTheme}
               disabled={!dirty || saving}
             >
-              {saving ? "Saving…" : "Save theme"}
+              {saving ? t("buttons.saving") : t("buttons.saveTheme")}
             </button>
 
             <button
@@ -742,24 +670,12 @@ export default function WidgetSettingsPage() {
               }}
               disabled={!dirty || saving}
             >
-              Reset
+              {t("buttons.reset")}
             </button>
 
-            <button
-              className={btnNeutralStrong}
-              onClick={rotateToken}
-              disabled={widgetLocked}
-            >
-              Generate token
-            </button>
-
-            <button
-              className={btnNeutralStrong}
-              onClick={rotatePublicKey}
-              disabled={widgetLocked}
-            >
-              Rotate public key
-            </button>
+            <Link href="/dashboard/widget/advanced" className={btnNeutralStrong}>
+              {t("buttons.advancedSettings")}
+            </Link>
           </div>
         </section>
       </div>

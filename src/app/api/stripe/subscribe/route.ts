@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe, assertPlanPrice, isAliigoPlan, type AliigoPlan } from "@/lib/stripe";
 import { normalizeCurrency, type AliigoCurrency } from "@/lib/currency";
+import { limitsForPlan } from "@/lib/planLimits";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { requireBusiness } from "@/lib/server/auth";
 
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
 
     if (bizErr) return NextResponse.json({ error: bizErr.message }, { status: 500 });
 
-    const customerId = biz.stripe_customer_id;
+    let customerId = biz.stripe_customer_id;
     const subscriptionId = biz.stripe_subscription_id;
 
     // --- ACTION: START (create subscription) ---
@@ -69,7 +70,20 @@ export async function POST(req: Request) {
 
       const siCustomer = typeof si.customer === "string" ? si.customer : si.customer?.id;
       if (siCustomer && siCustomer !== customerId) {
-        return NextResponse.json({ error: "SetupIntent customer mismatch" }, { status: 400 });
+        const setupIntentBusinessId = si.metadata?.business_id ?? null;
+        if (setupIntentBusinessId !== businessId) {
+          return NextResponse.json({ error: "SetupIntent customer mismatch" }, { status: 400 });
+        }
+
+        // Self-heal stale stripe_customer_id for this business when SetupIntent is valid.
+        const { error: fixCustomerErr } = await supabaseAdmin
+          .from("businesses")
+          .update({ stripe_customer_id: siCustomer })
+          .eq("id", businessId);
+        if (fixCustomerErr) {
+          return NextResponse.json({ error: fixCustomerErr.message }, { status: 500 });
+        }
+        customerId = siCustomer;
       }
 
       const paymentMethodId =
@@ -91,6 +105,7 @@ export async function POST(req: Request) {
       const patch = {
         stripe_subscription_id: sub.id,
         billing_plan: plan as AliigoPlan,
+        ...limitsForPlan(plan as AliigoPlan),
         billing_status: sub.status === "trialing" ? "trialing" : "incomplete",
         trial_end: toIsoOrNull(sub.trial_end),
         current_period_end: toIsoOrNull(sub.current_period_end),
@@ -184,6 +199,7 @@ export async function POST(req: Request) {
 
       const patch = {
         billing_plan: plan as AliigoPlan,
+        ...limitsForPlan(plan as AliigoPlan),
         billing_status: updated.status,
         trial_end: toIsoOrNull(updated.trial_end),
         current_period_end: toIsoOrNull(updated.current_period_end),

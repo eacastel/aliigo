@@ -3,6 +3,7 @@
 │   ├── ARCHITECTURE.md
 │   ├── LOCAL_DEV.md
 │   ├── SECURITY_NOTES.md
+│   ├── seats-domains.md
 │   ├── TODO.md
 │   └── TREE.md
 ├── .env.local
@@ -61,6 +62,8 @@
 │   │       │       │   │   └── page.tsx
 │   │       │       │   └── page.tsx
 │   │       │       └── widget
+│   │       │           ├── advanced
+│   │       │           │   └── page.tsx
 │   │       │           └── page.tsx
 │   │       ├── chat
 │   │       │   ├── ClientEmbed.tsx
@@ -112,13 +115,14 @@
 │   │   ├── embedGate.ts
 │   │   ├── locale.ts
 │   │   ├── metaHelpers.ts
+│   │   ├── planLimits.ts
 │   │   ├── supabaseAdmin.ts
 │   │   ├── supabaseClient.ts
 │   │   └── url.ts
 │   ├── messages
 │   │   ├── en.json
 │   │   └── es.json
-│   ├── middleware.ts
+│   ├── proxy.ts
 │   ├── types
 │   │   ├── chat.ts
 │   │   └── custom-elements.d.ts

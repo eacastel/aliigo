@@ -50,6 +50,10 @@ export const routing = defineRouting({
       en: '/dashboard/widget',
       es: '/dashboard/widget'
     },
+    '/dashboard/widget/advanced': {
+      en: '/dashboard/widget/advanced',
+      es: '/dashboard/widget/advanced'
+    },
     '/dashboard/messages': {
       en: '/dashboard/messages',
       es: '/dashboard/messages'

@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe, planFromPriceId, type AliigoPlan } from "@/lib/stripe";
+import { limitsForPlan } from "@/lib/planLimits";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
@@ -87,6 +88,7 @@ async function applySubscription(sub: Stripe.Subscription) {
     stripe_customer_id: customerId ?? null,
     stripe_subscription_id: subx.id,
     ...(plan ? { billing_plan: plan } : {}),
+    ...(plan ? limitsForPlan(plan) : {}),
     trial_end: toIsoOrNull(subx.trial_end),
     current_period_end: toIsoOrNull(subx.current_period_end),
     cancel_at_period_end: subx.cancel_at_period_end ?? false,

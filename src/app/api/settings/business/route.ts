@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { effectiveDomainLimit } from "@/lib/planLimits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,15 +47,37 @@ function normalizeHostname(input: string): string | null {
   return host;
 }
 
-function normalizeDomains(domains: unknown): string[] | null {
+function normalizeDomains(domains: unknown, domainLimit: number): string[] | null {
   if (!Array.isArray(domains)) return null;
-  const first = domains.find((d) => typeof d === "string" && d.trim().length > 0);
-  if (!first || typeof first !== "string") return [];
-  const base = normalizeHostname(first);
-  if (!base) return [];
-  if (base === "localhost") return ["localhost", "127.0.0.1"];
-  if (base === "127.0.0.1") return ["127.0.0.1", "localhost"];
-  return [base, `www.${base}`];
+  const bases = new Set<string>();
+  for (const raw of domains) {
+    if (typeof raw !== "string" || raw.trim().length === 0) continue;
+    const base = normalizeHostname(raw);
+    if (!base) continue;
+    bases.add(base);
+  }
+
+  if (bases.size > domainLimit) {
+    throw new Error(`Domain limit exceeded (${bases.size}/${domainLimit})`);
+  }
+
+  const expanded = new Set<string>();
+  for (const base of bases) {
+    if (base === "localhost") {
+      expanded.add("localhost");
+      expanded.add("127.0.0.1");
+      continue;
+    }
+    if (base === "127.0.0.1") {
+      expanded.add("127.0.0.1");
+      expanded.add("localhost");
+      continue;
+    }
+    expanded.add(base);
+    expanded.add(`www.${base}`);
+  }
+
+  return Array.from(expanded);
 }
 
 export async function POST(req: NextRequest) {
@@ -106,6 +129,19 @@ export async function POST(req: NextRequest) {
 
     const businessId = prof.business_id;
 
+    const { data: bizRow, error: bizReadErr } = await admin
+      .from("businesses")
+      .select("billing_plan,domain_limit")
+      .eq("id", businessId)
+      .single<{ billing_plan: string | null; domain_limit: number | null }>();
+    if (bizReadErr) {
+      return NextResponse.json({ error: bizReadErr.message }, { status: 400 });
+    }
+    const domainLimit = effectiveDomainLimit({
+      billingPlan: bizRow?.billing_plan,
+      domainLimit: bizRow?.domain_limit,
+    });
+
     // 4) Update profile (merge-only)
     if (body.profile) {
       const nextProfile: Record<string, unknown> = {};
@@ -136,7 +172,13 @@ export async function POST(req: NextRequest) {
       const qp = body.business.qualification_prompt ?? undefined; 
       const knowledge = body.business.knowledge ?? undefined;
       const assistantSettings = body.business.assistant_settings ?? undefined;
-      const domains = normalizeDomains(body.business.allowed_domains);
+      let domains: string[] | null = null;
+      try {
+        domains = normalizeDomains(body.business.allowed_domains, domainLimit);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Invalid domains";
+        return NextResponse.json({ error: message }, { status: 400 });
+      }
 
       const dlRaw = body.business.default_locale;
       const defaultLocale =

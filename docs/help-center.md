@@ -26,3 +26,7 @@ to match each section.
 
 - We can later expose the same content publicly for SEO.
 - The current implementation is inside the dashboard only.
+- Widget developer/security controls are separated from normal onboarding in:
+  - `/dashboard/widget/advanced`
+  - This keeps the main widget page focused on install + theme settings.
+- The dashboard sidebar includes an `Advanced` link (above `Help`) that points to `/dashboard/widget/advanced`.

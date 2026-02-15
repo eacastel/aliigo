@@ -13,6 +13,9 @@ export type BusinessRow = {
   created_at: string;
   system_prompt: string | null;
   allowed_domains: string[];
+  billing_plan?: string | null;
+  seat_limit?: number | null;
+  domain_limit?: number | null;
 };
 
 export type BusinessProfileRow = {

@@ -46,6 +46,8 @@ export type BusinessRow = {
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   billing_plan: string | null;
+  seat_limit: number | null;
+  domain_limit: number | null;
   trial_end: string | null;          // ISO string from Supabase client
   current_period_end: string | null; // ISO string
   cancel_at_period_end: boolean | null;

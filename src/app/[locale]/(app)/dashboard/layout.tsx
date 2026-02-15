@@ -30,6 +30,7 @@ export default function DashboardLayout({
     { href: "/dashboard/widget", label: t('links.widget') },
     { href: "/dashboard/messages", label: t('links.messages') },
     { href: "/dashboard/billing", label: t('links.billing') },
+    { href: "/dashboard/widget/advanced", label: t('links.advanced') },
     { href: "/dashboard/help", label: t('links.help') },
   ] as const;
 

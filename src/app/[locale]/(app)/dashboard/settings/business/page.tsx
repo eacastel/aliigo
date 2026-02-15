@@ -18,7 +18,7 @@ type ProfileState = {
 type BusinessState = {
   name: string;
   timezone: string;
-  allowed_domain: string;
+  allowed_domains_text: string;
   default_locale: "en" | "es";
 };
 
@@ -28,6 +28,7 @@ type JoinedBusiness = {
   timezone: string | null;
   slug?: string | null;
   allowed_domains?: string[] | null;
+  domain_limit?: number | null;
   default_locale?: string | null;
 } | null;
 
@@ -71,15 +72,22 @@ function normalizeDomainInput(value: string): string | null {
   return host;
 }
 
-function domainsToBase(domains: string[] | null | undefined): string {
+function domainsToBaseText(domains: string[] | null | undefined): string {
   const list = (domains ?? []).filter(Boolean);
-  if (list.length === 0) return "";
   const normalized = list
     .map((d) => (typeof d === "string" ? d.trim().toLowerCase() : ""))
-    .filter(Boolean)
-    .map((d) => (d.startsWith("www.") ? d.slice(4) : d));
-  const base = normalized[0] ?? "";
-  return base;
+    .filter(Boolean);
+
+  const bases = new Set<string>();
+  for (const d of normalized) {
+    if (d === "localhost" || d === "127.0.0.1") {
+      bases.add("localhost");
+      continue;
+    }
+    if (d.startsWith("www.") && normalized.includes(d.slice(4))) continue;
+    bases.add(d.startsWith("www.") ? d.slice(4) : d);
+  }
+  return Array.from(bases).join("\n");
 }
 
 export default function SettingsBusinessPage() {
@@ -101,9 +109,10 @@ export default function SettingsBusinessPage() {
   const [business, setBusiness] = useState<BusinessState>({
     name: "",
     timezone: "Europe/Madrid",
-    allowed_domain: "",
+    allowed_domains_text: "",
     default_locale: "en",
   });
+  const [domainLimit, setDomainLimit] = useState<number>(1);
 
   const initialProfile = useRef<ProfileState | null>(null);
   const initialBusiness = useRef<BusinessState | null>(null);
@@ -151,6 +160,7 @@ export default function SettingsBusinessPage() {
             timezone,
             slug,
             allowed_domains,
+            domain_limit,
             default_locale
           )
         `
@@ -184,9 +194,10 @@ export default function SettingsBusinessPage() {
         const nextBusiness: BusinessState = {
           name: biz.name ?? "",
           timezone: biz.timezone ?? "Europe/Madrid",
-          allowed_domain: domainsToBase(biz.allowed_domains),
+          allowed_domains_text: domainsToBaseText(biz.allowed_domains),
           default_locale: biz.default_locale === "es" ? "es" : "en",
         };
+        setDomainLimit(typeof biz.domain_limit === "number" && biz.domain_limit > 0 ? biz.domain_limit : 1);
 
         setBusiness(nextBusiness);
         initialBusiness.current = nextBusiness;
@@ -195,9 +206,10 @@ export default function SettingsBusinessPage() {
         const empty: BusinessState = {
           name: "",
           timezone: "Europe/Madrid",
-          allowed_domain: "",
+          allowed_domains_text: "",
           default_locale: "en",
         };
+        setDomainLimit(1);
         setBusiness(empty);
         initialBusiness.current = empty;
       }
@@ -222,27 +234,64 @@ export default function SettingsBusinessPage() {
       profile.telefono.trim() !== ip.telefono.trim() ||
       business.name.trim() !== ib.name.trim() ||
       business.timezone.trim() !== ib.timezone.trim() ||
-      business.allowed_domain.trim() !== ib.allowed_domain.trim() ||
+      business.allowed_domains_text.trim() !== ib.allowed_domains_text.trim() ||
       business.default_locale !== ib.default_locale
     );
   }, [profile, business]);
 
-  const normalizedDomain = useMemo(
-    () => normalizeDomainInput(business.allowed_domain),
-    [business.allowed_domain]
-  );
-  const domainInvalid =
-    business.allowed_domain.trim().length > 0 && !normalizedDomain;
+  const parsedDomainState = useMemo(() => {
+    const rawLines = business.allowed_domains_text
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const invalidLines: string[] = [];
+    const bases = new Set<string>();
+
+    for (const line of rawLines) {
+      const normalized = normalizeDomainInput(line);
+      if (!normalized) {
+        invalidLines.push(line);
+        continue;
+      }
+      bases.add(normalized);
+    }
+
+    const baseDomains = Array.from(bases);
+    const expanded = new Set<string>();
+    for (const base of baseDomains) {
+      if (base === "localhost") {
+        expanded.add("localhost");
+        expanded.add("127.0.0.1");
+      } else if (base === "127.0.0.1") {
+        expanded.add("127.0.0.1");
+        expanded.add("localhost");
+      } else {
+        expanded.add(base);
+        expanded.add(`www.${base}`);
+      }
+    }
+
+    return {
+      baseDomains,
+      expandedDomains: Array.from(expanded),
+      invalidLines,
+      exceedsLimit: baseDomains.length > domainLimit,
+    };
+  }, [business.allowed_domains_text, domainLimit]);
+
+  const domainInputRows = useMemo(() => {
+    const rows = business.allowed_domains_text.split("\n");
+    const trimmed = rows.map((r) => r.trim());
+    const fixed = trimmed.slice(0, domainLimit);
+    while (fixed.length < domainLimit) fixed.push("");
+    return fixed;
+  }, [business.allowed_domains_text, domainLimit]);
+
+  const domainInvalid = parsedDomainState.invalidLines.length > 0 || parsedDomainState.exceedsLimit;
   const valid = useMemo(
     () => business.name.trim().length > 0 && !domainInvalid,
     [business.name, domainInvalid]
   );
-  const allowedDomainList = useMemo(() => {
-    if (!normalizedDomain) return [];
-    if (normalizedDomain === "localhost") return ["localhost", "127.0.0.1"];
-    if (normalizedDomain === "127.0.0.1") return ["127.0.0.1", "localhost"];
-    return [normalizedDomain, `www.${normalizedDomain}`];
-  }, [normalizedDomain]);
 
   const save = async () => {
     setMsg(null);
@@ -265,7 +314,7 @@ export default function SettingsBusinessPage() {
         business: {
           name: business.name,
           timezone: business.timezone,
-          allowed_domains: allowedDomainList,
+          allowed_domains: parsedDomainState.baseDomains,
           default_locale: business.default_locale,
         },
       };
@@ -300,7 +349,7 @@ export default function SettingsBusinessPage() {
         const nextBusiness: BusinessState = {
           name: j.business.name ?? business.name,
           timezone: j.business.timezone ?? business.timezone,
-          allowed_domain: domainsToBase(j.business.allowed_domains),
+          allowed_domains_text: domainsToBaseText(j.business.allowed_domains),
           default_locale:
             j.business.default_locale === "es" ? "es" : business.default_locale,
         };
@@ -473,17 +522,35 @@ export default function SettingsBusinessPage() {
               <label className="block text-xs text-zinc-400 mb-1">
                 {t("domains.label")}
               </label>
-              <input
-                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                placeholder={t("domains.placeholder")}
-                value={business.allowed_domain}
-                onChange={(e) =>
-                  setBusiness((b) => ({ ...b, allowed_domain: e.target.value }))
-                }
-                disabled={domainLocked}
-              />
+              <div className="space-y-2">
+                {domainInputRows.map((value, idx) => (
+                  <input
+                    key={idx}
+                    className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                    placeholder={t("domains.placeholder")}
+                    value={value}
+                    onChange={(e) => {
+                      const next = [...domainInputRows];
+                      next[idx] = e.target.value;
+                      const normalizedText = next.join("\n").replace(/\n+$/, "");
+                      setBusiness((b) => ({ ...b, allowed_domains_text: normalizedText }));
+                    }}
+                    disabled={domainLocked}
+                    spellCheck={false}
+                  />
+                ))}
+              </div>
               <p className="text-[11px] text-zinc-500 mt-2">
                 {t("domains.help")}
+              </p>
+              <p className="text-[11px] text-zinc-500 mt-1">
+                {t("domains.limit", { count: domainLimit })}
+              </p>
+              <p className="text-[11px] text-zinc-500 mt-1">
+                {t("domains.used", {
+                  used: parsedDomainState.baseDomains.length,
+                  count: domainLimit,
+                })}
               </p>
               {domainLocked && (
                 <p className="text-[11px] text-amber-400 mt-1">
@@ -492,16 +559,18 @@ export default function SettingsBusinessPage() {
               )}
               {domainInvalid && (
                 <p className="text-[11px] text-red-400 mt-1">
-                  {t("domains.invalid")}
+                  {parsedDomainState.exceedsLimit
+                    ? t("domains.limitExceeded", { count: domainLimit })
+                    : t("domains.invalid")}
                 </p>
               )}
               <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2 text-xs text-zinc-300">
                 <div className="text-[11px] text-zinc-500 mb-1">
                   {t("domains.previewLabel")}
                 </div>
-                {allowedDomainList.length > 0 ? (
+                {parsedDomainState.expandedDomains.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {allowedDomainList.map((d) => (
+                    {parsedDomainState.expandedDomains.map((d) => (
                       <span
                         key={d}
                         className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2 py-1 text-[11px]"
