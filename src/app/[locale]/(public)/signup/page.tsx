@@ -202,31 +202,55 @@ export default function SignupPage() {
         return;
       }
 
-      // Create/link business + profile (server)
-      await withTimeout(
-        ensureBusinessProfileWithRetry({
-        id: userId,
-        email: normalizedEmail,
-        businessName: normalizedBiz,
-      }),
-        45000,
-        "Business setup"
-      );
+      // Do not block signup UX on post-auth setup calls.
+      void (async () => {
+        try {
+          await withTimeout(
+            ensureBusinessProfileWithRetry({
+              id: userId,
+              email: normalizedEmail,
+              businessName: normalizedBiz,
+            }),
+            45000,
+            "Business setup"
+          );
+        } catch (e) {
+          console.error("Signup background business setup failed:", e);
+        }
+      })();
 
-      const acceptanceRes = await withTimeout(fetch("/api/legal/acceptance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          termsVersion: "legal-v4",
-          locale,
-          agreement: "subscription_agreement",
-          marketingOptIn: acceptMarketing,
-        }),
-      }), 15000, "Legal acceptance");
-      if (!acceptanceRes.ok) {
-        throw new Error("No se pudo registrar la aceptación legal.");
-      }
+      void (async () => {
+        try {
+          const acceptanceRes = await withTimeout(
+            fetch("/api/legal/acceptance", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId,
+                termsVersion: "legal-v4",
+                locale,
+                agreement: "subscription_agreement",
+                marketingOptIn: acceptMarketing,
+              }),
+            }),
+            15000,
+            "Legal acceptance"
+          );
+          if (!acceptanceRes.ok) {
+            const body = await readJsonObject(acceptanceRes);
+            console.error("Signup background legal acceptance failed:", body);
+          }
+        } catch (e) {
+          console.error("Signup background legal acceptance failed:", e);
+        }
+      })();
+
+      // Trigger confirmation email again as a safety net.
+      void supabase.auth.resend({
+        type: "signup",
+        email: normalizedEmail,
+        options: { emailRedirectTo: `${window.location.origin}/${locale}/auth/callback` },
+      });
 
       // Analytics
       void fireLeadCAPIEvent(normalizedEmail);
@@ -244,14 +268,6 @@ export default function SignupPage() {
 
       router.push("/dashboard");
     } catch (err) {
-      if (err instanceof Error && /Business setup timed out/i.test(err.message)) {
-        setError(
-          locale === "es"
-            ? "La configuración está tardando más de lo esperado. Prueba iniciar sesión ahora; es posible que la cuenta ya esté creada."
-            : "Setup is taking longer than expected. Try logging in now; your account may already be created."
-        );
-        return;
-      }
       setError(
         err instanceof Error ? err.message : "No se pudo crear el negocio/perfil."
       );
