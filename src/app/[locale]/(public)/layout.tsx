@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
+import PublicTrackingEvents from "@/components/PublicTrackingEvents";
 
 export default async function PublicLayout({
   children,
@@ -14,6 +15,7 @@ export default async function PublicLayout({
   const t = await getTranslations("Navigation");
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-[#84c9ad]/30">
+      <PublicTrackingEvents />
       
       {/* HEADER - NOW STICKY & GLASS */}
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-zinc-950/80 backdrop-blur-md supports-backdrop-filter:bg-zinc-950/50">

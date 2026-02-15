@@ -7,12 +7,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { getMetaBrowserIDs } from "@/lib/metaHelpers";
-
-const pushToGTM = (event: string, data?: Record<string, unknown>) => {
-  if (typeof window === "undefined") return;
-  const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
-  w.dataLayer?.push({ event, ...data });
-};
+import { pushToGTM } from "@/lib/gtm";
 
 async function readJsonObject(res: Response): Promise<Record<string, unknown>> {
   const text = await res.text().catch(() => "");

@@ -63,3 +63,13 @@ Then in GTM:
 - Do not optimize on `signup_intent` in Google Ads; keep it as a secondary conversion.
 - If you turn on Meta campaigns later, we can add a `StartTrial` event and map it to the same trigger.
 
+## Current app event behavior (implemented)
+- `pricing_view`
+  - Fires when the pricing page is viewed (`/en/pricing` or `/es/precios`).
+  - Implemented via pathname detection in `src/components/PublicTrackingEvents.tsx`.
+- `signup_intent`
+  - Fires when users click links that navigate to signup (`/signup` or `/registro`) on public pages.
+  - Implemented via click listener in `src/components/PublicTrackingEvents.tsx`.
+- `trial_started`
+  - Fires after Stripe setup + subscription creation succeeds in checkout flow.
+  - Implemented in `src/components/billing/PaymentForm.tsx`.

@@ -5,6 +5,7 @@ import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import type { Plan } from "./BillingCheckout";
 import type { AliigoCurrency } from "@/lib/currency";
 import { useTranslations } from "next-intl";
+import { pushToGTM } from "@/lib/gtm";
 
 export default function PaymentForm({
   jwt,
@@ -59,6 +60,12 @@ export default function PaymentForm({
         setErr(j.error || "Subscription failed");
         return;
       }
+
+      pushToGTM("trial_started", {
+        plan,
+        currency,
+        source: "billing_checkout",
+      });
 
       window.location.reload();
     } finally {
