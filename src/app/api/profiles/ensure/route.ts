@@ -162,9 +162,11 @@ export async function POST(req: Request) {
     });
 
     // Rate limit (by IP)
+    // Signup can burst during QA/launch testing, so allow a higher ceiling.
+    const isSignupSource = source === "signup";
     const rl = await enforceRateLimit(supabaseAdmin, req, {
-      bucket: "profiles_ensure",
-      max: 8,
+      bucket: isSignupSource ? "profiles_ensure_signup" : "profiles_ensure",
+      max: isSignupSource ? 30 : 8,
       windowMs: 10 * 60 * 1000,
     });
 

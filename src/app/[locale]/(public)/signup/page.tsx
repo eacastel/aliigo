@@ -22,6 +22,23 @@ async function readJsonObject(res: Response): Promise<Record<string, unknown>> {
   }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`${label} timed out. Please try again.`));
+    }, ms);
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
 export default function SignupPage() {
   const t = useTranslations("Auth.signup");
   const router = useRouter();
@@ -158,7 +175,8 @@ export default function SignupPage() {
       const {
         data: { user },
         error: authError,
-      } = await supabase.auth.signUp({
+      } = await withTimeout(
+        supabase.auth.signUp({
         email: normalizedEmail,
         password,
         options: {
@@ -168,7 +186,10 @@ export default function SignupPage() {
             locale,
           },
         },
-      });
+      }),
+      20000,
+      "Signup request"
+      );
 
       if (authError) {
         setError(authError.message);
@@ -182,13 +203,17 @@ export default function SignupPage() {
       }
 
       // Create/link business + profile (server)
-      await ensureBusinessProfileWithRetry({
+      await withTimeout(
+        ensureBusinessProfileWithRetry({
         id: userId,
         email: normalizedEmail,
         businessName: normalizedBiz,
-      });
+      }),
+        20000,
+        "Business setup"
+      );
 
-      const acceptanceRes = await fetch("/api/legal/acceptance", {
+      const acceptanceRes = await withTimeout(fetch("/api/legal/acceptance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -198,7 +223,7 @@ export default function SignupPage() {
           agreement: "subscription_agreement",
           marketingOptIn: acceptMarketing,
         }),
-      });
+      }), 15000, "Legal acceptance");
       if (!acceptanceRes.ok) {
         throw new Error("No se pudo registrar la aceptación legal.");
       }
