@@ -66,10 +66,15 @@
 - `name` and `phone` are no longer collected at signup and are no longer required dependencies for profile creation.
 - Business name remains needed for initial workspace creation.
 - Signup now routes users to `/dashboard` instead of `/check-email`.
-- Dashboard shows an unverified email banner with a 72-hour countdown:
-  - >24h remaining: standard warning with hours left
-  - <=24h remaining: final warning
-  - <=0h: expired notice (scheduled-for-deletion state)
+- Custom verification is app-level and token-based:
+  - `email_verification_tokens` stores hashed tokens for signup/email-change verification.
+  - `business_profiles.email_verified_at` and `business_profiles.email_verification_deadline` drive dashboard verification state.
+  - Verification links go to `/{locale}/verify-email`, then call `/api/verification/confirm`.
+  - Dashboard shows unverified banner countdown:
+    - >24h remaining: standard warning with hours left
+    - <=24h remaining: final warning
+    - <=0h: expired notice (scheduled-for-deletion state)
+  - Cleanup endpoint `POST /api/admin/verification/cleanup` removes expired unverified accounts (requires `CRON_SECRET`).
 
 ## Known gaps to close (production hardening)
 - CORS rules should remain strict (no wildcard in production)

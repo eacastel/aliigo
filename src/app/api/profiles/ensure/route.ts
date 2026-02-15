@@ -122,6 +122,10 @@ export async function POST(req: Request) {
 
     // Optional extras
     const source = (body.source ?? null) as string | null;
+    const verificationDeadline =
+      source === "signup"
+        ? new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString()
+        : null;
 
     if (!looksLikeUUID(idRaw) || typeof nombre_negocio !== "string" || !nombre_negocio.trim()) {
       return NextResponse.json(
@@ -242,6 +246,12 @@ export async function POST(req: Request) {
             email,
             source, // remove if column doesn't exist
             business_id: biz.id,
+            ...(verificationDeadline
+              ? {
+                  email_verification_deadline: verificationDeadline,
+                  email_verified_at: null,
+                }
+              : {}),
             updated_at: new Date().toISOString(),
           },
         ],

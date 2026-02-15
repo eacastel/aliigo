@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/routing";
+import { usePathname } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PublicGetStartedButton({
@@ -11,6 +12,7 @@ export default function PublicGetStartedButton({
   className: string;
   label: string;
 }) {
+  const pathname = usePathname();
   const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
@@ -31,7 +33,10 @@ export default function PublicGetStartedButton({
     };
   }, []);
 
-  if (isAuthed) return null;
+  const isSignupPage =
+    pathname.endsWith("/signup") || pathname.endsWith("/registro");
+
+  if (isAuthed || isSignupPage) return null;
 
   return (
     <Link href="/signup" className={className}>
@@ -39,4 +44,3 @@ export default function PublicGetStartedButton({
     </Link>
   );
 }
-

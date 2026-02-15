@@ -22,7 +22,10 @@ type BusinessProfile = {
   nombre_negocio: string | null;
   nombre_contacto: string | null;
   telefono: string | null;
+  email: string | null;
   created_at: string | null;
+  email_verified_at: string | null;
+  email_verification_deadline: string | null;
   business_id: string | null;
   businesses: BusinessRow | null;
 };
@@ -46,7 +49,6 @@ type UsagePayload = {
 };
 
 const DEFAULT_ALLOWED_DOMAINS = new Set(["aliigo.com", "www.aliigo.com"]);
-const UNVERIFIED_DELETE_HOURS = 72;
 const UNVERIFIED_LAST_24H_THRESHOLD = 24;
 
 function nonEmpty(v: unknown) {
@@ -90,7 +92,7 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
   const [pending, setPending] = useState<PendingSignup | null>(null);
 
   const [embedToken, setEmbedToken] = useState<string | null>(null);
@@ -107,18 +109,20 @@ export default function DashboardPage() {
     return Math.max(30 - daysPassed, 0);
   }, [business, pending]);
 
-  const signupTimestampMs = useMemo(() => {
-    if (business?.created_at) {
-      return new Date(business.created_at).getTime();
+  const verificationDeadlineMs = useMemo(() => {
+    if (business?.email_verification_deadline) {
+      return new Date(business.email_verification_deadline).getTime();
     }
-    return pending?.createdAtMs ?? null;
-  }, [business?.created_at, pending?.createdAtMs]);
+    if (pending?.createdAtMs) {
+      return pending.createdAtMs + 72 * 60 * 60 * 1000;
+    }
+    return null;
+  }, [business?.email_verification_deadline, pending?.createdAtMs]);
 
   const unverifiedHoursRemaining = useMemo(() => {
-    if (isConfirmed || !signupTimestampMs) return null;
-    const elapsedHours = Math.floor((Date.now() - signupTimestampMs) / 3_600_000);
-    return UNVERIFIED_DELETE_HOURS - elapsedHours;
-  }, [isConfirmed, signupTimestampMs]);
+    if (isVerified || !verificationDeadlineMs) return null;
+    return Math.floor((verificationDeadlineMs - Date.now()) / 3_600_000);
+  }, [isVerified, verificationDeadlineMs]);
 
   useEffect(() => {
     let mounted = true;
@@ -141,7 +145,6 @@ export default function DashboardPage() {
         }
 
         localStorage.removeItem("aliigo_pending_signup");
-        setIsConfirmed(Boolean(session.user.email_confirmed_at));
         setUserEmail(session.user.email ?? null);
 
         const { data, error } = await supabase
@@ -152,7 +155,10 @@ export default function DashboardPage() {
             nombre_negocio,
             nombre_contacto,
             telefono,
+            email,
             created_at,
+            email_verified_at,
+            email_verification_deadline,
             business_id,
             businesses:businesses!business_profiles_business_id_fkey (
               id,
@@ -169,7 +175,10 @@ export default function DashboardPage() {
           .maybeSingle<BusinessProfile>();
 
         if (error) console.error("DB Error:", error.message);
-        if (mounted) setBusiness(data ?? null);
+        if (mounted) {
+          setBusiness(data ?? null);
+          setIsVerified(Boolean(data?.email_verified_at));
+        }
 
         if (data?.business_id) {
           const { data: tok, error: tokErr } = await supabase
@@ -216,7 +225,6 @@ export default function DashboardPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "USER_UPDATED" || event === "SIGNED_IN") {
-        setIsConfirmed(Boolean(session?.user?.email_confirmed_at));
         setUserEmail(session?.user?.email ?? null);
       }
       if (event === "SIGNED_OUT") {
@@ -232,23 +240,32 @@ export default function DashboardPage() {
 
   const handleResend = async () => {
     const { data } = await supabase.auth.getSession();
-    const email = data.session?.user?.email || pending?.email;
-    if (!email) return;
+    const token = data.session?.access_token;
+    if (!token) return;
 
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
+    const res = await fetch("/api/verification/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ purpose: "signup", locale }),
     });
+    const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
 
-    if (error) alert(t("resendError", { error: error.message }));
-    else alert(t("resendSuccess"));
+    if (!res.ok || body.ok !== true) {
+      alert(
+        t("resendError", {
+          error: typeof body.error === "string" ? body.error : "Unexpected error",
+        })
+      );
+      return;
+    }
+    alert(t("resendSuccess"));
   };
 
   const trialExpired = daysLeft !== null && daysLeft <= 0;
-  const featuresDisabled = !isConfirmed || trialExpired;
+  const featuresDisabled = !isVerified || trialExpired;
 
   if (loading) {
     return (
@@ -446,7 +463,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {!isConfirmed && (
+        {!isVerified && (
           <div className="mt-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
             <div className="flex gap-3">
               <div className="flex-shrink-0">

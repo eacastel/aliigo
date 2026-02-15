@@ -824,6 +824,13 @@
     },
     "callback": {
       "loading": "Confirming your access..."
+    },
+    "verifyEmail": {
+      "title": "Verifying your email",
+      "loading": "Please wait while we verify your email...",
+      "success": "Email verified. Redirecting...",
+      "failed": "We could not verify this link.",
+      "missingToken": "Verification link is invalid."
     }
   },
   "Legal": {

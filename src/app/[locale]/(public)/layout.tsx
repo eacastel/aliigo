@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
 import PublicTrackingEvents from "@/components/PublicTrackingEvents";
+import PublicGetStartedButton from "@/components/PublicGetStartedButton";
 
 export default async function PublicLayout({
   children,
@@ -50,12 +51,10 @@ export default async function PublicLayout({
             <PublicAuthActions className="hidden md:flex items-center gap-3" />
 
             {/* Compact button on mobile */}
-            <Link
-              href="/signup"
+            <PublicGetStartedButton
               className="bg-white text-black px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-md hover:bg-[#84c9ad] transition-colors whitespace-nowrap"
-            >
-              {t('actions.getStarted')}
-            </Link>
+              label={t("actions.getStarted")}
+            />
 
             <PublicAuthActions className="flex md:hidden items-center gap-3" />
           </nav>

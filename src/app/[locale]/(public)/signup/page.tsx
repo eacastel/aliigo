@@ -194,7 +194,7 @@ export default function SignupPage() {
       }
 
       const {
-        data: { user },
+        data: { user, session: signUpSession },
         error: authError,
       } = await withTimeout(
         supabase.auth.signUp({
@@ -263,6 +263,31 @@ export default function SignupPage() {
           }
         } catch (e) {
           console.error("Signup background legal acceptance failed:", e);
+        }
+      })();
+
+      void (async () => {
+        try {
+          const token = signUpSession?.access_token;
+          if (token) {
+            await fetch("/api/verification/send", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ purpose: "signup", locale }),
+            });
+            return;
+          }
+
+          await fetch("/api/verification/send-initial", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, email: normalizedEmail, locale }),
+          });
+        } catch (e) {
+          console.error("Signup background verification send failed:", e);
         }
       })();
 
