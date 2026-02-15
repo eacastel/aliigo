@@ -182,6 +182,17 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
+      // If another user is currently signed in, clear that session first.
+      // Otherwise signup can create a new auth user while the old dashboard session remains active.
+      const {
+        data: { session: existingSession },
+      } = await supabase.auth.getSession();
+
+      const existingEmail = existingSession?.user?.email?.trim().toLowerCase() ?? null;
+      if (existingSession?.user && existingEmail && existingEmail !== normalizedEmail) {
+        await supabase.auth.signOut();
+      }
+
       const {
         data: { user },
         error: authError,
