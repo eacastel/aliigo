@@ -39,6 +39,16 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   });
 }
 
+function mapSignupError(message: string, locale: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("email rate limit exceeded")) {
+    return locale === "es"
+      ? "Has alcanzado el límite temporal de emails de verificación. Espera unos minutos y vuelve a intentarlo, o inicia sesión si la cuenta ya fue creada."
+      : "You hit the temporary verification email limit. Wait a few minutes and try again, or log in if your account was already created.";
+  }
+  return message;
+}
+
 export default function SignupPage() {
   const t = useTranslations("Auth.signup");
   const router = useRouter();
@@ -192,7 +202,7 @@ export default function SignupPage() {
       );
 
       if (authError) {
-        setError(authError.message);
+        setError(mapSignupError(authError.message, locale));
         return;
       }
 
@@ -244,13 +254,6 @@ export default function SignupPage() {
           console.error("Signup background legal acceptance failed:", e);
         }
       })();
-
-      // Trigger confirmation email again as a safety net.
-      void supabase.auth.resend({
-        type: "signup",
-        email: normalizedEmail,
-        options: { emailRedirectTo: `${window.location.origin}/${locale}/auth/callback` },
-      });
 
       // Analytics
       void fireLeadCAPIEvent(normalizedEmail);
