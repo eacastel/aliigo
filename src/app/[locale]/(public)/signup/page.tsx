@@ -39,6 +39,36 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   });
 }
 
+async function sendCustomVerificationEmail(input: {
+  sessionToken?: string;
+  userId: string;
+  email: string;
+  locale: string;
+}) {
+  if (input.sessionToken) {
+    const res = await fetch("/api/verification/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${input.sessionToken}`,
+      },
+      body: JSON.stringify({ purpose: "signup", locale: input.locale }),
+    });
+    if (res.ok) return true;
+  }
+
+  const fallback = await fetch("/api/verification/send-initial", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: input.userId,
+      email: input.email,
+      locale: input.locale,
+    }),
+  });
+  return fallback.ok;
+}
+
 function mapSignupError(message: string, locale: string): string {
   const m = message.toLowerCase();
   if (m.includes("email rate limit exceeded")) {
@@ -266,30 +296,20 @@ export default function SignupPage() {
         }
       })();
 
-      void (async () => {
-        try {
-          const token = signUpSession?.access_token;
-          if (token) {
-            await fetch("/api/verification/send", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ purpose: "signup", locale }),
-            });
-            return;
-          }
-
-          await fetch("/api/verification/send-initial", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, email: normalizedEmail, locale }),
-          });
-        } catch (e) {
-          console.error("Signup background verification send failed:", e);
-        }
-      })();
+      try {
+        await withTimeout(
+          sendCustomVerificationEmail({
+            sessionToken: signUpSession?.access_token,
+            userId,
+            email: normalizedEmail,
+            locale,
+          }),
+          12000,
+          "Verification email send"
+        );
+      } catch (e) {
+        console.error("Signup verification send failed:", e);
+      }
 
       // Analytics
       void fireLeadCAPIEvent(normalizedEmail);
