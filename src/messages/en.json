@@ -19,7 +19,9 @@
     "publicLinks": {
       "features": "How it works",
       "pricing": "Pricing",
-      "blog": "Resources"
+      "blog": "Resources",
+      "whyAliigo": "Why Aliigo",
+      "founder": "Founder"
     },
     "actions": {
       "panel": "Dashboard",
@@ -37,7 +39,22 @@
       "terminos": "Terms of Use",
       "subscriptionAgreement": "Subscription Agreement",
       "dpa": "DPA",
-      "subprocessors": "Subprocessors"
+      "subprocessors": "Subprocessors",
+      "title": "Legal"
+    },
+    "footerCompany": {
+      "title": "Company",
+      "whyAliigo": "Why Aliigo",
+      "founder": "Founder",
+      "privacy": "Privacy",
+      "dpa": "DPA",
+      "subprocessors": "Subprocessors",
+      "contact": "Contact"
+    },
+    "mobileMenu": {
+      "open": "Open menu",
+      "close": "Close menu",
+      "title": "Menu"
     }
   },
   "PricingPage": {
@@ -1306,128 +1323,183 @@
   },
   "pages": {
     "whyAliigo": {
-      "metaTitle": "Why Aliigo — Conversations you can control",
-      "metaDescription": "Aliigo is a website AI assistant for real businesses. It answers from your approved sources, captures leads only on intent, and routes visitors to the right next step—without risking your brand voice.",
+      "metaTitle": "Why Aliigo exists — AI assistant for business websites",
+      "metaDescription": "Aliigo helps businesses answer instantly with approved knowledge, keep brand-safe responses, and route visitors to the right next step.",
       "hero": {
-        "headline": "Why Aliigo",
-        "subheadline": "Conversations you can control — built for real businesses, not generic chatbots.",
+        "headline": "Why Aliigo exists",
+        "subheadline": "Because businesses lose leads when they don’t answer instantly—and generic chatbots can damage trust.",
+        "ctaPrimary": "Start free trial",
+        "ctaSecondary": "See it in action",
+        "microstrip": "30-day free trial • Cancel anytime • Install with one script • Works with your content",
+        "visualTitle": "What matters most"
+      },
+      "pillars": {
+        "title": "The 3 pillars",
+        "card1": {
+          "title": "Approved knowledge",
+          "body": "Answers come from your approved website pages, documents, and FAQs."
+        },
+        "card2": {
+          "title": "Brand voice control",
+          "body": "Define tone, boundaries, and what the assistant should and should not say."
+        },
+        "card3": {
+          "title": "Safe routing",
+          "body": "Escalate to contact forms, booking, or human follow-up when needed."
+        }
+      },
+      "comparison": {
+        "title": "Aliigo vs alternatives",
+        "cols": {
+          "feature": "Capability",
+          "aliigo": "Aliigo",
+          "generic": "Generic AI chatbot",
+          "liveChat": "Live chat"
+        },
+        "rows": {
+          "r1": {
+            "feature": "Answers from approved sources",
+            "aliigo": "✅",
+            "generic": "⚠️ Sometimes",
+            "liveChat": "❌"
+          },
+          "r2": {
+            "feature": "Brand voice + safe boundaries",
+            "aliigo": "✅",
+            "generic": "⚠️ Varies",
+            "liveChat": "✅"
+          },
+          "r3": {
+            "feature": "Captures leads only on intent",
+            "aliigo": "✅",
+            "generic": "❌ Often interrupts",
+            "liveChat": "✅ Manual"
+          },
+          "r4": {
+            "feature": "Conversation visibility / audit trail",
+            "aliigo": "✅",
+            "generic": "⚠️ Varies",
+            "liveChat": "⚠️ Varies"
+          },
+          "r5": {
+            "feature": "Setup effort",
+            "aliigo": "Low",
+            "generic": "Low–Medium",
+            "liveChat": "Medium–High"
+          },
+          "r6": {
+            "feature": "After-hours coverage",
+            "aliigo": "✅",
+            "generic": "✅",
+            "liveChat": "❌"
+          }
+        }
+      },
+      "weekOne": {
+        "title": "What you get in week 1",
+        "d0": {
+          "day": "Day 0",
+          "body": "Install and choose goals (trial, booking, contact)."
+        },
+        "d1": {
+          "day": "Day 1",
+          "body": "Import sources (website pages and documents)."
+        },
+        "d3": {
+          "day": "Day 3",
+          "body": "Refine tone and “qualified lead” rules."
+        },
+        "d7": {
+          "day": "Day 7",
+          "body": "Review conversations and improve answers."
+        }
+      },
+      "trustPack": {
+        "title": "Trust pack",
+        "c1": "GDPR-first mindset",
+        "c2": "DPA available",
+        "c3": "Cancel anytime",
+        "c4": "Human support"
+      },
+      "finalCta": {
+        "headline": "Start with your website—go live in minutes.",
+        "subheadline": "Set clear goals, connect your content, and launch a controlled assistant your team can trust.",
         "ctaPrimary": "Start free trial",
         "ctaSecondary": "See it in action"
       },
-      "sections": [
-        {
-          "id": "problem",
-          "title": "The problem (plain language)",
-          "body": "Most businesses lose leads for one simple reason: they don’t respond instantly—especially after hours. And when they do add a chatbot, it often creates a new risk: generic answers that damage trust.\n\nAliigo exists to solve both problems:\n- Respond instantly, 24/7\n- Keep answers aligned with your business, your tone, and your standards"
-        },
-        {
-          "id": "principle",
-          "title": "The principle",
-          "body": "AI is powerful. But businesses need control.\n\nThat means:\n- Answers grounded in approved knowledge (your website, docs, FAQs)\n- A brand voice you can define (tone, style, what to say / what not to say)\n- Safe routing when a question needs a human or includes sensitive topics"
-        },
-        {
-          "id": "difference",
-          "title": "How Aliigo is different",
-          "bullets": [
-            "Answers from your sources: uses your approved content—not random internet guesses.",
-            "Lead capture only on intent: asks for details only when the visitor is genuinely ready.",
-            "Clear next-step guidance: calls, bookings, contact forms, directions—whatever you choose.",
-            "Audit-friendly handoff: visibility into conversations and outcomes.",
-            "Built with a GDPR-first mindset for EU/EAA customers (DPA available)."
-          ]
-        },
-        {
-          "id": "dayOne",
-          "title": "What you get on day one",
-          "bullets": [
-            "Install with one script (works on WordPress, Webflow, Shopify, Wix, Squarespace, and custom sites)",
-            "No training required — add your business info and go live",
-            "A safer, more consistent customer experience that scales beyond your inbox"
-          ]
-        },
-        {
-          "id": "fit",
-          "title": "Who it’s for / Who it’s not for",
-          "body": "**Aliigo is ideal if:**\n- You sell services (or high-consideration products)\n- One new customer is worth {value}+ (or similar)\n- You get recurring questions and inquiries every week\n- You want growth without sacrificing trust\n\n**Aliigo is not ideal if:**\n- You want a “fun” chatbot with open-ended creativity\n- Your business requires fully human-only responses for every interaction\n- You expect AI to replace your team without clear rules and oversight"
-        },
-        {
-          "id": "founderNote",
-          "title": "A note from the founder",
-          "body": "Aliigo is built by someone who’s spent two decades shipping digital solutions and obsessing over one thing: clear communication that turns attention into action—without compromising trust.\n\nI believe AI should be used as a force for good: to help small and mid-sized businesses compete, respond faster, and serve better—without needing an enterprise budget."
-        },
-        {
-          "id": "commitment",
-          "title": "Early-stage advantage (and our commitment)",
-          "body": "Aliigo is growing fast, and we build with customers. If you join early, you don’t just “buy software”—you help shape what it becomes.\n\nWe listen. We ship. We iterate.\nAnd we’ll always prioritize control, clarity, and safety over hype."
-        },
-        {
-          "id": "trust",
-          "title": "Trust & policies",
-          "body": "For transparency, here are the documents we maintain publicly:\n- Legal Notice\n- Privacy Policy\n- Cookies Policy\n- Terms of Use\n- Subscription Agreement\n- DPA\n- Subprocessors\n\nContact: legal@aliigo.com"
-        }
-      ],
-      "finalCta": {
-        "headline": "Ready to try Aliigo?",
-        "ctaPrimary": "Start free trial",
-        "ctaSecondary": "See it in action"
+      "crossLink": {
+        "prompt": "Want the founder’s story?",
+        "cta": "Meet the founder"
       }
     },
     "founder": {
-      "metaTitle": "Emilio Castellanos — Founder of Aliigo",
-      "metaDescription": "Meet the founder behind Aliigo and why the product is built around clarity, control, and trust—so businesses can grow without risking their voice.",
+      "metaTitle": "Founder — Built for clarity, control, and trust",
+      "metaDescription": "Meet the founder behind Aliigo and see how early customers get direct help with setup, optimization, and roadmap input.",
       "hero": {
-        "headline": "Built for businesses that can’t afford “generic.”",
-        "subheadline": "I’m Emilio Castellanos, founder of Aliigo. I build tools that help businesses respond faster, convert better, and protect trust.",
+        "photoAlt": "Founder photo",
+        "name": "Emilio Castellanos",
+        "role": "Founder, Aliigo",
+        "headline": "Built by the founder—so you get clarity, not tickets.",
+        "subheadline": "I built Aliigo for businesses that can’t afford vague answers. If you join early, you get direct access to me for setup and iteration.",
         "ctaPrimary": "Start free trial",
-        "ctaSecondary": "Why Aliigo"
-      },
-      "sections": [
-        {
-          "id": "why",
-          "title": "Why I built Aliigo",
-          "body": "I’ve spent the last 20+ years helping businesses improve their digital presence—websites, analytics, messaging, and conversion. A pattern kept repeating:\n\n- Visitors ask questions at the worst times (after hours, weekends).\n- Businesses reply too late and lose the lead.\n- Generic chatbots respond instantly—but often say the wrong thing.\n\nAliigo was created to give businesses the speed of AI with the control of a real brand."
-        },
-        {
-          "id": "principles",
-          "title": "What I believe (the principles)",
-          "bullets": [
-            "Clarity beats cleverness: simple, accurate answers convert better than “smart” talk.",
-            "Control is non‑negotiable: your assistant should follow your approved knowledge and rules.",
-            "Trust is the product: if a tool damages trust, it’s not helping growth.",
-            "Never stop learning: technology changes—our job is to adapt responsibly.",
-            "Use tools for good: build systems that serve customers and reduce chaos for teams."
-          ]
-        },
-        {
-          "id": "personalized",
-          "title": "What “personalized” means at Aliigo",
-          "bullets": [
-            "Your business info and approved sources",
-            "Your tone and style (professional, friendly, concise, etc.)",
-            "Safe routing when the answer isn’t clear (handoff to a human)",
-            "The next step that makes sense for your business (call, book, email, visit)"
-          ]
-        },
-        {
-          "id": "buildWithCustomers",
-          "title": "Building with customers (early-stage advantage)",
-          "body": "Aliigo is built with customers, not in isolation. If you join now, you can influence:\n\n- The assistant’s voice controls and safety rules\n- Qualification questions (what to ask / when to ask)\n- Reporting and conversation insights\n- Integrations you actually need\n\nIf you want to shape the roadmap, reach out directly.\n\nContact: legal@aliigo.com"
-        },
-        {
-          "id": "links",
-          "title": "Links & transparency",
-          "bullets": [
-            "Privacy Policy",
-            "DPA",
-            "Subprocessors",
-            "Terms of Use",
-            "Subscription Agreement"
-          ]
+        "ctaSecondary": "Talk to the founder",
+        "commitmentTitle": "Credibility + commitment",
+        "commitment": {
+          "i1": "20+ years building digital systems",
+          "i2": "Obsessed with conversion + clarity",
+          "i3": "Privacy-minded by default",
+          "i4": "Built with customers, not in isolation"
         }
-      ],
+      },
+      "whyBuilt": {
+        "title": "Why I built Aliigo",
+        "card1": {
+          "title": "The moment",
+          "body": "I kept seeing the same pattern: great businesses losing qualified leads because replies came too late."
+        },
+        "card2": {
+          "title": "The problem",
+          "body": "Teams were stuck between slow manual replies and generic bots that answered fast but hurt trust."
+        },
+        "card3": {
+          "title": "The solution",
+          "body": "Aliigo gives fast answers grounded in business-approved sources with controls teams can trust."
+        }
+      },
+      "earlyCustomers": {
+        "title": "How I work with early customers",
+        "i1": {
+          "title": "Onboarding help",
+          "body": "I help install and configure your assistant based on your business goals."
+        },
+        "i2": {
+          "title": "Optimization",
+          "body": "We review real conversations and improve prompts, answers, and lead routing."
+        },
+        "i3": {
+          "title": "Roadmap input",
+          "body": "Early customers influence priority features and product direction."
+        }
+      },
+      "timeline": {
+        "title": "How this came together",
+        "t1": "Built digital products and websites for years.",
+        "t2": "Learned what actually converts in real customer journeys.",
+        "t3": "Watched generic chatbots fail on trust and relevance.",
+        "t4": "Built Aliigo around controlled business conversations.",
+        "t5": "Now building with customers in the loop."
+      },
       "finalCta": {
-        "headline": "Try Aliigo on your website today.",
-        "ctaPrimary": "Start free trial"
+        "headline": "Ready to build this with me?",
+        "ctaPrimary": "Start free trial",
+        "ctaSecondary": "Why Aliigo",
+        "linkPrivacy": "Privacy",
+        "linkDpa": "DPA",
+        "linkSubprocessors": "Subprocessors"
+      },
+      "crossLink": {
+        "prompt": "What makes Aliigo different?",
+        "cta": "Why Aliigo"
       }
     }
   }

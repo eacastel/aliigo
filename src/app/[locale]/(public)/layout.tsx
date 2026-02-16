@@ -7,6 +7,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import PublicAuthActions from "@/components/PublicAuthActions";
 import PublicTrackingEvents from "@/components/PublicTrackingEvents";
 import PublicGetStartedButton from "@/components/PublicGetStartedButton";
+import PublicMobileMenu from "@/components/PublicMobileMenu";
 
 export default async function PublicLayout({
   children,
@@ -47,6 +48,18 @@ export default async function PublicLayout({
             >
               {t("publicLinks.pricing")}
             </Link>
+            <Link
+              href="/why-aliigo"
+              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
+            >
+              {t("publicLinks.whyAliigo")}
+            </Link>
+            <Link
+              href="/founder"
+              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
+            >
+              {t("publicLinks.founder")}
+            </Link>
 
             <PublicAuthActions className="hidden md:flex items-center gap-3" />
 
@@ -56,7 +69,7 @@ export default async function PublicLayout({
               label={t("actions.getStarted")}
             />
 
-            <PublicAuthActions className="flex md:hidden items-center gap-3" />
+            <PublicMobileMenu />
           </nav>
         </div>
       </header>
@@ -65,37 +78,37 @@ export default async function PublicLayout({
 
      {/* FOOTER */}
       <footer className="bg-zinc-950 border-t border-zinc-800 py-12">
-        <div className="max-w-6xl mx-auto px-4 lg:px-8 flex flex-col items-center">
-          
-          {/* Legal Links Row */}
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-6 text-xs font-medium text-zinc-500">
-            <Link href="/legal/aviso-legal" className="hover:text-zinc-300 transition-colors">
-              {t('footerLinks.avisoLegal')}
-            </Link>
-            <Link href="/legal/privacidad" className="hover:text-zinc-300 transition-colors">
-              {t('footerLinks.privacidad')}
-            </Link>
-            <Link href="/legal/cookies" className="hover:text-zinc-300 transition-colors">
-              {t('footerLinks.cookies')}
-            </Link>
-            <Link href="/legal/terminos" className="hover:text-zinc-300 transition-colors">
-              {t('footerLinks.terminos')}
-            </Link>
-            <Link href="/legal/subscription-agreement" className="hover:text-zinc-300 transition-colors">
-              {t('footerLinks.subscriptionAgreement')}
-            </Link>
-            <Link href="/legal/dpa" className="hover:text-zinc-300 transition-colors">
-              {t('footerLinks.dpa')}
-            </Link>
-            <Link href="/legal/subprocessors" className="hover:text-zinc-300 transition-colors">
-              {t('footerLinks.subprocessors')}
-            </Link>
+        <div className="max-w-6xl mx-auto px-4 lg:px-8">
+          <div className="grid gap-8 md:grid-cols-2">
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
+                {t("footerCompany.title")}
+              </h4>
+              <ul className="space-y-2 text-sm text-zinc-400">
+                <li><Link href="/why-aliigo" className="hover:text-white transition-colors">{t("footerCompany.whyAliigo")}</Link></li>
+                <li><Link href="/founder" className="hover:text-white transition-colors">{t("footerCompany.founder")}</Link></li>
+                <li><Link href="/legal/privacidad" className="hover:text-white transition-colors">{t("footerCompany.privacy")}</Link></li>
+                <li><Link href="/legal/dpa" className="hover:text-white transition-colors">{t("footerCompany.dpa")}</Link></li>
+                <li><Link href="/legal/subprocessors" className="hover:text-white transition-colors">{t("footerCompany.subprocessors")}</Link></li>
+                <li><a href="mailto:legal@aliigo.com" className="hover:text-white transition-colors">{t("footerCompany.contact")}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
+                {t("footerLinks.title")}
+              </h4>
+              <ul className="space-y-2 text-sm text-zinc-400">
+                <li><Link href="/legal/aviso-legal" className="hover:text-white transition-colors">{t("footerLinks.avisoLegal")}</Link></li>
+                <li><Link href="/legal/cookies" className="hover:text-white transition-colors">{t("footerLinks.cookies")}</Link></li>
+                <li><Link href="/legal/terminos" className="hover:text-white transition-colors">{t("footerLinks.terminos")}</Link></li>
+                <li><Link href="/legal/subscription-agreement" className="hover:text-white transition-colors">{t("footerLinks.subscriptionAgreement")}</Link></li>
+              </ul>
+            </div>
           </div>
-
-          <div className="text-center">
-             <p className="text-xs leading-5 text-zinc-600">
-               &copy; {new Date().getFullYear()} Aliigo — {t('footer')}
-             </p>
+          <div className="mt-8 pt-6 border-t border-zinc-800 text-center">
+            <p className="text-xs leading-5 text-zinc-600">
+              &copy; {new Date().getFullYear()} Aliigo — {t("footer")}
+            </p>
           </div>
         </div>
       </footer>

@@ -1,52 +1,6 @@
 import { Link } from "@/i18n/routing";
-import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
-
-type Section = {
-  id: string;
-  title: string;
-  body?: string;
-  bullets?: string[];
-};
-
-function renderInlineWithBold(text: string) {
-  const parts = text.split(/(\*\*.+?\*\*)/g).filter(Boolean);
-  return parts.map((part, idx) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={idx}>{part.slice(2, -2)}</strong>;
-    }
-    return <span key={idx}>{part}</span>;
-  });
-}
-
-function renderBody(body: string) {
-  const blocks = body.split("\n\n").map((b) => b.trim()).filter(Boolean);
-  return blocks.map((block, i) => {
-    const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
-    const isList = lines.length > 0 && lines.every((l) => l.startsWith("- "));
-    if (isList) {
-      return (
-        <ul key={i} className="mt-3 space-y-2 text-sm text-zinc-300 list-disc pl-5">
-          {lines.map((l) => (
-            <li key={l}>{renderInlineWithBold(l.replace(/^-\\s*/, ""))}</li>
-          ))}
-        </ul>
-      );
-    }
-    return (
-      <p key={i} className="mt-3 text-sm text-zinc-300 leading-relaxed">
-        {lines.map((line, idx) => (
-          <span key={idx}>
-            {renderInlineWithBold(line)}
-            {idx < lines.length - 1 ? <br /> : null}
-          </span>
-        ))}
-      </p>
-    );
-  });
-}
 
 export async function generateMetadata({
   params,
@@ -68,21 +22,7 @@ export default async function WhyAliigoPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.whyAliigo" });
-  const currency = getCurrencyFromHeaders(await headers()) as AliigoCurrency;
-  const displayLocale = currency === "USD" ? "en-US" : locale;
-  const value = new Intl.NumberFormat(displayLocale, {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(500);
-  const interpolate = (input?: string) =>
-    input ? input.replace(/\{value\}/g, value) : input;
-  const sections = ((t.raw("sections") as Section[]) || []).map((section) => ({
-    ...section,
-    title: interpolate(section.title) ?? section.title,
-    body: interpolate(section.body),
-    bullets: section.bullets?.map((b) => interpolate(b) ?? b),
-  }));
+
   const siteUrl =
     (process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com").replace(/\/$/, "");
   const pageUrl = `${siteUrl}/${locale}/why-aliigo`;
@@ -112,52 +52,142 @@ export default async function WhyAliigoPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
+
       <section className="border-b border-white/5">
-        <div className="max-w-4xl mx-auto px-4 py-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            {t("hero.headline")}
-          </h1>
-          <p className="text-lg text-zinc-400 mb-8">
-            {t("hero.subheadline")}
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center rounded-lg bg-[#84c9ad] text-black px-6 py-3 text-sm font-semibold hover:bg-[#73bba0] transition-all"
-            >
-              {t("hero.ctaPrimary")}
-            </Link>
-            <Link
-              href={{ pathname: "/", hash: "assistant-demo" }}
-              className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
-            >
-              {t("hero.ctaSecondary")}
-            </Link>
+        <div className="max-w-6xl mx-auto px-4 py-16">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+                  {t("hero.headline")}
+                </span>
+              </h1>
+              <p className="text-lg text-zinc-400 mb-8">{t("hero.subheadline")}</p>
+
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center rounded-lg bg-[#84c9ad] text-black px-6 py-3 text-sm font-semibold hover:bg-[#73bba0] transition-all"
+                >
+                  {t("hero.ctaPrimary")}
+                </Link>
+                <Link
+                  href={{ pathname: "/", hash: "assistant-demo" }}
+                  className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
+                >
+                  {t("hero.ctaSecondary")}
+                </Link>
+              </div>
+
+              <p className="mt-5 text-sm text-zinc-400">{t("hero.microstrip")}</p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6">
+              <h2 className="text-base font-semibold text-zinc-200 mb-4">{t("hero.visualTitle")}</h2>
+              <div className="space-y-3">
+                <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-4 text-sm text-zinc-200">
+                  {t("pillars.card1.title")}
+                </div>
+                <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-4 text-sm text-zinc-200">
+                  {t("pillars.card2.title")}
+                </div>
+                <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-4 text-sm text-zinc-200">
+                  {t("pillars.card3.title")}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 py-12 space-y-10">
-        {sections.map((s) => (
-          <div key={s.id} className="border-b border-white/5 pb-8 last:border-b-0 last:pb-0">
-            <h2 className="text-2xl font-semibold mb-2">{s.title}</h2>
-            {s.body ? renderBody(s.body) : null}
-            {s.bullets ? (
-              <ul className="mt-3 space-y-2 text-sm text-zinc-300 list-disc pl-5">
-                {s.bullets.map((b) => (
-                  <li key={b}>{b}</li>
-                ))}
-              </ul>
-            ) : null}
+      <section className="max-w-6xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-semibold mb-6">{t("pillars.title")}</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-5">
+            <h3 className="font-semibold mb-2">{t("pillars.card1.title")}</h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">{t("pillars.card1.body")}</p>
           </div>
-        ))}
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-5">
+            <h3 className="font-semibold mb-2">{t("pillars.card2.title")}</h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">{t("pillars.card2.body")}</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-5">
+            <h3 className="font-semibold mb-2">{t("pillars.card3.title")}</h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">{t("pillars.card3.body")}</p>
+          </div>
+        </div>
       </section>
 
-      <section className="border-t border-white/5">
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          <h3 className="text-2xl font-semibold mb-4">
-            {t("finalCta.headline")}
-          </h3>
+      <section className="max-w-6xl mx-auto px-4 py-4">
+        <h2 className="text-2xl font-semibold mb-6">{t("comparison.title")}</h2>
+        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-zinc-900/20">
+          <table className="w-full text-sm">
+            <thead className="bg-zinc-900/50">
+              <tr>
+                <th className="text-left p-4 text-zinc-300 font-semibold">{t("comparison.cols.feature")}</th>
+                <th className="text-left p-4 text-zinc-300 font-semibold">{t("comparison.cols.aliigo")}</th>
+                <th className="text-left p-4 text-zinc-300 font-semibold">{t("comparison.cols.generic")}</th>
+                <th className="text-left p-4 text-zinc-300 font-semibold">{t("comparison.cols.liveChat")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(["r1", "r2", "r3", "r4", "r5", "r6"] as const).map((r) => (
+                <tr key={r} className="border-t border-white/10">
+                  <td className="p-4 text-zinc-300">{t(`comparison.rows.${r}.feature`)}</td>
+                  <td className="p-4 text-zinc-100">{t(`comparison.rows.${r}.aliigo`)}</td>
+                  <td className="p-4 text-zinc-400">{t(`comparison.rows.${r}.generic`)}</td>
+                  <td className="p-4 text-zinc-400">{t(`comparison.rows.${r}.liveChat`)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-semibold mb-6">{t("weekOne.title")}</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          {(["d0", "d1", "d3", "d7"] as const).map((day) => (
+            <div key={day} className="rounded-2xl border border-white/10 bg-zinc-900/20 p-5">
+              <p className="text-xs uppercase tracking-wider text-[#84c9ad] mb-2">{t(`weekOne.${day}.day`)}</p>
+              <p className="text-sm text-zinc-300 leading-relaxed">{t(`weekOne.${day}.body`)}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 py-4">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-5">
+          <h2 className="text-xl font-semibold mb-4">{t("trustPack.title")}</h2>
+          <div className="flex flex-wrap gap-3">
+            {(["c1", "c2", "c3", "c4"] as const).map((chip) => (
+              <span
+                key={chip}
+                className="inline-flex items-center rounded-full border border-white/15 bg-zinc-950/60 px-3 py-1.5 text-xs text-zinc-300"
+              >
+                {t(`trustPack.${chip}`)}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 py-8">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-5 text-center">
+          <p className="text-zinc-300 mb-3">{t("crossLink.prompt")}</p>
+          <Link
+            href="/founder"
+            className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
+          >
+            {t("crossLink.cta")}
+          </Link>
+        </div>
+      </section>
+
+      <section className="border-t border-white/5 mt-10">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <h3 className="text-2xl font-semibold mb-3">{t("finalCta.headline")}</h3>
+          <p className="text-zinc-400 mb-5">{t("finalCta.subheadline")}</p>
           <div className="flex flex-wrap gap-4">
             <Link
               href="/signup"
