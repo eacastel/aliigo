@@ -553,7 +553,7 @@
       "photoAlt": "Foto del fundador",
       "name": "Emilio Castellanos",
       "role": "Fundador",
-      "headline": "Para empresas que no pueden permitirse respuestas vagas.",
+      "headline": "Para empresas que no pueden permitirse respuestas genéricas.",
       "body": "Llevo más de 20 años creando sistemas digitales que ayudan a las empresas a ser encontradas, generar confianza y convertir clientes. Aliigo es mi respuesta a la era de la IA: un asistente web que utiliza tu información aprobada para guiar a los visitantes hacia acciones reales—sin poner en riesgo tu reputación.",
       "trust": "Los primeros clientes tienen acceso directo a mí para la configuración y la optimización.",
       "cta": "Por qué creé Aliigo"
@@ -786,8 +786,8 @@
   "LandingLP": {
     "hero": {
       "badge": "Para webs de negocio",
-      "title": "Asistente de IA para tu web",
-      "titleHighlight": "(para empresas).",
+      "title": "Asistente de IA para la web",
+      "titleHighlight": "de tu empresa.",
       "subtitle": "Responde al instante con información de tu negocio, guía al visitante al siguiente paso y capta contactos solo cuando hay intención real.",
       "priceCue": "Desde {price}/mes",
       "bullet1": "Respuestas desde tu contenido",
@@ -796,6 +796,22 @@
       "ctaPrimary": "Empieza tu prueba gratis",
       "ctaSecondary": "Ver precios",
       "chatbotLine": "Chatbot IA para tu web — con respuestas de tu negocio (no un bot genérico)."
+    },
+    "heroGhost": {
+      "user": "¿Tenéis alguna política sobre mascotas en vuestros alquileres?",
+      "assistant": "Sí. Según el documento Contrato_de_arrendamiento_2025.pdf, se permiten perros de menos de 13 kg con un depósito de 200 €.",
+      "viewSource": "Ver fuente",
+      "pdfName": "Contrato_de_arrendamiento_2025.pdf",
+      "tryOwnQuestion": "Prueba tu propia pregunta →",
+      "title": "Tu Nombre de Negocio",
+      "placeholder": "Escribe tu consulta…",
+      "send": "Enviar",
+      "userFollowUp": "Perfecto, vamos a reservar el alquiler.",
+      "assistantFollowUp": "¡Excelente! Me alegra oírlo. Podéis hacer clic en este botón para reservar la villa.",
+      "userExcited": "Perfecto, vamos a reservar el alquiler.",
+      "userBook": "Perfecto, vamos a reservar el alquiler.",
+      "assistantBook": "¡Excelente! Me alegra oírlo. Podéis hacer clic en este botón para reservar la villa.",
+      "bookNow": "Reservar ahora"
     }
   },
   "Auth": {
@@ -1443,7 +1459,7 @@
         "name": "Emilio Castellanos",
         "role": "Fundador, Aliigo",
         "headline": "Creado por el fundador para darte claridad, no tickets.",
-        "subheadline": "Creé Aliigo para negocios que no pueden permitirse respuestas vagas. Si te unes en esta etapa, tendrás acceso directo a mí para implementación e iteración.",
+        "subheadline": "Creé Aliigo para negocios que no pueden permitirse respuestas genéricas. Si te unes en esta etapa, tendrás acceso directo a mí para implementación e iteración.",
         "ctaPrimary": "Empezar prueba gratis",
         "ctaSecondary": "Hablar con el fundador",
         "commitmentTitle": "Credibilidad y compromiso",

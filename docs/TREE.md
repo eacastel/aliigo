@@ -2,6 +2,7 @@
 ├── docs
 │   ├── ARCHITECTURE.md
 │   ├── LOCAL_DEV.md
+│   ├── lp-conversion-direction.md
 │   ├── SECURITY_NOTES.md
 │   ├── seats-domains.md
 │   ├── TODO.md

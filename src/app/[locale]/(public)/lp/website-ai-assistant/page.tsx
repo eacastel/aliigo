@@ -7,11 +7,10 @@ import {
 } from "@/lib/currency";
 import { LpHeroSection } from "@/components/home/LpHeroSection";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
-import { FitFilterSection } from "@/components/home/FitFilterSection";
-import { BusinessImpactSection } from "@/components/home/BusinessImpactSection";
 import { PricingSection } from "@/components/home/PricingSection";
 import { AssistantDemoSection } from "@/components/home/AssistantDemoSection";
-import { WorksWithStrip } from "@/components/home/WorksWithStrip";
+import { HowItWorksSection } from "@/components/home/HowItWorksSection";
+import { FeaturesGridSection } from "@/components/home/FeaturesGridSection";
 import { FaqSection } from "@/components/home/FaqSection";
 import { FounderTrustCard } from "@/components/home/FounderTrustCard";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
@@ -64,8 +63,8 @@ export default async function PaidLandingPage({
 
   const formatPrice = (amount: number) => {
     const formatted = priceFmt.format(amount);
-    // Brand decision: Spain LP campaign can use "€99" while rest of EU keeps locale default.
-    if (currency === "EUR" && marketParam === "es") {
+    // Brand decision: Spain LP uses "€99" while other EU locales can keep locale default.
+    if (currency === "EUR" && (marketParam === "es" || locale === "es")) {
       const numberPart = formatted
         .replace("€", "")
         .replace(/\s/g, "")
@@ -78,25 +77,35 @@ export default async function PaidLandingPage({
   const starterPrice = formatPrice(99);
   const growthPrice = formatPrice(149);
   const proPrice = formatPrice(349);
-  const fitValue = priceFmt.format(500);
 
   return (
     <div className="bg-zinc-950 overflow-hidden selection:bg-[#84c9ad]/30">
       <LpHeroSection startingPrice={starterPrice} />
       <CredibilityStrip />
-      <FitFilterSection value={fitValue} />
-      <BusinessImpactSection />
       <div id="pricing">
-        <PricingSection
-          starterPrice={starterPrice}
-          growthPrice={growthPrice}
-          proPrice={proPrice}
-        />
+        <div className="max-md:[&>section]:py-16">
+          <PricingSection
+            starterPrice={starterPrice}
+            growthPrice={growthPrice}
+            proPrice={proPrice}
+          />
+        </div>
       </div>
-      <AssistantDemoSection />
-      <WorksWithStrip />
-      <FaqSection />
-      <FounderTrustCard />
+      <div className="max-md:[&>section]:py-16">
+        <AssistantDemoSection />
+      </div>
+      <div className="max-md:[&>section]:py-16">
+        <HowItWorksSection />
+      </div>
+      <div className="max-md:[&>section]:py-16">
+        <FeaturesGridSection />
+      </div>
+      <div className="max-md:[&>section]:py-16">
+        <FaqSection />
+      </div>
+      <div className="max-md:pt-2 max-md:pb-4">
+        <FounderTrustCard />
+      </div>
       <FinalCtaSection />
       <HomeFloatingWidgetGate />
     </div>

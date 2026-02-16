@@ -785,8 +785,8 @@
   "LandingLP": {
     "hero": {
       "badge": "For business websites",
-      "title": "AI website assistant",
-      "titleHighlight": "for businesses.",
+      "title": "AI assistant",
+      "titleHighlight": "for business websites.",
       "subtitle": "Answer instantly from your business content, guide visitors to the right next step, and capture contact details only when intent is real.",
       "priceCue": "From {price}/month",
       "bullet1": "Business-owned answers from your content",
@@ -795,6 +795,22 @@
       "ctaPrimary": "Start free trial",
       "ctaSecondary": "See pricing",
       "chatbotLine": "Website chatbot powered by your approved business content — not a generic bot."
+    },
+    "heroGhost": {
+      "user": "Do you have a pet policy for your rentals?",
+      "assistant": "Yes. Based on Lease_Agreement_2024.pdf, dogs under 30lbs are allowed with a $200 deposit.",
+      "viewSource": "View source",
+      "pdfName": "Lease_Agreement_2025.pdf",
+      "tryOwnQuestion": "Try asking your own question →",
+      "title": "Your Business Name",
+      "placeholder": "Type your question…",
+      "send": "Send",
+      "userFollowUp": "Yes, I am interested in this service…",
+      "assistantFollowUp": "Great. Aliigo helps business websites answer instantly and capture qualified leads. Want to start a trial or see setup steps?",
+      "userExcited": "That’s fantastic!",
+      "userBook": "That's fantastic, we will book the rental.",
+      "assistantBook": "Excellent! I am happy to hear that. Please click on this button to book your Villa.",
+      "bookNow": "Book now"
     }
   },
   "Auth": {

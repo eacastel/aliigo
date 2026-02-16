@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import HeroRotator from "@/components/HeroRotator";
+import { HeroGhostPreview } from "@/components/home/HeroGhostPreview";
 
 export function HomeHeroSection() {
   const t = useTranslations("Landing");
@@ -64,7 +64,7 @@ export function HomeHeroSection() {
 
           <div className="relative">
             <div className="relative rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-2 shadow-2xl ring-1 ring-white/10">
-              <HeroRotator />
+              <HeroGhostPreview />
             </div>
             <div className="absolute -inset-1 -z-10 bg-gradient-to-tr from-[#84c9ad] to-blue-600 opacity-20 blur-xl rounded-2xl" />
           </div>

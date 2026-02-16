@@ -7,6 +7,10 @@ No dates. We’ll move fast once we decide.
 - Add a “Need help?” pill on the signup page that opens the widget with guided help (mobile‑friendly).
 - Extend the widget across the site (not only homepage) with page‑aware guidance and soft prompts.
 
+## Recently locked direction
+- Paid LP + signup conversion direction is documented and now treated as baseline implementation guidance:
+  - `docs/lp-conversion-direction.md`
+
 ## Backlog (discussed, not implemented)
 - Knowledgebase ingestion from URLs (auto‑pull external sources into assistant knowledge).
 - Stripe lifecycle emails (upgrade/downgrade/cancel) via webhooks.
