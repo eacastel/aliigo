@@ -62,7 +62,7 @@ export function HomeHeroSection() {
             </p>
           </div>
 
-          <div className="relative">
+          <div className="relative mx-auto w-full max-w-[760px] lg:max-w-none">
             <div className="relative rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-2 shadow-2xl ring-1 ring-white/10">
               <HeroGhostPreview />
             </div>

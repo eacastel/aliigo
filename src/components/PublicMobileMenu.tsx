@@ -54,13 +54,13 @@ export default function PublicMobileMenu() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t("mobileMenu.open")}
-        className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-900 transition-colors"
+        className="inline-flex min-[897px]:hidden h-9 w-9 items-center justify-center rounded-md border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-900 transition-colors"
       >
         <span className="text-base leading-none">☰</span>
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-[70] md:hidden">
+        <div className="fixed inset-0 z-[70] min-[897px]:hidden">
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -127,4 +127,3 @@ export default function PublicMobileMenu() {
     </>
   );
 }
-
