@@ -53,7 +53,7 @@ export default async function FounderPage({
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 rounded-full overflow-hidden ring-1 ring-white/10 bg-zinc-900">
                   <Image
-                    src="/founder.png"
+                    src="/founder2.png"
                     alt={t("hero.photoAlt")}
                     width={64}
                     height={64}
