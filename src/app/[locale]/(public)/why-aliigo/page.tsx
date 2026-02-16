@@ -230,26 +230,6 @@ export default async function WhyAliigoPage({
         </div>
       </section>
 
-      <section className="border-t border-white/5 mt-10">
-        <div className="max-w-6xl mx-auto px-4 py-12">
-          <h3 className="text-2xl font-semibold mb-3">{t("finalCta.headline")}</h3>
-          <p className="text-zinc-400 mb-5">{t("finalCta.subheadline")}</p>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center rounded-lg bg-[#84c9ad] text-black px-6 py-3 text-sm font-semibold hover:bg-[#73bba0] transition-all"
-            >
-              {t("finalCta.ctaPrimary")}
-            </Link>
-            <Link
-              href={{ pathname: "/", hash: "assistant-demo" }}
-              className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
-            >
-              {t("finalCta.ctaSecondary")}
-            </Link>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }

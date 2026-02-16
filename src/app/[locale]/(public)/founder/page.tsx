@@ -23,6 +23,7 @@ export default async function FounderPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.founder" });
+  const tWhy = await getTranslations({ locale, namespace: "pages.whyAliigo" });
   const siteUrl =
     (process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com").replace(/\/$/, "");
   const pageUrl = `${siteUrl}/${locale}/founder`;
@@ -153,19 +154,20 @@ export default async function FounderPage({
 
       <section className="border-t border-white/5">
         <div className="max-w-6xl mx-auto px-4 py-12">
-          <h3 className="text-2xl font-semibold mb-4">{t("finalCta.headline")}</h3>
-          <div className="flex flex-wrap gap-4 mb-6">
+          <h3 className="text-2xl font-semibold mb-3">{tWhy("finalCta.headline")}</h3>
+          <p className="text-zinc-400 mb-5">{tWhy("finalCta.subheadline")}</p>
+          <div className="flex flex-wrap gap-4 mb-7">
             <Link
               href="/signup"
               className="inline-flex items-center justify-center rounded-lg bg-[#84c9ad] text-black px-6 py-3 text-sm font-semibold hover:bg-[#73bba0] transition-all"
             >
-              {t("finalCta.ctaPrimary")}
+              {tWhy("finalCta.ctaPrimary")}
             </Link>
             <Link
-              href="/why-aliigo"
+              href={{ pathname: "/", hash: "assistant-demo" }}
               className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
             >
-              {t("finalCta.ctaSecondary")}
+              {tWhy("finalCta.ctaSecondary")}
             </Link>
           </div>
 

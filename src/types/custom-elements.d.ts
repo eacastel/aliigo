@@ -11,7 +11,6 @@ declare module "react" {
         variant?: "floating" | "inline" | "hero" | string;
 
         // session modes
-        "embed-key"?: string;
         "session-token"?: string;
 
         // config
@@ -24,8 +23,8 @@ declare module "react" {
         "floating-mode"?: "fixed" | "absolute" | string;
         "start-open"?: boolean | "true" | "false";
 
-        // allow any other attrs without fighting TS
-        [key: string]: any;
+        // allow pass-through custom attrs without losing type safety
+        [key: string]: unknown;
       };
     }
   }

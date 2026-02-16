@@ -77,6 +77,34 @@ Goal: reduce churn, keep implementation stable, and optimize for trial starts.
 - Additional LP section re-architecture
 - Broad A/B test matrix before a stable baseline is measured
 
+## Homepage Follow-up (Implemented)
+
+The homepage was re-ordered to improve first-screen trust and time-to-value without changing LP behavior.
+
+Current homepage order:
+1. Hero
+2. CredibilityStrip
+3. WorksWithStrip
+4. AssistantDemoSection
+5. PricingSection
+6. HowItWorksSection
+7. FeaturesGridSection
+8. FaqSection
+9. FounderTrustCard
+10. FinalCtaSection
+
+Removed from homepage flow:
+- ClaritySection
+- FitFilterSection
+- BusinessImpactSection
+- CtaBand
+
+## Why Aliigo / Founder Follow-up (Implemented)
+
+- `FitFilterSection` moved to `/why-aliigo`.
+- A framed clarity-style conversion block with CTA buttons was added to `/why-aliigo`.
+- Founder page image fixed to `public/founder2.png`.
+
 ## Final LP URLs (Google Ads)
 
 Use these as Final URLs in Google Ads.
