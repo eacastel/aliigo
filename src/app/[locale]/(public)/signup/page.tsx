@@ -352,6 +352,9 @@ export default function SignupPage() {
         <p className="text-sm text-zinc-400 leading-relaxed max-w-sm mx-auto">
           {t("introText")}
         </p>
+        <p className="mt-3 text-xs text-zinc-500 leading-relaxed max-w-sm mx-auto">
+          {t("trialBillingNote")}
+        </p>
       </div>
 
       {/* Card Container */}

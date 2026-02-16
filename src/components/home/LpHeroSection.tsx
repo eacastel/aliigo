@@ -34,6 +34,9 @@ export function LpHeroSection({ startingPrice }: LpHeroSectionProps) {
             <p className="mt-6 text-lg text-zinc-400 leading-relaxed max-w-lg">
               {t("hero.subtitle")}
             </p>
+            <p className="mt-3 text-sm text-zinc-300 leading-relaxed max-w-lg">
+              {t("hero.chatbotLine")}
+            </p>
 
             <div className="mt-4 inline-flex items-center rounded-full border border-white/10 bg-zinc-900/60 px-3 py-1 text-xs font-semibold text-zinc-200">
               {t("hero.priceCue", { price: startingPrice })}
@@ -75,4 +78,3 @@ export function LpHeroSection({ startingPrice }: LpHeroSectionProps) {
     </section>
   );
 }
-

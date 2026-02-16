@@ -794,7 +794,8 @@
       "bullet2": "Captura de leads solo con intención real",
       "bullet3": "Instalación con un solo script",
       "ctaPrimary": "Empieza tu prueba gratis",
-      "ctaSecondary": "Ver precios"
+      "ctaSecondary": "Ver precios",
+      "chatbotLine": "Chatbot IA para tu web — con respuestas de tu negocio (no un bot genérico)."
     }
   },
   "Auth": {
@@ -837,7 +838,8 @@
       "signInLink": "Inicia sesión",
       "errorValidation": "Completa los campos necesarios.",
       "errorPassword": "La contraseña debe tener al menos 6 caracteres.",
-      "loading": "Creando cuenta..."
+      "loading": "Creando cuenta...",
+      "trialBillingNote": "Sin tarjeta. No se cobra hasta que termine la prueba."
     },
     "checkEmail": {
       "title": "Revisa tu email",

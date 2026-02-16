@@ -3,11 +3,8 @@
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
-import PublicAuthActions from "@/components/PublicAuthActions";
 import PublicTrackingEvents from "@/components/PublicTrackingEvents";
-import PublicGetStartedButton from "@/components/PublicGetStartedButton";
-import PublicMobileMenu from "@/components/PublicMobileMenu";
+import PublicHeaderNav from "@/components/PublicHeaderNav";
 
 export default async function PublicLayout({
   children,
@@ -37,40 +34,12 @@ export default async function PublicLayout({
           </Link>
 
           {/* 2. Navigation */}
-          <nav className="flex items-center gap-3 sm:gap-6 text-sm">
-            
-            <LanguageSwitcher />
-
-            {/* Hidden on mobile, visible on tablet+ */}
-            <Link
-              href="/pricing"
-              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
-            >
-              {t("publicLinks.pricing")}
-            </Link>
-            <Link
-              href="/why-aliigo"
-              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
-            >
-              {t("publicLinks.whyAliigo")}
-            </Link>
-            <Link
-              href="/founder"
-              className="hidden md:block text-zinc-400 hover:text-white transition-colors"
-            >
-              {t("publicLinks.founder")}
-            </Link>
-
-            <PublicAuthActions className="hidden md:flex items-center gap-3" />
-
-            {/* Compact button on mobile */}
-            <PublicGetStartedButton
-              className="bg-white text-black px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-md hover:bg-[#84c9ad] transition-colors whitespace-nowrap"
-              label={t("actions.getStarted")}
-            />
-
-            <PublicMobileMenu />
-          </nav>
+          <PublicHeaderNav
+            pricingLabel={t("publicLinks.pricing")}
+            whyAliigoLabel={t("publicLinks.whyAliigo")}
+            founderLabel={t("publicLinks.founder")}
+            getStartedLabel={t("actions.getStarted")}
+          />
         </div>
       </header>
 

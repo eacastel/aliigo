@@ -793,7 +793,8 @@
       "bullet2": "Lead capture only when intent is real",
       "bullet3": "Install with one script",
       "ctaPrimary": "Start free trial",
-      "ctaSecondary": "See pricing"
+      "ctaSecondary": "See pricing",
+      "chatbotLine": "Website chatbot powered by your approved business content — not a generic bot."
     }
   },
   "Auth": {
@@ -836,7 +837,8 @@
       "signInLink": "Log in",
       "errorValidation": "Please complete all needed fields.",
       "errorPassword": "Password must be at least 6 characters.",
-      "loading": "Creating account..."
+      "loading": "Creating account...",
+      "trialBillingNote": "No card required. No charge until the trial ends."
     },
     "checkEmail": {
       "title": "Check your email",
