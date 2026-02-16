@@ -330,10 +330,8 @@ export default function DashboardPage() {
   const optional = flat.filter((x) => !x.required);
 
   const requiredDone = required.filter((x) => x.done).length;
-  const optionalDone = optional.filter((x) => x.done).length;
-
-  const total = required.length + optional.length;
-  const done = requiredDone + optionalDone;
+  const total = required.length;
+  const done = requiredDone;
 
   const completion = pct(done, total);
   const blockers = required.filter((x) => !x.done);
@@ -527,7 +525,7 @@ export default function DashboardPage() {
                               : "text-brand-400 hover:text-brand-300",
                           ].join(" ")}
                         >
-                          {t("onboarding.fix")}
+                          {it.required ? t("onboarding.fix") : t("onboarding.add")}
                         </Link>
                       ) : (
                         <span className="text-xs text-zinc-500 shrink-0">

@@ -216,36 +216,6 @@ export default function DashboardLayout({
         <main className="col-span-12 sm:col-span-9 lg:col-span-10">
           <BillingGateProvider value={{ status: billingStatus, isActive: billingActive }}>
             <div className="max-w-6xl mx-auto px-4 py-6">
-              {showBillingBanner && (
-                <div className="mb-6 rounded-2xl border border-emerald-900/40 bg-emerald-950/20 p-4">
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div className="space-y-2">
-                      <div className="text-sm text-zinc-300">
-                        {billingT("pending")}
-                      </div>
-                      <div className="font-semibold text-white">
-                        {billingT("trialTitle")}
-                      </div>
-                      <div className="text-sm text-zinc-300">
-                        {billingT("trialSubtitle")}
-                      </div>
-                      <ul className="mt-2 list-disc pl-5 text-sm text-zinc-300 space-y-1">
-                        <li>{billingT("trialBullet1")}</li>
-                        <li>{billingT("trialBullet2")}</li>
-                        <li>{billingT("trialBullet3")}</li>
-                      </ul>
-                    </div>
-                    <div className="shrink-0">
-                      <Link
-                        href="/dashboard/billing"
-                        className="inline-flex items-center justify-center rounded-xl bg-[#84c9ad] px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-[#73bba0] transition-colors"
-                      >
-                        {billingT("activateCta")}
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              )}
               {showVerificationBanner && (
                 <div className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
                   <div className="flex gap-3">
@@ -299,6 +269,36 @@ export default function DashboardLayout({
                           {dashboardT("resendButton")}
                         </button>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {showBillingBanner && (
+                <div className="mb-6 rounded-2xl border border-emerald-900/40 bg-emerald-950/20 p-4">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="space-y-2">
+                      <div className="text-sm text-zinc-300">
+                        {billingT("pending")}
+                      </div>
+                      <div className="font-semibold text-white">
+                        {billingT("trialTitle")}
+                      </div>
+                      <div className="text-sm text-zinc-300">
+                        {billingT("trialSubtitle")}
+                      </div>
+                      <ul className="mt-2 list-disc pl-5 text-sm text-zinc-300 space-y-1">
+                        <li>{billingT("trialBullet1")}</li>
+                        <li>{billingT("trialBullet2")}</li>
+                        <li>{billingT("trialBullet3")}</li>
+                      </ul>
+                    </div>
+                    <div className="shrink-0">
+                      <Link
+                        href="/dashboard/billing"
+                        className="inline-flex items-center justify-center rounded-xl bg-[#84c9ad] px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-[#73bba0] transition-colors"
+                      >
+                        {billingT("activateCta")}
+                      </Link>
                     </div>
                   </div>
                 </div>

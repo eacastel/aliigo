@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useBillingGate } from "@/components/BillingGateContext";
 
 /* ---------- Types ---------- */
@@ -33,6 +33,7 @@ type JoinedBusiness = {
 } | null;
 
 type ProfileJoinRow = {
+  email: string | null;
   nombre_negocio: string | null;
   nombre_contacto: string | null;
   telefono: string | null;
@@ -92,6 +93,7 @@ function domainsToBaseText(domains: string[] | null | undefined): string {
 
 export default function SettingsBusinessPage() {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("DashboardBusiness");
   const billingGate = useBillingGate();
   const domainLocked = billingGate.status === "inactive";
@@ -119,6 +121,12 @@ export default function SettingsBusinessPage() {
 
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [currentEmail, setCurrentEmail] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailMsg, setEmailMsg] = useState<string | null>(null);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const [pendingEmailExpiresAt, setPendingEmailExpiresAt] = useState<string | null>(null);
 
     // --- UI parity with Billing + Messages buttons ---
       const btnBase =
@@ -146,6 +154,24 @@ export default function SettingsBusinessPage() {
         return;
       }
 
+      const { data: sess2 } = await supabase.auth.getSession();
+      const token = sess2.session?.access_token;
+      if (token) {
+        const pendingRes = await fetch("/api/settings/business/email-change", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const pendingJson = (await pendingRes.json().catch(() => ({}))) as {
+          ok?: boolean;
+          pendingEmail?: string | null;
+          expiresAt?: string | null;
+        };
+        if (pendingRes.ok && pendingJson.ok) {
+          setPendingEmail(pendingJson.pendingEmail ?? null);
+          setPendingEmailExpiresAt(pendingJson.expiresAt ?? null);
+        }
+      }
+
       const { data, error } = await supabase
         .from("business_profiles")
         .select(
@@ -153,6 +179,7 @@ export default function SettingsBusinessPage() {
           nombre_negocio,
           nombre_contacto,
           telefono,
+          email,
           business_id,
           businesses:businesses!business_profiles_business_id_fkey (
             id,
@@ -184,6 +211,9 @@ export default function SettingsBusinessPage() {
         nombre_contacto: data.nombre_contacto ?? "",
         telefono: data.telefono ?? "",
       };
+      setCurrentEmail(data.email ?? "");
+      setNewEmail("");
+      setEmailMsg(null);
       setProfile(nextProfile);
       initialProfile.current = nextProfile;
 
@@ -368,6 +398,62 @@ export default function SettingsBusinessPage() {
     }
   };
 
+  const sendEmailChangeRequest = async () => {
+    setEmailMsg(null);
+    const target = newEmail.trim().toLowerCase();
+    if (!target || !target.includes("@")) {
+      setEmailMsg(t("emailChange.errorInvalid"));
+      return;
+    }
+    if (target === currentEmail.trim().toLowerCase()) {
+      setEmailMsg(t("emailChange.errorUnchanged"));
+      return;
+    }
+
+    setEmailSending(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) {
+        setEmailMsg("You must be logged in.");
+        return;
+      }
+
+      const res = await fetch("/api/settings/business/email-change", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: target, locale }),
+      });
+
+      const j = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+      };
+
+      if (!res.ok || !j.ok) {
+        setEmailMsg(
+          t("emailChange.errorGeneric", {
+            error: j.error ?? "unknown",
+          })
+        );
+        return;
+      }
+
+      setEmailMsg(t("emailChange.success", { email: target }));
+      setPendingEmail(target);
+      setNewEmail("");
+      void load();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown";
+      setEmailMsg(t("emailChange.errorGeneric", { error: message }));
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
   if (loading) return <p className="p-4 text-sm text-zinc-400">Cargando…</p>;
 
   if (unauth) {
@@ -465,6 +551,63 @@ export default function SettingsBusinessPage() {
                   setProfile((p) => ({ ...p, telefono: e.target.value }))
                 }
               />
+            </div>
+
+            <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+              <label className="block text-xs text-zinc-400 mb-1">
+                {t("emailChange.currentLabel")}
+              </label>
+              <input
+                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm text-zinc-300"
+                value={currentEmail}
+                readOnly
+              />
+              <label className="block text-xs text-zinc-400 mb-1 mt-3">
+                {t("emailChange.newLabel")}
+              </label>
+              <input
+                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                placeholder={t("emailChange.newPlaceholder")}
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+              />
+              <p className="text-[11px] text-zinc-500 mt-2">{t("emailChange.help")}</p>
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={sendEmailChangeRequest}
+                  disabled={emailSending}
+                  className={btnNeutralStrong}
+                >
+                  {emailSending ? t("emailChange.sending") : t("emailChange.sendButton")}
+                </button>
+                {emailMsg && (
+                  <span
+                    className={`text-xs ${
+                      emailMsg.includes("sent") || emailMsg.includes("enviado")
+                        ? "text-green-400"
+                        : "text-zinc-300"
+                    }`}
+                  >
+                    {emailMsg}
+                  </span>
+                )}
+              </div>
+              {pendingEmail && (
+                <p className="text-[11px] text-amber-300 mt-2">
+                  {t("emailChange.pending", {
+                    email: pendingEmail,
+                    expiresAt: pendingEmailExpiresAt
+                      ? new Intl.DateTimeFormat(locale, {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }).format(new Date(pendingEmailExpiresAt))
+                      : "—",
+                  })}
+                </p>
+              )}
             </div>
           </div>
         </section>

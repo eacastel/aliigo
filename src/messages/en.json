@@ -139,6 +139,19 @@
     "planProCta": "Contact sales"
   },
   "DashboardBusiness": {
+    "emailChange": {
+      "currentLabel": "Current account email",
+      "newLabel": "New account email",
+      "newPlaceholder": "name@company.com",
+      "help": "We will send a confirmation link to the new email. The change is applied only after verification.",
+      "sendButton": "Send confirmation email",
+      "sending": "Sending…",
+      "success": "Verification email sent to {email}.",
+      "pending": "Pending email change: {email}. Expires: {expiresAt}.",
+      "errorInvalid": "Please enter a valid email.",
+      "errorUnchanged": "Please enter a different email.",
+      "errorGeneric": "Could not send verification email: {error}"
+    },
     "domains": {
       "label": "Allowed domains",
       "placeholder": "example.com\\nsecond-domain.com",
@@ -325,6 +338,7 @@
       "requiredMissing": "Required items missing",
       "open": "Open",
       "fix": "Fix",
+      "add": "Add",
       "done": "Done",
       "requiredTag": "(required)"
     },
@@ -336,8 +350,8 @@
     "items": {
       "allowed_domains": "Allowed domains configured",
       "default_locale": "Default language selected",
-      "contact_name": "Contact name added",
-      "phone": "Phone added",
+      "contact_name": "Contact name set",
+      "phone": "Phone set",
       "system_prompt": "System prompt filled",
       "qualification_prompt": "Qualification criteria filled",
       "knowledge": "Knowledge filled",

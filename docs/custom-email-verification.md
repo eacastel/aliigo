@@ -34,6 +34,14 @@ This adds:
   - Marks token used and sets `business_profiles.email_verified_at`.
   - For `email_change`, updates auth user email and profile email.
 
+- `POST /api/settings/business/email-change`
+  - Auth required (`Authorization: Bearer <access_token>`).
+  - Creates `email_change` verification token and sends confirmation to target email.
+  - Applies email change only after `/api/verification/confirm`.
+- `GET /api/settings/business/email-change`
+  - Auth required (`Authorization: Bearer <access_token>`).
+  - Returns current pending email-change target (if any active unexpired token exists).
+
 - `POST /api/admin/verification/cleanup`
   - Deletes expired unverified auth users.
   - Requires header `x-cron-secret` matching `CRON_SECRET`.

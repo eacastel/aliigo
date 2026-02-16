@@ -140,6 +140,19 @@
     "planProCta": "Contactar ventas"
   },
   "DashboardBusiness": {
+    "emailChange": {
+      "currentLabel": "Email actual de la cuenta",
+      "newLabel": "Nuevo email de la cuenta",
+      "newPlaceholder": "nombre@empresa.com",
+      "help": "Enviaremos un enlace de confirmación al nuevo email. El cambio solo se aplica después de verificarlo.",
+      "sendButton": "Enviar email de confirmación",
+      "sending": "Enviando…",
+      "success": "Email de verificación enviado a {email}.",
+      "pending": "Cambio de email pendiente: {email}. Expira: {expiresAt}.",
+      "errorInvalid": "Introduce un email válido.",
+      "errorUnchanged": "Introduce un email diferente.",
+      "errorGeneric": "No se pudo enviar el email de verificación: {error}"
+    },
     "domains": {
       "label": "Dominios permitidos",
       "placeholder": "ejemplo.com\\nsegundo-dominio.com",
@@ -326,6 +339,7 @@
       "requiredMissing": "Faltan elementos obligatorios",
       "open": "Abrir",
       "fix": "Corregir",
+      "add": "Añadir",
       "done": "Hecho",
       "requiredTag": "(obligatorio)"
     },
@@ -337,8 +351,8 @@
     "items": {
       "allowed_domains": "Dominios permitidos configurados",
       "default_locale": "Idioma predeterminado seleccionado",
-      "contact_name": "Nombre de contacto añadido",
-      "phone": "Teléfono añadido",
+      "contact_name": "Nombre de contacto configurado",
+      "phone": "Teléfono configurado",
       "system_prompt": "Prompt del sistema completado",
       "qualification_prompt": "Criterios de cualificación completados",
       "knowledge": "Base de conocimiento completada",

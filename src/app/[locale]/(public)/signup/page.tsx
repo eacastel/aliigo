@@ -446,7 +446,7 @@ export default function SignupPage() {
           <label className="flex items-start gap-3 text-xs text-zinc-400 leading-relaxed">
             <input
               type="checkbox"
-              className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-zinc-950/50 text-[#84c9ad] focus:ring-[#84c9ad]"
+              className="mt-0.5 h-5 w-5 min-h-5 min-w-5 rounded border border-white/20 bg-zinc-950/50 text-[#84c9ad] focus:ring-[#84c9ad]"
               checked={acceptTerms}
               onChange={(e) => setAcceptTerms(e.target.checked)}
               required
@@ -479,7 +479,7 @@ export default function SignupPage() {
           <label className="flex items-start gap-3 text-xs text-zinc-400 leading-relaxed">
             <input
               type="checkbox"
-              className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-zinc-950/50 text-[#84c9ad] focus:ring-[#84c9ad]"
+              className="mt-0.5 h-5 w-5 min-h-5 min-w-5 rounded border border-white/20 bg-zinc-950/50 text-[#84c9ad] focus:ring-[#84c9ad]"
               checked={acceptMarketing}
               onChange={(e) => setAcceptMarketing(e.target.checked)}
             />
