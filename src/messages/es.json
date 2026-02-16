@@ -683,7 +683,7 @@
       "badge": "Prueba gratis de 30 días en todos los planes",
       "badgeNote": "No se cobra hasta que termine la prueba.",
       "period": "/mes",
-      "from": "desde",
+      "from": "desde ",
       "starter": {
         "name": "Starter",
         "subtitle": "Ideal para pequeños negocios locales.",

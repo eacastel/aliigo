@@ -180,7 +180,11 @@ async function validateEmbedAccess(token: string, host: string) {
       if (host !== aliigoHost()) return { ok: false as const, reason: "Preview token forbidden" };
     }
 
-    return { ok: true as const, businessId: sess.data.business_id };
+    return {
+      ok: true as const,
+      businessId: sess.data.business_id,
+      isPreview: !!sess.data.is_preview,
+    };
   }
 
   // 2) legacy fallback (keep temporarily; remove later)
@@ -194,7 +198,7 @@ async function validateEmbedAccess(token: string, host: string) {
     return { ok: false as const, reason: "Domain not allowed" };
   }
 
-  return { ok: true as const, businessId: biz.data.id };
+  return { ok: true as const, businessId: biz.data.id, isPreview: false as const };
 }
 
 function isBillingActive(status: BillingStatus | null | undefined) {
@@ -505,6 +509,7 @@ export async function POST(req: NextRequest) {
       );
     }
     const businessId = gate.businessId;
+    const isPreviewSession = gate.isPreview === true;
 
     // business prompt (also gives us default_locale + qualification_prompt + billing gate)
     const bizRes = await supabase
@@ -609,7 +614,7 @@ export async function POST(req: NextRequest) {
     let conversationId = safeInputConvId ?? null;
 
     if (!conversationId) {
-      if (externalRef) {
+      if (externalRef && !isPreviewSession) {
         const cutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
         const existing = await supabase
