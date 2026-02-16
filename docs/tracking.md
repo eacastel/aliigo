@@ -31,6 +31,8 @@ Primary conversion (optimize bidding on this):
 Secondary conversions (track only for now):
 - `signup_intent`
 - `pricing_view`
+- `lp_view`
+- `lp_signup_intent`
 
 ## Recommended Keep / Remove (to reduce noise)
 Keep:
@@ -53,6 +55,8 @@ We will add the following **dataLayer events** in the app:
 - `trial_started` (fires when trial actually starts)
 - `signup_intent` (fires when “Start free trial” is clicked)
 - `pricing_view` (fires when pricing page is viewed)
+- `lp_view` (fires on paid LP view)
+- `lp_signup_intent` (fires when signup CTA is clicked from paid LP)
 
 Then in GTM:
 - Create Custom Event triggers for each of the above.
@@ -73,3 +77,11 @@ Then in GTM:
 - `trial_started`
   - Fires after Stripe setup + subscription creation succeeds in checkout flow.
   - Implemented in `src/components/billing/PaymentForm.tsx`.
+- `lp_view`
+  - Fires on `/lp/website-ai-assistant` (localized URLs included through routing).
+  - Payload includes `path`, `market`, `currency` (from query string when present).
+  - Implemented in `src/components/PublicTrackingEvents.tsx`.
+- `lp_signup_intent`
+  - Fires when a signup CTA click originates from the LP.
+  - Payload includes `path`, `cta_text`, `market`, `currency`.
+  - Implemented in `src/components/PublicTrackingEvents.tsx`.

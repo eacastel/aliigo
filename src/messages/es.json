@@ -766,6 +766,20 @@
       "button": "Empieza tu prueba gratis"
     }
   },
+  "LandingLP": {
+    "hero": {
+      "badge": "Para webs de negocio",
+      "title": "Asistente de IA para tu web",
+      "titleHighlight": "(para empresas).",
+      "subtitle": "Responde al instante con información de tu negocio, guía al visitante al siguiente paso y capta contactos solo cuando hay intención real.",
+      "priceCue": "Desde {price}/mes",
+      "bullet1": "Respuestas desde tu contenido",
+      "bullet2": "Captura de leads solo con intención real",
+      "bullet3": "Instalación con un solo script",
+      "ctaPrimary": "Empieza tu prueba gratis",
+      "ctaSecondary": "Ver precios"
+    }
+  },
   "Auth": {
     "login": {
       "title": "Iniciar sesión",

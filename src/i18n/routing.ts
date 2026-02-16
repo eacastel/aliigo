@@ -38,6 +38,10 @@ export const routing = defineRouting({
       en: '/why-aliigo',
       es: '/por-que-aliigo'
     },
+    '/lp/website-ai-assistant': {
+      en: '/lp/website-ai-assistant',
+      es: '/lp/asistente-web-ia'
+    },
     '/founder': {
       en: '/founder',
       es: '/fundador'

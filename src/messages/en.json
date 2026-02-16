@@ -765,6 +765,20 @@
       "button": "Start free trial"
     }
   },
+  "LandingLP": {
+    "hero": {
+      "badge": "For business websites",
+      "title": "AI website assistant",
+      "titleHighlight": "for businesses.",
+      "subtitle": "Answer instantly from your business content, guide visitors to the right next step, and capture contact details only when intent is real.",
+      "priceCue": "From {price}/month",
+      "bullet1": "Business-owned answers from your content",
+      "bullet2": "Lead capture only when intent is real",
+      "bullet3": "Install with one script",
+      "ctaPrimary": "Start free trial",
+      "ctaSecondary": "See pricing"
+    }
+  },
   "Auth": {
     "login": {
       "title": "Log in",
