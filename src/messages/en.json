@@ -340,6 +340,23 @@
       "emailLine": "Email: {email}",
       "edit": "Edit"
     },
+    "usage": {
+      "title": "Message usage",
+      "resetsOn": "Resets on {date}",
+      "planLabel": "{plan} plan",
+      "messagesLeft": "{count} messages left this period.",
+      "plan": {
+        "starter": "Starter",
+        "growth": "Growth"
+      },
+      "status": {
+        "incomplete": "Incomplete",
+        "trialing": "Trialing",
+        "active": "Active",
+        "canceled": "Canceled",
+        "past_due": "Past due"
+      }
+    },
     "verifyTitle": "Verify your email",
     "verifyMessage": "Please confirm your email address to activate your assistant. We sent a verification link to {email}.",
     "verifyCountdownDays": "Verify within {hours} hours to avoid account deletion.",
@@ -348,6 +365,8 @@
     "resendButton": "Resend email",
     "resendSuccess": "Verification email sent.",
     "resendError": "Could not resend: {error}",
+    "bannerDetailsShow": "View details",
+    "bannerDetailsHide": "Hide details",
     "onboarding": {
       "title": "Onboarding",
       "subtitle": "Complete the required steps to activate your assistant and widget.",

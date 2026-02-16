@@ -250,6 +250,11 @@ export default function DashboardPage() {
     year: "numeric",
   });
   const usagePeriodEnd = usage?.period_end ? usageFmt.format(new Date(usage.period_end)) : "—";
+  const usageStatusLabel =
+    usage?.status ? t(`usage.status.${usage.status}` as const) : t("usage.status.incomplete");
+  const usagePlanLabel = usage?.plan ? t(`usage.plan.${usage.plan}` as const) : null;
+  const usageLimitLabel =
+    usage?.limit === null ? (usage?.status === "incomplete" ? "—" : "∞") : String(usage?.limit ?? 0);
 
   const checklist: { group: string; items: ChecklistItem[] }[] = [
     {
@@ -390,18 +395,20 @@ export default function DashboardPage() {
             <div className="px-4 py-4 sm:px-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-sm font-medium text-zinc-200">Message usage</h2>
+                  <h2 className="text-sm font-medium text-zinc-200">{t("usage.title")}</h2>
                   <p className="mt-1 text-xs text-zinc-400">
-                    Resets on {usagePeriodEnd}
+                    {t("usage.resetsOn", { date: usagePeriodEnd })}
                   </p>
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-semibold text-zinc-100">
                     {usage.used}
-                    {usage.limit === null ? " / ∞" : ` / ${usage.limit}`}
+                    {` / ${usageLimitLabel}`}
                   </div>
                   <div className="text-xs text-zinc-400 capitalize">
-                    {usage.plan ? `${usage.plan} plan` : usage.status}
+                    {usagePlanLabel
+                      ? t("usage.planLabel", { plan: usagePlanLabel })
+                      : usageStatusLabel}
                   </div>
                 </div>
               </div>
@@ -412,7 +419,7 @@ export default function DashboardPage() {
 
               {usage.limit !== null && (
                 <div className="mt-2 text-xs text-zinc-400">
-                  {usage.remaining ?? 0} messages left this period.
+                  {t("usage.messagesLeft", { count: usage.remaining ?? 0 })}
                 </div>
               )}
             </div>

@@ -28,6 +28,8 @@ export default function DashboardLayout({
   const [billingStatus, setBillingStatus] = useState<"loading" | "active" | "inactive">("loading");
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [verificationDeadline, setVerificationDeadline] = useState<string | null>(null);
+  const [showVerifyDetails, setShowVerifyDetails] = useState(false);
+  const [showBillingDetails, setShowBillingDetails] = useState(false);
 
   const nav = [
     { href: "/dashboard", label: t('links.dashboard') },
@@ -215,11 +217,12 @@ export default function DashboardLayout({
         {/* MAIN */}
         <main className="col-span-12 sm:col-span-9 lg:col-span-10">
           <BillingGateProvider value={{ status: billingStatus, isActive: billingActive }}>
-            <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="max-w-5xl mx-auto px-4 py-6">
               {showVerificationBanner && (
-                <div className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0">
+                <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex min-w-0 gap-3">
+                      <div className="flex-shrink-0">
                       <svg
                         className="h-5 w-5 text-amber-300"
                         viewBox="0 0 20 20"
@@ -233,13 +236,38 @@ export default function DashboardLayout({
                       </svg>
                     </div>
 
-                    <div className="min-w-0">
+                      <div className="min-w-0">
                       <h3 className="text-sm font-medium text-zinc-100">
                         {dashboardT("verifyTitle")}
                       </h3>
+                        <p className="mt-1 text-sm text-zinc-300 line-clamp-2">
+                          {dashboardT("verifyMessage", { email: email ?? "" })}
+                        </p>
+                      </div>
+                    </div>
 
-                      <div className="mt-1 text-sm text-zinc-300">
-                        <p>{dashboardT("verifyMessage", { email: email ?? "" })}</p>
+                    <div className="shrink-0 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowVerifyDetails((v) => !v)}
+                        className="rounded-md border border-amber-300/30 px-3 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-300/10"
+                      >
+                        {showVerifyDetails
+                          ? dashboardT("bannerDetailsHide")
+                          : dashboardT("bannerDetailsShow")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        className="rounded-md bg-amber-300/15 px-3 py-1.5 text-xs font-medium text-amber-200 ring-1 ring-inset ring-amber-300/20 hover:bg-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
+                      >
+                        {dashboardT("resendButton")}
+                      </button>
+                    </div>
+                  </div>
+
+                  {showVerifyDetails ? (
+                    <div className="mt-3 border-t border-amber-300/20 pt-3 text-sm text-zinc-300">
                         {unverifiedHoursRemaining !== null &&
                           unverifiedHoursRemaining > UNVERIFIED_LAST_24H_THRESHOLD && (
                             <p className="mt-1">
@@ -258,31 +286,43 @@ export default function DashboardLayout({
                         {unverifiedHoursRemaining !== null && unverifiedHoursRemaining <= 0 && (
                           <p className="mt-1 text-red-200">{dashboardT("verifyCountdownExpired")}</p>
                         )}
-                      </div>
-
-                      <div className="mt-3">
-                        <button
-                          type="button"
-                          onClick={handleResendVerification}
-                          className="rounded-md bg-amber-300/15 px-3 py-1.5 text-sm font-medium text-amber-200 ring-1 ring-inset ring-amber-300/20 hover:bg-amber-300/20 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
-                        >
-                          {dashboardT("resendButton")}
-                        </button>
-                      </div>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
               )}
               {showBillingBanner && (
-                <div className="mb-6 rounded-2xl border border-emerald-900/40 bg-emerald-950/20 p-4">
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div className="space-y-2">
-                      <div className="text-sm text-zinc-300">
+                <div className="mb-4 rounded-xl border border-emerald-900/40 bg-emerald-950/20 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="text-xs text-zinc-300">
                         {billingT("pending")}
                       </div>
-                      <div className="font-semibold text-white">
+                      <div className="font-semibold text-white mt-1">
                         {billingT("trialTitle")}
                       </div>
+                    </div>
+
+                    <div className="shrink-0 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowBillingDetails((v) => !v)}
+                        className="rounded-md border border-emerald-300/25 px-3 py-1.5 text-xs font-medium text-emerald-200 hover:bg-emerald-300/10"
+                      >
+                        {showBillingDetails
+                          ? dashboardT("bannerDetailsHide")
+                          : dashboardT("bannerDetailsShow")}
+                      </button>
+                      <Link
+                        href="/dashboard/billing"
+                        className="inline-flex items-center justify-center rounded-xl bg-[#84c9ad] px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-[#73bba0] transition-colors"
+                      >
+                        {billingT("activateCta")}
+                      </Link>
+                    </div>
+                  </div>
+
+                  {showBillingDetails ? (
+                    <div className="mt-3 border-t border-emerald-300/15 pt-3">
                       <div className="text-sm text-zinc-300">
                         {billingT("trialSubtitle")}
                       </div>
@@ -292,15 +332,7 @@ export default function DashboardLayout({
                         <li>{billingT("trialBullet3")}</li>
                       </ul>
                     </div>
-                    <div className="shrink-0">
-                      <Link
-                        href="/dashboard/billing"
-                        className="inline-flex items-center justify-center rounded-xl bg-[#84c9ad] px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-[#73bba0] transition-colors"
-                      >
-                        {billingT("activateCta")}
-                      </Link>
-                    </div>
-                  </div>
+                  ) : null}
                 </div>
               )}
               {children}

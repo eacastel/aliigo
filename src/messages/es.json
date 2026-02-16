@@ -341,6 +341,23 @@
       "emailLine": "Email: {email}",
       "edit": "Editar"
     },
+    "usage": {
+      "title": "Uso de mensajes",
+      "resetsOn": "Se reinicia el {date}",
+      "planLabel": "Plan {plan}",
+      "messagesLeft": "Quedan {count} mensajes en este periodo.",
+      "plan": {
+        "starter": "Starter",
+        "growth": "Growth"
+      },
+      "status": {
+        "incomplete": "Incompleto",
+        "trialing": "En prueba",
+        "active": "Activo",
+        "canceled": "Cancelado",
+        "past_due": "Pago pendiente"
+      }
+    },
     "verifyTitle": "Verifica tu email",
     "verifyMessage": "Confirma tu email para activar el asistente. Te hemos enviado un enlace de verificación a {email}.",
     "verifyCountdownDays": "Confirma tu email en {hours} horas para evitar la eliminación de la cuenta.",
@@ -349,6 +366,8 @@
     "resendButton": "Reenviar email",
     "resendSuccess": "Email de verificación enviado.",
     "resendError": "No se pudo reenviar: {error}",
+    "bannerDetailsShow": "Ver detalles",
+    "bannerDetailsHide": "Ocultar detalles",
     "onboarding": {
       "title": "Puesta en marcha",
       "subtitle": "Completa los pasos obligatorios para activar tu asistente y el widget.",
