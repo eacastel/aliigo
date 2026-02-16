@@ -174,7 +174,7 @@ function rgbaFromHex(hex: string, a: number) {
 class AliigoWidget extends HTMLElement {
   private root!: ShadowRoot;
 
-  private STORAGE_TTL_MS = 30 * 60 * 1000;
+  private STORAGE_TTL_MS = 12 * 60 * 1000;
   private STORAGE_PREFIX = "aliigo_widget_v1";
 
   private pendingScroll: "bottom" | "lastAssistantStart" | null = null;

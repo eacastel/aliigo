@@ -6,7 +6,7 @@ export function FaqSection() {
   const t = useTranslations("Landing");
 
   return (
-    <section className="py-24 bg-zinc-950">
+    <section id="faq" className="py-24 bg-zinc-950 scroll-mt-24">
       <div className="max-w-3xl mx-auto px-4">
         <h2 className="text-3xl font-bold text-white mb-12 text-center">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">

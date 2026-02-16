@@ -615,7 +615,7 @@ export async function POST(req: NextRequest) {
 
     if (!conversationId) {
       if (externalRef && !isPreviewSession) {
-        const cutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+        const cutoff = new Date(Date.now() - 12 * 60 * 1000).toISOString();
 
         const existing = await supabase
           .from("conversations")
