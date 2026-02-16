@@ -10,6 +10,10 @@ No dates. We’ll move fast once we decide.
 ## Recently locked direction
 - Paid LP + signup conversion direction is documented and now treated as baseline implementation guidance:
   - `docs/lp-conversion-direction.md`
+- Dashboard layout consistency pass is now baseline:
+  - unified page content width (`max-w-5xl`) across core dashboard routes
+  - compact/collapsible verification + billing banners
+  - localized usage card labels/status text
 
 ## Backlog (discussed, not implemented)
 - Knowledgebase ingestion from URLs (auto‑pull external sources into assistant knowledge).

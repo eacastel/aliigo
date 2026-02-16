@@ -126,7 +126,7 @@ export default function WidgetAdvancedPage() {
   };
 
   if (loading) {
-    return <div className="max-w-3xl text-zinc-300">{t("loadingPreview")}</div>;
+    return <div className="max-w-5xl text-zinc-300">{t("loadingPreview")}</div>;
   }
 
   if (!businessId) {
@@ -140,7 +140,7 @@ export default function WidgetAdvancedPage() {
   }
 
   return (
-    <main className="max-w-3xl text-white space-y-6">
+    <main className="max-w-5xl text-white space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{t("advanced.title")}</h1>
         <Link href="/dashboard/widget" className={btnNeutral}>
@@ -186,4 +186,3 @@ export default function WidgetAdvancedPage() {
     </main>
   );
 }
-

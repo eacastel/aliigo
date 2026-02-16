@@ -492,7 +492,7 @@ export default function SettingsBusinessPage() {
   }
 
   return (
-    <div className="max-w-3xl text-white">
+    <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">Business Settings</h1>
 
       {msg && (

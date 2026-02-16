@@ -342,7 +342,7 @@ export default function DashboardPage() {
   const blockers = required.filter((x) => !x.done);
 
   return (
-    <div className="mx-auto mt-10 max-w-3xl px-4">
+    <div className="mx-auto max-w-5xl">
       <div className="mb-8">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold text-zinc-100">

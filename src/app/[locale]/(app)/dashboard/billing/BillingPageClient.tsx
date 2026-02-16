@@ -222,7 +222,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
 
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
+    <main className="max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-2">{safeT("title", undefined, "Billing")}</h1>
 
       {loading ? (

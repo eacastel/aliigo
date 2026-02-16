@@ -710,7 +710,7 @@ export default function SettingsAssistantPage() {
   }
 
   return (
-    <div className="max-w-3xl text-white">
+    <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       <p className="mb-6 text-sm text-zinc-400">{t("description")}</p>
       {msg && (
@@ -1106,7 +1106,7 @@ export default function SettingsAssistantPage() {
 
       {dirty ? (
         <div className="fixed bottom-4 left-4 right-4 z-40">
-          <div className="mx-auto max-w-3xl rounded-xl border border-zinc-800 bg-zinc-950/90 backdrop-blur px-4 py-3 flex items-center justify-between gap-3">
+          <div className="mx-auto max-w-5xl rounded-xl border border-zinc-800 bg-zinc-950/90 backdrop-blur px-4 py-3 flex items-center justify-between gap-3">
             <div className="text-xs text-zinc-400">{t("actions.unsaved")}</div>
             <div className="flex gap-2">
               <button onClick={save} disabled={saving} className={btnBrand}>
