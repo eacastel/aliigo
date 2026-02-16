@@ -34,7 +34,7 @@ function resolveMarketCurrency(params: {
   if (!marketParam) return params.fallback;
 
   if (["us", "usa", "na"].includes(marketParam)) return "USD";
-  if (["eu", "europe", "eea"].includes(marketParam)) return "EUR";
+  if (["eu", "europe", "eea", "es", "spain"].includes(marketParam)) return "EUR";
   return params.fallback;
 }
 
@@ -46,6 +46,9 @@ export default async function PaidLandingPage({
   const locale = await getLocale();
   const headerCurrency = getCurrencyFromHeaders(await headers());
   const query = await searchParams;
+  const marketParam = (Array.isArray(query.market) ? query.market[0] : query.market)
+    ?.trim()
+    .toLowerCase();
   const currency = resolveMarketCurrency({
     market: query.market,
     currency: query.currency,
@@ -59,9 +62,22 @@ export default async function PaidLandingPage({
     maximumFractionDigits: 0,
   });
 
-  const starterPrice = priceFmt.format(99);
-  const growthPrice = priceFmt.format(149);
-  const proPrice = priceFmt.format(349);
+  const formatPrice = (amount: number) => {
+    const formatted = priceFmt.format(amount);
+    // Brand decision: Spain LP campaign can use "€99" while rest of EU keeps locale default.
+    if (currency === "EUR" && marketParam === "es") {
+      const numberPart = formatted
+        .replace("€", "")
+        .replace(/\s/g, "")
+        .trim();
+      return `€${numberPart}`;
+    }
+    return formatted;
+  };
+
+  const starterPrice = formatPrice(99);
+  const growthPrice = formatPrice(149);
+  const proPrice = formatPrice(349);
   const fitValue = priceFmt.format(500);
 
   return (
@@ -86,4 +102,3 @@ export default async function PaidLandingPage({
     </div>
   );
 }
-

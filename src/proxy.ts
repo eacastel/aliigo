@@ -69,6 +69,7 @@ export default function middleware(req: NextRequest) {
 
   const pathLocale = getPathLocale(pathname);
   const cookieLocale = getLocaleCookie(req);
+  const isPaidLpPath = /^\/(en|es)\/lp\//.test(pathname);
 
   const ES_SLUG_REDIRECTS: Record<string, string> = {
     "/es/pricing": "/es/precios",
@@ -93,7 +94,7 @@ export default function middleware(req: NextRequest) {
   };
 
   // 2) If locale cookie exists and differs from path locale, redirect to cookie locale path
-  if (pathLocale && cookieLocale && pathLocale !== cookieLocale) {
+  if (pathLocale && cookieLocale && pathLocale !== cookieLocale && !isPaidLpPath) {
     const rest = pathname.replace(/^\/(en|es)/, "");
     url.pathname = `/${cookieLocale}${rest || ""}`;
     const res = NextResponse.redirect(url, 308);
