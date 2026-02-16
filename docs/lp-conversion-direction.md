@@ -77,3 +77,23 @@ Goal: reduce churn, keep implementation stable, and optimize for trial starts.
 - Additional LP section re-architecture
 - Broad A/B test matrix before a stable baseline is measured
 
+## Final LP URLs (Google Ads)
+
+Use these as Final URLs in Google Ads.
+
+### US campaign (EN + USD)
+- `https://aliigo.com/en/lp/website-ai-assistant?market=us`
+
+With UTMs + ValueTrack:
+- `https://aliigo.com/en/lp/website-ai-assistant?market=us&utm_source=google&utm_medium=cpc&utm_campaign={campaignname}&utm_term={keyword}&utm_content={creative}`
+
+### Spain campaign (ES + EUR)
+- `https://aliigo.com/es/lp/asistente-web-ia?market=es`
+
+With UTMs + ValueTrack:
+- `https://aliigo.com/es/lp/asistente-web-ia?market=es&utm_source=google&utm_medium=cpc&utm_campaign={campaignname}&utm_term={keyword}&utm_content={creative}`
+
+### Locale/currency behavior (current implementation)
+- LP paths (`/en/lp/*`, `/es/lp/*`) are locale-pinned and are not redirected by `NEXT_LOCALE` cookie.
+- `market=us` forces USD formatting.
+- `market=es` keeps EUR and Spanish formatting (symbol on the left, e.g. `€99`).

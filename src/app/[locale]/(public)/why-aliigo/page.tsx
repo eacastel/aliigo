@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
+import { FitFilterSection } from "@/components/home/FitFilterSection";
 
 export async function generateMetadata({
   params,
@@ -22,6 +23,12 @@ export default async function WhyAliigoPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.whyAliigo" });
+  const tClarity = await getTranslations({ locale, namespace: "Landing.clarity" });
+  const fitValue = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-US", {
+    style: "currency",
+    currency: locale === "es" ? "EUR" : "USD",
+    maximumFractionDigits: 0,
+  }).format(500);
 
   const siteUrl =
     (process.env.NEXT_PUBLIC_SITE_URL || "https://aliigo.com").replace(/\/$/, "");
@@ -118,6 +125,8 @@ export default async function WhyAliigoPage({
         </div>
       </section>
 
+      <FitFilterSection value={fitValue} />
+
       <section className="max-w-6xl mx-auto px-4 py-4">
         <h2 className="text-2xl font-semibold mb-6">{t("comparison.title")}</h2>
         <div className="overflow-x-auto rounded-2xl border border-white/10 bg-zinc-900/20">
@@ -181,6 +190,43 @@ export default async function WhyAliigoPage({
           >
             {t("crossLink.cta")}
           </Link>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 py-6">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-6 md:p-8">
+          <h2 className="text-2xl font-semibold mb-2">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#84c9ad]">
+              {tClarity("title")}
+            </span>
+          </h2>
+          <p className="text-zinc-400 mb-6">{tClarity("note")}</p>
+
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            {(["card1", "card2", "card3"] as const).map((card) => (
+              <div key={card} className="rounded-xl border border-white/10 bg-zinc-950/50 p-4">
+                <h3 className="text-sm font-semibold text-white mb-1">
+                  {tClarity(`${card}.title`)}
+                </h3>
+                <p className="text-sm text-zinc-400">{tClarity(`${card}.benefit`)}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center rounded-lg bg-[#84c9ad] text-black px-6 py-3 text-sm font-semibold hover:bg-[#73bba0] transition-all"
+            >
+              {t("finalCta.ctaPrimary")}
+            </Link>
+            <Link
+              href={{ pathname: "/", hash: "assistant-demo" }}
+              className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
+            >
+              {t("finalCta.ctaSecondary")}
+            </Link>
+          </div>
         </div>
       </section>
 

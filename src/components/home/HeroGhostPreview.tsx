@@ -80,9 +80,8 @@ export function HeroGhostPreview({
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4 shadow-2xl ring-1 ring-white/10 overflow-hidden">
       <div className="h-[480px] w-full flex flex-col rounded-xl border border-white/10 overflow-hidden">
-        <div className="h-14 bg-white px-5 flex items-center justify-between border-b border-zinc-200">
+        <div className="h-14 bg-white px-5 flex items-center border-b border-zinc-200">
           <div className="text-zinc-900 font-semibold text-xl">{t("title")}</div>
-          <div className="text-zinc-500 text-3xl leading-none">×</div>
         </div>
 
         <div className="flex-1 bg-zinc-300 p-4 overflow-hidden">
