@@ -2,6 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { type AliigoCurrency } from "@/lib/currency";
+import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 import { HomeHeroSection } from "@/components/home/Hero";
 import { AssistantDemoSection } from "@/components/home/AssistantDemoSection";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
@@ -22,15 +23,30 @@ export default function HomePageClient({ initialCurrency }: HomePageClientProps)
   const locale = useLocale();
   const currency = initialCurrency;
 
-  const displayLocale = currency === "USD" ? "en-US" : locale;
-  const priceFmt = new Intl.NumberFormat(displayLocale, {
-    style: "currency",
+  const basicPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "basic"),
     currency,
-    maximumFractionDigits: 0,
+    locale,
+    forceLeadingEuroForSpanish: true,
   });
-  const starterPrice = priceFmt.format(99);
-  const growthPrice = priceFmt.format(149);
-  const proPrice = priceFmt.format(349);
+  const growthPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "growth"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const proPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "pro"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const customPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "custom"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
 
   return (
     <div className="bg-zinc-950 overflow-hidden selection:bg-[#84c9ad]/30">
@@ -39,9 +55,10 @@ export default function HomePageClient({ initialCurrency }: HomePageClientProps)
       <WorksWithStrip />
       <AssistantDemoSection />
       <PricingSection
-        starterPrice={starterPrice}
+        basicPrice={basicPrice}
         growthPrice={growthPrice}
         proPrice={proPrice}
+        customPrice={customPrice}
       />
       <HowItWorksSection />
       <FeaturesGridSection />

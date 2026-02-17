@@ -40,7 +40,7 @@ type PendingSignup = {
 
 type UsagePayload = {
   status: "incomplete" | "trialing" | "active" | "canceled" | "past_due";
-  plan: "starter" | "growth" | null;
+  plan: "basic" | "growth" | "pro" | "custom" | "starter" | null;
   used: number;
   limit: number | null;
   remaining: number | null;

@@ -31,7 +31,7 @@ type MetaEventPayload = {
   fbp?: string;
 
   business_id?: string;
-  plan?: "starter" | "growth" | "pro";
+  plan?: "basic" | "growth" | "pro" | "custom" | "starter";
 
   value?: number;
   currency?: string;

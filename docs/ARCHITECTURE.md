@@ -47,15 +47,25 @@
 
 ## Billing flow notes
 - Billing setup path: `POST /api/stripe/setup-intent` then `POST /api/stripe/subscribe` (`action=start`).
+- Subscriptions are created with a 30-day trial and saved default payment method.
+- At `trial_end`, Stripe attempts off-session payment automatically.
+- `POST /api/stripe/webhook` is the source of truth sync for subscription/invoice status:
+  - paid -> `active`
+  - failed payment -> `past_due`
+  - subscription delete/cancel updates local `billing_status` and period fields.
 - `subscribe` now includes a guarded self-heal for stale Stripe customer IDs:
   - if SetupIntent customer differs from DB customer, adopt it only when SetupIntent metadata business id matches.
   - otherwise fail closed with customer mismatch.
 - Plan pricing comes from env-bound currency price IDs in `src/lib/stripe.ts`.
 - Stripe price env vars are validated at startup in `src/lib/stripe.ts` (fail-fast on missing/invalid values).
-- Plan limits are synced from billing plan for starter/growth:
-  - starter: 1 seat / 1 domain
-  - growth: 3 seats / 4 domains
-  - custom/pro: admin-defined
+- Plan limits are synced from billing plan:
+  - basic: 1 seat / 1 domain
+  - growth: 3 seats / 1 domain
+  - pro: 5 seats / 3 domains
+  - custom: admin-defined
+- Legacy compatibility:
+  - Existing rows with `billing_plan='starter'` are treated as `basic` in runtime logic.
+  - Optional cleanup migration: `docs/db/plan_rename_starter_to_basic.sql`
 
 ## Signup flow notes
 - Public signup form now collects only:

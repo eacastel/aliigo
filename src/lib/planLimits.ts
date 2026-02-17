@@ -6,8 +6,9 @@ export type PlanLimits = {
 };
 
 const LIMITS_BY_PLAN: Record<AliigoPlan, PlanLimits> = {
-  starter: { seat_limit: 1, domain_limit: 1 },
-  growth: { seat_limit: 3, domain_limit: 4 },
+  basic: { seat_limit: 1, domain_limit: 1 },
+  growth: { seat_limit: 3, domain_limit: 1 },
+  pro: { seat_limit: 5, domain_limit: 3 },
 };
 
 export function limitsForPlan(plan: AliigoPlan): PlanLimits {
@@ -19,8 +20,9 @@ export function effectiveDomainLimit(opts: {
   domainLimit: number | null | undefined;
 }): number {
   if (typeof opts.domainLimit === "number" && opts.domainLimit > 0) return opts.domainLimit;
-  if (opts.billingPlan === "starter") return LIMITS_BY_PLAN.starter.domain_limit;
+  if (opts.billingPlan === "basic" || opts.billingPlan === "starter") return LIMITS_BY_PLAN.basic.domain_limit;
   if (opts.billingPlan === "growth") return LIMITS_BY_PLAN.growth.domain_limit;
+  if (opts.billingPlan === "pro") return LIMITS_BY_PLAN.pro.domain_limit;
+  if (opts.billingPlan === "custom") return Number.MAX_SAFE_INTEGER;
   return 1;
 }
-

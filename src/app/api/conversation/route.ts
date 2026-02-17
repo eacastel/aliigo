@@ -10,6 +10,7 @@ import {
 } from "@/lib/billingUsage";
 import { buildLeadNotification, normalizeLocale as normalizeLeadLocale } from "@/emails/lead/notification";
 import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
+import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -724,20 +725,37 @@ ${knowledge}`;
 
     const isAliigoSite = host === aliigoHost() || bizSlug === "aliigo";
     if (isAliigoSite) {
-      const priceFmt = new Intl.NumberFormat(locale, {
-        style: "currency",
+      const basic = formatPlanPrice({
+        amount: planPriceAmount(currency as AliigoCurrency, "basic"),
         currency: currency as AliigoCurrency,
-        maximumFractionDigits: 0,
+        locale,
+        forceLeadingEuroForSpanish: true,
       });
-      const starter = priceFmt.format(99);
-      const growth = priceFmt.format(149);
-      const pro = priceFmt.format(349);
+      const growth = formatPlanPrice({
+        amount: planPriceAmount(currency as AliigoCurrency, "growth"),
+        currency: currency as AliigoCurrency,
+        locale,
+        forceLeadingEuroForSpanish: true,
+      });
+      const pro = formatPlanPrice({
+        amount: planPriceAmount(currency as AliigoCurrency, "pro"),
+        currency: currency as AliigoCurrency,
+        locale,
+        forceLeadingEuroForSpanish: true,
+      });
+      const custom = formatPlanPrice({
+        amount: planPriceAmount(currency as AliigoCurrency, "custom"),
+        currency: currency as AliigoCurrency,
+        locale,
+        forceLeadingEuroForSpanish: true,
+      });
       sys += `
 
 Aliigo pricing (authoritative, aliigo.com only):
-- Starter: ${starter} / month
+- Basic: ${basic} / month
 - Growth: ${growth} / month
-- Pro: ${pro}+ / month (custom)
+- Pro: ${pro} / month
+- Custom: from ${custom} / month (sales-led)
 
 Rules:
 - Only share pricing when asked or when the user explicitly requests it.

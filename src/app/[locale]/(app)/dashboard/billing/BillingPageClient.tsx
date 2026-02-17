@@ -8,7 +8,7 @@ import { type AliigoCurrency } from "@/lib/currency";
 import BillingCheckout from "@/components/billing/BillingCheckout";
 
 type BillingStatus = "incomplete" | "trialing" | "active" | "canceled" | "past_due";
-type BillingPlan = "starter" | "growth" | null;
+type BillingPlan = "basic" | "growth" | "pro" | "custom" | "starter" | null;
 
 type BillingPayload = {
   status: BillingStatus;
@@ -72,10 +72,19 @@ export default function BillingPageClient({ initialCurrency }: BillingPageClient
   const displayLocale = currency === "USD" ? "en-US" : locale;
   const priceFmt = new Intl.NumberFormat(displayLocale, { style: "currency", currency, maximumFractionDigits: 0 });
   const priceForPlan = (p: BillingPlan) =>
-    p === "starter" ? priceFmt.format(99) : p === "growth" ? priceFmt.format(149) : "—";
-  const starterPrice = priceForPlan("starter");
+    p === "basic" || p === "starter"
+      ? priceFmt.format(currency === "USD" ? 49 : 39)
+      : p === "growth"
+        ? priceFmt.format(currency === "USD" ? 99 : 89)
+        : p === "pro"
+          ? priceFmt.format(currency === "USD" ? 149 : 129)
+          : p === "custom"
+            ? priceFmt.format(currency === "USD" ? 349 : 299)
+            : "—";
+  const basicPrice = priceForPlan("basic");
   const growthPrice = priceForPlan("growth");
-  const proPrice = priceFmt.format(349);
+  const proPrice = priceForPlan("pro");
+  const customPrice = priceForPlan("custom");
 
   const perMonth = safeT("perMonth", undefined, "/month");
 
@@ -151,11 +160,15 @@ export default function BillingPageClient({ initialCurrency }: BillingPageClient
   const trialDaysLeft = daysUntil(billing?.trial_end ?? null);
 
   const planLabel =
-    billing?.plan === "starter"
-      ? safeT("planStarter", undefined, "Aliigo Starter")
+    billing?.plan === "basic" || billing?.plan === "starter"
+      ? safeT("planBasic", undefined, "Aliigo Basic")
       : billing?.plan === "growth"
         ? safeT("planGrowth", undefined, "Aliigo Growth")
-        : safeT("planUnknown", undefined, "Aliigo");
+        : billing?.plan === "pro"
+          ? safeT("planPro", undefined, "Aliigo Pro")
+          : billing?.plan === "custom"
+            ? safeT("planCustom", undefined, "Aliigo Custom")
+            : safeT("planUnknown", undefined, "Aliigo");
 
   const trialEndsText = billing?.trial_end ? fmt.format(new Date(billing.trial_end)) : "—";
 
@@ -334,47 +347,47 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                     {safeT("plansTitle", undefined, "Plans")}
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {/* Starter card */}
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {/* Basic card */}
                     <div className="rounded-2xl border border-zinc-800 bg-zinc-950/30 p-4">
                       <div className="flex items-baseline justify-between">
                         <div className="text-sm font-semibold text-zinc-100">
-                          {safeT("planStarter", undefined, "Aliigo Starter")}
+                          {safeT("planBasic", undefined, "Aliigo Basic")}
                         </div>
                         <div className="text-sm text-zinc-300">
-                          {starterPrice} <span className="text-zinc-500">{perMonth}</span>
+                          {basicPrice} <span className="text-zinc-500">{perMonth}</span>
                         </div>
                       </div>
                       <div className="mt-1 text-xs text-zinc-400">
-                        {safeT("planStarterDesc", undefined, "Ideal for small local businesses.")}
+                        {safeT("planBasicDesc", undefined, "Best for solo businesses getting started.")}
                       </div>
 
                       <ul className="mt-3 space-y-1 text-xs text-zinc-400">
-                        <li>• {safeT("starterF1", undefined, "Smart website chat assistant")}</li>
-                        <li>• {safeT("starterF2", undefined, "Generous monthly conversation volume")}</li>
-                        <li>• {safeT("starterF3", undefined, "Basic business setup")}</li>
-                        <li>• {safeT("starterF4", undefined, "Lead capture (name, email, phone)")}</li>
-                        <li>• {safeT("starterF5", undefined, "Support in Spanish and English")}</li>
+                        <li>• {safeT("basicF1", undefined, "50 conversations / month")}</li>
+                        <li>• {safeT("basicF2", undefined, "1 domain")}</li>
+                        <li>• {safeT("basicF3", undefined, "Reply-only assistant")}</li>
+                        <li>• {safeT("basicF4", undefined, "Lead capture (name, email)")}</li>
+                        <li>• {safeT("basicF5", undefined, "Email support")}</li>
                       </ul>
 
                       <div className="mt-4">
-                        {billing?.plan === "starter" ? (
+                        {billing?.plan === "basic" || billing?.plan === "starter" ? (
                           <button type="button" disabled className={btnNeutralStrong}>
                             {safeT("currentPlan", undefined, "Current plan")}
                           </button>
                         ) : (
                           <button
                             type="button"
-                            onClick={() => runBillingAction("change_plan", "starter")}
+                            onClick={() => runBillingAction("change_plan", "basic")}
                             disabled={portalLoading !== null}
                             className={btnNeutral}
                           >
                             {portalLoading === "change_plan"
                               ? safeT("loading", undefined, "Loading…")
                               : safeT(
-                                  "switchToStarter",
+                                  "switchToBasic",
                                   undefined,
-                                  `Switch to Starter (${starterPrice} ${perMonth})`
+                                  `Switch to Basic (${basicPrice} ${perMonth})`
                                 )}
                           </button>
                         )}
@@ -396,13 +409,13 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                       </div>
 
                       <div className="mt-3 text-xs text-zinc-400">
-                        {safeT("growthIntro", undefined, "Everything in Starter, plus:")}
+                        {safeT("growthIntro", undefined, "Everything in Basic, plus:")}
                       </div>
                       <ul className="mt-2 space-y-1 text-xs text-zinc-400">
-                        <li>• {safeT("growthF1", undefined, "Higher conversation volume")}</li>
-                        <li>• {safeT("growthF2", undefined, "More advanced customization")}</li>
-                        <li>• {safeT("growthF3", undefined, "More precise lead qualification")}</li>
-                        <li>• {safeT("growthF4", undefined, "Priority for high‑intent visitors")}</li>
+                        <li>• {safeT("growthF1", undefined, "500 conversations / month")}</li>
+                        <li>• {safeT("growthF2", undefined, "1 domain")}</li>
+                        <li>• {safeT("growthF3", undefined, "Richer lead capture fields")}</li>
+                        <li>• {safeT("growthF4", undefined, "Email + chat support")}</li>
                       </ul>
 
                       <div className="mt-4">
@@ -428,34 +441,71 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                         )}
                       </div>
                     </div>
+
+                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950/30 p-4">
+                      <div className="flex items-baseline justify-between">
+                        <div className="text-sm font-semibold text-zinc-100">
+                          {safeT("planPro", undefined, "Aliigo Pro")}
+                        </div>
+                        <div className="text-sm text-zinc-300">
+                          {proPrice} <span className="text-zinc-500">{perMonth}</span>
+                        </div>
+                      </div>
+                      <div className="mt-1 text-xs text-zinc-400">
+                        {safeT("planProDesc", undefined, "Best for growing teams that need higher volume.")}
+                      </div>
+
+                      <ul className="mt-3 space-y-1 text-xs text-zinc-400">
+                        <li>• {safeT("proF1", undefined, "2,000 conversations / month")}</li>
+                        <li>• {safeT("proF2", undefined, "3 domains")}</li>
+                        <li>• {safeT("proF3", undefined, "Priority support")}</li>
+                        <li>• {safeT("proF4", undefined, "Advanced assistant controls")}</li>
+                      </ul>
+
+                      <div className="mt-4">
+                        {billing?.plan === "pro" ? (
+                          <button type="button" disabled className={btnNeutralStrong}>
+                            {safeT("currentPlan", undefined, "Current plan")}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => runBillingAction("change_plan", "pro")}
+                            disabled={portalLoading !== null}
+                            className={btnBrand}
+                          >
+                            {portalLoading === "change_plan"
+                              ? safeT("loading", undefined, "Loading…")
+                              : safeT("upgradeToPro", undefined, `Upgrade to Pro (${proPrice} ${perMonth})`)}
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Pro */}
-                  <div className="rounded-2xl border border-zinc-800 bg-zinc-950/30 p-4">
+                  {/* Custom (sales-led) */}
+                  <div className="rounded-2xl border border-zinc-800 bg-zinc-950/30 p-4 sm:col-span-2 lg:col-span-3">
                     <div className="text-sm font-semibold text-zinc-100">
-                      {safeT("planProTitle", undefined, "Aliigo Pro")}
+                      {safeT("planCustom", undefined, "Aliigo Custom")}
                     </div>
                     <div className="mt-1 text-xs text-zinc-400">
-                      {safeT("planProDesc", undefined, "Ideal for high‑traffic or high‑value businesses.")}
+                      {safeT("planCustomDesc", undefined, "For advanced teams needing high volume and custom workflows.")}
                     </div>
                     <div className="mt-2 text-sm text-zinc-300">
-                      {safeT("planProPrice", { price: proPrice }, `from ${proPrice}`)}
-                    </div>
-                    <div className="mt-3 text-xs text-zinc-400">
-                      {safeT("planProIntro", undefined, "Everything in Growth, plus:")}
+                      {safeT("planCustomPrice", { price: customPrice }, `from ${customPrice}`)}
                     </div>
                     <ul className="mt-2 space-y-1 text-xs text-zinc-400">
-                      <li>• {safeT("proF1", undefined, "Tailored customization")}</li>
-                      <li>• {safeT("proF2", undefined, "Higher or unlimited message volume")}</li>
-                      <li>• {safeT("proF3", undefined, "Custom behaviors and flows")}</li>
-                      <li>• {safeT("proF4", undefined, "Built for high‑volume teams")}</li>
+                      <li>• {safeT("customF1", undefined, "10k+ conversations / month")}</li>
+                      <li>• {safeT("customF2", undefined, "Unlimited domains")}</li>
+                      <li>• {safeT("customF3", undefined, "Advanced automations & integrations")}</li>
+                      <li>• {safeT("customF4", undefined, "Dedicated support")}</li>
                     </ul>
                     <div className="mt-4">
                       <Link
                         href={{ pathname: "/pricing", hash: "pro-contact" }}
                         className={btnNeutral}
                       >
-                        {safeT("planProCta", undefined, "Contact sales")}
+                        {safeT("planCustomCta", undefined, "Contact sales")}
                       </Link>
                     </div>
                   </div>

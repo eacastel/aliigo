@@ -29,19 +29,46 @@ Plans:
 
 Required env vars:
 ```
-STRIPE_PRICE_STARTER_EUR
+STRIPE_PRICE_BASIC_EUR
 STRIPE_PRICE_GROWTH_EUR
-STRIPE_PRICE_STARTER_USD
+STRIPE_PRICE_PRO_EUR
+STRIPE_PRICE_BASIC_USD
 STRIPE_PRICE_GROWTH_USD
+STRIPE_PRICE_PRO_USD
 ```
 
 If using prod keys, mirror with your prod environment values.
+
+## 30-day trial charge lifecycle
+Aliigo uses Stripe subscriptions with a 30-day trial and saved payment method.
+
+Sequence:
+1) Customer enters card details in checkout (`SetupIntent`).
+2) App calls `POST /api/stripe/subscribe` with `action=start`.
+3) Subscription is created with:
+   - `trial_period_days: 30`
+   - `default_payment_method` from successful SetupIntent
+   - `payment_settings.save_default_payment_method = on_subscription`
+4) During trial, status is `trialing` and `trial_end` is stored in `businesses`.
+5) At `trial_end`, Stripe automatically attempts to collect the first invoice off-session.
+6) Stripe webhook updates local status:
+   - success (`invoice.paid` / subscription active) -> `active`
+   - failure (`invoice.payment_failed`) -> `past_due`
+
+Cancellation behavior:
+- If user cancels with `cancel_at_period_end: true` before trial ends, access continues through trial end and no post-trial renewal charge is made.
+- If user resumes before trial/current period end, `cancel_at_period_end` is set back to `false`.
+
+Plan-change behavior:
+- Plan changes use `proration_behavior: none` to avoid surprise immediate charges.
+- New plan applies on next billing boundary (for trial users: trial-end invoice).
 
 ## Where it’s applied in code
 - `src/proxy.ts` handles locale routing and sets `aliigo_country_debug`
 - `src/lib/currency.ts` helpers (country → currency)
 - `src/lib/stripe.ts` maps currency → Stripe price IDs
 - `src/app/api/stripe/subscribe/route.ts` creates subscription using currency
+- `src/app/api/stripe/webhook/route.ts` syncs Stripe invoice/subscription events into `businesses`
 - `src/app/api/conversation/route.ts` uses the same country-based currency for Aliigo pricing snippets
 - Pricing UI:
   - `src/app/[locale]/(public)/page.tsx` → `HomePageClient` (server passes `initialCurrency`)
@@ -53,10 +80,12 @@ If using prod keys, mirror with your prod environment values.
 - `headers()` is async in this Next.js version; server wrappers must `await headers()` before calling `getCurrencyFromHeaders`.
 - Any client components that need currency should receive it via props from a server wrapper (no cookies).
 - Startup guard in `src/lib/stripe.ts` now validates required Stripe price env vars:
-  - `STRIPE_PRICE_STARTER_EUR`
+  - `STRIPE_PRICE_BASIC_EUR`
   - `STRIPE_PRICE_GROWTH_EUR`
-  - `STRIPE_PRICE_STARTER_USD`
+  - `STRIPE_PRICE_PRO_EUR`
+  - `STRIPE_PRICE_BASIC_USD`
   - `STRIPE_PRICE_GROWTH_USD`
+  - `STRIPE_PRICE_PRO_USD`
   - Missing or malformed values fail fast at startup (`price_*` expected).
 - Billing hardening in `src/app/api/stripe/subscribe/route.ts`:
   - On `start`, if Stripe returns a SetupIntent whose customer differs from `businesses.stripe_customer_id`, we now:
@@ -66,6 +95,10 @@ If using prod keys, mirror with your prod environment values.
   - If metadata does not match, request still fails with `SetupIntent customer mismatch`.
 - Stripe price lookup errors now include currency context:
   - `Missing Stripe price for plan: <plan> (<currency>)`
+- Plan naming migration:
+  - Canonical plan slugs are now `basic`, `growth`, `pro`, `custom`.
+  - Runtime keeps temporary compatibility for legacy `starter` values.
+  - Optional DB cleanup SQL: `docs/db/plan_rename_starter_to_basic.sql`.
 
 ## Notes
 - Language is **not** tied to Stripe product/prices.

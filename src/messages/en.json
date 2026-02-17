@@ -131,11 +131,11 @@
     "starterF4": "Lead capture (name, email, phone)",
     "starterF5": "Support in Spanish and English",
     "planGrowthDesc": "Ideal for clinics, agencies, and service businesses.",
-    "growthIntro": "Everything in Starter, plus:",
-    "growthF1": "Advanced assistant controls",
-    "growthF2": "Team workflows + analytics (coming)",
-    "growthF3": "Priority support",
-    "growthF4": "Priority for high‑intent visitors",
+    "growthIntro": "Everything in Basic, plus:",
+    "growthF1": "500 conversations / month",
+    "growthF2": "1 domain",
+    "growthF3": "Richer lead capture fields",
+    "growthF4": "Email + chat support",
     "planProDesc": "Custom. Contact support to set it up.",
     "planProPrice": "from {price}",
     "planProIntro": "Everything in Growth, plus:",
@@ -153,7 +153,25 @@
     "resumeMembership": "Keep membership",
     "cancelMembership": "Cancel membership",
     "planProTitle": "Aliigo Pro",
-    "planProCta": "Contact sales"
+    "planProCta": "Contact sales",
+    "planBasic": "Aliigo Basic",
+    "planPro": "Aliigo Pro",
+    "planCustom": "Aliigo Custom",
+    "planBasicDesc": "Best for solo businesses getting started.",
+    "basicF1": "50 conversations / month",
+    "basicF2": "1 domain",
+    "basicF3": "Website source training",
+    "basicF4": "Lead capture (name and email)",
+    "basicF5": "Email support",
+    "upgradeToPro": "Upgrade to Pro",
+    "switchToBasic": "Switch to Basic",
+    "planCustomDesc": "For advanced teams needing high volume and custom workflows.",
+    "planCustomPrice": "from {price}",
+    "planCustomCta": "Contact sales",
+    "customF1": "10k+ conversations / month",
+    "customF2": "Unlimited domains",
+    "customF3": "Advanced automations & integrations",
+    "customF4": "Dedicated support"
   },
   "DashboardBusiness": {
     "emailChange": {
@@ -346,8 +364,11 @@
       "planLabel": "{plan} plan",
       "messagesLeft": "{count} messages left this period.",
       "plan": {
-        "starter": "Starter",
-        "growth": "Growth"
+        "starter": "Basic",
+        "growth": "Growth",
+        "basic": "Basic",
+        "pro": "Pro",
+        "custom": "Custom"
       },
       "status": {
         "incomplete": "Incomplete",
@@ -720,40 +741,52 @@
       "period": "/month",
       "from": "from",
       "starter": {
-        "name": "Starter",
-        "subtitle": "Best for small local businesses.",
+        "name": "Basic",
+        "subtitle": "Best for solo businesses getting started.",
         "cta": "Start free trial",
         "features": {
-          "f1": "Smart website chat assistant",
-          "f2": "Ample monthly conversation allowance",
-          "f3": "Basic business configuration",
-          "f4": "Lead capture (name, email, phone)",
-          "f5": "English & Spanish support"
+          "f1": "50 conversations / month",
+          "f2": "1 domain",
+          "f3": "Website source training",
+          "f4": "Lead capture (name and email)",
+          "f5": "Email support"
         }
       },
       "growth": {
         "name": "Growth",
-        "subtitle": "Best for clinics, agencies, and service businesses.",
+        "subtitle": "Best for service businesses and teams.",
         "tag": "Best value",
         "cta": "Start free trial",
-        "plusLabel": "Everything in Starter, plus:",
+        "plusLabel": "Everything in Basic, plus:",
         "features": {
-          "f1": "Higher conversation allowance",
-          "f2": "Deeper business customization",
-          "f3": "Smarter lead qualification",
-          "f4": "Priority handling for high-intent visitors"
+          "f1": "500 conversations / month",
+          "f2": "1 domain",
+          "f3": "Richer lead capture fields",
+          "f4": "Email + chat support"
         }
       },
       "pro": {
         "name": "Pro",
-        "subtitle": "Best for high-traffic or high-value businesses.",
-        "cta": "Contact us",
+        "subtitle": "Best for growing teams that need higher volume.",
+        "cta": "Start free trial",
         "plusLabel": "Everything in Growth, plus:",
         "features": {
-          "f1": "Advanced customization",
-          "f2": "Higher or unlimited message volume",
-          "f3": "Custom behavior and flows",
-          "f4": "Built for high-traffic teams"
+          "f1": "2,000 conversations / month",
+          "f2": "3 domains",
+          "f3": "Priority support",
+          "f4": "Advanced assistant controls"
+        }
+      },
+      "custom": {
+        "name": "Custom",
+        "subtitle": "For advanced teams with high traffic and custom workflows.",
+        "cta": "Contact sales",
+        "plusLabel": "Everything in Pro, plus:",
+        "features": {
+          "f1": "10k+ conversations / month",
+          "f2": "Unlimited domains",
+          "f3": "Custom workflows and integrations",
+          "f4": "Dedicated support"
         }
       }
     },

@@ -1,7 +1,11 @@
 // src/app/api/stripe/subscribe/route.ts
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { stripe, assertPlanPrice, isAliigoPlan, type AliigoPlan } from "@/lib/stripe";
+import {
+  stripe,
+  assertPlanPrice,
+  normalizeAliigoPlan,
+} from "@/lib/stripe";
 import { normalizeCurrency, type AliigoCurrency } from "@/lib/currency";
 import { limitsForPlan } from "@/lib/planLimits";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
@@ -47,11 +51,11 @@ export async function POST(req: Request) {
 
     // --- ACTION: START (create subscription) ---
     if (action === "start") {
-      const plan = body.plan as unknown;
+      const plan = normalizeAliigoPlan(body.plan);
       const setupIntentId = body.setup_intent_id as unknown;
       const currency = normalizeCurrency(body.currency as string | undefined) ?? "EUR";
 
-      if (!isAliigoPlan(plan)) {
+      if (!plan) {
         return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
       }
       if (!setupIntentId || typeof setupIntentId !== "string") {
@@ -95,17 +99,17 @@ export async function POST(req: Request) {
 
       const sub = (await stripe.subscriptions.create({
         customer: customerId,
-        items: [{ price: assertPlanPrice(plan as AliigoPlan, currency as AliigoCurrency) }],
+        items: [{ price: assertPlanPrice(plan, currency as AliigoCurrency) }],
         trial_period_days: 30,
         default_payment_method: paymentMethodId,
         payment_settings: { save_default_payment_method: "on_subscription" },
-        metadata: { business_id: businessId, plan: plan as AliigoPlan, currency },
+        metadata: { business_id: businessId, plan, currency },
       })) as unknown as AliigoStripeSub;
 
       const patch = {
         stripe_subscription_id: sub.id,
-        billing_plan: plan as AliigoPlan,
-        ...limitsForPlan(plan as AliigoPlan),
+        billing_plan: plan,
+        ...limitsForPlan(plan),
         billing_status: sub.status === "trialing" ? "trialing" : "incomplete",
         trial_end: toIsoOrNull(sub.trial_end),
         current_period_end: toIsoOrNull(sub.current_period_end),
@@ -171,8 +175,8 @@ export async function POST(req: Request) {
 
     // --- ACTION: CHANGE PLAN ---
     if (action === "change_plan") {
-      const plan = body.plan as unknown;
-      if (!isAliigoPlan(plan)) {
+      const plan = normalizeAliigoPlan(body.plan);
+      if (!plan) {
         return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
       }
 
@@ -191,15 +195,15 @@ export async function POST(req: Request) {
         normalizeCurrency(existingCurrency) ?? normalizeCurrency(body.currency as string | undefined) ?? "EUR";
 
       const updated = (await stripe.subscriptions.update(subscriptionId, {
-        items: [{ id: firstItemId, price: assertPlanPrice(plan as AliigoPlan, currency as AliigoCurrency) }],
+        items: [{ id: firstItemId, price: assertPlanPrice(plan, currency as AliigoCurrency) }],
         // Avoid surprise immediate charges; it will take effect on next invoice / trial end.
         proration_behavior: "none",
-        metadata: { business_id: businessId, plan: plan as AliigoPlan, currency },
+        metadata: { business_id: businessId, plan, currency },
       })) as unknown as AliigoStripeSub;
 
       const patch = {
-        billing_plan: plan as AliigoPlan,
-        ...limitsForPlan(plan as AliigoPlan),
+        billing_plan: plan,
+        ...limitsForPlan(plan),
         billing_status: updated.status,
         trial_end: toIsoOrNull(updated.trial_end),
         current_period_end: toIsoOrNull(updated.current_period_end),

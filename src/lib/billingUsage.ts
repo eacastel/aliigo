@@ -1,12 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type BillingStatus = "incomplete" | "trialing" | "active" | "canceled" | "past_due";
-export type BillingPlan = "starter" | "growth" | null;
+export type BillingPlan = "basic" | "growth" | "pro" | "custom" | "starter" | null;
 
 const DEFAULT_LIMITS = {
   trial: 200,
-  starter: 1000,
-  growth: 3000,
+  basic: 50,
+  growth: 500,
+  pro: 2000,
+  custom: 10000,
   periodDays: 30,
 };
 
@@ -28,8 +30,13 @@ function parsePeriodDays(raw: string | undefined, fallback: number): number {
 export function getBillingLimitsFromEnv() {
   return {
     trial: parseLimit(process.env.TRIAL_MESSAGE_LIMIT, DEFAULT_LIMITS.trial),
-    starter: parseLimit(process.env.STARTER_MESSAGE_LIMIT, DEFAULT_LIMITS.starter),
+    basic: parseLimit(
+      process.env.BASIC_MESSAGE_LIMIT ?? process.env.STARTER_MESSAGE_LIMIT,
+      DEFAULT_LIMITS.basic
+    ),
     growth: parseLimit(process.env.GROWTH_MESSAGE_LIMIT, DEFAULT_LIMITS.growth),
+    pro: parseLimit(process.env.PRO_MESSAGE_LIMIT, DEFAULT_LIMITS.pro),
+    custom: parseLimit(process.env.CUSTOM_MESSAGE_LIMIT, DEFAULT_LIMITS.custom),
     periodDays: parsePeriodDays(process.env.BILLING_PERIOD_DAYS, DEFAULT_LIMITS.periodDays),
   };
 }
@@ -56,11 +63,15 @@ export function resolveUsageWindow(opts: {
   const limit =
     opts.status === "trialing"
       ? limits.trial
-      : opts.plan === "starter"
-        ? limits.starter
+      : opts.plan === "basic" || opts.plan === "starter"
+        ? limits.basic
         : opts.plan === "growth"
           ? limits.growth
-          : null;
+          : opts.plan === "pro"
+            ? limits.pro
+            : opts.plan === "custom"
+              ? limits.custom
+              : null;
 
   return {
     periodStart,

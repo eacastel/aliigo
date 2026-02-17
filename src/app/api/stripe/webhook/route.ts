@@ -1,7 +1,11 @@
 // src/app/api/stripe/webhook/route.ts
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { stripe, planFromPriceId, type AliigoPlan } from "@/lib/stripe";
+import {
+  stripe,
+  planFromPriceId,
+  normalizeAliigoPlan,
+} from "@/lib/stripe";
 import { limitsForPlan } from "@/lib/planLimits";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -81,7 +85,7 @@ async function applySubscription(sub: Stripe.Subscription) {
 
   const plan =
     planFromPriceId(priceId) ??
-    ((subx.metadata?.plan as AliigoPlan | undefined) ?? null);
+    normalizeAliigoPlan(subx.metadata?.plan);
 
   const patch: Record<string, unknown> = {
     billing_status: mapStripeStatus(subx.status),

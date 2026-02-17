@@ -9,12 +9,12 @@ import PaymentForm from "./PaymentForm";
 import type { AliigoCurrency } from "@/lib/currency";
 import { useLocale, useTranslations } from "next-intl";
 
-export type Plan = "starter" | "growth";
+export type Plan = "basic" | "growth" | "pro";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function BillingCheckout({ jwt, currency }: { jwt: string; currency: AliigoCurrency }) {
-  const [plan, setPlan] = useState<Plan>("starter");
+  const [plan, setPlan] = useState<Plan>("basic");
   const [clientSecret, setClientSecret] = useState<string>("");
   const [err, setErr] = useState<string>("");
   const locale = useLocale();

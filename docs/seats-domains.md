@@ -1,9 +1,10 @@
 # Seats & Domains Limits
 
 ## Plan policy (Phase B)
-- Starter: `1 seat`, `1 domain`
-- Growth: `3 seats`, `4 domains`
-- Pro/custom: admin-defined (`seat_limit`, `domain_limit`)
+- Basic: `1 seat`, `1 domain`
+- Growth: `3 seats`, `1 domain`
+- Pro: `5 seats`, `3 domains`
+- Custom: admin-defined (`seat_limit`, `domain_limit`)
 
 ## Data model
 - `businesses.seat_limit` (nullable int)
@@ -11,6 +12,7 @@
 
 Migration:
 - `docs/db/plan_limits.sql`
+- `docs/db/plan_rename_starter_to_basic.sql` (optional cleanup for legacy rows)
 
 ## Enforcement points
 1) Billing lifecycle updates

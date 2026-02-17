@@ -131,11 +131,11 @@
     "starterF4": "Captura de leads (nombre, email y teléfono)",
     "starterF5": "Soporte en español e inglés",
     "planGrowthDesc": "Ideal para clínicas, agencias y negocios de servicios.",
-    "growthIntro": "Todo lo de Starter, y además:",
-    "growthF1": "Controles avanzados del asistente",
-    "growthF2": "Flujos de equipo + analítica (próximamente)",
-    "growthF3": "Soporte prioritario",
-    "growthF4": "Prioridad para visitantes con alta intención",
+    "growthIntro": "Todo lo de Basic, y además:",
+    "growthF1": "500 conversaciones / mes",
+    "growthF2": "1 dominio",
+    "growthF3": "Captura de leads más completa",
+    "growthF4": "Soporte por email + chat",
     "planProDesc": "Personalizado. Contacta soporte para configurarlo.",
     "planProPrice": "desde {price}",
     "planProIntro": "Todo lo de Growth, y además:",
@@ -154,7 +154,25 @@
     "resumeMembership": "Mantener suscripción",
     "cancelMembership": "Cancelar suscripción",
     "planProTitle": "Aliigo Pro",
-    "planProCta": "Contactar ventas"
+    "planProCta": "Contactar ventas",
+    "planBasic": "Aliigo Basic",
+    "planPro": "Aliigo Pro",
+    "planCustom": "Aliigo Custom",
+    "planBasicDesc": "Ideal para negocios que están empezando.",
+    "basicF1": "50 conversaciones / mes",
+    "basicF2": "1 dominio",
+    "basicF3": "Entrenamiento con fuente web",
+    "basicF4": "Captura de leads (nombre y email)",
+    "basicF5": "Soporte por email",
+    "upgradeToPro": "Subir a Pro",
+    "switchToBasic": "Cambiar a Basic",
+    "planCustomDesc": "Para equipos avanzados con alto volumen y flujos personalizados.",
+    "planCustomPrice": "desde {price}",
+    "planCustomCta": "Contactar ventas",
+    "customF1": "10k+ conversaciones / mes",
+    "customF2": "Dominios ilimitados",
+    "customF3": "Automatizaciones e integraciones avanzadas",
+    "customF4": "Soporte dedicado"
   },
   "DashboardBusiness": {
     "emailChange": {
@@ -347,8 +365,11 @@
       "planLabel": "Plan {plan}",
       "messagesLeft": "Quedan {count} mensajes en este periodo.",
       "plan": {
-        "starter": "Starter",
-        "growth": "Growth"
+        "starter": "Basic",
+        "growth": "Growth",
+        "basic": "Basic",
+        "pro": "Pro",
+        "custom": "Custom"
       },
       "status": {
         "incomplete": "Incompleto",
@@ -721,40 +742,52 @@
       "period": "/mes",
       "from": "desde ",
       "starter": {
-        "name": "Starter",
-        "subtitle": "Ideal para pequeños negocios locales.",
+        "name": "Basic",
+        "subtitle": "Ideal para negocios que están empezando.",
         "cta": "Empieza tu prueba gratis",
         "features": {
-          "f1": "Asistente de chat inteligente en tu web",
-          "f2": "Amplio volumen mensual de conversaciones",
-          "f3": "Configuración básica del negocio",
-          "f4": "Captura de leads (nombre, email y teléfono)",
-          "f5": "Soporte en español e inglés"
+          "f1": "50 conversaciones / mes",
+          "f2": "1 dominio",
+          "f3": "Entrenamiento con fuente web",
+          "f4": "Captura de leads (nombre y email)",
+          "f5": "Soporte por email"
         }
       },
       "growth": {
         "name": "Growth",
-        "subtitle": "Ideal para clínicas, agencias y negocios de servicios.",
+        "subtitle": "Ideal para negocios de servicios y equipos.",
         "tag": "Mejor opción",
         "cta": "Empieza tu prueba gratis",
-        "plusLabel": "Todo lo de Starter, y además:",
+        "plusLabel": "Todo lo de Basic, y además:",
         "features": {
-          "f1": "Más volumen de conversaciones",
-          "f2": "Personalización más avanzada",
-          "f3": "Cualificación de contactos más precisa",
-          "f4": "Prioridad para visitantes con alta intención"
+          "f1": "500 conversaciones / mes",
+          "f2": "1 dominio",
+          "f3": "Captura de leads más completa",
+          "f4": "Soporte por email + chat"
         }
       },
       "pro": {
         "name": "Pro",
-        "subtitle": "Ideal para negocios con mucho tráfico o alto valor.",
-        "cta": "Contactar",
+        "subtitle": "Ideal para equipos en crecimiento con mayor volumen.",
+        "cta": "Empieza tu prueba gratis",
         "plusLabel": "Todo lo de Growth, y además:",
         "features": {
-          "f1": "Personalización a medida",
-          "f2": "Mayor volumen de mensajes o ilimitado",
-          "f3": "Comportamientos y flujos personalizados",
-          "f4": "Pensado para equipos con alto volumen"
+          "f1": "2.000 conversaciones / mes",
+          "f2": "3 dominios",
+          "f3": "Soporte prioritario",
+          "f4": "Controles avanzados del asistente"
+        }
+      },
+      "custom": {
+        "name": "Custom",
+        "subtitle": "Para equipos avanzados con alto tráfico y flujos personalizados.",
+        "cta": "Contactar ventas",
+        "plusLabel": "Todo lo de Pro, y además:",
+        "features": {
+          "f1": "10k+ conversaciones / mes",
+          "f2": "Dominios ilimitados",
+          "f3": "Flujos e integraciones a medida",
+          "f4": "Soporte dedicado"
         }
       }
     },

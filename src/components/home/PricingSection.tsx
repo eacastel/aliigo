@@ -5,12 +5,13 @@ import { useTranslations } from "next-intl";
 import { Building2, CheckCircle2, Sparkles, Store, Zap } from "lucide-react";
 
 type PricingSectionProps = {
-  starterPrice: string;
+  basicPrice: string;
   growthPrice: string;
   proPrice: string;
+  customPrice: string;
 };
 
-export function PricingSection({ starterPrice, growthPrice, proPrice }: PricingSectionProps) {
+export function PricingSection({ basicPrice, growthPrice, proPrice, customPrice }: PricingSectionProps) {
   const t = useTranslations("Landing");
 
   return (
@@ -32,8 +33,8 @@ export function PricingSection({ starterPrice, growthPrice, proPrice }: PricingS
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
-          {/* PLAN 1: STARTER */}
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
+          {/* PLAN 1: BASIC */}
           <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-5 sm:p-6 lg:p-8 hover:border-white/10 transition-all">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-zinc-800 rounded-lg text-white">
@@ -49,12 +50,12 @@ export function PricingSection({ starterPrice, growthPrice, proPrice }: PricingS
             </p>
 
             <div className="mb-5 md:mb-6">
-              <span className="text-3xl md:text-4xl font-bold text-white">{starterPrice}</span>
+              <span className="text-3xl md:text-4xl font-bold text-white">{basicPrice}</span>
               <span className="text-zinc-500"> {t("pricing.period")}</span>
             </div>
 
             <Link
-              href={{ pathname: "/signup", query: { plan: "starter" } }}
+              href={{ pathname: "/signup", query: { plan: "basic" } }}
               className="block w-full py-2.5 md:py-3 px-4 bg-zinc-800 text-white text-center rounded-lg text-sm font-semibold hover:bg-zinc-700 transition-colors border border-white/5"
             >
               {t("pricing.starter.cta")}
@@ -161,16 +162,12 @@ export function PricingSection({ starterPrice, growthPrice, proPrice }: PricingS
             </p>
 
             <div className="mb-5 md:mb-6">
-              <div className="flex items-baseline">
-                <span className="text-2xl font-semibold text-zinc-400 mr-1">
-                  {t("pricing.from")}
-                </span>
-                <span className="text-3xl md:text-4xl font-bold text-white">{proPrice}</span>
-              </div>
+              <span className="text-3xl md:text-4xl font-bold text-white">{proPrice}</span>
+              <span className="text-zinc-500"> {t("pricing.period")}</span>
             </div>
 
             <Link
-              href={{ pathname: "/pricing", hash: "pro-contact" }}
+              href={{ pathname: "/signup", query: { plan: "pro" } }}
               className="block w-full py-2.5 md:py-3 px-4 bg-zinc-800 text-white text-center rounded-lg text-sm font-semibold hover:bg-zinc-700 transition-colors border border-white/5"
             >
               {t("pricing.pro.cta")}
@@ -197,6 +194,63 @@ export function PricingSection({ starterPrice, growthPrice, proPrice }: PricingS
                 <li className="flex gap-3">
                   <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
                   {t("pricing.pro.features.f4")}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* PLAN 4: CUSTOM */}
+          <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-5 sm:p-6 lg:p-8 hover:border-white/10 transition-all">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-zinc-800 rounded-lg text-white">
+                <Building2 size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                {t("pricing.custom.name")}
+              </h3>
+            </div>
+
+            <p className="text-zinc-400 text-sm mb-5 md:mb-6 min-h-[2.5rem] md:h-10">
+              {t("pricing.custom.subtitle")}
+            </p>
+
+            <div className="mb-5 md:mb-6">
+              <div className="flex items-baseline">
+                <span className="text-2xl font-semibold text-zinc-400 mr-1">
+                  {t("pricing.from")}
+                </span>
+                <span className="text-3xl md:text-4xl font-bold text-white">{customPrice}</span>
+              </div>
+            </div>
+
+            <Link
+              href={{ pathname: "/pricing", hash: "pro-contact" }}
+              className="block w-full py-2.5 md:py-3 px-4 bg-zinc-800 text-white text-center rounded-lg text-sm font-semibold hover:bg-zinc-700 transition-colors border border-white/5"
+            >
+              {t("pricing.custom.cta")}
+            </Link>
+
+            <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-white/5 flex-1">
+              <div className="text-xs font-semibold text-zinc-500 mb-4 uppercase tracking-wider">
+                {t("pricing.custom.plusLabel")}
+              </div>
+
+              <ul className="space-y-3 md:space-y-4 text-sm text-zinc-400">
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
+                  {t("pricing.custom.features.f1")}
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
+                  {t("pricing.custom.features.f2")}
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
+                  {t("pricing.custom.features.f3")}
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
+                  {t("pricing.custom.features.f4")}
                 </li>
               </ul>
             </div>

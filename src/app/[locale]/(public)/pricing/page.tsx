@@ -4,17 +4,68 @@ import { CheckCircle2, Sparkles, Building2, Store, Zap } from "lucide-react";
 import { ProContactForm } from "@/components/ProContactForm";
 import { headers } from "next/headers";
 import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
+import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 
 export default async function PricingPage() {
   const t = await getTranslations("Landing");
   const p = await getTranslations("PricingPage");
   const locale = await getLocale();
   const currency = getCurrencyFromHeaders(await headers()) as AliigoCurrency;
-  const displayLocale = currency === "USD" ? "en-US" : locale;
-  const priceFmt = new Intl.NumberFormat(displayLocale, { style: "currency", currency, maximumFractionDigits: 0 });
-  const starterPrice = priceFmt.format(99);
-  const growthPrice = priceFmt.format(149);
-  const proPrice = priceFmt.format(349);
+  const basicPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "basic"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const growthPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "growth"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const proPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "pro"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const customPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "custom"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const isEs = locale.startsWith("es");
+  const matrixRows = [
+    {
+      feature: isEs ? "Conversaciones mensuales" : "Monthly conversations",
+      basic: "50",
+      growth: "500",
+      pro: "2,000",
+      custom: "10k+",
+    },
+    {
+      feature: isEs ? "Dominios" : "Domains",
+      basic: "1",
+      growth: "1",
+      pro: "3",
+      custom: isEs ? "Ilimitado" : "Unlimited",
+    },
+    {
+      feature: isEs ? "Fuentes de entrenamiento" : "Training sources",
+      basic: isEs ? "Solo web" : "Website only",
+      growth: isEs ? "Web + PDF" : "Website + PDF",
+      pro: isEs ? "Web + PDF + Docs" : "Website + PDF + Docs",
+      custom: isEs ? "Todo + API" : "All + API",
+    },
+    {
+      feature: isEs ? "Soporte" : "Support",
+      basic: isEs ? "Email" : "Email",
+      growth: isEs ? "Email + chat" : "Email + chat",
+      pro: isEs ? "Prioritario" : "Priority",
+      custom: isEs ? "Dedicado" : "Dedicated",
+    },
+  ];
 
   return (
     <div className="bg-zinc-950 text-white">
@@ -66,12 +117,12 @@ export default async function PricingPage() {
               </p>
 
               <div className="mb-6">
-                <span className="text-4xl font-bold text-white">{starterPrice}</span>
+                <span className="text-4xl font-bold text-white">{basicPrice}</span>
                 <span className="text-zinc-500"> {t("pricing.period")}</span>
               </div>
 
               <Link
-                href={{ pathname: "/signup", query: { plan: "starter" } }}
+                href={{ pathname: "/signup", query: { plan: "basic" } }}
                 className="block w-full rounded-lg border border-white/5 bg-zinc-800 py-3 text-center text-sm font-semibold text-white transition hover:bg-zinc-700"
               >
                 {t("pricing.starter.cta")}
@@ -175,15 +226,13 @@ export default async function PricingPage() {
                 {t("pricing.pro.subtitle")}
               </p>
 
-              <div className="mb-6 flex items-baseline">
-                <span className="mr-1 text-2xl font-semibold text-zinc-400">
-                  {t("pricing.from")}
-                </span>
-                <span className="text-4xl font-bold text-white">{proPrice}</span>
-              </div>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-white">{proPrice}</span>
+                  <span className="text-zinc-500"> {t("pricing.period")}</span>
+                </div>
 
               <Link
-                href={{ pathname: "/pricing", hash: "pro-contact" }}
+                href={{ pathname: "/signup", query: { plan: "pro" } }}
                 className="block w-full rounded-lg border border-white/5 bg-zinc-800 py-3 text-center text-sm font-semibold text-white transition hover:bg-zinc-700"
               >
                 {t("pricing.pro.cta")}
@@ -214,11 +263,73 @@ export default async function PricingPage() {
                 </ul>
               </div>
             </div>
+
+            <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-8 md:col-span-3">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="rounded-lg bg-zinc-800 p-2 text-white">
+                  <Building2 size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-white">
+                  {t("pricing.custom.name")}
+                </h3>
+              </div>
+
+              <p className="mb-4 text-sm text-zinc-400">
+                {t("pricing.custom.subtitle")}
+              </p>
+
+              <div className="mb-5">
+                <div className="flex items-baseline">
+                  <span className="mr-1 text-2xl font-semibold text-zinc-400">
+                    {t("pricing.from")}
+                  </span>
+                  <span className="text-4xl font-bold text-white">{customPrice}</span>
+                </div>
+              </div>
+
+              <Link
+                href={{ pathname: "/pricing", hash: "pro-contact" }}
+                className="block w-full rounded-lg border border-white/5 bg-zinc-800 py-3 text-center text-sm font-semibold text-white transition hover:bg-zinc-700 md:w-auto md:px-6"
+              >
+                {t("pricing.custom.cta")}
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="pro-contact" className="border-t border-white/5 bg-zinc-900/30 py-20">
+        <div className="mx-auto mb-12 max-w-6xl px-4">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6">
+            <h2 className="text-2xl font-bold text-white">
+              {isEs ? "Comparativa de planes" : "Plan comparison"}
+            </h2>
+            <div className="mt-4 overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 text-zinc-300">
+                    <th className="px-3 py-2 font-semibold">{isEs ? "Función" : "Feature"}</th>
+                    <th className="px-3 py-2 font-semibold">Basic</th>
+                    <th className="px-3 py-2 font-semibold">Growth</th>
+                    <th className="px-3 py-2 font-semibold">Pro</th>
+                    <th className="px-3 py-2 font-semibold">Custom</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matrixRows.map((row) => (
+                    <tr key={row.feature} className="border-b border-white/5 text-zinc-400">
+                      <td className="px-3 py-2 text-zinc-200">{row.feature}</td>
+                      <td className="px-3 py-2">{row.basic}</td>
+                      <td className="px-3 py-2">{row.growth}</td>
+                      <td className="px-3 py-2">{row.pro}</td>
+                      <td className="px-3 py-2">{row.custom}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
         <div className="mx-auto max-w-4xl px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white">{p("contactTitle")}</h2>

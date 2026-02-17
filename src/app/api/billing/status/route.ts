@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type BillingStatus = "incomplete" | "trialing" | "active" | "canceled" | "past_due";
-type BillingPlan = "starter" | "growth" | null;
+type BillingPlan = "basic" | "growth" | "pro" | "custom" | "starter" | null;
 
 export async function GET(req: Request) {
   try {

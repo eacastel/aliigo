@@ -5,6 +5,7 @@ import {
   normalizeCurrency,
   type AliigoCurrency,
 } from "@/lib/currency";
+import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 import { LpHeroSection } from "@/components/home/LpHeroSection";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { PricingSection } from "@/components/home/PricingSection";
@@ -54,40 +55,43 @@ export default async function PaidLandingPage({
     fallback: headerCurrency,
   });
 
-  const displayLocale = currency === "USD" ? "en-US" : locale;
-  const priceFmt = new Intl.NumberFormat(displayLocale, {
-    style: "currency",
+  const shouldForceSpanishEuro = currency === "EUR" && (marketParam === "es" || locale === "es");
+  const basicPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "basic"),
     currency,
-    maximumFractionDigits: 0,
+    locale,
+    forceLeadingEuroForSpanish: shouldForceSpanishEuro,
   });
-
-  const formatPrice = (amount: number) => {
-    const formatted = priceFmt.format(amount);
-    // Brand decision: Spain LP uses "€99" while other EU locales can keep locale default.
-    if (currency === "EUR" && (marketParam === "es" || locale === "es")) {
-      const numberPart = formatted
-        .replace("€", "")
-        .replace(/\s/g, "")
-        .trim();
-      return `€${numberPart}`;
-    }
-    return formatted;
-  };
-
-  const starterPrice = formatPrice(99);
-  const growthPrice = formatPrice(149);
-  const proPrice = formatPrice(349);
+  const growthPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "growth"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: shouldForceSpanishEuro,
+  });
+  const proPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "pro"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: shouldForceSpanishEuro,
+  });
+  const customPrice = formatPlanPrice({
+    amount: planPriceAmount(currency, "custom"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: shouldForceSpanishEuro,
+  });
 
   return (
     <div className="bg-zinc-950 overflow-hidden selection:bg-[#84c9ad]/30">
-      <LpHeroSection startingPrice={starterPrice} />
+      <LpHeroSection startingPrice={basicPrice} />
       <CredibilityStrip />
       <div id="pricing">
         <div className="max-md:[&>section]:py-16">
           <PricingSection
-            starterPrice={starterPrice}
+            basicPrice={basicPrice}
             growthPrice={growthPrice}
             proPrice={proPrice}
+            customPrice={customPrice}
           />
         </div>
       </div>
