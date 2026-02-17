@@ -672,6 +672,17 @@
       "published": "Cambios publicados.",
       "publishError": "No se pudo publicar",
       "loginRequired": "Debes iniciar sesión para continuar."
+    },
+    "autofill": {
+      "title": "Autocompletar desde web",
+      "desc": "Extrae contenido de una URL permitida para sugerir campos del asistente. Revisa y guarda borrador antes de publicar.",
+      "placeholder": "https://tu-dominio.com",
+      "action": "Traer sugerencias",
+      "loading": "Extrayendo…",
+      "allowed": "Dominios permitidos",
+      "success": "Sugerencias cargadas. Revisa los campos y guarda borrador.",
+      "error": "No se pudo autocompletar",
+      "missingUrl": "Introduce una URL para autocompletar."
     }
   },
   "Landing": {

@@ -45,6 +45,7 @@ type JoinedBusiness = {
   qualification_prompt?: string | null;
   knowledge?: string | null;
   assistant_settings?: AssistantSettings | null;
+  allowed_domains?: string[] | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -350,6 +351,9 @@ export default function SettingsAssistantPage() {
   const [ackAuthorized, setAckAuthorized] = useState(false);
   const [settingsEnvelope, setSettingsEnvelope] =
     useState<AssistantSettingsEnvelope | null>(null);
+  const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
+  const [autofillUrl, setAutofillUrl] = useState("");
+  const [autofilling, setAutofilling] = useState(false);
 
   const initialAssistant = useRef<AssistantState | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -388,7 +392,8 @@ export default function SettingsAssistantPage() {
             system_prompt,
             qualification_prompt,
             knowledge,
-            assistant_settings
+            assistant_settings,
+            allowed_domains
           )
         `,
         )
@@ -423,6 +428,13 @@ export default function SettingsAssistantPage() {
         const parsedKnowledge = parseKnowledge(next.knowledge);
         const settings = (biz.assistant_settings ?? null) as AssistantSettingsEnvelope | null;
         setSettingsEnvelope(settings);
+        const domains = (biz.allowed_domains ?? [])
+          .map((d) => d.trim().toLowerCase())
+          .filter((d) => d && !d.startsWith("www."));
+        setAllowedDomains(domains);
+        if (domains[0]) {
+          setAutofillUrl(`https://${domains[0]}`);
+        }
         const draftForm = settings?.draft?.form ?? null;
         const systemFromSettings = settings?.system ?? {};
         const knowledgeFromSettings = settings?.knowledge ?? {};
@@ -538,13 +550,80 @@ export default function SettingsAssistantPage() {
     return status;
   }, [form]);
 
-  const previewText = useMemo(() => {
-    return t("preview.compactResponse", {
-      tone: t(`preview.tone.${form.tone}`),
-      goal: t(`preview.goal.${form.goal}`),
-      business: t("preview.businessFallback"),
-    });
-  }, [form.tone, form.goal, t]);
+  const runAutofill = async () => {
+    setMsg(null);
+    if (!autofillUrl.trim()) {
+      setMsgTone("error");
+      setMsg(t("autofill.missingUrl"));
+      return;
+    }
+    setAutofilling(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) {
+        setMsgTone("error");
+        setMsg(t("workflow.loginRequired"));
+        return;
+      }
+
+      const res = await fetch("/api/settings/assistant/autofill", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ url: autofillUrl.trim() }),
+      });
+      const j: {
+        error?: string;
+        sourceUrl?: string;
+        fetchedAt?: string;
+        draftForm?: Partial<AssistantForm>;
+        fieldStatuses?: Record<string, "suggested" | "needs_review" | "missing">;
+      } = await res.json().catch(() => ({}));
+      if (!res.ok || !j.draftForm) {
+        setMsgTone("error");
+        setMsg(`${t("autofill.error")}: ${j.error || "unknown"}`);
+        return;
+      }
+
+      setForm((prev) => {
+        const next = { ...prev };
+        const writable = next as Record<string, string>;
+        for (const [key, val] of Object.entries(j.draftForm ?? {})) {
+          if (typeof val !== "string") continue;
+          if (!val.trim()) continue;
+          if (!(writable[key] ?? "").trim()) writable[key] = val;
+        }
+        return next;
+      });
+
+      setSettingsEnvelope((prev) => ({
+        ...(prev ?? {}),
+        draft: {
+          form: j.draftForm ?? {},
+          sourceUrl: j.sourceUrl ?? autofillUrl.trim(),
+          fieldStatuses: j.fieldStatuses ?? {},
+          savedAt: j.fetchedAt ?? new Date().toISOString(),
+          savedBy: userId ?? undefined,
+        },
+        workflow: {
+          ...(prev?.workflow ?? {}),
+          lastDraftSavedAt: j.fetchedAt ?? new Date().toISOString(),
+          lastDraftSavedBy: userId ?? undefined,
+        },
+      }));
+      setMsgTone("success");
+      setMsg(t("autofill.success"));
+    } catch (e) {
+      console.error("[settings-assistant] autofill", e);
+      setMsgTone("error");
+      setMsg(t("autofill.error"));
+    } finally {
+      setAutofilling(false);
+    }
+  };
 
   const saveDraft = async () => {
     setMsg(null);
@@ -764,6 +843,32 @@ export default function SettingsAssistantPage() {
       )}
 
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+        <div className="text-sm font-semibold text-zinc-100">{t("autofill.title")}</div>
+        <p className="text-xs text-zinc-400">{t("autofill.desc")}</p>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+            value={autofillUrl}
+            onChange={(e) => setAutofillUrl(e.target.value)}
+            placeholder={t("autofill.placeholder")}
+          />
+          <button
+            type="button"
+            onClick={() => void runAutofill()}
+            disabled={autofilling}
+            className={btnBrand}
+          >
+            {autofilling ? t("autofill.loading") : t("autofill.action")}
+          </button>
+        </div>
+        {allowedDomains.length > 0 ? (
+          <p className="text-[11px] text-zinc-500">
+            {t("autofill.allowed")}: {allowedDomains.join(", ")}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="text-sm font-semibold text-zinc-100">{t("workflow.title")}</div>
         <p className="text-xs text-zinc-400">{t("workflow.desc")}</p>
         <div className="grid gap-2 text-xs text-zinc-300">
@@ -832,13 +937,7 @@ export default function SettingsAssistantPage() {
         </div>
 
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-          <div
-            className={`grid gap-4 ${
-              editorMode === "advanced"
-                ? "lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]"
-                : "grid-cols-1"
-            }`}
-          >
+          <div className="grid gap-4 grid-cols-1">
             <div className="space-y-4">
               <div className="grid gap-4 lg:grid-cols-2">
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
@@ -926,30 +1025,8 @@ export default function SettingsAssistantPage() {
                     ))}
                   </div>
                 </div>
-            </div>
-          </div>
-
-          {editorMode === "advanced" ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 h-fit lg:sticky lg:top-6">
-              <div className="text-sm font-semibold text-zinc-100 mb-2">
-                {t("preview.title")}
-              </div>
-              <div className="grid gap-3">
-                <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
-                  <div className="text-[11px] text-zinc-500 mb-1">
-                    {t("preview.userLabel")}
-                  </div>
-                  {t("preview.userMessage")}
                 </div>
-                <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100">
-                  <div className="text-[11px] text-zinc-500 mb-1">
-                    {t("preview.assistantLabel")}
-                  </div>
-                  {previewText}
-                </div>
-              </div>
             </div>
-          ) : null}
           </div>
         </div>
 

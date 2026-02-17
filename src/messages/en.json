@@ -671,6 +671,17 @@
       "published": "Changes published.",
       "publishError": "Could not publish",
       "loginRequired": "You must be logged in to continue."
+    },
+    "autofill": {
+      "title": "Website autofill",
+      "desc": "Extract content from an allowed URL to suggest assistant fields. Review and save draft before publishing.",
+      "placeholder": "https://your-domain.com",
+      "action": "Fetch suggestions",
+      "loading": "Fetching…",
+      "allowed": "Allowed domains",
+      "success": "Suggestions loaded. Review fields and save draft.",
+      "error": "Could not autofill",
+      "missingUrl": "Enter a URL to autofill."
     }
   },
   "Landing": {

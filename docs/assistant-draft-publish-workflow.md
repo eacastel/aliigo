@@ -43,4 +43,19 @@ Stored under `assistant_settings.draft`:
 ## Notes
 
 - This uses existing JSON storage and does not require a DB migration.
-- Next step (autofill importer): populate `draft.form`, `draft.sourceUrl`, and field statuses from site crawl suggestions.
+
+## Website autofill (implemented)
+
+- Endpoint: `POST /api/settings/assistant/autofill`
+- Auth: requires bearer session token.
+- Authorization: URL hostname must belong to the business `allowed_domains`.
+- Output:
+  - `draftForm` suggestions for assistant fields
+  - `fieldStatuses`
+  - `sourceUrl`, `fetchedAt`
+
+In UI (`dashboard/settings/assistant`):
+- user enters an allowed URL
+- clicks `Fetch suggestions`
+- suggestions are merged into empty form fields
+- then user can `Save draft` and later `Publish changes`
