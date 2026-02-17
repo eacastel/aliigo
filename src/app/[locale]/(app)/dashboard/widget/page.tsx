@@ -206,6 +206,7 @@ export default function WidgetSettingsPage() {
   const [previewSessionToken, setPreviewSessionToken] = useState<string | null>(null);
   const [previewLocale, setPreviewLocale] = useState<"en" | "es">("en");
   const [previewShowBranding, setPreviewShowBranding] = useState(false);
+  const [previewShowHeaderIcon, setPreviewShowHeaderIcon] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoMsg, setLogoMsg] = useState<string | null>(null);
@@ -312,6 +313,7 @@ export default function WidgetSettingsPage() {
               | "es"
           );
           setPreviewShowBranding(Boolean(j.show_branding));
+          setPreviewShowHeaderIcon(Boolean(j.show_header_icon));
         }
       }
 
@@ -451,6 +453,10 @@ export default function WidgetSettingsPage() {
       setTheme(merged);
       setInitialTheme(merged);
       setMsg(t("messages.saved"));
+      // Force a full refresh so preview/session state is always in sync after save.
+      setTimeout(() => {
+        window.location.reload();
+      }, 250);
     } catch (e: unknown) {
       console.error(e);
       setMsg(t("messages.saveNowError"));
@@ -582,6 +588,7 @@ export default function WidgetSettingsPage() {
                   locale={previewLocale}
                   session-token={previewSessionToken}
                   show-branding={previewShowBranding ? "true" : "false"}
+                  show-header-icon={previewShowHeaderIcon ? "true" : "false"}
                   theme={previewThemeJson}
                   brand={brand}
                 />
@@ -774,13 +781,13 @@ export default function WidgetSettingsPage() {
                 role="switch"
                 aria-checked={theme.showBranding}
                 onClick={() => setTheme((prev) => ({ ...prev, showBranding: !prev.showBranding }))}
-                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                  theme.showBranding ? "bg-brand-500/70" : "bg-zinc-700"
+                className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
+                  theme.showBranding ? "bg-brand-500/80" : "bg-zinc-700"
                 }`}
               >
                 <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                    theme.showBranding ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    theme.showBranding ? "translate-x-5" : "translate-x-0.5"
                   }`}
                 />
               </button>
