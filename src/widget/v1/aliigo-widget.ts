@@ -709,6 +709,7 @@ class AliigoWidget extends HTMLElement {
         slug: (data.slug || "").trim(),
         theme: (data.theme as Theme | null) || null,
         show_branding: Boolean(data.show_branding),
+        show_header_icon: Boolean((data as { show_header_icon?: boolean }).show_header_icon),
         locale_auto: localeAuto,
         enabled_locales: enabledLocales,
       };
