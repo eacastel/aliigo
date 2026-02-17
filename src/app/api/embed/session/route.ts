@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     if (!host) return json(req, { error: "Missing host" }, 400);
 
     // Pull only what we need for widget config
-    const bizRes = await supabase
+    const primaryBizRes = await supabase
       .from("businesses")
       .select(
         "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, widget_header_logo_path"
@@ -68,45 +68,73 @@ export async function GET(req: NextRequest) {
         widget_header_logo_path: string | null;
       }>();
 
-    if (bizRes.error) {
-      return json(req, { error: "Supabase error", details: bizRes.error.message }, 500);
-    }
-    if (!bizRes.data) return json(req, { error: "Invalid key" }, 403);
+    let bizData = primaryBizRes.data;
+    let bizError = primaryBizRes.error;
 
-    const allowed = bizRes.data.allowed_domains ?? [];
+    if (bizError && /widget_header_logo_path.*does not exist/i.test(bizError.message || "")) {
+      const fallback = await supabase
+        .from("businesses")
+        .select(
+          "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan"
+        )
+        .eq("public_embed_key", key)
+        .maybeSingle<{
+          id: string;
+          slug: string;
+          name: string | null;
+          brand_name: string | null;
+          allowed_domains: string[] | null;
+          default_locale: string | null;
+          enabled_locales: string[] | null;
+          widget_theme: ThemeDb;
+          billing_plan: string | null;
+        }>();
+      bizData = fallback.data ? { ...fallback.data, widget_header_logo_path: null } : null;
+      bizError = fallback.error;
+    }
+
+    if (bizError) {
+      return json(req, { error: "Supabase error", details: bizError.message }, 500);
+    }
+    if (!bizData) return json(req, { error: "Invalid key" }, 403);
+
+    const allowed = bizData.allowed_domains ?? [];
     if (!hostAllowed(host, allowed)) {
       return json(req, { error: "Domain not allowed" }, 403);
     }
 
 
-    const locale = (bizRes.data.default_locale || "en").toLowerCase().startsWith("es") ? "es" : "en";
-    const brand = (bizRes.data.brand_name || bizRes.data.name || "Aliigo").trim();
-    const slug = bizRes.data.slug;
+    const locale = (bizData.default_locale || "en").toLowerCase().startsWith("es") ? "es" : "en";
+    const brand = (bizData.brand_name || bizData.name || "Aliigo").trim();
+    const slug = bizData.slug;
     const themeObj: Record<string, unknown> =
-      bizRes.data.widget_theme && typeof bizRes.data.widget_theme === "object"
-        ? { ...(bizRes.data.widget_theme as Record<string, unknown>) }
+      bizData.widget_theme && typeof bizData.widget_theme === "object"
+        ? { ...(bizData.widget_theme as Record<string, unknown>) }
         : {};
     const isBasicPlan =
-      bizRes.data.billing_plan === "basic" || bizRes.data.billing_plan === "starter";
+      bizData.billing_plan === "basic" || bizData.billing_plan === "starter";
     const showBrandingPref =
       typeof themeObj.showBranding === "boolean" ? themeObj.showBranding : null;
     const showBranding = isBasicPlan || showBrandingPref === true;
     const showHeaderIcon =
-      bizRes.data.billing_plan === "growth" ||
-      bizRes.data.billing_plan === "pro" ||
-      bizRes.data.billing_plan === "custom";
-    if (showHeaderIcon && bizRes.data.widget_header_logo_path) {
+      bizData.billing_plan === "growth" ||
+      bizData.billing_plan === "pro" ||
+      bizData.billing_plan === "custom";
+    const headerLogoPath =
+      bizData.widget_header_logo_path ||
+      (typeof themeObj.headerLogoPath === "string" ? themeObj.headerLogoPath : null);
+    if (showHeaderIcon && headerLogoPath) {
       const signed = await supabase.storage
         .from("business-assets")
-        .createSignedUrl(bizRes.data.widget_header_logo_path, 60 * 60);
+        .createSignedUrl(headerLogoPath, 60 * 60);
       if (!signed.error && signed.data?.signedUrl) {
         themeObj.headerLogoUrl = signed.data.signedUrl;
       }
     }
     const localeAuto =
-      bizRes.data.billing_plan === "growth" ||
-      bizRes.data.billing_plan === "pro" ||
-      bizRes.data.billing_plan === "custom";
+      bizData.billing_plan === "growth" ||
+      bizData.billing_plan === "pro" ||
+      bizData.billing_plan === "custom";
 
     // Mint short-lived session token bound to this host
     const token = crypto.randomBytes(24).toString("hex");
@@ -114,7 +142,7 @@ export async function GET(req: NextRequest) {
 
     const ins = await supabase.from("embed_sessions").insert({
       token,
-      business_id: bizRes.data.id,
+      business_id: bizData.id,
       host,
       is_preview: false,
       expires_at: expiresAt,
@@ -124,8 +152,8 @@ export async function GET(req: NextRequest) {
       return json(req, { error: "Failed to create session", details: ins.error.message }, 500);
     }
 
-    const enabledLocalesRaw = Array.isArray(bizRes.data.enabled_locales)
-      ? bizRes.data.enabled_locales
+    const enabledLocalesRaw = Array.isArray(bizData.enabled_locales)
+      ? bizData.enabled_locales
       : [];
     const enabledLocales = Array.from(
       new Set(enabledLocalesRaw.map((l) => (String(l).toLowerCase().startsWith("es") ? "es" : "en")))

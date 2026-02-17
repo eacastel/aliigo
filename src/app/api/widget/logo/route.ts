@@ -25,6 +25,8 @@ function extForMime(mime: string) {
   return null;
 }
 
+type ThemeDb = Record<string, unknown> | null;
+
 async function resolveUserAndBusiness(req: NextRequest) {
   const token = getBearer(req);
   if (!token) return { error: "Unauthorized", status: 401 } as const;
@@ -47,13 +49,59 @@ async function resolveUserAndBusiness(req: NextRequest) {
     return { error: "Business not linked", status: 400 } as const;
   }
 
-  const { data: biz, error: bizErr } = await adminFromTable("businesses")
-    .select("id,billing_plan,widget_header_logo_path")
+  const withColumn = await adminFromTable("businesses")
+    .select("id,billing_plan,widget_header_logo_path,widget_theme")
     .eq("id", prof.business_id)
-    .single<{ id: string; billing_plan: string | null; widget_header_logo_path: string | null }>();
-  if (bizErr || !biz) return { error: "Business not found", status: 404 } as const;
+    .single<{
+      id: string;
+      billing_plan: string | null;
+      widget_header_logo_path: string | null;
+      widget_theme: ThemeDb;
+    }>();
 
-  return { userId, businessId: biz.id, billingPlan: biz.billing_plan, currentPath: biz.widget_header_logo_path } as const;
+  if (!withColumn.error && withColumn.data) {
+    const themeObj =
+      withColumn.data.widget_theme && typeof withColumn.data.widget_theme === "object"
+        ? (withColumn.data.widget_theme as Record<string, unknown>)
+        : {};
+    return {
+      userId,
+      businessId: withColumn.data.id,
+      billingPlan: withColumn.data.billing_plan,
+      currentPath: withColumn.data.widget_header_logo_path,
+      themeObj,
+      hasPathColumn: true,
+    } as const;
+  }
+
+  const msg = withColumn.error?.message || "";
+  if (!/widget_header_logo_path.*does not exist/i.test(msg)) {
+    return { error: "Business not found", status: 404 } as const;
+  }
+
+  // Backward compatibility before DB migration is applied.
+  const withoutColumn = await adminFromTable("businesses")
+    .select("id,billing_plan,widget_theme")
+    .eq("id", prof.business_id)
+    .single<{ id: string; billing_plan: string | null; widget_theme: ThemeDb }>();
+  if (withoutColumn.error || !withoutColumn.data) {
+    return { error: "Business not found", status: 404 } as const;
+  }
+
+  const themeObj =
+    withoutColumn.data.widget_theme && typeof withoutColumn.data.widget_theme === "object"
+      ? (withoutColumn.data.widget_theme as Record<string, unknown>)
+      : {};
+  const pathFromTheme = typeof themeObj.headerLogoPath === "string" ? themeObj.headerLogoPath : null;
+
+  return {
+    userId,
+    businessId: withoutColumn.data.id,
+    billingPlan: withoutColumn.data.billing_plan,
+    currentPath: pathFromTheme,
+    themeObj,
+    hasPathColumn: false,
+  } as const;
 }
 
 export async function GET(req: NextRequest) {
@@ -104,8 +152,14 @@ export async function POST(req: NextRequest) {
     await supabaseAdmin.storage.from(BUCKET).remove([ctx.currentPath]);
   }
 
+  const updatePayload: Record<string, unknown> = {};
+  if (ctx.hasPathColumn) {
+    updatePayload.widget_header_logo_path = nextPath;
+  } else {
+    updatePayload.widget_theme = { ...(ctx.themeObj || {}), headerLogoPath: nextPath };
+  }
   const upd = await adminFromTable("businesses")
-    .update({ widget_header_logo_path: nextPath })
+    .update(updatePayload)
     .eq("id", ctx.businessId);
   if (upd.error) {
     return NextResponse.json({ error: upd.error.message }, { status: 500 });
@@ -125,8 +179,16 @@ export async function DELETE(req: NextRequest) {
   if (ctx.currentPath) {
     await supabaseAdmin.storage.from(BUCKET).remove([ctx.currentPath]);
   }
+  const updatePayload: Record<string, unknown> = {};
+  if (ctx.hasPathColumn) {
+    updatePayload.widget_header_logo_path = null;
+  } else {
+    const nextTheme = { ...(ctx.themeObj || {}) };
+    delete nextTheme.headerLogoPath;
+    updatePayload.widget_theme = nextTheme;
+  }
   const upd = await adminFromTable("businesses")
-    .update({ widget_header_logo_path: null })
+    .update(updatePayload)
     .eq("id", ctx.businessId);
   if (upd.error) {
     return NextResponse.json({ error: upd.error.message }, { status: 500 });
