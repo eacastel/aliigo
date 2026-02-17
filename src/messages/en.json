@@ -187,7 +187,7 @@
       "errorUnchanged": "Please enter a different email.",
       "errorGeneric": "Could not send verification email: {error}"
     },
-    "domains": {
+  "domains": {
       "label": "Allowed domains",
       "placeholder": "example.com\\nsecond-domain.com",
       "help": "Enter one root domain per line, without http(s) or www. We will automatically allow both versions.",
@@ -197,9 +197,15 @@
       "locked": "Activate billing to unlock the domain allowlist.",
       "invalid": "Please enter a valid domain like example.com (or localhost for local testing).",
       "previewLabel": "Domains allowed",
-      "previewEmpty": "Enter a domain to see what will be allowed."
-    }
+    "previewEmpty": "Enter a domain to see what will be allowed."
   },
+  "languages": {
+    "label": "Enabled languages",
+    "limit": "Plan limit: up to {count} language(s).",
+    "unlimited": "unlimited",
+    "basicLocked": "Basic includes one language. Upgrade to add multilingual support."
+  }
+},
   "DashboardWidget": {
     "title": "Widget",
     "livePreview": "Live preview",

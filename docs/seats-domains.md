@@ -31,3 +31,11 @@ Migration:
 - Business settings UI now accepts multiple domains (one base domain per line).
 - Backend now supports multi-domain validation against plan limits for future UI expansion.
 - Seat invite/member flows are planned for Phase C.
+
+## Related multilingual limits
+- `docs/db/plan_language_limits.sql` adds `businesses.enabled_locales`.
+- Language caps are enforced in `/api/settings/business` based on plan:
+  - basic/starter: 1
+  - growth: 2
+  - pro: 3
+  - custom: unlimited

@@ -67,6 +67,18 @@
   - Existing rows with `billing_plan='starter'` are treated as `basic` in runtime logic.
   - Optional cleanup migration: `docs/db/plan_rename_starter_to_basic.sql`
 
+## Languages by plan
+- `businesses.enabled_locales` stores allowed widget UI languages per business.
+- `businesses.default_locale` remains the fallback locale.
+- Language caps are enforced in `POST /api/settings/business`:
+  - basic/starter: 1
+  - growth: 2
+  - pro: 3
+  - custom: unlimited
+- API always ensures `default_locale` is included in `enabled_locales`.
+- Embed session endpoints include both `locale_auto` and `enabled_locales`.
+- Widget auto-detection switches language only when detected locale is in `enabled_locales`.
+
 ## Signup flow notes
 - Public signup form now collects only:
   - email

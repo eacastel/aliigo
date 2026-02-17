@@ -188,7 +188,7 @@
       "errorUnchanged": "Introduce un email diferente.",
       "errorGeneric": "No se pudo enviar el email de verificación: {error}"
     },
-    "domains": {
+  "domains": {
       "label": "Dominios permitidos",
       "placeholder": "ejemplo.com\\nsegundo-dominio.com",
       "help": "Introduce un dominio raíz por línea, sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
@@ -198,9 +198,15 @@
       "locked": "Activa la facturación para desbloquear la lista de dominios.",
       "invalid": "Introduce un dominio válido como ejemplo.com (o localhost para pruebas locales).",
       "previewLabel": "Dominios permitidos",
-      "previewEmpty": "Introduce un dominio para ver lo que se permitirá."
-    }
+    "previewEmpty": "Introduce un dominio para ver lo que se permitirá."
   },
+  "languages": {
+    "label": "Idiomas habilitados",
+    "limit": "Límite del plan: hasta {count} idioma(s).",
+    "unlimited": "ilimitado",
+    "basicLocked": "Basic incluye un solo idioma. Sube de plan para activar el soporte multilingüe."
+  }
+},
   "DashboardWidget": {
     "title": "Widget",
     "livePreview": "Vista previa en vivo",

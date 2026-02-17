@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
     const bizRes = await supabaseAdmin
       .from("businesses")
-      .select("id, slug, name, brand_name, default_locale, widget_theme, billing_plan")
+      .select("id, slug, name, brand_name, default_locale, enabled_locales, widget_theme, billing_plan")
       .eq("public_embed_key", key)
       .maybeSingle<{
         id: string;
@@ -77,6 +77,7 @@ export async function GET(req: NextRequest) {
         name: string | null;
         brand_name: string | null;
         default_locale: string | null;
+        enabled_locales: string[] | null;
         widget_theme: ThemeDb;
         billing_plan: string | null;
       }>();
@@ -122,9 +123,26 @@ export async function GET(req: NextRequest) {
 
     if (ins.error) return json(req, { error: "Failed to create session", details: ins.error.message }, 500);
 
+    const enabledLocalesRaw = Array.isArray(bizRes.data.enabled_locales)
+      ? bizRes.data.enabled_locales
+      : [];
+    const enabledLocales = Array.from(
+      new Set(enabledLocalesRaw.map((l) => (String(l).toLowerCase().startsWith("es") ? "es" : "en")))
+    );
+    if (!enabledLocales.includes(locale)) enabledLocales.push(locale);
+
     return json(
       req,
-      { token, locale, brand, slug, theme, show_branding: showBranding, locale_auto: localeAuto },
+      {
+        token,
+        locale,
+        brand,
+        slug,
+        theme,
+        show_branding: showBranding,
+        locale_auto: localeAuto,
+        enabled_locales: enabledLocales,
+      },
       200
     );
   } catch (e: unknown) {

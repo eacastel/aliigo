@@ -22,7 +22,31 @@ type BusinessPayload = {
   assistant_settings?: Record<string, unknown> | null;
   allowed_domains?: string[] | null;
   default_locale?: "en" | "es" | string | null;
+  enabled_locales?: string[] | null;
 };
+
+type SupportedLocale = "en" | "es";
+
+function normalizeLocale(input: unknown): SupportedLocale {
+  return typeof input === "string" && input.toLowerCase().startsWith("es") ? "es" : "en";
+}
+
+function normalizeEnabledLocales(input: unknown): SupportedLocale[] | null {
+  if (!Array.isArray(input)) return null;
+  const out: SupportedLocale[] = [];
+  for (const raw of input) {
+    const l = normalizeLocale(raw);
+    if (!out.includes(l)) out.push(l);
+  }
+  return out;
+}
+
+function localeLimitForPlan(plan: string | null | undefined): number {
+  if (plan === "growth") return 2;
+  if (plan === "pro") return 3;
+  if (plan === "custom") return Number.MAX_SAFE_INTEGER;
+  return 1; // basic + legacy starter + fallback
+}
 
 const nonEmpty = (v: unknown) =>
   typeof v === "string" ? (v.trim().length > 0 ? v.trim() : null) : v ?? null;
@@ -131,9 +155,14 @@ export async function POST(req: NextRequest) {
 
     const { data: bizRow, error: bizReadErr } = await admin
       .from("businesses")
-      .select("billing_plan,domain_limit")
+      .select("billing_plan,domain_limit,default_locale,enabled_locales")
       .eq("id", businessId)
-      .single<{ billing_plan: string | null; domain_limit: number | null }>();
+      .single<{
+        billing_plan: string | null;
+        domain_limit: number | null;
+        default_locale: string | null;
+        enabled_locales: string[] | null;
+      }>();
     if (bizReadErr) {
       return NextResponse.json({ error: bizReadErr.message }, { status: 400 });
     }
@@ -141,6 +170,7 @@ export async function POST(req: NextRequest) {
       billingPlan: bizRow?.billing_plan,
       domainLimit: bizRow?.domain_limit,
     });
+    const localeLimit = localeLimitForPlan(bizRow?.billing_plan);
 
     // 4) Update profile (merge-only)
     if (body.profile) {
@@ -181,9 +211,26 @@ export async function POST(req: NextRequest) {
       }
 
       const dlRaw = body.business.default_locale;
-      const defaultLocale =
-        typeof dlRaw === "string" && dlRaw.toLowerCase().startsWith("es") ? "es" : "en";
-
+      const defaultLocale = dlRaw !== undefined
+        ? normalizeLocale(dlRaw)
+        : normalizeLocale(bizRow?.default_locale);
+      const requestedEnabledLocales = normalizeEnabledLocales(body.business.enabled_locales);
+      const currentEnabledLocales = normalizeEnabledLocales(bizRow?.enabled_locales) ?? [defaultLocale];
+      const nextEnabledLocalesBase = requestedEnabledLocales ?? currentEnabledLocales;
+      const nextEnabledLocales = nextEnabledLocalesBase.includes(defaultLocale)
+        ? nextEnabledLocalesBase
+        : [...nextEnabledLocalesBase, defaultLocale];
+      if (nextEnabledLocales.length > localeLimit) {
+        return NextResponse.json(
+          {
+            error:
+              localeLimit === 1
+                ? "Your current plan allows only 1 language."
+                : `Your current plan allows up to ${localeLimit} languages.`,
+          },
+          { status: 400 }
+        );
+      }
 
       if (name !== null && name !== undefined) nextBiz.name = name;
       if (tz !== null && tz !== undefined) nextBiz.timezone = tz;
@@ -193,6 +240,9 @@ export async function POST(req: NextRequest) {
       if (assistantSettings !== undefined) nextBiz.assistant_settings = assistantSettings;
       if (domains !== null) nextBiz.allowed_domains = domains;
       if (dlRaw !== undefined) nextBiz.default_locale = defaultLocale;
+      if (body.business.enabled_locales !== undefined || dlRaw !== undefined) {
+        nextBiz.enabled_locales = nextEnabledLocales;
+      }
 
 
       if (Object.keys(nextBiz).length > 0) {
@@ -208,7 +258,9 @@ export async function POST(req: NextRequest) {
     // 6) Return current business row
     const { data: currentBiz, error: readErr } = await admin
       .from("businesses")
-      .select("id, slug, name, timezone, system_prompt, qualification_prompt, knowledge, assistant_settings, allowed_domains, public_embed_key, default_locale")
+      .select(
+        "id, slug, name, timezone, system_prompt, qualification_prompt, knowledge, assistant_settings, allowed_domains, public_embed_key, default_locale, enabled_locales, billing_plan"
+      )
       .eq("id", businessId)
       .single();
 

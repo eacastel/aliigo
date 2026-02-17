@@ -25,6 +25,7 @@ type SessionPayload = {
   theme: Theme | null;
   show_branding?: boolean;
   locale_auto?: boolean;
+  enabled_locales?: ("en" | "es")[];
 };
 
 type WidgetState = {
@@ -135,6 +136,19 @@ const UI = {
 
 function isEs(locale: string) {
   return (locale || "").toLowerCase().startsWith("es");
+}
+
+function normalizeEnabledLocales(input: unknown, fallback: "en" | "es"): ("en" | "es")[] {
+  const out: ("en" | "es")[] = [];
+  if (Array.isArray(input)) {
+    for (const raw of input) {
+      const locale = isEs(String(raw)) ? "es" : "en";
+      if (!out.includes(locale)) out.push(locale);
+    }
+  }
+  if (!out.length) out.push(fallback);
+  if (!out.includes(fallback)) out.push(fallback);
+  return out;
 }
 
 function splitPair(v?: string, defaults?: { bg: string; text: string }) {
@@ -673,7 +687,9 @@ class AliigoWidget extends HTMLElement {
       const fallbackLocale = isEs(data.locale || "en") ? "es" : "en";
       const localeAuto = Boolean(data.locale_auto);
       const detectedLocale = localeAuto ? this.detectWebsiteLocale() : null;
-      const locale = localeOverride || detectedLocale || fallbackLocale;
+      const enabledLocales = normalizeEnabledLocales(data.enabled_locales, fallbackLocale);
+      const candidateLocale = localeOverride || detectedLocale || fallbackLocale;
+      const locale = enabledLocales.includes(candidateLocale) ? candidateLocale : fallbackLocale;
 
       this.state.session = {
         token: data.token,
@@ -683,6 +699,7 @@ class AliigoWidget extends HTMLElement {
         theme: (data.theme as Theme | null) || null,
         show_branding: Boolean(data.show_branding),
         locale_auto: localeAuto,
+        enabled_locales: enabledLocales,
       };
 
       this.cachedTheme = this.state.session.theme || null;
@@ -1094,7 +1111,8 @@ class AliigoWidget extends HTMLElement {
     let locale = localeOverride || this.state.locale;
     if (!localeOverride && session?.locale_auto) {
       const detected = this.detectWebsiteLocale();
-      if (detected && detected !== locale) {
+      const enabledLocales = normalizeEnabledLocales(session?.enabled_locales, session?.locale || locale);
+      if (detected && enabledLocales.includes(detected) && detected !== locale) {
         locale = detected;
         this.state.locale = detected;
       }

@@ -20,6 +20,7 @@ type BusinessState = {
   timezone: string;
   allowed_domains_text: string;
   default_locale: "en" | "es";
+  enabled_locales: ("en" | "es")[];
 };
 
 type JoinedBusiness = {
@@ -30,6 +31,8 @@ type JoinedBusiness = {
   allowed_domains?: string[] | null;
   domain_limit?: number | null;
   default_locale?: string | null;
+  enabled_locales?: string[] | null;
+  billing_plan?: string | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -113,8 +116,10 @@ export default function SettingsBusinessPage() {
     timezone: "Europe/Madrid",
     allowed_domains_text: "",
     default_locale: "en",
+    enabled_locales: ["en"],
   });
   const [domainLimit, setDomainLimit] = useState<number>(1);
+  const [billingPlan, setBillingPlan] = useState<string>("basic");
 
   const initialProfile = useRef<ProfileState | null>(null);
   const initialBusiness = useRef<BusinessState | null>(null);
@@ -188,7 +193,9 @@ export default function SettingsBusinessPage() {
             slug,
             allowed_domains,
             domain_limit,
-            default_locale
+            default_locale,
+            enabled_locales,
+            billing_plan
           )
         `
         )
@@ -221,13 +228,28 @@ export default function SettingsBusinessPage() {
       if (data.business_id && biz) {
         setBusinessId(data.business_id);
 
-        const nextBusiness: BusinessState = {
+      const nextBusiness: BusinessState = {
           name: biz.name ?? "",
           timezone: biz.timezone ?? "Europe/Madrid",
           allowed_domains_text: domainsToBaseText(biz.allowed_domains),
           default_locale: biz.default_locale === "es" ? "es" : "en",
+          enabled_locales: (() => {
+            const langs = Array.isArray(biz.enabled_locales)
+              ? Array.from(
+                  new Set(
+                    biz.enabled_locales
+                      .map((l) => (String(l).toLowerCase().startsWith("es") ? "es" : "en"))
+                  )
+                )
+              : [];
+            const fallbackDefault = biz.default_locale === "es" ? "es" : "en";
+            if (!langs.length) langs.push(fallbackDefault);
+            if (!langs.includes(fallbackDefault)) langs.push(fallbackDefault);
+            return langs as ("en" | "es")[];
+          })(),
         };
         setDomainLimit(typeof biz.domain_limit === "number" && biz.domain_limit > 0 ? biz.domain_limit : 1);
+        setBillingPlan((biz.billing_plan || "basic").toLowerCase());
 
         setBusiness(nextBusiness);
         initialBusiness.current = nextBusiness;
@@ -238,8 +260,10 @@ export default function SettingsBusinessPage() {
           timezone: "Europe/Madrid",
           allowed_domains_text: "",
           default_locale: "en",
+          enabled_locales: ["en"],
         };
         setDomainLimit(1);
+        setBillingPlan("basic");
         setBusiness(empty);
         initialBusiness.current = empty;
       }
@@ -265,9 +289,45 @@ export default function SettingsBusinessPage() {
       business.name.trim() !== ib.name.trim() ||
       business.timezone.trim() !== ib.timezone.trim() ||
       business.allowed_domains_text.trim() !== ib.allowed_domains_text.trim() ||
-      business.default_locale !== ib.default_locale
+      business.default_locale !== ib.default_locale ||
+      [...business.enabled_locales].sort().join(",") !==
+        [...ib.enabled_locales].sort().join(",")
     );
   }, [profile, business]);
+
+  const localeLimit = useMemo(() => {
+    if (billingPlan === "growth") return 2;
+    if (billingPlan === "pro") return 3;
+    if (billingPlan === "custom") return Number.MAX_SAFE_INTEGER;
+    return 1;
+  }, [billingPlan]);
+
+  const localeOptions: Array<{ code: "en" | "es"; label: string }> = [
+    { code: "en", label: "English" },
+    { code: "es", label: "Español" },
+  ];
+
+  const toggleEnabledLocale = (localeCode: "en" | "es") => {
+    setBusiness((prev) => {
+      const hasLocale = prev.enabled_locales.includes(localeCode);
+      let next = [...prev.enabled_locales];
+      if (hasLocale) {
+        if (next.length <= 1) return prev;
+        next = next.filter((l) => l !== localeCode);
+      } else {
+        if (next.length >= localeLimit) return prev;
+        next.push(localeCode);
+      }
+      if (!next.includes(prev.default_locale)) {
+        return {
+          ...prev,
+          enabled_locales: next,
+          default_locale: next[0] ?? "en",
+        };
+      }
+      return { ...prev, enabled_locales: next };
+    });
+  };
 
   const parsedDomainState = useMemo(() => {
     const rawLines = business.allowed_domains_text
@@ -346,6 +406,7 @@ export default function SettingsBusinessPage() {
           timezone: business.timezone,
           allowed_domains: parsedDomainState.baseDomains,
           default_locale: business.default_locale,
+          enabled_locales: business.enabled_locales,
         },
       };
 
@@ -365,6 +426,7 @@ export default function SettingsBusinessPage() {
           timezone?: string | null;
           allowed_domains?: string[] | null;
           default_locale?: string | null;
+          enabled_locales?: string[] | null;
         };
       } = await res.json().catch(() => ({}));
 
@@ -382,6 +444,18 @@ export default function SettingsBusinessPage() {
           allowed_domains_text: domainsToBaseText(j.business.allowed_domains),
           default_locale:
             j.business.default_locale === "es" ? "es" : business.default_locale,
+          enabled_locales: (() => {
+            const langs = Array.isArray(j.business.enabled_locales)
+              ? Array.from(
+                  new Set(
+                    j.business.enabled_locales
+                      .map((l) => (String(l).toLowerCase().startsWith("es") ? "es" : "en"))
+                  )
+                )
+              : [];
+            if (!langs.length) langs.push(j.business.default_locale === "es" ? "es" : "en");
+            return langs as ("en" | "es")[];
+          })(),
         };
         initialBusiness.current = nextBusiness;
         setBusiness(nextBusiness);
@@ -650,15 +724,70 @@ export default function SettingsBusinessPage() {
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
                 value={business.default_locale}
                 onChange={(e) =>
-                  setBusiness((b) => ({
-                    ...b,
-                    default_locale: e.target.value === "es" ? "es" : "en",
-                  }))
+                  setBusiness((b) => {
+                    const nextDefault = e.target.value === "es" ? "es" : "en";
+                    const nextLocales: ("en" | "es")[] = b.enabled_locales.includes(nextDefault)
+                      ? b.enabled_locales
+                      : [...b.enabled_locales, nextDefault];
+                    return {
+                      ...b,
+                      default_locale: nextDefault,
+                      enabled_locales: nextLocales,
+                    };
+                  })
                 }
               >
-                <option value="en">English</option>
-                <option value="es">Español</option>
+                {localeOptions
+                  .filter((opt) => business.enabled_locales.includes(opt.code))
+                  .map((opt) => (
+                    <option key={opt.code} value={opt.code}>
+                      {opt.label}
+                    </option>
+                  ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">
+                {t("languages.label")}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {localeOptions.map((opt) => {
+                  const checked = business.enabled_locales.includes(opt.code);
+                  const blockAdd = !checked && business.enabled_locales.length >= localeLimit;
+                  const disabled = (checked && business.enabled_locales.length === 1) || blockAdd;
+                  return (
+                    <label
+                      key={opt.code}
+                      className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+                        checked
+                          ? "border-brand-600/50 bg-brand-500/10 text-brand-100"
+                          : "border-zinc-800 bg-zinc-950 text-zinc-300"
+                      } ${disabled ? "opacity-60" : ""}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleEnabledLocale(opt.code)}
+                        disabled={disabled}
+                        className="accent-emerald-500"
+                      />
+                      {opt.label}
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-zinc-500 mt-2">
+                {t("languages.limit", {
+                  count:
+                    localeLimit === Number.MAX_SAFE_INTEGER
+                      ? t("languages.unlimited")
+                      : String(localeLimit),
+                })}
+              </p>
+              {localeLimit === 1 && (
+                <p className="text-[11px] text-amber-400 mt-1">{t("languages.basicLocked")}</p>
+              )}
             </div>
 
             <div>
