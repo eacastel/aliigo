@@ -561,67 +561,54 @@
     },
     "intro": {
       "label": "Introduction (optional)",
-      "placeholder": "Short greeting or intro (only once). Leave blank to keep it natural.",
       "help": "Optional. Keep it short and friendly."
     },
     "scope": {
       "label": "Scope & boundaries (optional)",
-      "placeholder": "What the assistant should and should not answer. Any sensitive topics to avoid.",
       "help": "Optional but recommended for clarity."
     },
     "style": {
       "label": "Style rules (optional)",
-      "placeholder": "Response length, formatting preferences, do/don’t…",
       "help": "Optional. Keep it simple."
     },
     "businessSummary": {
       "label": "Business summary (required)",
-      "placeholder": "Who you are and what you do in 1–3 sentences.",
       "help": "This anchors how the assistant describes your business."
     },
     "businessDetails": {
       "label": "What you do (services / offers)",
-      "placeholder": "List services, products, or key offerings.",
       "help": "Write this as bullet points or short lines."
     },
     "keyFacts": {
       "label": "Key facts (hours, location, pricing policy)",
-      "placeholder": "Hours, location, service area, booking rules, etc.",
       "help": "Stick to factual details the assistant must get right."
     },
     "policies": {
       "label": "Policies (cancellations, refunds, limitations)",
-      "placeholder": "Cancellation windows, refunds, deposit rules, etc.",
       "help": "Only include policies you want the assistant to state."
     },
     "links": {
       "label": "Links (booking, contact, maps)",
-      "placeholder": "URLs the assistant should share.",
       "help": "General links the assistant can share when relevant."
     },
     "ctaUrls": {
       "label": "CTA URLs (signup, demo, pricing)",
-      "placeholder": "Paste any primary call-to-action URLs here.",
       "help": "These links should be used when the visitor asks how to get started."
     },
     "supportEmail": {
       "label": "Customer support email (optional)",
-      "placeholder": "support@yourbusiness.com, sales@yourbusiness.com",
       "help": "Used if the assistant needs to route someone to customer support. Separate multiple emails with commas."
     },
     "additionalBusinessInfo": {
       "label": "Additional business info (optional)",
-      "placeholder": "Anything else visitors should know.",
       "help": "Optional details that don't fit above."
     },
     "qualification": {
       "label": "Qualification (fit + lead capture)",
-      "placeholder": "Qualification flow, thresholds, when to ask for email/phone, next-step CTAs…",
       "help": "This guides how the assistant qualifies and when it should collect contact info."
     },
     "additionalInstructions": {
       "label": "Additional instructions (optional)",
-      "placeholder": "Extra rules, nuances, or edge cases.",
       "help": "Only include what really matters."
     },
     "rawPreview": {
@@ -662,6 +649,7 @@
         "soft": "guide gently toward the next step",
         "direct": "suggest a clear next step"
       },
+      "compactResponse": "Thanks for asking. {business} I’ll be {tone} and {goal}.",
       "response": "Thanks for asking — {business} I’ll be {tone} and {goal}. I’ll {handoff} and {cta}. What kind of business do you run?"
     }
   },

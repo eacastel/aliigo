@@ -562,67 +562,54 @@
     },
     "intro": {
       "label": "Introducción (opcional)",
-      "placeholder": "Saludo breve (solo una vez). Déjalo vacío para hacerlo natural.",
       "help": "Opcional. Mantenlo breve y cercano."
     },
     "scope": {
       "label": "Alcance y límites (opcional)",
-      "placeholder": "Qué puede y qué no puede responder. Temas sensibles a evitar.",
       "help": "Opcional pero recomendable para dar claridad."
     },
     "style": {
       "label": "Reglas de estilo (opcional)",
-      "placeholder": "Longitud de respuesta, formato preferido, cosas a evitar…",
       "help": "Opcional. Mantenlo simple."
     },
     "businessSummary": {
       "label": "Resumen del negocio (obligatorio)",
-      "placeholder": "Quién eres y qué haces en 1–3 frases.",
       "help": "Esto guía cómo el asistente describe tu negocio."
     },
     "businessDetails": {
       "label": "Lo que ofreces (servicios / productos)",
-      "placeholder": "Lista servicios, productos u ofertas principales.",
       "help": "Puedes usar viñetas o líneas cortas."
     },
     "keyFacts": {
       "label": "Datos clave (horario, ubicación, política de precios)",
-      "placeholder": "Horario, ubicación, zona de servicio, normas de reserva, etc.",
       "help": "Solo datos factuales que el asistente debe decir bien."
     },
     "policies": {
       "label": "Políticas (cancelaciones, reembolsos, limitaciones)",
-      "placeholder": "Ventanas de cancelación, reembolsos, depósitos, etc.",
       "help": "Incluye solo políticas que quieras que comunique."
     },
     "links": {
       "label": "Enlaces (reservas, contacto, mapas)",
-      "placeholder": "URLs que el asistente debe compartir.",
       "help": "Enlaces generales que puede compartir cuando sea útil."
     },
     "ctaUrls": {
       "label": "URLs de CTA (registro, demo, precios)",
-      "placeholder": "Pega aquí los enlaces principales de acción.",
       "help": "Estos enlaces se usan cuando el visitante pregunta cómo empezar."
     },
     "supportEmail": {
       "label": "Email de atención al cliente (opcional)",
-      "placeholder": "soporte@tudominio.com, ventas@tudominio.com",
       "help": "Se usa si el asistente necesita derivar a atención al cliente. Separa varios correos con comas."
     },
     "additionalBusinessInfo": {
       "label": "Información adicional del negocio (opcional)",
-      "placeholder": "Cualquier otra cosa que deban saber los visitantes.",
       "help": "Detalles opcionales que no encajan arriba."
     },
     "qualification": {
       "label": "Calificación (fit + captación)",
-      "placeholder": "Flujo de calificación, umbrales, cuándo pedir email/teléfono, CTAs…",
       "help": "Guía cómo el asistente califica y cuándo recoge datos."
     },
     "additionalInstructions": {
       "label": "Instrucciones adicionales (opcional)",
-      "placeholder": "Reglas extra, matices o casos especiales.",
       "help": "Añade solo lo que realmente importe."
     },
     "rawPreview": {
@@ -663,6 +650,7 @@
         "soft": "guiar con suavidad el siguiente paso",
         "direct": "sugerir un siguiente paso claro"
       },
+      "compactResponse": "Gracias por preguntar. {business} Seré {tone} y {goal}.",
       "response": "Gracias por preguntar — {business} Seré {tone} y {goal}. Voy a {handoff} y {cta}. ¿Qué tipo de negocio tienes?"
     }
   },
