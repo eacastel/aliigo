@@ -617,8 +617,10 @@
       "empty": "Nothing to preview yet."
     },
     "actions": {
-      "save": "Save",
+      "saveDraft": "Save draft",
+      "publish": "Publish changes",
       "saving": "Saving…",
+      "publishing": "Publishing…",
       "reset": "Reset changes",
       "unsaved": "You have unsaved changes."
     },
@@ -651,6 +653,24 @@
       },
       "compactResponse": "Thanks for asking. {business} I’ll be {tone} and {goal}.",
       "response": "Thanks for asking — {business} I’ll be {tone} and {goal}. I’ll {handoff} and {cta}. What kind of business do you run?"
+    },
+    "workflow": {
+      "title": "Review and publish",
+      "desc": "Save changes as draft and publish after review.",
+      "lastDraft": "Last draft",
+      "lastPublished": "Last publish",
+      "never": "Never",
+      "loadedDraft": "Your latest saved draft was loaded.",
+      "missingRequired": "Missing required fields",
+      "noneMissing": "No required fields are missing.",
+      "ack": "I confirm I’m authorized to import and publish this content and understand Aliigo is not responsible for errors or omissions in applied information.",
+      "ackRequiredError": "You must confirm authorization before publishing.",
+      "missingRequiredError": "Required fields are missing before publishing.",
+      "draftSaved": "Draft saved.",
+      "saveDraftError": "Could not save draft",
+      "published": "Changes published.",
+      "publishError": "Could not publish",
+      "loginRequired": "You must be logged in to continue."
     }
   },
   "Landing": {

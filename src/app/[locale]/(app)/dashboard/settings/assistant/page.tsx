@@ -83,6 +83,23 @@ type AssistantSettings = {
   };
 };
 
+type AssistantSettingsEnvelope = AssistantSettings & {
+  draft?: {
+    form?: Partial<AssistantForm>;
+    sourceUrl?: string | null;
+    fieldStatuses?: Record<string, "suggested" | "needs_review" | "missing">;
+    savedAt?: string;
+    savedBy?: string;
+  } | null;
+  workflow?: {
+    lastDraftSavedAt?: string;
+    lastDraftSavedBy?: string;
+    lastPublishedAt?: string;
+    lastPublishedBy?: string;
+    lastMissingRequired?: string[];
+  };
+};
+
 const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "");
 
 const sanitizeMarkdown = (value: string) =>
@@ -280,12 +297,29 @@ function hasAdvancedContent(form: AssistantForm) {
   );
 }
 
+const REQUIRED_FIELDS: Array<{
+  key: keyof AssistantForm;
+  labelKey:
+    | "businessSummary.label"
+    | "businessDetails.label"
+    | "keyFacts.label"
+    | "ctaUrls.label"
+    | "supportEmail.label";
+}> = [
+  { key: "businessSummary", labelKey: "businessSummary.label" },
+  { key: "businessDetails", labelKey: "businessDetails.label" },
+  { key: "keyFacts", labelKey: "keyFacts.label" },
+  { key: "ctaUrls", labelKey: "ctaUrls.label" },
+  { key: "supportEmail", labelKey: "supportEmail.label" },
+];
+
 export default function SettingsAssistantPage() {
   const router = useRouter();
   const t = useTranslations("AssistantSettings");
 
   const [loading, setLoading] = useState(true);
   const [unauth, setUnauth] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const [businessId, setBusinessId] = useState<string | null>(null);
 
   const [assistant, setAssistant] = useState<AssistantState>({
@@ -313,12 +347,13 @@ export default function SettingsAssistantPage() {
     additionalBusinessInfo: "",
     qualificationPrompt: "",
   });
+  const [ackAuthorized, setAckAuthorized] = useState(false);
+  const [settingsEnvelope, setSettingsEnvelope] =
+    useState<AssistantSettingsEnvelope | null>(null);
 
   const initialAssistant = useRef<AssistantState | null>(null);
-  const lastSavedForm = useRef<AssistantForm | null>(null);
-  const presetSaveTimer = useRef<number | null>(null);
-
   const [msg, setMsg] = useState<string | null>(null);
+  const [msgTone, setMsgTone] = useState<"success" | "error">("success");
   const [saving, setSaving] = useState(false);
   const [editorMode, setEditorMode] = useState<"quick" | "advanced">("quick");
 
@@ -341,6 +376,7 @@ export default function SettingsAssistantPage() {
         setUnauth(true);
         return;
       }
+      setUserId(uid);
 
       const { data, error } = await supabase
         .from("business_profiles")
@@ -362,11 +398,13 @@ export default function SettingsAssistantPage() {
 
       if (error) {
         console.error("[settings-assistant] join error:", error.message);
+        setMsgTone("error");
         setMsg("Could not load your assistant settings.");
         return;
       }
 
       if (!isProfileJoinRow(data)) {
+        setMsgTone("error");
         setMsg("Profile not found. Please log in again.");
         return;
       }
@@ -383,12 +421,14 @@ export default function SettingsAssistantPage() {
 
         const parsedSystem = parseSystemPrompt(next.system_prompt);
         const parsedKnowledge = parseKnowledge(next.knowledge);
-        const settings = biz.assistant_settings ?? null;
+        const settings = (biz.assistant_settings ?? null) as AssistantSettingsEnvelope | null;
+        setSettingsEnvelope(settings);
+        const draftForm = settings?.draft?.form ?? null;
         const systemFromSettings = settings?.system ?? {};
         const knowledgeFromSettings = settings?.knowledge ?? {};
 
         setAssistant(next);
-        const nextForm: AssistantForm = {
+        const nextFormBase: AssistantForm = {
           tone: systemFromSettings.tone ?? parsedSystem.tone,
           goal: systemFromSettings.goal ?? parsedSystem.goal,
           handoff: systemFromSettings.handoff ?? parsedSystem.handoff,
@@ -413,43 +453,27 @@ export default function SettingsAssistantPage() {
             knowledgeFromSettings.additionalBusinessInfo ??
             parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
+        };
+        const nextForm: AssistantForm = {
+          ...nextFormBase,
+          ...(draftForm ?? {}),
         };
 
         setForm((f) => ({
           ...f,
           ...nextForm,
         }));
+        setAckAuthorized(false);
         setEditorMode(hasAdvancedContent(nextForm) ? "advanced" : "quick");
 
         initialAssistant.current = next;
-        lastSavedForm.current = {
-          tone: systemFromSettings.tone ?? parsedSystem.tone,
-          goal: systemFromSettings.goal ?? parsedSystem.goal,
-          handoff: systemFromSettings.handoff ?? parsedSystem.handoff,
-          cta: systemFromSettings.cta ?? parsedSystem.cta,
-          intro: systemFromSettings.intro ?? parsedSystem.intro,
-          scope: systemFromSettings.scope ?? parsedSystem.scope,
-          styleRules: systemFromSettings.styleRules ?? parsedSystem.styleRules,
-          additionalInstructions:
-            systemFromSettings.additionalInstructions ??
-            parsedSystem.additionalInstructions,
-          businessSummary:
-            knowledgeFromSettings.businessSummary ?? parsedKnowledge.businessSummary,
-          businessDetails:
-            knowledgeFromSettings.businessDetails ?? parsedKnowledge.businessDetails,
-          keyFacts: knowledgeFromSettings.keyFacts ?? parsedKnowledge.keyFacts,
-          policies: knowledgeFromSettings.policies ?? parsedKnowledge.policies,
-          links: knowledgeFromSettings.links ?? parsedKnowledge.links,
-          ctaUrls: knowledgeFromSettings.ctaUrls ?? parsedKnowledge.ctaUrls,
-          supportEmail:
-            knowledgeFromSettings.supportEmail ?? parsedKnowledge.supportEmail,
-          additionalBusinessInfo:
-            knowledgeFromSettings.additionalBusinessInfo ??
-            parsedKnowledge.additionalBusinessInfo,
-          qualificationPrompt: next.qualification_prompt,
-        };
+        if (settings?.draft?.savedAt) {
+          setMsgTone("success");
+          setMsg(t("workflow.loadedDraft"));
+        }
       } else {
         setBusinessId(null);
+        setSettingsEnvelope(null);
         const empty = {
           system_prompt: "",
           qualification_prompt: "",
@@ -476,7 +500,6 @@ export default function SettingsAssistantPage() {
           qualificationPrompt: "",
         });
         initialAssistant.current = empty;
-        lastSavedForm.current = null;
       }
     } finally {
       setLoading(false);
@@ -501,6 +524,20 @@ export default function SettingsAssistantPage() {
     );
   }, [assistant, form]);
 
+  const missingRequired = useMemo(() => {
+    return REQUIRED_FIELDS.filter(({ key }) => form[key].trim().length === 0).map(
+      ({ key }) => key,
+    );
+  }, [form]);
+
+  const fieldStatuses = useMemo(() => {
+    const status: Record<string, "suggested" | "needs_review" | "missing"> = {};
+    for (const { key } of REQUIRED_FIELDS) {
+      status[key] = form[key].trim().length > 0 ? "needs_review" : "missing";
+    }
+    return status;
+  }, [form]);
+
   const previewText = useMemo(() => {
     return t("preview.compactResponse", {
       tone: t(`preview.tone.${form.tone}`),
@@ -509,49 +546,118 @@ export default function SettingsAssistantPage() {
     });
   }, [form.tone, form.goal, t]);
 
-  const rawPromptPreview = useMemo(() => {
-    const sanitized = sanitizeForm(form);
-    const system = composeSystemPrompt(sanitized).trim();
-    const knowledge = composeKnowledge(sanitized).trim();
-    const qualification = sanitized.qualificationPrompt.trim();
+  const saveDraft = async () => {
+    setMsg(null);
+    if (!dirty) return;
 
-    return [
-      "### System Prompt",
-      system,
-      "",
-      "### Business Knowledge",
-      knowledge,
-      "",
-      "### Qualification",
-      qualification,
-    ]
-      .join("\n")
-      .trim();
-  }, [form]);
-
-  const autosavePresets = async () => {
-    const saved = lastSavedForm.current;
-    if (!saved) return;
-    if (!initialAssistant.current) return;
-    if (saving) return;
-
-    const nextForm: AssistantForm = {
-      ...saved,
-      tone: form.tone,
-      goal: form.goal,
-      handoff: form.handoff,
-      cta: form.cta,
-    };
-
-    const sanitizedForm = sanitizeForm(nextForm);
-    const composedSystem = composeSystemPrompt(sanitizedForm);
-    const composedKnowledge = composeKnowledge(sanitizedForm);
-    const assistantSettings = toAssistantSettings(sanitizedForm);
-
+    setSaving(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess.session?.access_token;
-      if (!token) return;
+      const uid = sess.session?.user?.id ?? userId;
+      if (!token || !uid) {
+        setMsgTone("error");
+        setMsg(t("workflow.loginRequired"));
+        setUnauth(true);
+        return;
+      }
+
+      const now = new Date().toISOString();
+      const previous = settingsEnvelope ?? {};
+      const nextEnvelope: AssistantSettingsEnvelope = {
+        ...previous,
+        system: previous.system ?? toAssistantSettings(sanitizeForm(form)).system,
+        knowledge:
+          previous.knowledge ?? toAssistantSettings(sanitizeForm(form)).knowledge,
+        draft: {
+          form,
+          sourceUrl: previous.draft?.sourceUrl ?? null,
+          fieldStatuses,
+          savedAt: now,
+          savedBy: uid,
+        },
+        workflow: {
+          ...(previous.workflow ?? {}),
+          lastDraftSavedAt: now,
+          lastDraftSavedBy: uid,
+          lastMissingRequired: missingRequired.map(String),
+        },
+      };
+
+      const res = await fetch("/api/settings/business", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          business: {
+            assistant_settings: nextEnvelope,
+          },
+        }),
+      });
+
+      const j: { error?: string } = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setMsgTone("error");
+        setMsg(`${t("workflow.saveDraftError")}: ${j.error || "unknown"}`);
+        return;
+      }
+
+      setSettingsEnvelope(nextEnvelope);
+      setMsgTone("success");
+      setMsg(t("workflow.draftSaved"));
+    } catch (e) {
+      console.error("[settings-assistant] saveDraft", e);
+      setMsgTone("error");
+      setMsg(t("workflow.saveDraftError"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const publish = async () => {
+    setMsg(null);
+    if (!dirty) return;
+    if (missingRequired.length > 0) {
+      setMsgTone("error");
+      setMsg(t("workflow.missingRequiredError"));
+      return;
+    }
+    if (!ackAuthorized) {
+      setMsgTone("error");
+      setMsg(t("workflow.ackRequiredError"));
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const uid = sess.session?.user?.id ?? userId;
+      if (!token || !uid) {
+        setMsgTone("error");
+        setMsg(t("workflow.loginRequired"));
+        setUnauth(true);
+        return;
+      }
+
+      const sanitizedForm = sanitizeForm(form);
+      const composedSystem = composeSystemPrompt(sanitizedForm);
+      const composedKnowledge = composeKnowledge(sanitizedForm);
+      const now = new Date().toISOString();
+
+      const nextEnvelope: AssistantSettingsEnvelope = {
+        ...(settingsEnvelope ?? {}),
+        ...toAssistantSettings(sanitizedForm),
+        draft: null,
+        workflow: {
+          ...(settingsEnvelope?.workflow ?? {}),
+          lastPublishedAt: now,
+          lastPublishedBy: uid,
+          lastMissingRequired: [],
+        },
+      };
 
       const res = await fetch("/api/settings/business", {
         method: "POST",
@@ -564,93 +670,9 @@ export default function SettingsAssistantPage() {
             system_prompt: composedSystem,
             qualification_prompt: sanitizedForm.qualificationPrompt,
             knowledge: composedKnowledge,
-            assistant_settings: assistantSettings,
+            assistant_settings: nextEnvelope,
           },
         }),
-      });
-
-      if (!res.ok) return;
-
-      const j: {
-        business?: {
-          system_prompt?: string | null;
-          qualification_prompt?: string | null;
-          knowledge?: string | null;
-          assistant_settings?: AssistantSettings | null;
-        };
-      } = await res.json().catch(() => ({}));
-
-      const next: AssistantState = {
-        system_prompt: (j.business?.system_prompt ?? composedSystem).trim(),
-        qualification_prompt: (
-          j.business?.qualification_prompt ?? sanitizedForm.qualificationPrompt
-        ).trim(),
-        knowledge: (j.business?.knowledge ?? composedKnowledge).trim(),
-      };
-
-      initialAssistant.current = next;
-      setAssistant(next);
-      lastSavedForm.current = sanitizedForm;
-      setMsg(null);
-    } catch (e) {
-      console.error("[settings-assistant] autosave presets failed", e);
-    }
-  };
-
-  useEffect(() => {
-    if (!lastSavedForm.current) return;
-    if (presetSaveTimer.current) {
-      window.clearTimeout(presetSaveTimer.current);
-    }
-    presetSaveTimer.current = window.setTimeout(() => {
-      void autosavePresets();
-    }, 600);
-
-    return () => {
-      if (presetSaveTimer.current) {
-        window.clearTimeout(presetSaveTimer.current);
-      }
-    };
-  }, [form.tone, form.goal, form.handoff, form.cta]);
-
-  // valid even if empty; let them clear fields
-  const save = async () => {
-    setMsg(null);
-    if (!dirty) return;
-
-    setSaving(true);
-    try {
-      const { data: sess } = await supabase.auth.getSession();
-      const token = sess.session?.access_token;
-
-      if (!token) {
-        setMsg("You must be logged in.");
-        setUnauth(true);
-        return;
-      }
-
-      // IMPORTANT: only send assistant fields; do not touch domains/locale/etc
-      const sanitizedForm = sanitizeForm(form);
-      const composedSystem = composeSystemPrompt(sanitizedForm);
-      const composedKnowledge = composeKnowledge(sanitizedForm);
-      const assistantSettings = toAssistantSettings(sanitizedForm);
-
-      const payload = {
-        business: {
-          system_prompt: composedSystem,
-          qualification_prompt: sanitizedForm.qualificationPrompt,
-          knowledge: composedKnowledge,
-          assistant_settings: assistantSettings,
-        },
-      };
-
-      const res = await fetch("/api/settings/business", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
       });
 
       const j: {
@@ -659,12 +681,13 @@ export default function SettingsAssistantPage() {
           system_prompt?: string | null;
           qualification_prompt?: string | null;
           knowledge?: string | null;
-          assistant_settings?: AssistantSettings | null;
+          assistant_settings?: AssistantSettingsEnvelope | null;
         };
       } = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setMsg(`Save error: ${j.error || "unknown"}`);
+        setMsgTone("error");
+        setMsg(`${t("workflow.publishError")}: ${j.error || "unknown"}`);
         return;
       }
 
@@ -680,11 +703,14 @@ export default function SettingsAssistantPage() {
 
       initialAssistant.current = next;
       setAssistant(next);
-      lastSavedForm.current = sanitizedForm;
-      setMsg("Saved.");
-    } catch (e: unknown) {
-      console.error(e);
-      setMsg("Could not save now. Try again.");
+      setSettingsEnvelope((j.business?.assistant_settings ?? nextEnvelope) as AssistantSettingsEnvelope);
+      setAckAuthorized(false);
+      setMsgTone("success");
+      setMsg(t("workflow.published"));
+    } catch (e) {
+      console.error("[settings-assistant] publish", e);
+      setMsgTone("error");
+      setMsg(t("workflow.publishError"));
     } finally {
       setSaving(false);
     }
@@ -731,13 +757,55 @@ export default function SettingsAssistantPage() {
       <p className="mb-6 text-sm text-zinc-400">{t("description")}</p>
       {msg && (
         <div
-          className={`mb-4 text-sm ${
-            msg.startsWith("Saved") ? "text-green-400" : "text-red-400"
-          }`}
+          className={`mb-4 text-sm ${msgTone === "error" ? "text-red-400" : "text-green-400"}`}
         >
           {msg}
         </div>
       )}
+
+      <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+        <div className="text-sm font-semibold text-zinc-100">{t("workflow.title")}</div>
+        <p className="text-xs text-zinc-400">{t("workflow.desc")}</p>
+        <div className="grid gap-2 text-xs text-zinc-300">
+          <div>
+            {t("workflow.lastDraft")}:{" "}
+            <span className="text-zinc-400">
+              {settingsEnvelope?.workflow?.lastDraftSavedAt || t("workflow.never")}
+            </span>
+          </div>
+          <div>
+            {t("workflow.lastPublished")}:{" "}
+            <span className="text-zinc-400">
+              {settingsEnvelope?.workflow?.lastPublishedAt || t("workflow.never")}
+            </span>
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-medium text-zinc-200 mb-1">
+            {t("workflow.missingRequired")} ({missingRequired.length})
+          </div>
+          {missingRequired.length === 0 ? (
+            <div className="text-xs text-green-300">{t("workflow.noneMissing")}</div>
+          ) : (
+            <ul className="text-xs text-amber-300 list-disc pl-5 space-y-1">
+              {REQUIRED_FIELDS.filter(({ key }) => missingRequired.includes(key)).map(
+                ({ key, labelKey }) => (
+                  <li key={key}>{t(labelKey)}</li>
+                ),
+              )}
+            </ul>
+          )}
+        </div>
+        <label className="flex items-start gap-2 text-xs text-zinc-300">
+          <input
+            type="checkbox"
+            checked={ackAuthorized}
+            onChange={(e) => setAckAuthorized(e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>{t("workflow.ack")}</span>
+        </label>
+      </section>
 
       <section className="space-y-6">
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
@@ -1127,11 +1195,19 @@ export default function SettingsAssistantPage() {
 
         <div className="flex gap-2">
           <button
-            onClick={save}
+            onClick={saveDraft}
             disabled={!dirty || saving}
             className={btnBrand}
           >
-            {saving ? t("actions.saving") : t("actions.save")}
+            {saving ? t("actions.saving") : t("actions.saveDraft")}
+          </button>
+
+          <button
+            onClick={publish}
+            disabled={!dirty || saving}
+            className={btnNeutral}
+          >
+            {saving ? t("actions.publishing") : t("actions.publish")}
           </button>
 
           <button onClick={() => void load()} className={btnNeutral}>
@@ -1145,8 +1221,11 @@ export default function SettingsAssistantPage() {
           <div className="mx-auto max-w-5xl rounded-xl border border-zinc-800 bg-zinc-950/90 backdrop-blur px-4 py-3 flex items-center justify-between gap-3">
             <div className="text-xs text-zinc-400">{t("actions.unsaved")}</div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving} className={btnBrand}>
-                {saving ? t("actions.saving") : t("actions.save")}
+              <button onClick={saveDraft} disabled={saving} className={btnBrand}>
+                {saving ? t("actions.saving") : t("actions.saveDraft")}
+              </button>
+              <button onClick={publish} disabled={saving} className={btnNeutral}>
+                {saving ? t("actions.publishing") : t("actions.publish")}
               </button>
               <button onClick={() => void load()} className={btnNeutral}>
                 {t("actions.reset")}

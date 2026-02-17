@@ -618,8 +618,10 @@
       "empty": "Todavía no hay contenido para previsualizar."
     },
     "actions": {
-      "save": "Guardar",
+      "saveDraft": "Guardar borrador",
+      "publish": "Publicar cambios",
       "saving": "Guardando…",
+      "publishing": "Publicando…",
       "reset": "Restablecer cambios",
       "unsaved": "Tienes cambios sin guardar."
     },
@@ -652,6 +654,24 @@
       },
       "compactResponse": "Gracias por preguntar. {business} Seré {tone} y {goal}.",
       "response": "Gracias por preguntar — {business} Seré {tone} y {goal}. Voy a {handoff} y {cta}. ¿Qué tipo de negocio tienes?"
+    },
+    "workflow": {
+      "title": "Revisión y publicación",
+      "desc": "Guarda cambios como borrador y publícalos cuando estén revisados.",
+      "lastDraft": "Último borrador",
+      "lastPublished": "Última publicación",
+      "never": "Nunca",
+      "loadedDraft": "Se cargó tu último borrador guardado.",
+      "missingRequired": "Campos obligatorios pendientes",
+      "noneMissing": "No faltan campos obligatorios.",
+      "ack": "Confirmo que estoy autorizado para importar y publicar este contenido y que Aliigo no es responsable de errores u omisiones en la información aplicada.",
+      "ackRequiredError": "Debes confirmar la autorización antes de publicar.",
+      "missingRequiredError": "Faltan campos obligatorios antes de publicar.",
+      "draftSaved": "Borrador guardado.",
+      "saveDraftError": "No se pudo guardar el borrador",
+      "published": "Cambios publicados.",
+      "publishError": "No se pudo publicar",
+      "loginRequired": "Debes iniciar sesión para continuar."
     }
   },
   "Landing": {
