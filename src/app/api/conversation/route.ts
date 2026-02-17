@@ -716,6 +716,10 @@ Universal guardrails (always on):
 - Always reply in the user’s language; follow if they switch.`;
 
     const knowledge = (bizRes.data?.knowledge ?? "").trim();
+    const isAliigoSite = host === aliigoHost() || bizSlug === "aliigo";
+    const strictKnowledgeMode = process.env.STRICT_KNOWLEDGE_MODE !== "false";
+    const blockUnverifiedAnswers = strictKnowledgeMode && !isAliigoSite && knowledge.length === 0;
+
     if (knowledge) {
       sys += `
 
@@ -723,7 +727,6 @@ Business knowledge (authoritative):
 ${knowledge}`;
     }
 
-    const isAliigoSite = host === aliigoHost() || bizSlug === "aliigo";
     if (isAliigoSite) {
       const basic = formatPlanPrice({
         amount: planPriceAmount(currency as AliigoCurrency, "basic"),
@@ -807,7 +810,24 @@ Rules:
       });
     }
 
-    if (openai) {
+    if (blockUnverifiedAnswers) {
+      reply =
+        locale === "es"
+          ? "Aún no tengo información verificada de este sitio. Déjanos tu pregunta y te contactamos en breve."
+          : "I don’t have verified information for this site yet. Leave your question and we’ll follow up shortly.";
+      actions = [
+        {
+          type: "collect_lead",
+          fields: ["name", "email"],
+          reason:
+            locale === "es"
+              ? "Recoger datos para responder con información validada."
+              : "Collect details to follow up with verified information.",
+        },
+      ];
+    }
+
+    if (openai && !blockUnverifiedAnswers) {
       try {
         const toolDef: OpenAI.Chat.Completions.ChatCompletionTool = {
           type: "function",
