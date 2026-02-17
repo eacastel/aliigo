@@ -277,6 +277,8 @@
     "publicEmbedKey": "Public embed key",
     "previewToken": "Preview token (dev)",
     "brand": "Brand",
+    "showPoweredBy": "Show “Powered by Aliigo”",
+    "showPoweredByHelp": "Basic always shows branding. Growth, Pro, and Custom can toggle this.",
     "headerLogoUrl": "Header logo URL (Growth+)",
     "headerLogoHelp": "Optional. Icon appears only on Growth, Pro, and Custom when this URL is set.",
     "embedSnippet": "Embed snippet",

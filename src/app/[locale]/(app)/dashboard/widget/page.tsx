@@ -18,6 +18,7 @@ type Theme = {
   panelBg: string;   
   panelOpacity: number;   
   headerLogoUrl: string;
+  showBranding: boolean;
 };
 
 type ThemeDb = Partial<Theme>;
@@ -99,6 +100,7 @@ const DEFAULT_THEME: Theme = {
   panelBg: "#09090b",
   panelOpacity: 0.72,
   headerLogoUrl: "",
+  showBranding: false,
 };
 
 function mergeTheme(db: ThemeDb | null | undefined): Theme {
@@ -120,6 +122,7 @@ function toThemeDb(x: unknown): ThemeDb | undefined {
   if (typeof o.panelBg === "string") out.panelBg = o.panelBg;
   if (typeof o.panelOpacity === "number") out.panelOpacity = o.panelOpacity;
   if (typeof o.headerLogoUrl === "string") out.headerLogoUrl = o.headerLogoUrl;
+  if (typeof o.showBranding === "boolean") out.showBranding = o.showBranding;
 
 
   return out;
@@ -384,6 +387,7 @@ export default function WidgetSettingsPage() {
     panelBg: theme.panelBg,
     panelOpacity: theme.panelOpacity,
     headerLogoUrl: theme.headerLogoUrl,
+    showBranding: theme.showBranding,
   });
 }, [theme]);
 
@@ -416,6 +420,7 @@ export default function WidgetSettingsPage() {
             sendText: theme.sendText,
             panelBg: theme.panelBg,
             panelOpacity: theme.panelOpacity,
+            showBranding: theme.showBranding,
           },
           brand_name: brand,
         }),
@@ -756,6 +761,30 @@ export default function WidgetSettingsPage() {
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
             />
+          </div>
+
+          <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm text-zinc-200">{t("showPoweredBy")}</div>
+                <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByHelp")}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={theme.showBranding}
+                onClick={() => setTheme((prev) => ({ ...prev, showBranding: !prev.showBranding }))}
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                  theme.showBranding ? "bg-brand-500/70" : "bg-zinc-700"
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    theme.showBranding ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </label>
           </div>
 
           <div className="space-y-2">

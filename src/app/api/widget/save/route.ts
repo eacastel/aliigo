@@ -14,6 +14,8 @@ type Theme = {
   sendText: string;
   panelBg?: string;
   panelOpacity?: number;
+  headerLogoUrl?: string;
+  showBranding?: boolean;
 };
 type ThemeDb = Partial<Theme>;
 

@@ -107,8 +107,11 @@ export async function GET(req: NextRequest) {
       bizRes.data.widget_theme && typeof bizRes.data.widget_theme === "object"
         ? { ...(bizRes.data.widget_theme as Record<string, unknown>) }
         : {};
-    const showBranding =
+    const isBasicPlan =
       bizRes.data.billing_plan === "basic" || bizRes.data.billing_plan === "starter";
+    const showBrandingPref =
+      typeof themeObj.showBranding === "boolean" ? themeObj.showBranding : null;
+    const showBranding = isBasicPlan || showBrandingPref === true;
     const showHeaderIcon =
       bizRes.data.billing_plan === "growth" ||
       bizRes.data.billing_plan === "pro" ||
