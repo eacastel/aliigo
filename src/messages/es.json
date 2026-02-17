@@ -304,7 +304,10 @@
       "reset": "Restablecer",
       "generateToken": "Generar token",
       "rotatePublicKey": "Rotar clave pública",
-      "advancedSettings": "Ajustes avanzados"
+      "advancedSettings": "Ajustes avanzados",
+      "uploadLogo": "Subir logo",
+      "replaceLogo": "Reemplazar logo",
+      "removeLogo": "Eliminar logo"
     },
     "advanced": {
       "title": "Ajustes avanzados del widget",

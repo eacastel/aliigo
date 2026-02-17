@@ -841,26 +841,33 @@ class AliigoWidget extends HTMLElement {
       /* --- Header --- */
       .header {
         padding: 16px 20px;
+        position: relative;
+        overflow: visible;
         display: flex; align-items: center; justify-content: space-between;
         border-bottom: 1px solid rgba(0,0,0,0.05);
         font-weight: 600;
         font-size: 16px;
         letter-spacing: -0.01em;
       }
+      .header.has-logo .header-main {
+        padding-left: 52px;
+      }
       .header-main {
         min-width: 0;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
       }
       .header-icon {
-        width: 20px;
-        height: 20px;
+        width: 40px;
+        height: 40px;
         border-radius: 4px;
         object-fit: contain;
         display: block;
-        border: 1px solid rgba(255,255,255,0.35);
-        flex: 0 0 auto;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
       }
       .header-title {
         min-width: 0;
@@ -1312,9 +1319,9 @@ class AliigoWidget extends HTMLElement {
           ${
             hideHeader
               ? ""
-              : `<div class="header" style="background:${header.bg};color:${header.text};">
+              : `<div class="header ${shouldShowHeaderLogo ? "has-logo" : ""}" style="background:${header.bg};color:${header.text};">
+            ${shouldShowHeaderLogo ? `<img class="header-icon" src="${safeHeaderLogoUrl}" alt="" onerror="this.style.display='none'" />` : ``}
             <div class="header-main">
-              ${shouldShowHeaderLogo ? `<img class="header-icon" src="${safeHeaderLogoUrl}" alt="" onerror="this.style.display='none'" />` : ``}
               <span class="header-title">${t.title(brand)}</span>
             </div>
             ${variant === "floating" ? `<button class="close" aria-label="Close" style="color:${header.text};">×</button>` : ``}

@@ -303,7 +303,10 @@
       "reset": "Reset",
       "generateToken": "Generate token",
       "rotatePublicKey": "Rotate public key",
-      "advancedSettings": "Advanced settings"
+      "advancedSettings": "Advanced settings",
+      "uploadLogo": "Upload logo",
+      "replaceLogo": "Replace logo",
+      "removeLogo": "Remove logo"
     },
     "advanced": {
       "title": "Widget advanced settings",

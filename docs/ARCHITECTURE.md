@@ -79,6 +79,14 @@
 - Embed session endpoints include both `locale_auto` and `enabled_locales`.
 - Widget auto-detection switches language only when detected locale is in `enabled_locales`.
 
+## Widget logo (Growth+)
+- Header logo file is uploaded to Supabase Storage bucket `business-assets` (private).
+- `businesses.widget_header_logo_path` stores object path.
+- Upload/delete API: `src/app/api/widget/logo/route.ts`.
+- Embed session routes attach a short-lived signed URL into widget theme (`headerLogoUrl`) when:
+  - plan is `growth`, `pro`, or `custom`
+  - `widget_header_logo_path` exists.
+
 ## Signup flow notes
 - Public signup form now collects only:
   - email

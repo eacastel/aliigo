@@ -203,6 +203,9 @@ export default function WidgetSettingsPage() {
   const [previewSessionToken, setPreviewSessionToken] = useState<string | null>(null);
   const [previewLocale, setPreviewLocale] = useState<"en" | "es">("en");
   const [previewShowBranding, setPreviewShowBranding] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>("");
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [logoMsg, setLogoMsg] = useState<string | null>(null);
 
   type BizRow = {
     id: string;
@@ -309,6 +312,22 @@ export default function WidgetSettingsPage() {
         }
       }
 
+      if (accessToken) {
+        const logoRes = await fetch("/api/widget/logo", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const logoJson = (await logoRes.json().catch(() => ({}))) as {
+          ok?: boolean;
+          hasLogo?: boolean;
+          logoUrl?: string | null;
+        };
+        const nextLogoUrl = logoRes.ok && logoJson.ok && logoJson.hasLogo && logoJson.logoUrl
+          ? logoJson.logoUrl
+          : "";
+        setLogoUrl(nextLogoUrl);
+      }
+
 
       const effectiveBrand = (b.brand_name || b.name || "Aliigo").trim();
       setBrand(effectiveBrand);
@@ -330,6 +349,10 @@ export default function WidgetSettingsPage() {
 
     })();
   }, []);
+
+  useEffect(() => {
+    setTheme((prev) => ({ ...prev, headerLogoUrl: logoUrl }));
+  }, [logoUrl]);
 
   const dirty = useMemo(() => {
     const themeDirty = JSON.stringify(theme) !== JSON.stringify(initialTheme);
@@ -384,7 +407,16 @@ export default function WidgetSettingsPage() {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          widget_theme: theme,
+          widget_theme: {
+            headerBg: theme.headerBg,
+            headerText: theme.headerText,
+            bubbleUser: theme.bubbleUser,
+            bubbleBot: theme.bubbleBot,
+            sendBg: theme.sendBg,
+            sendText: theme.sendText,
+            panelBg: theme.panelBg,
+            panelOpacity: theme.panelOpacity,
+          },
           brand_name: brand,
         }),
       });
@@ -419,6 +451,70 @@ export default function WidgetSettingsPage() {
       setMsg(t("messages.saveNowError"));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const uploadHeaderLogo = async (file: File | null) => {
+    if (!file) return;
+    setLogoBusy(true);
+    setLogoMsg(null);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const accessToken = sess.session?.access_token;
+      if (!accessToken) {
+        setLogoMsg(t("messages.loginRequired"));
+        return;
+      }
+
+      const formData = new FormData();
+      formData.set("file", file);
+      const res = await fetch("/api/widget/logo", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: formData,
+      });
+      const j = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        logoUrl?: string | null;
+        error?: string;
+      };
+      if (!res.ok || !j.ok) {
+        setLogoMsg(j.error || t("messages.saveError"));
+        return;
+      }
+      const next = j.logoUrl || "";
+      setLogoUrl(next);
+      setTheme((prev) => ({ ...prev, headerLogoUrl: next }));
+      setLogoMsg(t("messages.saved"));
+    } finally {
+      setLogoBusy(false);
+    }
+  };
+
+  const removeHeaderLogo = async () => {
+    setLogoBusy(true);
+    setLogoMsg(null);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const accessToken = sess.session?.access_token;
+      if (!accessToken) {
+        setLogoMsg(t("messages.loginRequired"));
+        return;
+      }
+      const res = await fetch("/api/widget/logo", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const j = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!res.ok || !j.ok) {
+        setLogoMsg(j.error || t("messages.saveError"));
+        return;
+      }
+      setLogoUrl("");
+      setTheme((prev) => ({ ...prev, headerLogoUrl: "" }));
+      setLogoMsg(t("messages.saved"));
+    } finally {
+      setLogoBusy(false);
     }
   };
 
@@ -662,17 +758,59 @@ export default function WidgetSettingsPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm text-zinc-300 mb-1">{t("headerLogoUrl")}</label>
+          <div className="space-y-2">
+            <label className="block text-sm text-zinc-300">{t("headerLogoUrl")}</label>
+            {logoUrl ? (
+              <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
+                <img src={logoUrl} alt="" className="h-8 w-8 rounded object-contain border border-zinc-700" />
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    className={btnNeutral}
+                    disabled={logoBusy}
+                    onClick={() => {
+                      const input = document.getElementById("widget-logo-input") as HTMLInputElement | null;
+                      input?.click();
+                    }}
+                  >
+                    {t("buttons.replaceLogo")}
+                  </button>
+                  <button
+                    type="button"
+                    className={btnNeutralStrong}
+                    disabled={logoBusy}
+                    onClick={removeHeaderLogo}
+                  >
+                    {t("buttons.removeLogo")}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className={btnNeutral}
+                disabled={logoBusy}
+                onClick={() => {
+                  const input = document.getElementById("widget-logo-input") as HTMLInputElement | null;
+                  input?.click();
+                }}
+              >
+                {t("buttons.uploadLogo")}
+              </button>
+            )}
             <input
-              className="w-full border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
-              placeholder="https://example.com/logo.png"
-              value={theme.headerLogoUrl}
-              onChange={(e) =>
-                setTheme((prev) => ({ ...prev, headerLogoUrl: e.target.value.trim() }))
-              }
+              id="widget-logo-input"
+              type="file"
+              className="hidden"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
+                void uploadHeaderLogo(file);
+                e.currentTarget.value = "";
+              }}
             />
-            <p className="mt-1 text-xs text-zinc-500">{t("headerLogoHelp")}</p>
+            <p className="text-xs text-zinc-500">{t("headerLogoHelp")}</p>
+            {logoMsg ? <p className="text-xs text-zinc-400">{logoMsg}</p> : null}
           </div>
 
           {widgetLocked ? (

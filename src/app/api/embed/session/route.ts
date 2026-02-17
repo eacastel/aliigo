@@ -51,7 +51,9 @@ export async function GET(req: NextRequest) {
     // Pull only what we need for widget config
     const bizRes = await supabase
       .from("businesses")
-      .select("id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan")
+      .select(
+        "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, widget_header_logo_path"
+      )
       .eq("public_embed_key", key)
       .maybeSingle<{
         id: string;
@@ -63,6 +65,7 @@ export async function GET(req: NextRequest) {
         enabled_locales: string[] | null;
         widget_theme: ThemeDb;
         billing_plan: string | null;
+        widget_header_logo_path: string | null;
       }>();
 
     if (bizRes.error) {
@@ -79,13 +82,24 @@ export async function GET(req: NextRequest) {
     const locale = (bizRes.data.default_locale || "en").toLowerCase().startsWith("es") ? "es" : "en";
     const brand = (bizRes.data.brand_name || bizRes.data.name || "Aliigo").trim();
     const slug = bizRes.data.slug;
-    const theme = bizRes.data.widget_theme ?? null;
+    const themeObj: Record<string, unknown> =
+      bizRes.data.widget_theme && typeof bizRes.data.widget_theme === "object"
+        ? { ...(bizRes.data.widget_theme as Record<string, unknown>) }
+        : {};
     const showBranding =
       bizRes.data.billing_plan === "basic" || bizRes.data.billing_plan === "starter";
     const showHeaderIcon =
       bizRes.data.billing_plan === "growth" ||
       bizRes.data.billing_plan === "pro" ||
       bizRes.data.billing_plan === "custom";
+    if (showHeaderIcon && bizRes.data.widget_header_logo_path) {
+      const signed = await supabase.storage
+        .from("business-assets")
+        .createSignedUrl(bizRes.data.widget_header_logo_path, 60 * 60);
+      if (!signed.error && signed.data?.signedUrl) {
+        themeObj.headerLogoUrl = signed.data.signedUrl;
+      }
+    }
     const localeAuto =
       bizRes.data.billing_plan === "growth" ||
       bizRes.data.billing_plan === "pro" ||
@@ -122,7 +136,7 @@ export async function GET(req: NextRequest) {
         locale,
         brand,
         slug,
-        theme,
+        theme: themeObj,
         show_branding: showBranding,
         locale_auto: localeAuto,
         show_header_icon: showHeaderIcon,
