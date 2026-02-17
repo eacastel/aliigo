@@ -18,7 +18,7 @@
     },
     "publicLinks": {
       "features": "Cómo funciona",
-      "pricing": "Precios",
+      "pricing": "Planes",
       "blog": "Recursos",
       "whyAliigo": "Por qué Aliigo",
       "founder": "Fundador"
@@ -59,7 +59,7 @@
   },
   "PricingPage": {
     "badge": "Planes simples y transparentes",
-    "title": "Precios que crecen con tu negocio",
+    "title": "Planes que crecen con tu negocio",
     "subtitle": "Empieza con Starter o Growth. Para Pro, hablemos.",
     "description": "Todos los planes incluyen la experiencia Aliigo, el widget seguro y soporte multilingüe. Inicia la prueba gratuita de 30 días y cambia de plan cuando quieras.",
     "ctaPrimary": "Empieza tu prueba gratis",
@@ -846,7 +846,7 @@
       "bullet2": "Captura de leads solo con intención real",
       "bullet3": "Instalación con un solo script",
       "ctaPrimary": "Empieza tu prueba gratis",
-      "ctaSecondary": "Ver precios",
+      "ctaSecondary": "Ver planes",
       "chatbotLine": "Chatbot IA para tu web — con respuestas de tu negocio (no un bot genérico)."
     },
     "heroGhost": {

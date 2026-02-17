@@ -33,7 +33,7 @@ export function PricingSection({ basicPrice, growthPrice, proPrice, customPrice 
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
+        <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
           {/* PLAN 1: BASIC */}
           <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-5 sm:p-6 lg:p-8 hover:border-white/10 transition-all">
             <div className="flex items-center gap-3 mb-4">
@@ -199,7 +199,10 @@ export function PricingSection({ basicPrice, growthPrice, proPrice, customPrice 
             </div>
           </div>
 
-          {/* PLAN 4: CUSTOM */}
+        </div>
+
+        {/* PLAN 4: CUSTOM (full-width row to avoid mosaic layout) */}
+        <div className="mt-4 md:mt-6 max-w-6xl mx-auto">
           <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-5 sm:p-6 lg:p-8 hover:border-white/10 transition-all">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-zinc-800 rounded-lg text-white">
@@ -235,7 +238,7 @@ export function PricingSection({ basicPrice, growthPrice, proPrice, customPrice 
                 {t("pricing.custom.plusLabel")}
               </div>
 
-              <ul className="space-y-3 md:space-y-4 text-sm text-zinc-400">
+              <ul className="grid gap-3 text-sm text-zinc-400 md:grid-cols-2">
                 <li className="flex gap-3">
                   <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
                   {t("pricing.custom.features.f1")}

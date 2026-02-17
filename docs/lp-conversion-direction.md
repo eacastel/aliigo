@@ -125,3 +125,19 @@ With UTMs + ValueTrack:
 - LP paths (`/en/lp/*`, `/es/lp/*`) are locale-pinned and are not redirected by `NEXT_LOCALE` cookie.
 - `market=us` forces USD formatting.
 - `market=es` keeps EUR and Spanish formatting (symbol on the left, e.g. `€99`).
+
+## Plans UX Updates (Latest)
+
+- Public navigation wording:
+  - EN: `Plans` (was `Pricing`)
+  - ES: `Planes` (was `Precios`)
+- LP hero secondary CTA wording:
+  - EN: `See plans`
+  - ES: `Ver planes`
+- Main homepage pricing layout:
+  - Uses a stable 3-card row plus a full-width `Custom` row (avoids awkward 2x2 mosaic breakpoints).
+- `/pricing` comparison matrix:
+  - Upgraded to standard SaaS-style table treatment with:
+    - included/not-included chips (check/x visual cues)
+    - quantitative limits as badges
+    - stronger visual hierarchy for plan guidance.

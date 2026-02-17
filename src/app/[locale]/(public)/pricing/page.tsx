@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/routing";
 import { getLocale, getTranslations } from "next-intl/server";
-import { CheckCircle2, Sparkles, Building2, Store, Zap } from "lucide-react";
+import { Check, CheckCircle2, Sparkles, Building2, Store, X, Zap } from "lucide-react";
 import { ProContactForm } from "@/components/ProContactForm";
 import { headers } from "next/headers";
 import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
@@ -43,6 +43,7 @@ export default async function PricingPage() {
       growth: "500",
       pro: "2,000",
       custom: "10k+",
+      type: "text",
     },
     {
       feature: isEs ? "Dominios" : "Domains",
@@ -50,20 +51,47 @@ export default async function PricingPage() {
       growth: "1",
       pro: "3",
       custom: isEs ? "Ilimitado" : "Unlimited",
+      type: "text",
     },
     {
-      feature: isEs ? "Fuentes de entrenamiento" : "Training sources",
-      basic: isEs ? "Solo web" : "Website only",
-      growth: isEs ? "Web + PDF" : "Website + PDF",
-      pro: isEs ? "Web + PDF + Docs" : "Website + PDF + Docs",
-      custom: isEs ? "Todo + API" : "All + API",
+      feature: isEs ? "Entrenamiento con fuente web" : "Website source training",
+      basic: true,
+      growth: true,
+      pro: true,
+      custom: true,
+      type: "bool",
     },
     {
-      feature: isEs ? "Soporte" : "Support",
-      basic: isEs ? "Email" : "Email",
-      growth: isEs ? "Email + chat" : "Email + chat",
-      pro: isEs ? "Prioritario" : "Priority",
-      custom: isEs ? "Dedicado" : "Dedicated",
+      feature: isEs ? "Captura de leads (nombre + email)" : "Lead capture (name + email)",
+      basic: true,
+      growth: true,
+      pro: true,
+      custom: true,
+      type: "bool",
+    },
+    {
+      feature: isEs ? "Soporte por chat" : "Chat support",
+      basic: false,
+      growth: true,
+      pro: true,
+      custom: true,
+      type: "bool",
+    },
+    {
+      feature: isEs ? "Dominio ilimitado" : "Unlimited domains",
+      basic: false,
+      growth: false,
+      pro: false,
+      custom: true,
+      type: "bool",
+    },
+    {
+      feature: isEs ? "Soporte dedicado" : "Dedicated support",
+      basic: false,
+      growth: false,
+      pro: false,
+      custom: true,
+      type: "bool",
     },
   ];
 
@@ -307,22 +335,37 @@ export default async function PricingPage() {
             <div className="mt-4 overflow-x-auto">
               <table className="min-w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-white/10 text-zinc-300">
+                  <tr className="border-b border-white/10 text-zinc-200">
                     <th className="px-3 py-2 font-semibold">{isEs ? "Función" : "Feature"}</th>
-                    <th className="px-3 py-2 font-semibold">Basic</th>
-                    <th className="px-3 py-2 font-semibold">Growth</th>
-                    <th className="px-3 py-2 font-semibold">Pro</th>
-                    <th className="px-3 py-2 font-semibold">Custom</th>
+                    <th className="px-3 py-2 font-semibold text-emerald-300">Basic</th>
+                    <th className="px-3 py-2 font-semibold text-emerald-300">Growth</th>
+                    <th className="px-3 py-2 font-semibold text-emerald-300">Pro</th>
+                    <th className="px-3 py-2 font-semibold text-emerald-300">Custom</th>
                   </tr>
                 </thead>
                 <tbody>
                   {matrixRows.map((row) => (
                     <tr key={row.feature} className="border-b border-white/5 text-zinc-400">
                       <td className="px-3 py-2 text-zinc-200">{row.feature}</td>
-                      <td className="px-3 py-2">{row.basic}</td>
-                      <td className="px-3 py-2">{row.growth}</td>
-                      <td className="px-3 py-2">{row.pro}</td>
-                      <td className="px-3 py-2">{row.custom}</td>
+                      {[row.basic, row.growth, row.pro, row.custom].map((value, idx) => (
+                        <td key={`${row.feature}-${idx}`} className="px-3 py-2">
+                          {row.type === "bool" ? (
+                            value ? (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-300">
+                                <Check size={14} /> {isEs ? "Incluido" : "Included"}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-zinc-600/50 bg-zinc-800/50 px-2 py-1 text-xs text-zinc-400">
+                                <X size={14} /> {isEs ? "No incluido" : "Not included"}
+                              </span>
+                            )
+                          ) : (
+                            <span className="inline-flex rounded-full border border-white/10 bg-zinc-800/50 px-2 py-1 text-xs text-zinc-200">
+                              {value}
+                            </span>
+                          )}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
