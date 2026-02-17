@@ -17,6 +17,7 @@ type Theme = {
   sendText: string;
   panelBg: string;   
   panelOpacity: number;   
+  headerLogoUrl: string;
 };
 
 type ThemeDb = Partial<Theme>;
@@ -97,6 +98,7 @@ const DEFAULT_THEME: Theme = {
   sendText: "#ffffff", // kept for backwards compat, not used by new UI
   panelBg: "#09090b",
   panelOpacity: 0.72,
+  headerLogoUrl: "",
 };
 
 function mergeTheme(db: ThemeDb | null | undefined): Theme {
@@ -117,6 +119,7 @@ function toThemeDb(x: unknown): ThemeDb | undefined {
   if (typeof o.sendText === "string") out.sendText = o.sendText;
   if (typeof o.panelBg === "string") out.panelBg = o.panelBg;
   if (typeof o.panelOpacity === "number") out.panelOpacity = o.panelOpacity;
+  if (typeof o.headerLogoUrl === "string") out.headerLogoUrl = o.headerLogoUrl;
 
 
   return out;
@@ -357,6 +360,7 @@ export default function WidgetSettingsPage() {
     sendBg: theme.sendBg,
     panelBg: theme.panelBg,
     panelOpacity: theme.panelOpacity,
+    headerLogoUrl: theme.headerLogoUrl,
   });
 }, [theme]);
 
@@ -656,6 +660,19 @@ export default function WidgetSettingsPage() {
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm text-zinc-300 mb-1">{t("headerLogoUrl")}</label>
+            <input
+              className="w-full border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              placeholder="https://example.com/logo.png"
+              value={theme.headerLogoUrl}
+              onChange={(e) =>
+                setTheme((prev) => ({ ...prev, headerLogoUrl: e.target.value.trim() }))
+              }
+            />
+            <p className="mt-1 text-xs text-zinc-500">{t("headerLogoHelp")}</p>
           </div>
 
           {widgetLocked ? (

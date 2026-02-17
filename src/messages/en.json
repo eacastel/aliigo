@@ -174,6 +174,59 @@
     "customF4": "Dedicated support"
   },
   "DashboardBusiness": {
+    "title": "Business settings",
+    "sections": {
+      "profile": "Profile",
+      "business": "Business"
+    },
+    "auth": {
+      "loginRequiredTitle": "Login required",
+      "loginRequiredDescription": "Please sign in to edit business settings.",
+      "signIn": "Sign in",
+      "noBusinessTitle": "No linked business",
+      "noBusinessDescription": "We couldn’t find a business linked to your profile. Reload the page. If it persists, try signup again."
+    },
+    "fields": {
+      "profileBusinessName": {
+        "label": "Business name (profile)",
+        "placeholder": "Business name",
+        "help": "This updates your profile display. Public name is configured below."
+      },
+      "contactName": {
+        "label": "Contact name",
+        "placeholder": "Contact name"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Phone"
+      },
+      "publicName": {
+        "label": "Public name",
+        "placeholder": "Public name"
+      },
+      "timezone": {
+        "label": "Timezone",
+        "placeholder": "Europe/Madrid"
+      },
+      "defaultLanguage": {
+        "label": "Default language"
+      }
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving…",
+      "reset": "Reset changes",
+      "retry": "Retry"
+    },
+    "status": {
+      "loading": "Loading…",
+      "saved": "Saved.",
+      "mustLogin": "You must be logged in.",
+      "loadError": "Could not load your profile.",
+      "profileNotFound": "Profile not found. Please log in again.",
+      "saveRetry": "Could not save now. Try again.",
+      "saveError": "Save error: {error}"
+    },
     "emailChange": {
       "currentLabel": "Current account email",
       "newLabel": "New account email",
@@ -187,7 +240,7 @@
       "errorUnchanged": "Please enter a different email.",
       "errorGeneric": "Could not send verification email: {error}"
     },
-  "domains": {
+    "domains": {
       "label": "Allowed domains",
       "placeholder": "example.com\\nsecond-domain.com",
       "help": "Enter one root domain per line, without http(s) or www. We will automatically allow both versions.",
@@ -197,15 +250,17 @@
       "locked": "Activate billing to unlock the domain allowlist.",
       "invalid": "Please enter a valid domain like example.com (or localhost for local testing).",
       "previewLabel": "Domains allowed",
-    "previewEmpty": "Enter a domain to see what will be allowed."
+      "previewEmpty": "Enter a domain to see what will be allowed."
+    },
+    "languages": {
+      "label": "Enabled languages",
+      "english": "English",
+      "spanish": "Español",
+      "limit": "Plan limit: up to {count} language(s).",
+      "unlimited": "unlimited",
+      "basicLocked": "Basic includes one language. Upgrade to add multilingual support."
+    }
   },
-  "languages": {
-    "label": "Enabled languages",
-    "limit": "Plan limit: up to {count} language(s).",
-    "unlimited": "unlimited",
-    "basicLocked": "Basic includes one language. Upgrade to add multilingual support."
-  }
-},
   "DashboardWidget": {
     "title": "Widget",
     "livePreview": "Live preview",
@@ -222,6 +277,8 @@
     "publicEmbedKey": "Public embed key",
     "previewToken": "Preview token (dev)",
     "brand": "Brand",
+    "headerLogoUrl": "Header logo URL (Growth+)",
+    "headerLogoHelp": "Optional. Icon appears only on Growth, Pro, and Custom when this URL is set.",
     "embedSnippet": "Embed snippet",
     "emptyDash": "—",
     "lockedHint": "Activate billing to unlock the widget install code.",

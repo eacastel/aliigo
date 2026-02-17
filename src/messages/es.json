@@ -175,6 +175,59 @@
     "customF4": "Soporte dedicado"
   },
   "DashboardBusiness": {
+    "title": "Configuración del negocio",
+    "sections": {
+      "profile": "Perfil",
+      "business": "Negocio"
+    },
+    "auth": {
+      "loginRequiredTitle": "Inicio de sesión requerido",
+      "loginRequiredDescription": "Inicia sesión para editar la configuración del negocio.",
+      "signIn": "Iniciar sesión",
+      "noBusinessTitle": "Sin negocio vinculado",
+      "noBusinessDescription": "No encontramos un negocio vinculado a tu perfil. Recarga la página. Si persiste, intenta registrarte de nuevo."
+    },
+    "fields": {
+      "profileBusinessName": {
+        "label": "Nombre del negocio (perfil)",
+        "placeholder": "Nombre del negocio",
+        "help": "Esto actualiza la visualización de tu perfil. El nombre público se configura abajo."
+      },
+      "contactName": {
+        "label": "Nombre de contacto",
+        "placeholder": "Nombre de contacto"
+      },
+      "phone": {
+        "label": "Teléfono",
+        "placeholder": "Teléfono"
+      },
+      "publicName": {
+        "label": "Nombre público",
+        "placeholder": "Nombre público"
+      },
+      "timezone": {
+        "label": "Zona horaria",
+        "placeholder": "Europe/Madrid"
+      },
+      "defaultLanguage": {
+        "label": "Idioma predeterminado"
+      }
+    },
+    "actions": {
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "reset": "Restablecer cambios",
+      "retry": "Reintentar"
+    },
+    "status": {
+      "loading": "Cargando…",
+      "saved": "Guardado.",
+      "mustLogin": "Debes iniciar sesión.",
+      "loadError": "No se pudo cargar tu perfil.",
+      "profileNotFound": "No se encontró el perfil. Vuelve a iniciar sesión.",
+      "saveRetry": "No se pudo guardar ahora. Inténtalo de nuevo.",
+      "saveError": "Error al guardar: {error}"
+    },
     "emailChange": {
       "currentLabel": "Email actual de la cuenta",
       "newLabel": "Nuevo email de la cuenta",
@@ -188,7 +241,7 @@
       "errorUnchanged": "Introduce un email diferente.",
       "errorGeneric": "No se pudo enviar el email de verificación: {error}"
     },
-  "domains": {
+    "domains": {
       "label": "Dominios permitidos",
       "placeholder": "ejemplo.com\\nsegundo-dominio.com",
       "help": "Introduce un dominio raíz por línea, sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
@@ -198,15 +251,17 @@
       "locked": "Activa la facturación para desbloquear la lista de dominios.",
       "invalid": "Introduce un dominio válido como ejemplo.com (o localhost para pruebas locales).",
       "previewLabel": "Dominios permitidos",
-    "previewEmpty": "Introduce un dominio para ver lo que se permitirá."
+      "previewEmpty": "Introduce un dominio para ver lo que se permitirá."
+    },
+    "languages": {
+      "label": "Idiomas habilitados",
+      "english": "English",
+      "spanish": "Español",
+      "limit": "Límite del plan: hasta {count} idioma(s).",
+      "unlimited": "ilimitado",
+      "basicLocked": "Basic incluye un solo idioma. Sube de plan para activar el soporte multilingüe."
+    }
   },
-  "languages": {
-    "label": "Idiomas habilitados",
-    "limit": "Límite del plan: hasta {count} idioma(s).",
-    "unlimited": "ilimitado",
-    "basicLocked": "Basic incluye un solo idioma. Sube de plan para activar el soporte multilingüe."
-  }
-},
   "DashboardWidget": {
     "title": "Widget",
     "livePreview": "Vista previa en vivo",
@@ -223,6 +278,8 @@
     "publicEmbedKey": "Clave pública de embed",
     "previewToken": "Token de vista previa (dev)",
     "brand": "Marca",
+    "headerLogoUrl": "URL del logo de cabecera (Growth+)",
+    "headerLogoHelp": "Opcional. El icono solo aparece en Growth, Pro y Custom cuando esta URL está definida.",
     "embedSnippet": "Snippet de instalación",
     "emptyDash": "—",
     "lockedHint": "Activa la facturación para desbloquear el código del widget.",

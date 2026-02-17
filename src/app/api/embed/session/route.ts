@@ -82,6 +82,10 @@ export async function GET(req: NextRequest) {
     const theme = bizRes.data.widget_theme ?? null;
     const showBranding =
       bizRes.data.billing_plan === "basic" || bizRes.data.billing_plan === "starter";
+    const showHeaderIcon =
+      bizRes.data.billing_plan === "growth" ||
+      bizRes.data.billing_plan === "pro" ||
+      bizRes.data.billing_plan === "custom";
     const localeAuto =
       bizRes.data.billing_plan === "growth" ||
       bizRes.data.billing_plan === "pro" ||
@@ -121,6 +125,7 @@ export async function GET(req: NextRequest) {
         theme,
         show_branding: showBranding,
         locale_auto: localeAuto,
+        show_header_icon: showHeaderIcon,
         enabled_locales: enabledLocales,
       },
       200

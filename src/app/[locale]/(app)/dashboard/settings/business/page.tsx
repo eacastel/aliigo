@@ -205,11 +205,11 @@ export default function SettingsBusinessPage() {
 
       if (error) {
         console.error("[settings-business] join error:", error.message);
-        setMsg("Could not load your profile.");
+        setMsg(t("status.loadError"));
         return;
       }
       if (!isProfileJoinRow(data)) {
-        setMsg("Profile not found. Please log in again.");
+        setMsg(t("status.profileNotFound"));
         return;
       }
 
@@ -303,8 +303,8 @@ export default function SettingsBusinessPage() {
   }, [billingPlan]);
 
   const localeOptions: Array<{ code: "en" | "es"; label: string }> = [
-    { code: "en", label: "English" },
-    { code: "es", label: "Español" },
+    { code: "en", label: t("languages.english") },
+    { code: "es", label: t("languages.spanish") },
   ];
 
   const toggleEnabledLocale = (localeCode: "en" | "es") => {
@@ -393,7 +393,7 @@ export default function SettingsBusinessPage() {
       const token = sess.session?.access_token;
 
       if (!token) {
-        setMsg("You must be logged in.");
+        setMsg(t("status.mustLogin"));
         setUnauth(true);
         return;
       }
@@ -431,7 +431,7 @@ export default function SettingsBusinessPage() {
       } = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setMsg(`Save error: ${j.error || "unknown"}`);
+        setMsg(t("status.saveError", { error: j.error || "unknown" }));
         return;
       }
 
@@ -463,10 +463,10 @@ export default function SettingsBusinessPage() {
         initialBusiness.current = { ...business };
       }
 
-      setMsg("Saved.");
+      setMsg(t("status.saved"));
     } catch (e: unknown) {
       console.error(e);
-      setMsg("Could not save now. Try again.");
+      setMsg(t("status.saveRetry"));
     } finally {
       setSaving(false);
     }
@@ -489,7 +489,7 @@ export default function SettingsBusinessPage() {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess.session?.access_token;
       if (!token) {
-        setEmailMsg("You must be logged in.");
+        setEmailMsg(t("status.mustLogin"));
         return;
       }
 
@@ -528,20 +528,20 @@ export default function SettingsBusinessPage() {
     }
   };
 
-  if (loading) return <p className="p-4 text-sm text-zinc-400">Cargando…</p>;
+  if (loading) return <p className="p-4 text-sm text-zinc-400">{t("status.loading")}</p>;
 
   if (unauth) {
     return (
       <div className="max-w-lg p-4 text-white">
-        <h1 className="text-xl font-semibold mb-2">Login required</h1>
+        <h1 className="text-xl font-semibold mb-2">{t("auth.loginRequiredTitle")}</h1>
         <p className="text-sm text-zinc-400 mb-4">
-          Please sign in to edit business settings.
+          {t("auth.loginRequiredDescription")}
         </p>
         <button
           onClick={() => router.push("/login")}
           className={btnBrand}
         >
-          Sign in
+          {t("auth.signIn")}
         </button>
       </div>
     );
@@ -550,16 +550,15 @@ export default function SettingsBusinessPage() {
   if (!businessId) {
     return (
       <div className="max-w-lg p-4 text-white">
-        <h1 className="text-xl font-semibold mb-2">No linked business</h1>
+        <h1 className="text-xl font-semibold mb-2">{t("auth.noBusinessTitle")}</h1>
         <p className="text-sm text-zinc-400">
-          We didn’t find a business linked to your profile. Reload the page. If
-          it persists, try signup again.
+          {t("auth.noBusinessDescription")}
         </p>
         <button
           onClick={() => void load()}
           className={`mt-3 ${btnNeutral}`}
         >
-          Retry
+          {t("actions.retry")}
         </button>
       </div>
     );
@@ -567,12 +566,12 @@ export default function SettingsBusinessPage() {
 
   return (
     <div className="max-w-5xl text-white">
-      <h1 className="text-2xl font-bold mb-4">Business Settings</h1>
+      <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
 
       {msg && (
         <div
           className={`mb-4 text-sm ${
-            msg.startsWith("Saved") ? "text-green-400" : "text-red-400"
+            msg === t("status.saved") ? "text-green-400" : "text-red-400"
           }`}
         >
           {msg}
@@ -582,32 +581,32 @@ export default function SettingsBusinessPage() {
       <div className="space-y-8">
         {/* Profile */}
         <section className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
-          <h2 className="font-semibold mb-3">Profile</h2>
+          <h2 className="font-semibold mb-3">{t("sections.profile")}</h2>
           <div className="grid gap-3">
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                Business name (profile)
+                {t("fields.profileBusinessName.label")}
               </label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Business name"
+                placeholder={t("fields.profileBusinessName.placeholder")}
                 value={profile.nombre_negocio}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, nombre_negocio: e.target.value }))
                 }
               />
               <p className="text-[11px] text-zinc-500 mt-1">
-                This updates your profile’s display. Public name lives below.
+                {t("fields.profileBusinessName.help")}
               </p>
             </div>
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                Contact name
+                {t("fields.contactName.label")}
               </label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Contact name"
+                placeholder={t("fields.contactName.placeholder")}
                 value={profile.nombre_contacto}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, nombre_contacto: e.target.value }))
@@ -616,10 +615,10 @@ export default function SettingsBusinessPage() {
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Phone</label>
+              <label className="block text-xs text-zinc-400 mb-1">{t("fields.phone.label")}</label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Phone"
+                placeholder={t("fields.phone.placeholder")}
                 value={profile.telefono}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, telefono: e.target.value }))
@@ -688,15 +687,15 @@ export default function SettingsBusinessPage() {
 
         {/* Business */}
         <section className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4">
-          <h2 className="font-semibold mb-3">Business</h2>
+          <h2 className="font-semibold mb-3">{t("sections.business")}</h2>
           <div className="grid gap-3">
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                Public name <span className="text-red-400">*</span>
+                {t("fields.publicName.label")} <span className="text-red-400">*</span>
               </label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Public name"
+                placeholder={t("fields.publicName.placeholder")}
                 value={business.name}
                 onChange={(e) =>
                   setBusiness((b) => ({ ...b, name: e.target.value }))
@@ -705,10 +704,10 @@ export default function SettingsBusinessPage() {
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Timezone</label>
+              <label className="block text-xs text-zinc-400 mb-1">{t("fields.timezone.label")}</label>
               <input
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                placeholder="Europe/Madrid"
+                placeholder={t("fields.timezone.placeholder")}
                 value={business.timezone}
                 onChange={(e) =>
                   setBusiness((b) => ({ ...b, timezone: e.target.value }))
@@ -718,7 +717,7 @@ export default function SettingsBusinessPage() {
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                Default language
+                {t("fields.defaultLanguage.label")}
               </label>
               <select
                 className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
@@ -868,14 +867,14 @@ export default function SettingsBusinessPage() {
             className={btnBrand}
 
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? t("actions.saving") : t("actions.save")}
           </button>
 
           <button
             onClick={() => void load()}
             className={btnNeutral}
           >
-            Reset changes
+            {t("actions.reset")}
           </button>
         </div>
       </div>

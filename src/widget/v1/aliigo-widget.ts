@@ -15,6 +15,7 @@ type Theme = {
   sendBg?: string;     // "#2563eb #ffffff"
   panelBg?: string;        // "#09090b"
   panelOpacity?: number;   // 0..1
+  headerLogoUrl?: string;
 };
 
 type SessionPayload = {
@@ -24,6 +25,7 @@ type SessionPayload = {
   slug: string;
   theme: Theme | null;
   show_branding?: boolean;
+  show_header_icon?: boolean;
   locale_auto?: boolean;
   enabled_locales?: ("en" | "es")[];
 };
@@ -184,6 +186,14 @@ function rgbaFromHex(hex: string, a: number) {
   const rgb = hexToRgb(hex);
   if (!rgb) return null;
   return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${clamp01(a)})`;
+}
+
+function escapeAttr(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 
@@ -605,6 +615,7 @@ class AliigoWidget extends HTMLElement {
       if (typeof o.sendBg === "string") out.sendBg = o.sendBg;
       if (typeof o.panelBg === "string") out.panelBg = o.panelBg;
       if (typeof o.panelOpacity === "number") out.panelOpacity = o.panelOpacity;
+      if (typeof o.headerLogoUrl === "string") out.headerLogoUrl = o.headerLogoUrl;
 
 
       return out;
@@ -834,6 +845,27 @@ class AliigoWidget extends HTMLElement {
         font-weight: 600;
         font-size: 16px;
         letter-spacing: -0.01em;
+      }
+      .header-main {
+        min-width: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        object-fit: contain;
+        display: block;
+        border: 1px solid rgba(255,255,255,0.35);
+        flex: 0 0 auto;
+      }
+      .header-title {
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .close {
         border: 0; background: transparent; cursor: pointer;
@@ -1141,6 +1173,10 @@ class AliigoWidget extends HTMLElement {
     const hideHeader = this.getHideHeader();
     const showBranding =
       this.getShowBrandingOverride() ?? Boolean(session?.show_branding);
+    const showHeaderIcon = Boolean(session?.show_header_icon);
+    const headerLogoUrl = (theme.headerLogoUrl || "").trim();
+    const shouldShowHeaderLogo = showHeaderIcon && headerLogoUrl.length > 0;
+    const safeHeaderLogoUrl = shouldShowHeaderLogo ? escapeAttr(headerLogoUrl) : "";
 
     const open = variant !== "floating" ? true : this.state.open;
 
@@ -1276,7 +1312,10 @@ class AliigoWidget extends HTMLElement {
             hideHeader
               ? ""
               : `<div class="header" style="background:${header.bg};color:${header.text};">
-            <div>${t.title(brand)}</div>
+            <div class="header-main">
+              ${shouldShowHeaderLogo ? `<img class="header-icon" src="${safeHeaderLogoUrl}" alt="" onerror="this.style.display='none'" />` : ``}
+              <span class="header-title">${t.title(brand)}</span>
+            </div>
             ${variant === "floating" ? `<button class="close" aria-label="Close" style="color:${header.text};">×</button>` : ``}
           </div>`
           }
