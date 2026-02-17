@@ -60,7 +60,7 @@
   "PricingPage": {
     "badge": "Simple, transparent plans",
     "title": "Plans that scale with your business",
-    "subtitle": "Launch with confidence on Starter or Growth. Talk to us for Pro.",
+    "subtitle": "Launch with confidence on Basic or Growth. Talk to us for Pro or Custom.",
     "description": "All plans include the Aliigo concierge experience, secure embed, and multi-language support. Start your 30-day free trial and upgrade or cancel anytime.",
     "ctaPrimary": "Start free trial",
     "ctaSecondary": "Talk to sales",
@@ -121,15 +121,15 @@
     "renewsOn": "Renews on:",
     "cancelAtPeriodEnd": "will cancel at period end",
     "noNeedToPayAgain": "You don’t need to pay again. Your subscription is already active.",
-    "planStarter": "Aliigo Starter",
+    "planStarter": "Aliigo Basic",
     "planGrowth": "Aliigo Growth",
     "planUnknown": "Plan not set",
-    "planStarterDesc": "Ideal for small local businesses.",
-    "starterF1": "Website chat widget + inbox",
-    "starterF2": "Basic assistant + domain verification",
-    "starterF3": "Conversation history",
-    "starterF4": "Lead capture (name, email, phone)",
-    "starterF5": "Support in Spanish and English",
+    "planStarterDesc": "Best for solo businesses getting started.",
+    "starterF1": "50 conversations / month",
+    "starterF2": "1 domain",
+    "starterF3": "Website source training",
+    "starterF4": "Lead capture (name and email)",
+    "starterF5": "Email support",
     "planGrowthDesc": "Ideal for clinics, agencies, and service businesses.",
     "growthIntro": "Everything in Basic, plus:",
     "growthF1": "500 conversations / month",
@@ -149,7 +149,7 @@
     "perMonth": "/month",
     "plansTitle": "Plans",
     "upgradeToGrowth": "Upgrade to Growth",
-    "switchToStarter": "Switch to Starter",
+    "switchToStarter": "Switch to Basic",
     "resumeMembership": "Keep membership",
     "cancelMembership": "Cancel membership",
     "planProTitle": "Aliigo Pro",
@@ -310,10 +310,10 @@
         "title": "5. Billing & Plans",
         "desc": "Start your free trial and manage your subscription.",
         "bullets": [
-          "You get a 30‑day free trial on Starter or Growth.",
+          "You get a 30-day free trial on Basic or Growth.",
           "Cancel anytime before the trial ends to avoid charges.",
           "Upgrade or downgrade anytime from Billing.",
-          "Pro plans are custom — contact us for a tailored setup."
+          "Pro and Custom plans are tailored — contact us for a tailored setup."
         ],
         "screenshot": "Screenshot placeholder: Billing and plan selector."
       }
@@ -1201,7 +1201,7 @@
       },
       "section5": {
         "title": "5. Plans, free trial, and billing",
-        "content": "Aliigo offers paid plans (e.g., Starter, Growth, and Pro) and may offer a 30-day free trial. Trials are cancellable at any time before they end. After the trial, your subscription renews automatically unless cancelled.\nPlan details and included usage allowances are described on the pricing page and/or in your dashboard. Excessive or abusive usage may require an upgrade or may be throttled."
+        "content": "Aliigo offers paid plans (e.g., Basic, Growth, Pro, and Custom) and may offer a 30-day free trial. Trials are cancellable at any time before they end. After the trial, your subscription renews automatically unless cancelled.\nPlan details and included usage allowances are described on the plans page and/or in your dashboard. Excessive or abusive usage may require an upgrade or may be throttled."
       },
       "section6": {
         "title": "6. Fees, taxes, and payments",
@@ -1331,7 +1331,7 @@
       },
       "section6": {
         "title": "6. Fees, billing in advance, and taxes",
-        "content": "Subscriptions are billed in advance on a recurring basis (typically monthly) unless otherwise stated at checkout. Fees and plan details are shown on the pricing page and/or at checkout and may differ for Pro/custom plans.\nFees are exclusive of taxes unless stated otherwise. You are responsible for any applicable taxes, levies, or duties, except taxes based on Aliigo’s income."
+        "content": "Subscriptions are billed in advance on a recurring basis (typically monthly) unless otherwise stated at checkout. Fees and plan details are shown on the plans page and/or at checkout and may differ for Pro/custom plans.\nFees are exclusive of taxes unless stated otherwise. You are responsible for any applicable taxes, levies, or duties, except taxes based on Aliigo’s income."
       },
       "section7": {
         "title": "7. Failed payments, past due status, and suspension",
@@ -1343,7 +1343,7 @@
       },
       "section9": {
         "title": "9. Usage limits, plan allowances, and fair use",
-        "content": "Plans include a monthly usage allowance intended for normal business use. Exact limits (such as message/conversation allowances) are shown on the pricing page, in your dashboard, or in plan documentation.\nIf usage is excessive, abusive, or materially exceeds plan expectations, we may throttle traffic, apply rate limits, require an upgrade, or offer a custom plan. We do not guarantee that every message will be delivered or processed under heavy load."
+        "content": "Plans include a monthly usage allowance intended for normal business use. Exact limits (such as message/conversation allowances) are shown on the plans page, in your dashboard, or in plan documentation.\nIf usage is excessive, abusive, or materially exceeds plan expectations, we may throttle traffic, apply rate limits, require an upgrade, or offer a custom plan. We do not guarantee that every message will be delivered or processed under heavy load."
       },
       "section10": {
         "title": "10. Customer content, leads, and outputs",

@@ -87,9 +87,6 @@ export default function PublicMobileMenu() {
               <Link href="/why-aliigo" className="block text-zinc-300 hover:text-white" onClick={() => setOpen(false)}>
                 {t("publicLinks.whyAliigo")}
               </Link>
-              <Link href="/founder" className="block text-zinc-300 hover:text-white" onClick={() => setOpen(false)}>
-                {t("publicLinks.founder")}
-              </Link>
             </nav>
 
             <div className="mt-auto pt-4 border-t border-zinc-800">

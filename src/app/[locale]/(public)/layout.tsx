@@ -37,7 +37,6 @@ export default async function PublicLayout({
           <PublicHeaderNav
             pricingLabel={t("publicLinks.pricing")}
             whyAliigoLabel={t("publicLinks.whyAliigo")}
-            founderLabel={t("publicLinks.founder")}
             getStartedLabel={t("actions.getStarted")}
           />
         </div>
@@ -48,12 +47,12 @@ export default async function PublicLayout({
      {/* FOOTER */}
       <footer className="bg-zinc-950 border-t border-zinc-800 py-12">
         <div className="max-w-6xl mx-auto px-4 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="mx-auto max-w-3xl grid gap-10 md:grid-cols-2 md:gap-16">
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
                 {t("footerCompany.title")}
               </h4>
-              <ul className="space-y-2 text-sm text-zinc-400">
+              <ul className="hidden md:block space-y-2 text-sm text-zinc-400">
                 <li><Link href="/why-aliigo" className="hover:text-white transition-colors">{t("footerCompany.whyAliigo")}</Link></li>
                 <li><Link href="/founder" className="hover:text-white transition-colors">{t("footerCompany.founder")}</Link></li>
                 <li><Link href="/legal/privacidad" className="hover:text-white transition-colors">{t("footerCompany.privacy")}</Link></li>
@@ -61,17 +60,39 @@ export default async function PublicLayout({
                 <li><Link href="/legal/subprocessors" className="hover:text-white transition-colors">{t("footerCompany.subprocessors")}</Link></li>
                 <li><a href="mailto:legal@aliigo.com" className="hover:text-white transition-colors">{t("footerCompany.contact")}</a></li>
               </ul>
+              <div className="md:hidden text-sm text-zinc-400 leading-7">
+                <Link href="/why-aliigo" className="hover:text-white transition-colors">{t("footerCompany.whyAliigo")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/founder" className="hover:text-white transition-colors">{t("footerCompany.founder")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/privacidad" className="hover:text-white transition-colors">{t("footerCompany.privacy")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/dpa" className="hover:text-white transition-colors">{t("footerCompany.dpa")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/subprocessors" className="hover:text-white transition-colors">{t("footerCompany.subprocessors")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <a href="mailto:legal@aliigo.com" className="hover:text-white transition-colors">{t("footerCompany.contact")}</a>
+              </div>
             </div>
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
                 {t("footerLinks.title")}
               </h4>
-              <ul className="space-y-2 text-sm text-zinc-400">
+              <ul className="hidden md:block space-y-2 text-sm text-zinc-400">
                 <li><Link href="/legal/aviso-legal" className="hover:text-white transition-colors">{t("footerLinks.avisoLegal")}</Link></li>
                 <li><Link href="/legal/cookies" className="hover:text-white transition-colors">{t("footerLinks.cookies")}</Link></li>
                 <li><Link href="/legal/terminos" className="hover:text-white transition-colors">{t("footerLinks.terminos")}</Link></li>
                 <li><Link href="/legal/subscription-agreement" className="hover:text-white transition-colors">{t("footerLinks.subscriptionAgreement")}</Link></li>
               </ul>
+              <div className="md:hidden text-sm text-zinc-400 leading-7">
+                <Link href="/legal/aviso-legal" className="hover:text-white transition-colors">{t("footerLinks.avisoLegal")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/cookies" className="hover:text-white transition-colors">{t("footerLinks.cookies")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/terminos" className="hover:text-white transition-colors">{t("footerLinks.terminos")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/subscription-agreement" className="hover:text-white transition-colors">{t("footerLinks.subscriptionAgreement")}</Link>
+              </div>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-zinc-800 text-center">

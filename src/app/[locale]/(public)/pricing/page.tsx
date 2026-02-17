@@ -38,11 +38,27 @@ export default async function PricingPage() {
   const isEs = locale.startsWith("es");
   const matrixRows = [
     {
+      feature: isEs ? "Precio" : "Price",
+      basic: `${basicPrice} ${isEs ? "/mes" : "/mo"}`,
+      growth: `${growthPrice} ${isEs ? "/mes" : "/mo"}`,
+      pro: `${proPrice} ${isEs ? "/mes" : "/mo"}`,
+      custom: `${customPrice} ${isEs ? "/mes" : "/mo"}`,
+      type: "text",
+    },
+    {
       feature: isEs ? "Conversaciones mensuales" : "Monthly conversations",
       basic: "50",
       growth: "500",
       pro: "2,000",
       custom: "10k+",
+      type: "text",
+    },
+    {
+      feature: isEs ? "Marca en widget" : "Widget branding",
+      basic: isEs ? "\"Powered by Aliigo\" (fijo)" : "\"Powered by Aliigo\" (fixed)",
+      growth: isEs ? "Sin marca de Aliigo" : "Aliigo branding removed",
+      pro: isEs ? "Sin marca de Aliigo" : "Aliigo branding removed",
+      custom: isEs ? "Marca blanca / personalizada" : "White-label / custom",
       type: "text",
     },
     {
@@ -54,44 +70,44 @@ export default async function PricingPage() {
       type: "text",
     },
     {
-      feature: isEs ? "Entrenamiento con fuente web" : "Website source training",
-      basic: true,
-      growth: true,
-      pro: true,
-      custom: true,
-      type: "bool",
+      feature: isEs ? "Entrenamiento" : "Training sources",
+      basic: isEs ? "Solo web (autogestión)" : "Website only (self-serve)",
+      growth: isEs ? "Web + PDF (autogestión)" : "Website + PDF (self-serve)",
+      pro: isEs ? "Web + PDF + ayuda de entrenamiento" : "Website + PDF + training assistance",
+      custom: isEs ? "API + CRM + integraciones personalizadas" : "API + CRM + custom integrations",
+      type: "text",
     },
     {
-      feature: isEs ? "Captura de leads (nombre + email)" : "Lead capture (name + email)",
-      basic: true,
-      growth: true,
-      pro: true,
-      custom: true,
-      type: "bool",
+      feature: isEs ? "Captura de leads" : "Lead capture",
+      basic: isEs ? "Nombre + email" : "Name + email",
+      growth: isEs ? "Nombre + email + teléfono" : "Name + email + phone",
+      pro: isEs ? "Con calificación (campos avanzados)" : "With qualification (advanced fields)",
+      custom: isEs ? "Lógica personalizada" : "Custom logic",
+      type: "text",
     },
     {
-      feature: isEs ? "Soporte por chat" : "Chat support",
-      basic: false,
-      growth: true,
-      pro: true,
-      custom: true,
-      type: "bool",
+      feature: isEs ? "Acciones inteligentes" : "Smart actions",
+      basic: isEs ? "Responder + enlace" : "Reply + link",
+      growth: isEs ? "Responder + enlace + captura" : "Reply + link + capture",
+      pro: isEs ? "Reserva de citas (Calendly/Google)" : "Appointment booking (Calendly/Google)",
+      custom: isEs ? "Flujos a medida" : "Custom workflows",
+      type: "text",
     },
     {
-      feature: isEs ? "Dominio ilimitado" : "Unlimited domains",
-      basic: false,
-      growth: false,
-      pro: false,
-      custom: true,
-      type: "bool",
+      feature: isEs ? "Soporte" : "Support",
+      basic: isEs ? "Email" : "Email",
+      growth: isEs ? "Email + chat" : "Email + chat",
+      pro: isEs ? "Prioritario" : "Priority",
+      custom: isEs ? "Manager dedicado" : "Dedicated manager",
+      type: "text",
     },
     {
-      feature: isEs ? "Soporte dedicado" : "Dedicated support",
-      basic: false,
-      growth: false,
-      pro: false,
-      custom: true,
-      type: "bool",
+      feature: isEs ? "Puesta en marcha" : "Onboarding",
+      basic: isEs ? "Autogestión" : "Self-serve",
+      growth: isEs ? "Autogestión" : "Self-serve",
+      pro: isEs ? "Sesión 1:1" : "1-on-1 onboarding",
+      custom: isEs ? "Implementación con nuestro equipo" : "Done-for-you setup",
+      type: "text",
     },
   ];
 
@@ -118,7 +134,7 @@ export default async function PricingPage() {
               {p("ctaPrimary")}
             </Link>
             <Link
-              href={{ pathname: "/pricing", hash: "pro-contact" }}
+              href={{ pathname: "/pricing", hash: "sales-contact" }}
               className="rounded-lg border border-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/30"
             >
               {p("ctaSecondary")}
@@ -316,7 +332,7 @@ export default async function PricingPage() {
               </div>
 
               <Link
-                href={{ pathname: "/pricing", hash: "pro-contact" }}
+                href={{ pathname: "/pricing", hash: "sales-contact" }}
                 className="block w-full rounded-lg border border-white/5 bg-zinc-800 py-3 text-center text-sm font-semibold text-white transition hover:bg-zinc-700 md:w-auto md:px-6"
               >
                 {t("pricing.custom.cta")}
@@ -326,41 +342,65 @@ export default async function PricingPage() {
         </div>
       </section>
 
-      <section id="pro-contact" className="border-t border-white/5 bg-zinc-900/30 py-20">
-        <div className="mx-auto mb-12 max-w-6xl px-4">
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6">
-            <h2 className="text-2xl font-bold text-white">
-              {isEs ? "Comparativa de planes" : "Plan comparison"}
+      <section id="pro-contact" className="border-t border-white/5 bg-zinc-900/30 pt-12 pb-24">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold md:text-4xl">
+              <span className="bg-gradient-to-r from-white to-[#84c9ad] bg-clip-text text-transparent">
+                {isEs ? "Comparativa de planes" : "Plan comparison"}
+              </span>
             </h2>
-            <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
+          </div>
+          <div className="mt-6 rounded-2xl border border-white/10 bg-zinc-900/40 p-6">
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-fixed text-sm">
+                <colgroup>
+                  <col className="w-[18%]" />
+                  <col className="w-[20.5%]" />
+                  <col className="w-[20.5%]" />
+                  <col className="w-[20.5%]" />
+                  <col className="w-[20.5%]" />
+                </colgroup>
                 <thead>
                   <tr className="border-b border-white/10 text-zinc-200">
-                    <th className="px-3 py-2 font-semibold">{isEs ? "Función" : "Feature"}</th>
-                    <th className="px-3 py-2 font-semibold text-emerald-300">Basic</th>
-                    <th className="px-3 py-2 font-semibold text-emerald-300">Growth</th>
-                    <th className="px-3 py-2 font-semibold text-emerald-300">Pro</th>
-                    <th className="px-3 py-2 font-semibold text-emerald-300">Custom</th>
+                    <th className="px-3 py-3 text-left font-semibold">{isEs ? "Características" : "Features"}</th>
+                    <th className="border-l border-white/10 px-3 py-3 text-center font-semibold text-emerald-300">
+                      <div>Basic</div>
+                    </th>
+                    <th className="border-l border-white/10 px-3 py-3 text-center font-semibold text-emerald-300">
+                      <div>Growth</div>
+                    </th>
+                    <th className="border-l border-white/10 px-3 py-3 text-center font-semibold text-emerald-300">
+                      <div>Pro</div>
+                    </th>
+                    <th className="border-l border-white/10 px-3 py-3 text-center font-semibold text-emerald-300">
+                      <div>Custom</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {matrixRows.map((row) => (
-                    <tr key={row.feature} className="border-b border-white/5 text-zinc-400">
-                      <td className="px-3 py-2 text-zinc-200">{row.feature}</td>
+                  {matrixRows.map((row, rowIndex) => (
+                    <tr
+                      key={row.feature}
+                      className={`border-b border-white/5 text-zinc-400 ${
+                        rowIndex % 2 === 0 ? "bg-zinc-900/5" : "bg-zinc-800/45"
+                      }`}
+                    >
+                      <td className="px-3 py-3 text-left text-zinc-200">{row.feature}</td>
                       {[row.basic, row.growth, row.pro, row.custom].map((value, idx) => (
-                        <td key={`${row.feature}-${idx}`} className="px-3 py-2">
+                        <td key={`${row.feature}-${idx}`} className="border-l border-white/10 px-3 py-3 text-center">
                           {row.type === "bool" ? (
                             value ? (
-                              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-300">
+                              <span className="inline-flex items-center justify-center gap-1 text-xs text-emerald-300">
                                 <Check size={14} /> {isEs ? "Incluido" : "Included"}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 rounded-full border border-zinc-600/50 bg-zinc-800/50 px-2 py-1 text-xs text-zinc-400">
+                              <span className="inline-flex items-center justify-center gap-1 text-xs text-zinc-400">
                                 <X size={14} /> {isEs ? "No incluido" : "Not included"}
                               </span>
                             )
                           ) : (
-                            <span className="inline-flex rounded-full border border-white/10 bg-zinc-800/50 px-2 py-1 text-xs text-zinc-200">
+                            <span className="inline-flex items-center justify-center text-sm text-zinc-200">
                               {value}
                             </span>
                           )}
@@ -368,12 +408,49 @@ export default async function PricingPage() {
                       ))}
                     </tr>
                   ))}
+                  <tr className="bg-zinc-900/20">
+                    <td className="px-3 py-4 text-left text-zinc-200">
+                      {isEs ? "Elegir plan" : "Choose plan"}
+                    </td>
+                    <td className="border-l border-white/10 px-3 py-4 text-center">
+                      <Link
+                        href={{ pathname: "/signup", query: { plan: "basic" } }}
+                        className="inline-flex rounded-md border border-emerald-400/40 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/20"
+                      >
+                        {isEs ? "Elegir Basic" : "Choose Basic"}
+                      </Link>
+                    </td>
+                    <td className="border-l border-white/10 px-3 py-4 text-center">
+                      <Link
+                        href={{ pathname: "/signup", query: { plan: "growth" } }}
+                        className="inline-flex rounded-md border border-emerald-400/40 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/20"
+                      >
+                        {isEs ? "Elegir Growth" : "Choose Growth"}
+                      </Link>
+                    </td>
+                    <td className="border-l border-white/10 px-3 py-4 text-center">
+                      <Link
+                        href={{ pathname: "/signup", query: { plan: "pro" } }}
+                        className="inline-flex rounded-md border border-emerald-400/40 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/20"
+                      >
+                        {isEs ? "Elegir Pro" : "Choose Pro"}
+                      </Link>
+                    </td>
+                    <td className="border-l border-white/10 px-3 py-4 text-center">
+                      <Link
+                        href={{ pathname: "/pricing", hash: "sales-contact" }}
+                        className="inline-flex rounded-md border border-emerald-400/40 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/20"
+                      >
+                        {isEs ? "Hablar con ventas" : "Contact sales"}
+                      </Link>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-        <div className="mx-auto max-w-4xl px-4">
+        <div id="sales-contact" className="mx-auto mt-24 max-w-4xl scroll-mt-24 px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white">{p("contactTitle")}</h2>
             <p className="mt-3 text-sm text-zinc-400">{p("contactSubtitle")}</p>

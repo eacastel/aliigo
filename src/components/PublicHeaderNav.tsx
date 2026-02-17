@@ -10,14 +10,12 @@ import PublicMobileMenu from "@/components/PublicMobileMenu";
 type PublicHeaderNavProps = {
   pricingLabel: string;
   whyAliigoLabel: string;
-  founderLabel: string;
   getStartedLabel: string;
 };
 
 export default function PublicHeaderNav({
   pricingLabel,
   whyAliigoLabel,
-  founderLabel,
   getStartedLabel,
 }: PublicHeaderNavProps) {
   const pathname = usePathname();
@@ -41,12 +39,6 @@ export default function PublicHeaderNav({
             className="hidden min-[897px]:block text-zinc-400 hover:text-white transition-colors"
           >
             {whyAliigoLabel}
-          </Link>
-          <Link
-            href="/founder"
-            className="hidden min-[897px]:block text-zinc-400 hover:text-white transition-colors"
-          >
-            {founderLabel}
           </Link>
         </>
       ) : null}

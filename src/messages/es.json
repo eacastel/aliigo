@@ -60,7 +60,7 @@
   "PricingPage": {
     "badge": "Planes simples y transparentes",
     "title": "Planes que crecen con tu negocio",
-    "subtitle": "Empieza con Starter o Growth. Para Pro, hablemos.",
+    "subtitle": "Empieza con Basic o Growth. Para Pro o Custom, hablemos.",
     "description": "Todos los planes incluyen la experiencia Aliigo, el widget seguro y soporte multilingüe. Inicia la prueba gratuita de 30 días y cambia de plan cuando quieras.",
     "ctaPrimary": "Empieza tu prueba gratis",
     "ctaSecondary": "Hablar con el equipo comercial",
@@ -121,15 +121,15 @@
     "renewsOn": "Renueva el:",
     "cancelAtPeriodEnd": "cancelará al final del periodo",
     "noNeedToPayAgain": "No necesitas pagar de nuevo. Tu suscripción ya está activa.",
-    "planStarter": "Aliigo Starter",
+    "planStarter": "Aliigo Basic",
     "planGrowth": "Aliigo Growth",
     "planUnknown": "Plan no definido",
-    "planStarterDesc": "Ideal para pequeños negocios locales.",
-    "starterF1": "Widget de chat + bandeja de entrada",
-    "starterF2": "Asistente básico + verificación de dominio",
-    "starterF3": "Historial de conversaciones",
-    "starterF4": "Captura de leads (nombre, email y teléfono)",
-    "starterF5": "Soporte en español e inglés",
+    "planStarterDesc": "Ideal para negocios que están empezando.",
+    "starterF1": "50 conversaciones / mes",
+    "starterF2": "1 dominio",
+    "starterF3": "Entrenamiento con fuente web",
+    "starterF4": "Captura de leads (nombre y email)",
+    "starterF5": "Soporte por email",
     "planGrowthDesc": "Ideal para clínicas, agencias y negocios de servicios.",
     "growthIntro": "Todo lo de Basic, y además:",
     "growthF1": "500 conversaciones / mes",
@@ -146,11 +146,11 @@
     "daysLeft": "{count, plural, one {# día restante} other {# días restantes}}",
     "managePlan": "Gestionar plan",
     "openingPortal": "Abriendo…",
-    "downgradeToStarter": "Cambiar a Starter",
+    "downgradeToStarter": "Cambiar a Basic",
     "perMonth": "/mes",
     "plansTitle": "Planes",
     "upgradeToGrowth": "Mejorar a Growth",
-    "switchToStarter": "Cambiar a Starter",
+    "switchToStarter": "Cambiar a Basic",
     "resumeMembership": "Mantener suscripción",
     "cancelMembership": "Cancelar suscripción",
     "planProTitle": "Aliigo Pro",
@@ -311,10 +311,10 @@
         "title": "5. Facturación y planes",
         "desc": "Activa la prueba gratuita y gestiona tu suscripción.",
         "bullets": [
-          "Tienes 30 días de prueba gratis en Starter o Growth.",
+          "Tienes 30 días de prueba gratis en Basic o Growth.",
           "Cancela antes de que termine la prueba para no pagar.",
           "Sube o baja de plan cuando quieras desde Facturación.",
-          "Pro es personalizado — contáctanos para una propuesta."
+          "Pro y Custom son personalizados — contáctanos para una propuesta."
         ],
         "screenshot": "Marcador de captura: Facturación y selector de plan."
       }
@@ -1202,7 +1202,7 @@
       },
       "section5": {
         "title": "5. Planes, prueba gratis y facturación",
-        "content": "Aliigo ofrece planes de pago (por ejemplo, Starter, Growth y Pro) y puede ofrecer una prueba gratis de 30 días. La prueba se puede cancelar en cualquier momento antes de finalizar. Tras la prueba, la suscripción se renueva automáticamente salvo cancelación.\nLos detalles del plan y los límites/uso incluido se describen en la página de Precios y/o en tu panel. Un uso excesivo o abusivo puede requerir un cambio de plan o limitación."
+        "content": "Aliigo ofrece planes de pago (por ejemplo, Basic, Growth, Pro y Custom) y puede ofrecer una prueba gratis de 30 días. La prueba se puede cancelar en cualquier momento antes de finalizar. Tras la prueba, la suscripción se renueva automáticamente salvo cancelación.\nLos detalles del plan y los límites/uso incluido se describen en la página de Planes y/o en tu panel. Un uso excesivo o abusivo puede requerir un cambio de plan o limitación."
       },
       "section6": {
         "title": "6. Cuotas, impuestos y pagos",
@@ -1332,7 +1332,7 @@
       },
       "section6": {
         "title": "6. Cuotas, cobro por adelantado e impuestos",
-        "content": "Las suscripciones se cobran por adelantado de forma recurrente (normalmente mensual), salvo que se indique otra cosa en el checkout. Las cuotas y detalles del plan se muestran en la página de precios y/o en el checkout y pueden variar para Pro/personalizado.\nLas cuotas no incluyen impuestos salvo indicación expresa. Eres responsable de los impuestos, tasas o gravámenes aplicables, salvo los impuestos sobre los ingresos de Aliigo."
+        "content": "Las suscripciones se cobran por adelantado de forma recurrente (normalmente mensual), salvo que se indique otra cosa en el checkout. Las cuotas y detalles del plan se muestran en la página de planes y/o en el checkout y pueden variar para Pro/personalizado.\nLas cuotas no incluyen impuestos salvo indicación expresa. Eres responsable de los impuestos, tasas o gravámenes aplicables, salvo los impuestos sobre los ingresos de Aliigo."
       },
       "section7": {
         "title": "7. Pagos fallidos, estado vencido y suspensión",
@@ -1344,7 +1344,7 @@
       },
       "section9": {
         "title": "9. Límites de uso, cuotas del plan y uso razonable",
-        "content": "Los planes incluyen una cuota mensual de uso pensada para un uso normal de negocio. Los límites exactos (por ejemplo, mensajes/conversaciones incluidas) se muestran en la página de precios, en tu panel o en la documentación del plan.\nSi el uso es excesivo, abusivo o supera de forma material lo previsto en el plan, podemos aplicar limitaciones (rate limits), reducir la capacidad, solicitar una mejora de plan u ofrecer un plan personalizado. No garantizamos el procesamiento o entrega de todos los mensajes bajo carga elevada."
+        "content": "Los planes incluyen una cuota mensual de uso pensada para un uso normal de negocio. Los límites exactos (por ejemplo, mensajes/conversaciones incluidas) se muestran en la página de planes, en tu panel o en la documentación del plan.\nSi el uso es excesivo, abusivo o supera de forma material lo previsto en el plan, podemos aplicar limitaciones (rate limits), reducir la capacidad, solicitar una mejora de plan u ofrecer un plan personalizado. No garantizamos el procesamiento o entrega de todos los mensajes bajo carga elevada."
       },
       "section10": {
         "title": "10. Contenido del cliente, leads y salidas de IA",
