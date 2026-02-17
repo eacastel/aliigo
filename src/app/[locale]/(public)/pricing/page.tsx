@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Link } from "@/i18n/routing";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Check, Sparkles, X } from "lucide-react";
@@ -6,6 +7,19 @@ import { headers } from "next/headers";
 import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
 import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 import { PricingCards } from "@/components/home/PricingCards";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const p = await getTranslations({ locale, namespace: "PricingPage" });
+  return {
+    title: p("title"),
+    description: p("description"),
+  };
+}
 
 export default async function PricingPage() {
   const t = await getTranslations("Landing");

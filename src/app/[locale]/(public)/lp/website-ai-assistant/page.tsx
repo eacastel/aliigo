@@ -1,5 +1,6 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   getCurrencyFromHeaders,
   normalizeCurrency,
@@ -16,6 +17,21 @@ import { FaqSection } from "@/components/home/FaqSection";
 import { FounderTrustCard } from "@/components/home/FounderTrustCard";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { HomeFloatingWidgetGate } from "@/components/home/FloatingWidgetGate";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Metadata" });
+  return {
+    title: locale.startsWith("es")
+      ? "Asistente web IA para empresas"
+      : "AI Website Assistant for Businesses",
+    description: t("description"),
+  };
+}
 
 function resolveMarketCurrency(params: {
   market?: string | string[];

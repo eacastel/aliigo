@@ -132,6 +132,26 @@ export default function middleware(req: NextRequest) {
   const res = handleI18nRouting(req);
   if (pathLocale) setLocaleCookie(res, pathLocale);
 
+  // Baseline security headers for app/public pages.
+  // Keep /embed/chat out of X-Frame-Options so external embedding still works via CSP frame-ancestors.
+  const isEmbedChat = pathname === "/embed/chat";
+  res.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), browsing-topics=()"
+  );
+  res.headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.headers.set("Cross-Origin-Resource-Policy", "same-site");
+  if (!isEmbedChat) {
+    res.headers.set("X-Frame-Options", "SAMEORIGIN");
+    res.headers.set(
+      "Content-Security-Policy",
+      "frame-ancestors 'self'; object-src 'none'; base-uri 'self'"
+    );
+  }
+
   const debugCountry = getCountryCode(req);
   if (debugCountry) {
     res.cookies.set("aliigo_country_debug", debugCountry, {

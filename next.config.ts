@@ -26,8 +26,6 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `frame-ancestors 'self' ${NEXT_PUBLIC_EMBED_ALLOW};`,
           },
-          // Legacy header; harmless for extra compatibility
-          { key: "X-Frame-Options", value: "ALLOWALL" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
