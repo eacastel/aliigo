@@ -23,6 +23,7 @@ type SessionPayload = {
   brand: string;
   slug: string;
   theme: Theme | null;
+  show_branding?: boolean;
 };
 
 type WidgetState = {
@@ -209,6 +210,7 @@ class AliigoWidget extends HTMLElement {
     return [
       "variant", "embed-key", "api-base", "locale", "session-token",
       "floating-mode", "theme", "brand",
+      "show-branding",
       "start-open",
     ];
   }
@@ -579,6 +581,14 @@ class AliigoWidget extends HTMLElement {
     return (this.getAttribute("start-open") || "").toLowerCase() === "true";
   }
 
+  private getShowBrandingOverride(): boolean | null {
+    const v = (this.getAttribute("show-branding") || "").trim().toLowerCase();
+    if (!v) return null;
+    if (v === "true") return true;
+    if (v === "false") return false;
+    return null;
+  }
+
   private getHideHeader(): boolean {
     return (this.getAttribute("hide-header") || "").toLowerCase() === "true";
   }
@@ -610,6 +620,7 @@ class AliigoWidget extends HTMLElement {
           brand: (brandOverride || "").trim(),
           slug: "",
           theme: themeOverride,
+          show_branding: this.getShowBrandingOverride() ?? false,
         };
 
         this.cachedTheme = this.state.session.theme || null;
@@ -644,6 +655,7 @@ class AliigoWidget extends HTMLElement {
         brand: (data.brand || "").trim(),
         slug: (data.slug || "").trim(),
         theme: (data.theme as Theme | null) || null,
+        show_branding: Boolean(data.show_branding),
       };
 
       this.cachedTheme = this.state.session.theme || null;
@@ -854,6 +866,36 @@ class AliigoWidget extends HTMLElement {
         backdrop-filter: blur(6px);
       }
 
+      .powered-wrap {
+        flex: 0 0 auto;
+        border-top: 1px solid rgba(255,255,255,0.14);
+        background: #0b0b0c;
+        padding: 12px 12px 8px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .powered-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        text-decoration: none;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      .powered-prefix {
+        color: #d4d4d8;
+        font-weight: 500;
+        font-style: italic;
+      }
+      .powered-logo {
+        width: 64px;
+        height: 21px;
+        object-fit: contain;
+        display: inline-block;
+      }
+
       /* --- Actions (buttons/links under assistant messages) --- */
       .actions { margin-top: 8px; display:flex; flex-wrap:wrap; gap:8px; }
       .action, .action-btn {
@@ -1044,6 +1086,8 @@ class AliigoWidget extends HTMLElement {
     const bot = splitPair(theme.bubbleBot, { bg: "#f3f4f6", text: "#111827" });
     const send = splitPair(theme.sendBg, { bg: "#2563eb", text: "#ffffff" });
     const hideHeader = this.getHideHeader();
+    const showBranding =
+      this.getShowBrandingOverride() ?? Boolean(session?.show_branding);
 
     const open = variant !== "floating" ? true : this.state.open;
 
@@ -1170,6 +1214,7 @@ class AliigoWidget extends HTMLElement {
       return;
     }
 
+    const brandingLogoUrl = `${this.getApiBase()}/widget/v1/aliigo.svg`;
     this.root.innerHTML = `
       <style>${this.css()}</style>
       <div class="${wrapperClass}">
@@ -1191,6 +1236,16 @@ class AliigoWidget extends HTMLElement {
             <input class="input" placeholder="${t.placeholder}" />
             <button class="send" type="submit" style="background:${send.bg};color:${send.text};" ${this.state.busy || !session?.token ? "disabled" : ""}>${t.send}</button>
           </form>
+          ${
+            showBranding
+              ? `<div class="powered-wrap">
+            <a class="powered-link" href="https://aliigo.com" target="_blank" rel="noopener noreferrer">
+              <span class="powered-prefix">Powered by</span>
+              <img class="powered-logo" src="${brandingLogoUrl}" alt="Aliigo logo" />
+            </a>
+          </div>`
+              : ""
+          }
         </div>
       </div>
     `;

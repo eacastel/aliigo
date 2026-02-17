@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
     const bizRes = await supabaseAdmin
       .from("businesses")
-      .select("id, slug, name, brand_name, default_locale, widget_theme")
+      .select("id, slug, name, brand_name, default_locale, widget_theme, billing_plan")
       .eq("public_embed_key", key)
       .maybeSingle<{
         id: string;
@@ -78,6 +78,7 @@ export async function GET(req: NextRequest) {
         brand_name: string | null;
         default_locale: string | null;
         widget_theme: ThemeDb;
+        billing_plan: string | null;
       }>();
 
     if (bizRes.error) return json(req, { error: "Supabase error", details: bizRes.error.message }, 500);
@@ -99,6 +100,8 @@ export async function GET(req: NextRequest) {
     const brand = (bizRes.data.brand_name || bizRes.data.name || "Aliigo").trim();
     const slug = bizRes.data.slug;
     const theme = bizRes.data.widget_theme ?? null;
+    const showBranding =
+      bizRes.data.billing_plan === "basic" || bizRes.data.billing_plan === "starter";
 
     const host = aliigoHost();
 
@@ -115,7 +118,7 @@ export async function GET(req: NextRequest) {
 
     if (ins.error) return json(req, { error: "Failed to create session", details: ins.error.message }, 500);
 
-    return json(req, { token, locale, brand, slug, theme }, 200);
+    return json(req, { token, locale, brand, slug, theme, show_branding: showBranding }, 200);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Server error";
     return json(req, { error: msg }, 500);

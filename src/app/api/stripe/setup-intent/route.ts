@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { supabaseAdmin, type BusinessRow } from "@/lib/supabaseAdmin";
 import { requireBusiness } from "@/lib/server/auth";
 import type Stripe from "stripe";
@@ -10,6 +10,7 @@ type BizStripeSlice = Pick<BusinessRow, "id" | "name" | "stripe_customer_id">;
 
 export async function POST(req: Request) {
   try {
+    const stripe = getStripe();
     const { businessId, email } = await requireBusiness(req);
 
     const { data: biz, error: bizErr } = await supabaseAdmin

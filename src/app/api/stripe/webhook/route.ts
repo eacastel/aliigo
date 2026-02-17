@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import {
-  stripe,
+  getStripe,
   planFromPriceId,
   normalizeAliigoPlan,
 } from "@/lib/stripe";
@@ -74,7 +74,7 @@ async function resolveBusinessIdFromSubscription(sub: Stripe.Subscription): Prom
   return null;
 }
 
-async function applySubscription(sub: Stripe.Subscription) {
+async function applySubscription(stripe: Stripe, sub: Stripe.Subscription) {
   const businessId = await resolveBusinessIdFromSubscription(sub);
   if (!businessId) return;
 
@@ -104,6 +104,7 @@ async function applySubscription(sub: Stripe.Subscription) {
 }
 
 export async function POST(req: Request) {
+  const stripe = getStripe();
   const sig = req.headers.get("stripe-signature");
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
-        await applySubscription(sub);
+        await applySubscription(stripe, sub);
         break;
       }
 
@@ -146,7 +147,7 @@ export async function POST(req: Request) {
 
         if (subId) {
           const sub = (await stripe.subscriptions.retrieve(subId)) as unknown as Stripe.Subscription;
-          await applySubscription(sub);
+          await applySubscription(stripe, sub);
         }
         break;
       }

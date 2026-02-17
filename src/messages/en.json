@@ -231,7 +231,8 @@
       "saveNowError": "Could not save now.",
       "generateTokenError": "Could not generate token.",
       "tokenGenerated": "Token generated.",
-      "rotatePublicKeyTodo": "TODO: implement /api/widget/rotate-public-key to rotate businesses.public_embed_key."
+      "rotatePublicKeySuccess": "Public embed key rotated.",
+      "rotatePublicKeyError": "Could not rotate public embed key."
     },
     "buttons": {
       "saving": "Saving…",
@@ -248,7 +249,7 @@
       "generateTokenTitle": "Developer token",
       "generateTokenDesc": "Generate a preview token for advanced/debug workflows.",
       "rotatePublicKeyTitle": "Public embed key",
-      "rotatePublicKeyDesc": "Rotate only if you suspect key leakage or abuse. This action is not implemented yet."
+      "rotatePublicKeyDesc": "Rotate only if you suspect key leakage or abuse."
     }
   },
   "Dashboard": {

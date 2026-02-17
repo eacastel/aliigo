@@ -2,11 +2,16 @@
 import Stripe from "stripe";
 import type { AliigoCurrency } from "@/lib/currency";
 
-const secretKey = process.env.STRIPE_SECRET_KEY;
-if (!secretKey) throw new Error("Missing STRIPE_SECRET_KEY");
+let stripeClient: Stripe | null = null;
 
 // Don’t hardcode apiVersion. Keep stripe SDK up to date and let it pin internally.
-export const stripe = new Stripe(secretKey, { typescript: true });
+export function getStripe(): Stripe {
+  if (stripeClient) return stripeClient;
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) throw new Error("Missing STRIPE_SECRET_KEY");
+  stripeClient = new Stripe(secretKey, { typescript: true });
+  return stripeClient;
+}
 
 export type AliigoPlan = "basic" | "growth" | "pro";
 export type AliigoPlanInput = AliigoPlan | "starter";
@@ -54,8 +59,6 @@ function validateStripePriceConfig(): void {
   }
 }
 
-validateStripePriceConfig();
-
 export function normalizeAliigoPlan(v: unknown): AliigoPlan | null {
   if (v === "starter" || v === "basic") return "basic";
   if (v === "growth") return "growth";
@@ -68,6 +71,7 @@ export function isAliigoPlan(v: unknown): v is AliigoPlanInput {
 }
 
 export function assertPlanPrice(plan: AliigoPlan, currency: AliigoCurrency): string {
+  validateStripePriceConfig();
   const price = PRICE_TABLE[currency]?.[plan];
   if (!price) throw new Error(`Missing Stripe price for plan: ${plan} (${currency})`);
   return price;

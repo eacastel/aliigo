@@ -12,6 +12,26 @@ function isLpPath(pathname: string): boolean {
   return pathname === "/lp/website-ai-assistant";
 }
 
+function resolveMarketCurrency(pathname: string) {
+  const params = new URLSearchParams(window.location.search);
+  const marketRaw = (params.get("market") || "").toLowerCase();
+  const currencyRaw = (params.get("currency") || "").toUpperCase();
+
+  const inferredMarket =
+    marketRaw ||
+    (window.location.pathname.startsWith("/es/") ? "es" : window.location.pathname.startsWith("/en/") ? "us" : "");
+
+  const inferredCurrency =
+    currencyRaw ||
+    (inferredMarket === "us" ? "USD" : inferredMarket ? "EUR" : "");
+
+  return {
+    market: inferredMarket || undefined,
+    currency: inferredCurrency || undefined,
+    path: pathname,
+  };
+}
+
 export default function PublicTrackingEvents() {
   const pathname = usePathname();
   const pricingTrackedRef = useRef<string | null>(null);
@@ -29,11 +49,11 @@ export default function PublicTrackingEvents() {
 
   useEffect(() => {
     if (isLpPath(pathname) && lpTrackedRef.current !== pathname) {
-      const params = new URLSearchParams(window.location.search);
+      const payload = resolveMarketCurrency(pathname);
       pushToGTM("lp_view", {
-        path: pathname,
-        market: params.get("market") ?? undefined,
-        currency: params.get("currency") ?? undefined,
+        path: payload.path,
+        market: payload.market,
+        currency: payload.currency,
       });
       lpTrackedRef.current = pathname;
     }
@@ -60,19 +80,19 @@ export default function PublicTrackingEvents() {
 
       const text = (anchor.textContent || "").trim().slice(0, 80);
       const sourcePath = window.location.pathname;
-      const params = new URLSearchParams(window.location.search);
+      const payload = resolveMarketCurrency(sourcePath);
       pushToGTM("signup_intent", {
-        path: sourcePath,
+        path: payload.path,
         cta_text: text || undefined,
-        market: params.get("market") ?? undefined,
-        currency: params.get("currency") ?? undefined,
+        market: payload.market,
+        currency: payload.currency,
       });
       if (isLpPath(pathname)) {
         pushToGTM("lp_signup_intent", {
-          path: sourcePath,
+          path: payload.path,
           cta_text: text || undefined,
-          market: params.get("market") ?? undefined,
-          currency: params.get("currency") ?? undefined,
+          market: payload.market,
+          currency: payload.currency,
         });
       }
     };

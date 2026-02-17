@@ -32,6 +32,7 @@ export default function WidgetAdvancedPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [rotatingToken, setRotatingToken] = useState(false);
+  const [rotatingKey, setRotatingKey] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -122,7 +123,36 @@ export default function WidgetAdvancedPage() {
   };
 
   const rotatePublicKey = async () => {
-    setMsg(t("messages.rotatePublicKeyTodo"));
+    setMsg(null);
+    setRotatingKey(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const accessToken = sess.session?.access_token;
+      if (!accessToken) {
+        setMsg(t("messages.loginRequired"));
+        return;
+      }
+
+      const res = await fetch("/api/widget/rotate-public-key", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const j: { publicEmbedKey?: string; error?: string } = await res.json().catch(() => ({}));
+      if (!res.ok || !j.publicEmbedKey) {
+        setMsg(j.error || t("messages.rotatePublicKeyError"));
+        return;
+      }
+
+      setPublicEmbedKey(j.publicEmbedKey);
+      setMsg(t("messages.rotatePublicKeySuccess"));
+    } catch {
+      setMsg(t("messages.rotatePublicKeyError"));
+    } finally {
+      setRotatingKey(false);
+    }
   };
 
   if (loading) {
@@ -179,8 +209,8 @@ export default function WidgetAdvancedPage() {
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <h2 className="font-semibold">{t("advanced.rotatePublicKeyTitle")}</h2>
         <p className="text-sm text-zinc-400">{t("advanced.rotatePublicKeyDesc")}</p>
-        <button className={btnNeutralStrong} onClick={rotatePublicKey} disabled={widgetLocked}>
-          {t("buttons.rotatePublicKey")}
+        <button className={btnNeutralStrong} onClick={rotatePublicKey} disabled={widgetLocked || rotatingKey}>
+          {rotatingKey ? t("buttons.saving") : t("buttons.rotatePublicKey")}
         </button>
       </section>
     </main>

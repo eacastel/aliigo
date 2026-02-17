@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
     // Pull only what we need for widget config
     const bizRes = await supabase
       .from("businesses")
-      .select("id, slug, name, brand_name, allowed_domains, default_locale, widget_theme")
+      .select("id, slug, name, brand_name, allowed_domains, default_locale, widget_theme, billing_plan")
       .eq("public_embed_key", key)
       .maybeSingle<{
         id: string;
@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
         allowed_domains: string[] | null;
         default_locale: string | null;
         widget_theme: ThemeDb;
+        billing_plan: string | null;
       }>();
 
     if (bizRes.error) {
@@ -78,6 +79,8 @@ export async function GET(req: NextRequest) {
     const brand = (bizRes.data.brand_name || bizRes.data.name || "Aliigo").trim();
     const slug = bizRes.data.slug;
     const theme = bizRes.data.widget_theme ?? null;
+    const showBranding =
+      bizRes.data.billing_plan === "basic" || bizRes.data.billing_plan === "starter";
 
     // Mint short-lived session token bound to this host
     const token = crypto.randomBytes(24).toString("hex");
@@ -95,7 +98,7 @@ export async function GET(req: NextRequest) {
       return json(req, { error: "Failed to create session", details: ins.error.message }, 500);
     }
 
-    return json(req, { token, locale, brand, slug, theme }, 200);
+    return json(req, { token, locale, brand, slug, theme, show_branding: showBranding }, 200);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     return json(req, { error: message }, 500);

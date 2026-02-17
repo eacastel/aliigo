@@ -232,7 +232,8 @@
       "saveNowError": "No se pudo guardar ahora.",
       "generateTokenError": "No se pudo generar el token.",
       "tokenGenerated": "Token generado.",
-      "rotatePublicKeyTodo": "TODO: implementar /api/widget/rotate-public-key para rotar businesses.public_embed_key."
+      "rotatePublicKeySuccess": "Clave pública de embed rotada.",
+      "rotatePublicKeyError": "No se pudo rotar la clave pública de embed."
     },
     "buttons": {
       "saving": "Guardando…",
@@ -249,7 +250,7 @@
       "generateTokenTitle": "Token de desarrollo",
       "generateTokenDesc": "Genera un token de vista previa para flujos avanzados o depuración.",
       "rotatePublicKeyTitle": "Clave pública de embed",
-      "rotatePublicKeyDesc": "Rótala solo si sospechas fuga o abuso de la clave. Esta acción aún no está implementada."
+      "rotatePublicKeyDesc": "Rótala solo si sospechas fuga o abuso de la clave."
     }
   },
   "Dashboard": {

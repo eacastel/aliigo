@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import {
-  stripe,
+  getStripe,
   assertPlanPrice,
   normalizeAliigoPlan,
 } from "@/lib/stripe";
@@ -32,6 +32,7 @@ type AliigoStripeSub = Stripe.Subscription & SubPeriods;
 
 export async function POST(req: Request) {
   try {
+    const stripe = getStripe();
     const { businessId } = await requireBusiness(req);
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 

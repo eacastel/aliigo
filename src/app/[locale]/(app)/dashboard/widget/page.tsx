@@ -141,6 +141,46 @@ function safeHex(v: string) {
   return "#" + rest.slice(0, 6);
 }
 
+function toColorPickerValue(v: string, fallback: string): string {
+  const s = v.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
+  if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+    const r = s[1];
+    const g = s[2];
+    const b = s[3];
+    return `#${r}${r}${g}${g}${b}${b}`;
+  }
+  return fallback;
+}
+
+function HexInput({
+  value,
+  onChange,
+  fallback = "#000000",
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  fallback?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        type="color"
+        className="h-10 w-10 cursor-pointer rounded border border-zinc-800 bg-zinc-950 p-1"
+        value={toColorPickerValue(value, fallback)}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label="Color picker"
+      />
+      <input
+        className="w-full border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+        value={value}
+        placeholder="#RRGGBB"
+        onChange={(e) => onChange(safeHex(e.target.value))}
+      />
+    </div>
+  );
+}
+
 export default function WidgetSettingsPage() {
   const t = useTranslations("DashboardWidget");
   const billingGate = useBillingGate();
@@ -159,6 +199,7 @@ export default function WidgetSettingsPage() {
 
   const [previewSessionToken, setPreviewSessionToken] = useState<string | null>(null);
   const [previewLocale, setPreviewLocale] = useState<"en" | "es">("en");
+  const [previewShowBranding, setPreviewShowBranding] = useState(false);
 
   type BizRow = {
     id: string;
@@ -261,6 +302,7 @@ export default function WidgetSettingsPage() {
               | "en"
               | "es"
           );
+          setPreviewShowBranding(Boolean(j.show_branding));
         }
       }
 
@@ -434,6 +476,7 @@ export default function WidgetSettingsPage() {
                   api-base={getBaseUrl()}
                   locale={previewLocale}
                   session-token={previewSessionToken}
+                  show-branding={previewShowBranding ? "true" : "false"}
                   theme={previewThemeJson}
                   brand={brand}
                 />
@@ -453,29 +496,25 @@ export default function WidgetSettingsPage() {
                 {t("bgText")}
               </div>
 
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={headerSplit.bg}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const bg = safeHex(e.target.value);
+                fallback="#111827"
+                onChange={(bg) =>
                   setTheme((t) => ({
                     ...t,
                     headerBg: joinTwoHex(bg, headerSplit.text || "#ffffff"),
-                  }));
-                }}
+                  }))
+                }
               />
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={headerSplit.text}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const text = safeHex(e.target.value);
+                fallback="#ffffff"
+                onChange={(text) =>
                   setTheme((t) => ({
                     ...t,
                     headerBg: joinTwoHex(headerSplit.bg || "#111827", text),
-                  }));
-                }}
+                  }))
+                }
               />
             </div>
 
@@ -488,29 +527,25 @@ export default function WidgetSettingsPage() {
                 {t("bgText")}
               </div>
 
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={userSplit.bg}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const bg = safeHex(e.target.value);
+                fallback="#2563eb"
+                onChange={(bg) =>
                   setTheme((t) => ({
                     ...t,
                     bubbleUser: joinTwoHex(bg, userSplit.text || "#ffffff"),
-                  }));
-                }}
+                  }))
+                }
               />
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={userSplit.text}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const text = safeHex(e.target.value);
+                fallback="#ffffff"
+                onChange={(text) =>
                   setTheme((t) => ({
                     ...t,
                     bubbleUser: joinTwoHex(userSplit.bg || "#2563eb", text),
-                  }));
-                }}
+                  }))
+                }
               />
             </div>
 
@@ -523,29 +558,25 @@ export default function WidgetSettingsPage() {
                 {t("bgText")}
               </div>
 
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={botSplit.bg}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const bg = safeHex(e.target.value);
+                fallback="#f3f4f6"
+                onChange={(bg) =>
                   setTheme((t) => ({
                     ...t,
                     bubbleBot: joinTwoHex(bg, botSplit.text || "#111827"),
-                  }));
-                }}
+                  }))
+                }
               />
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={botSplit.text}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const text = safeHex(e.target.value);
+                fallback="#111827"
+                onChange={(text) =>
                   setTheme((t) => ({
                     ...t,
                     bubbleBot: joinTwoHex(botSplit.bg || "#f3f4f6", text),
-                  }));
-                }}
+                  }))
+                }
               />
             </div>
             
@@ -557,14 +588,10 @@ export default function WidgetSettingsPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <input
-                  className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+                <HexInput
                   value={theme.panelBg}
-                  placeholder="#RRGGBB"
-                  onChange={(e) => {
-                    const bg = safeHex(e.target.value);
-                    setTheme((t) => ({ ...t, panelBg: bg }));
-                  }}
+                  fallback="#09090b"
+                  onChange={(bg) => setTheme((t) => ({ ...t, panelBg: bg }))}
                 />
 
                 <div className="flex items-center gap-3">
@@ -596,29 +623,25 @@ export default function WidgetSettingsPage() {
                 {t("bgText")}
               </div>
 
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={sendSplit.bg}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const bg = safeHex(e.target.value);
+                fallback="#2563eb"
+                onChange={(bg) =>
                   setTheme((t) => ({
                     ...t,
                     sendBg: joinTwoHex(bg, sendSplit.text || "#ffffff"),
-                  }));
-                }}
+                  }))
+                }
               />
-              <input
-                className="border border-zinc-800 bg-zinc-950 text-white rounded px-3 py-2 text-sm"
+              <HexInput
                 value={sendSplit.text}
-                placeholder="#RRGGBB"
-                onChange={(e) => {
-                  const text = safeHex(e.target.value);
+                fallback="#ffffff"
+                onChange={(text) =>
                   setTheme((t) => ({
                     ...t,
                     sendBg: joinTwoHex(sendSplit.bg || "#2563eb", text),
-                  }));
-                }}
+                  }))
+                }
               />
             </div>
           </div>
