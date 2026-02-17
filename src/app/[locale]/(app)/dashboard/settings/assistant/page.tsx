@@ -308,6 +308,7 @@ export default function SettingsAssistantPage() {
 
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [editorMode, setEditorMode] = useState<"quick" | "advanced">("quick");
 
   // --- UI parity buttons ---
   const btnBase =
@@ -725,6 +726,29 @@ export default function SettingsAssistantPage() {
 
       <section className="space-y-6">
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <div className="text-sm font-semibold text-zinc-100 mb-2">
+            {t("mode.title")}
+          </div>
+          <p className="text-xs text-zinc-400 mb-3">{t("mode.desc")}</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setEditorMode("quick")}
+              className={editorMode === "quick" ? btnBrand : btnNeutral}
+            >
+              {t("mode.quick")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditorMode("advanced")}
+              className={editorMode === "advanced" ? btnBrand : btnNeutral}
+            >
+              {t("mode.advanced")}
+            </button>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
           <div className="text-sm font-semibold text-zinc-100">
             {t("sections.presets.title")}
           </div>
@@ -956,43 +980,52 @@ export default function SettingsAssistantPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-xs text-zinc-400 mb-1">
-              {t("links.label")}
-            </label>
-            <p className="text-[11px] text-zinc-500 mb-2">{t("links.help")}</p>
-            <textarea
-              className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-              placeholder={t("links.placeholder")}
-              value={form.links}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, links: e.target.value }))
-              }
-            />
-          </div>
+          {editorMode === "advanced" ? (
+            <>
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("links.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">{t("links.help")}</p>
+                <textarea
+                  className="w-full min-h-[100px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("links.placeholder")}
+                  value={form.links}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, links: e.target.value }))
+                  }
+                />
+              </div>
 
-          <div>
-            <label className="block text-xs text-zinc-400 mb-1">
-              {t("additionalBusinessInfo.label")}
-            </label>
-            <p className="text-[11px] text-zinc-500 mb-2">
-              {t("additionalBusinessInfo.help")}
-            </p>
-            <textarea
-              className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-              placeholder={t("additionalBusinessInfo.placeholder")}
-              value={form.additionalBusinessInfo}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  additionalBusinessInfo: e.target.value,
-                }))
-              }
-            />
-          </div>
+              <div>
+                <label className="block text-xs text-zinc-400 mb-1">
+                  {t("additionalBusinessInfo.label")}
+                </label>
+                <p className="text-[11px] text-zinc-500 mb-2">
+                  {t("additionalBusinessInfo.help")}
+                </p>
+                <textarea
+                  className="w-full min-h-[140px] border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
+                  placeholder={t("additionalBusinessInfo.placeholder")}
+                  value={form.additionalBusinessInfo}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      additionalBusinessInfo: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </>
+          ) : (
+            <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-xs text-zinc-400">
+              {t("mode.quickHint")}
+            </div>
+          )}
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+        {editorMode === "advanced" ? (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
           <div className="text-sm font-semibold text-zinc-100">
             {t("sections.behavior.title")}
           </div>
@@ -1062,9 +1095,11 @@ export default function SettingsAssistantPage() {
               }
             />
           </div>
-        </div>
+          </div>
+        ) : null}
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+        {editorMode === "advanced" ? (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
           <div className="text-sm font-semibold text-zinc-100">
             {t("sections.qualification.title")}
           </div>
@@ -1087,7 +1122,8 @@ export default function SettingsAssistantPage() {
               }
             />
           </div>
-        </div>
+          </div>
+        ) : null}
 
         <div className="flex gap-2">
           <button

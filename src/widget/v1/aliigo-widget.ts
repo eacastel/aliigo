@@ -102,7 +102,7 @@ const UI = {
       message: "Here are my contact details.",
       hiddenMessage: "Lead submitted.",
       followUp:
-        "Thanks — I’ve got your details. Do you have any other questions? I can share pricing, show how the widget works, or help you get set up.",
+        "Thanks — we’ve received your information. We’ll follow up shortly.",
       consent: "I agree to be contacted about my request.",
       consentNote: "Your information will only be used to follow up on this request.",
     },
@@ -129,7 +129,7 @@ const UI = {
       message: "Aquí tienes mis datos de contacto.",
       hiddenMessage: "Datos enviados.",
       followUp:
-        "Gracias — ya tengo tus datos. ¿Tienes alguna otra pregunta? Puedo compartir precios, enseñarte cómo funciona el widget o ayudarte a empezar.",
+        "Gracias — hemos recibido tu información. Te responderemos en breve.",
       consent: "Acepto que me contacten sobre mi solicitud.",
       consentNote: "Usaremos estos datos solo para dar seguimiento a tu solicitud.",
     },

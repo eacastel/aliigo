@@ -489,6 +489,13 @@
   "AssistantSettings": {
     "title": "Assistant",
     "description": "Configure how your assistant speaks, what it should cover, and which links to share. Start with the essentials, then add details as needed.",
+    "mode": {
+      "title": "Setup mode",
+      "desc": "Use Quick setup for onboarding. Switch to Advanced when you want deeper control.",
+      "quick": "Quick setup",
+      "advanced": "Advanced setup",
+      "quickHint": "Advanced fields are hidden in Quick setup. Switch to Advanced to edit extra links, behavior rules, and qualification criteria."
+    },
     "loading": "Loading…",
     "loginRequired": {
       "title": "Login required",

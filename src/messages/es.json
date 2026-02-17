@@ -490,6 +490,13 @@
   "AssistantSettings": {
     "title": "Asistente",
     "description": "Configura cómo habla el asistente, qué debe cubrir y qué enlaces compartir. Empieza por lo esencial y añade detalles cuando lo necesites.",
+    "mode": {
+      "title": "Modo de configuración",
+      "desc": "Usa Configuración rápida para onboarding. Cambia a Avanzado para tener más control.",
+      "quick": "Configuración rápida",
+      "advanced": "Configuración avanzada",
+      "quickHint": "Los campos avanzados están ocultos en Configuración rápida. Cambia a Avanzado para editar enlaces extra, reglas de comportamiento y criterios de calificación."
+    },
     "loading": "Cargando…",
     "loginRequired": {
       "title": "Inicio de sesión requerido",
