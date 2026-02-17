@@ -49,10 +49,20 @@ Stored under `assistant_settings.draft`:
 - Endpoint: `POST /api/settings/assistant/autofill`
 - Auth: requires bearer session token.
 - Authorization: URL hostname must belong to the business `allowed_domains`.
+- Crawl strategy: same-domain crawl, breadth-first.
+- Limits:
+  - max pages: `20`
+  - max depth: `2`
+  - hard timeout: `20s`
+- Default exclusions:
+  - admin/account/auth paths (`/admin`, `/dashboard`, `/login`, `/auth`, `/wp-admin`, etc.)
+  - checkout/cart paths
+  - non-HTML asset extensions (`.pdf`, images, `.zip`, `.xml`, `.json`)
+  - URLs with `preview` or `token` query params
 - Output:
   - `draftForm` suggestions for assistant fields
   - `fieldStatuses`
-  - `sourceUrl`, `fetchedAt`
+  - `sourceUrl`, `fetchedAt`, `pagesCrawled`
 
 In UI (`dashboard/settings/assistant`):
 - user enters an allowed URL

@@ -356,6 +356,7 @@ export default function SettingsAssistantPage() {
   const [autofilling, setAutofilling] = useState(false);
 
   const initialAssistant = useRef<AssistantState | null>(null);
+  const publishedFormRef = useRef<AssistantForm | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [msgTone, setMsgTone] = useState<"success" | "error">("success");
   const [saving, setSaving] = useState(false);
@@ -475,6 +476,7 @@ export default function SettingsAssistantPage() {
           ...f,
           ...nextForm,
         }));
+        publishedFormRef.current = nextFormBase;
         setAckAuthorized(false);
         setEditorMode(hasAdvancedContent(nextForm) ? "advanced" : "quick");
 
@@ -511,6 +513,7 @@ export default function SettingsAssistantPage() {
           additionalBusinessInfo: "",
           qualificationPrompt: "",
         });
+        publishedFormRef.current = null;
         initialAssistant.current = empty;
       }
     } finally {
@@ -550,6 +553,63 @@ export default function SettingsAssistantPage() {
     return status;
   }, [form]);
 
+  const mergedFieldStatus = (key: keyof AssistantForm): "suggested" | "needs_review" | "missing" => {
+    const fromDraft = settingsEnvelope?.draft?.fieldStatuses?.[key];
+    if (fromDraft === "suggested" || fromDraft === "needs_review" || fromDraft === "missing") {
+      if (form[key].trim().length === 0) return "missing";
+      return fromDraft === "missing" ? "needs_review" : fromDraft;
+    }
+    return fieldStatuses[key] ?? "needs_review";
+  };
+
+  const statusBadge = (key: keyof AssistantForm) => {
+    const status = mergedFieldStatus(key);
+    const cls =
+      status === "suggested"
+        ? "text-emerald-300 border-emerald-800/70 bg-emerald-900/20"
+        : status === "missing"
+          ? "text-amber-300 border-amber-800/70 bg-amber-900/20"
+          : "text-zinc-300 border-zinc-700 bg-zinc-900/40";
+    return (
+      <span className={`ml-2 rounded-full border px-2 py-0.5 text-[10px] ${cls}`}>
+        {t(`autofill.status.${status}`)}
+      </span>
+    );
+  };
+
+  const clearField = (key: keyof AssistantForm) => {
+    setForm((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const revertField = (key: keyof AssistantForm) => {
+    const published = publishedFormRef.current;
+    setForm((prev) => ({
+      ...prev,
+      [key]: published ? published[key] : "",
+    }));
+  };
+
+  const fieldActions = (key: keyof AssistantForm) => (
+    mergedFieldStatus(key) === "suggested" ? (
+      <div className="mt-1 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => clearField(key)}
+          className="rounded-md border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300 hover:bg-zinc-900/60"
+        >
+          {t("actions.clearField")}
+        </button>
+        <button
+          type="button"
+          onClick={() => revertField(key)}
+          className="rounded-md border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300 hover:bg-zinc-900/60"
+        >
+          {t("actions.revertField")}
+        </button>
+      </div>
+    ) : null
+  );
+
   const runAutofill = async () => {
     setMsg(null);
     if (!autofillUrl.trim()) {
@@ -579,6 +639,7 @@ export default function SettingsAssistantPage() {
         error?: string;
         sourceUrl?: string;
         fetchedAt?: string;
+        pagesCrawled?: number;
         draftForm?: Partial<AssistantForm>;
         fieldStatuses?: Record<string, "suggested" | "needs_review" | "missing">;
       } = await res.json().catch(() => ({}));
@@ -615,7 +676,11 @@ export default function SettingsAssistantPage() {
         },
       }));
       setMsgTone("success");
-      setMsg(t("autofill.success"));
+      setMsg(
+        t("autofill.successWithPages", {
+          count: j.pagesCrawled ?? 1,
+        }),
+      );
     } catch (e) {
       console.error("[settings-assistant] autofill", e);
       setMsgTone("error");
@@ -782,6 +847,7 @@ export default function SettingsAssistantPage() {
 
       initialAssistant.current = next;
       setAssistant(next);
+      publishedFormRef.current = sanitizedForm;
       setSettingsEnvelope((j.business?.assistant_settings ?? nextEnvelope) as AssistantSettingsEnvelope);
       setAckAuthorized(false);
       setMsgTone("success");
@@ -846,20 +912,20 @@ export default function SettingsAssistantPage() {
         <div className="text-sm font-semibold text-zinc-100">{t("autofill.title")}</div>
         <p className="text-xs text-zinc-400">{t("autofill.desc")}</p>
         <div className="flex flex-col gap-2 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => void runAutofill()}
+            disabled={autofilling}
+            className="rounded-lg bg-brand-500/10 px-3 py-2 text-xs font-medium text-brand-200 ring-1 ring-inset ring-brand-500/25 transition-colors hover:bg-brand-500/15 disabled:opacity-60"
+          >
+            {autofilling ? t("autofill.loading") : t("autofill.action")}
+          </button>
           <input
             className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
             value={autofillUrl}
             onChange={(e) => setAutofillUrl(e.target.value)}
             placeholder={t("autofill.placeholder")}
           />
-          <button
-            type="button"
-            onClick={() => void runAutofill()}
-            disabled={autofilling}
-            className={btnBrand}
-          >
-            {autofilling ? t("autofill.loading") : t("autofill.action")}
-          </button>
         </div>
         {allowedDomains.length > 0 ? (
           <p className="text-[11px] text-zinc-500">
@@ -1039,6 +1105,7 @@ export default function SettingsAssistantPage() {
           <div>
             <label className="block text-xs text-zinc-400 mb-1">
               {t("businessSummary.label")}
+              {statusBadge("businessSummary")}
             </label>
             <p className="text-[11px] text-zinc-500 mb-2">
               {t("businessSummary.help")}
@@ -1050,11 +1117,13 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, businessSummary: e.target.value }))
               }
             />
+            {fieldActions("businessSummary")}
           </div>
 
           <div>
             <label className="block text-xs text-zinc-400 mb-1">
               {t("supportEmail.label")}
+              {statusBadge("supportEmail")}
             </label>
             <p className="text-[11px] text-zinc-500 mb-2">
               {t("supportEmail.help")}
@@ -1066,11 +1135,13 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, supportEmail: e.target.value }))
               }
             />
+            {fieldActions("supportEmail")}
           </div>
 
           <div>
             <label className="block text-xs text-zinc-400 mb-1">
               {t("ctaUrls.label")}
+              {statusBadge("ctaUrls")}
             </label>
             <p className="text-[11px] text-zinc-500 mb-2">
               {t("ctaUrls.help")}
@@ -1082,11 +1153,13 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, ctaUrls: e.target.value }))
               }
             />
+            {fieldActions("ctaUrls")}
           </div>
 
           <div>
             <label className="block text-xs text-zinc-400 mb-1">
               {t("businessDetails.label")}
+              {statusBadge("businessDetails")}
             </label>
             <p className="text-[11px] text-zinc-500 mb-2">
               {t("businessDetails.help")}
@@ -1098,11 +1171,13 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, businessDetails: e.target.value }))
               }
             />
+            {fieldActions("businessDetails")}
           </div>
 
           <div>
             <label className="block text-xs text-zinc-400 mb-1">
               {t("keyFacts.label")}
+              {statusBadge("keyFacts")}
             </label>
             <p className="text-[11px] text-zinc-500 mb-2">
               {t("keyFacts.help")}
@@ -1114,6 +1189,7 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, keyFacts: e.target.value }))
               }
             />
+            {fieldActions("keyFacts")}
           </div>
 
           <div>
@@ -1130,6 +1206,7 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, policies: e.target.value }))
               }
             />
+            {fieldActions("policies")}
           </div>
 
           {editorMode === "advanced" ? (
@@ -1146,6 +1223,7 @@ export default function SettingsAssistantPage() {
                     setForm((f) => ({ ...f, links: e.target.value }))
                   }
                 />
+                {fieldActions("links")}
               </div>
 
               <div>

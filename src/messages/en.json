@@ -622,7 +622,9 @@
       "saving": "Saving…",
       "publishing": "Publishing…",
       "reset": "Reset changes",
-      "unsaved": "You have unsaved changes."
+      "unsaved": "You have unsaved changes.",
+      "clearField": "Clear field",
+      "revertField": "Restore published"
     },
     "preview": {
       "title": "Assistant preview",
@@ -681,7 +683,13 @@
       "allowed": "Allowed domains",
       "success": "Suggestions loaded. Review fields and save draft.",
       "error": "Could not autofill",
-      "missingUrl": "Enter a URL to autofill."
+      "missingUrl": "Enter a URL to autofill.",
+      "status": {
+        "suggested": "Suggested",
+        "needs_review": "Review",
+        "missing": "Missing"
+      },
+      "successWithPages": "Suggestions loaded from {count} pages. Review fields and save draft."
     }
   },
   "Landing": {

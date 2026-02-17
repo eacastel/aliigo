@@ -623,7 +623,9 @@
       "saving": "Guardando…",
       "publishing": "Publicando…",
       "reset": "Restablecer cambios",
-      "unsaved": "Tienes cambios sin guardar."
+      "unsaved": "Tienes cambios sin guardar.",
+      "clearField": "Limpiar campo",
+      "revertField": "Restaurar publicado"
     },
     "preview": {
       "title": "Vista previa del asistente",
@@ -682,7 +684,13 @@
       "allowed": "Dominios permitidos",
       "success": "Sugerencias cargadas. Revisa los campos y guarda borrador.",
       "error": "No se pudo autocompletar",
-      "missingUrl": "Introduce una URL para autocompletar."
+      "missingUrl": "Introduce una URL para autocompletar.",
+      "status": {
+        "suggested": "Sugerido",
+        "needs_review": "Revisar",
+        "missing": "Falta"
+      },
+      "successWithPages": "Sugerencias cargadas desde {count} páginas. Revisa los campos y guarda borrador."
     }
   },
   "Landing": {
