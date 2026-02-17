@@ -81,6 +81,10 @@ export async function GET(req: NextRequest) {
     const theme = bizRes.data.widget_theme ?? null;
     const showBranding =
       bizRes.data.billing_plan === "basic" || bizRes.data.billing_plan === "starter";
+    const localeAuto =
+      bizRes.data.billing_plan === "growth" ||
+      bizRes.data.billing_plan === "pro" ||
+      bizRes.data.billing_plan === "custom";
 
     // Mint short-lived session token bound to this host
     const token = crypto.randomBytes(24).toString("hex");
@@ -98,7 +102,11 @@ export async function GET(req: NextRequest) {
       return json(req, { error: "Failed to create session", details: ins.error.message }, 500);
     }
 
-    return json(req, { token, locale, brand, slug, theme, show_branding: showBranding }, 200);
+    return json(
+      req,
+      { token, locale, brand, slug, theme, show_branding: showBranding, locale_auto: localeAuto },
+      200
+    );
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     return json(req, { error: message }, 500);

@@ -24,6 +24,7 @@ type SessionPayload = {
   slug: string;
   theme: Theme | null;
   show_branding?: boolean;
+  locale_auto?: boolean;
 };
 
 type WidgetState = {
@@ -550,6 +551,27 @@ class AliigoWidget extends HTMLElement {
     return v.startsWith("es") ? "es" : "en";
   }
 
+  private detectWebsiteLocale(): "en" | "es" | null {
+    try {
+      const htmlLang = (document.documentElement.lang || "").toLowerCase();
+      if (htmlLang.startsWith("es")) return "es";
+      if (htmlLang.startsWith("en")) return "en";
+
+      const og = (
+        document
+          .querySelector('meta[property="og:locale"],meta[name="og:locale"]')
+          ?.getAttribute("content") || ""
+      ).toLowerCase();
+      if (og.startsWith("es")) return "es";
+      if (og.startsWith("en")) return "en";
+
+      const p = window.location.pathname.toLowerCase();
+      if (/(^|\/)es(\/|$)/.test(p)) return "es";
+      if (/(^|\/)en(\/|$)/.test(p)) return "en";
+    } catch {}
+    return null;
+  }
+
   private getSessionTokenOverride(): string | null {
     const t = (this.getAttribute("session-token") || "").trim();
     return t || null;
@@ -621,6 +643,7 @@ class AliigoWidget extends HTMLElement {
           slug: "",
           theme: themeOverride,
           show_branding: this.getShowBrandingOverride() ?? false,
+          locale_auto: false,
         };
 
         this.cachedTheme = this.state.session.theme || null;
@@ -647,7 +670,10 @@ class AliigoWidget extends HTMLElement {
       }
 
       const localeOverride = this.getLocaleOverride();
-      const locale = localeOverride || (isEs(data.locale || "en") ? "es" : "en");
+      const fallbackLocale = isEs(data.locale || "en") ? "es" : "en";
+      const localeAuto = Boolean(data.locale_auto);
+      const detectedLocale = localeAuto ? this.detectWebsiteLocale() : null;
+      const locale = localeOverride || detectedLocale || fallbackLocale;
 
       this.state.session = {
         token: data.token,
@@ -656,6 +682,7 @@ class AliigoWidget extends HTMLElement {
         slug: (data.slug || "").trim(),
         theme: (data.theme as Theme | null) || null,
         show_branding: Boolean(data.show_branding),
+        locale_auto: localeAuto,
       };
 
       this.cachedTheme = this.state.session.theme || null;
@@ -1063,7 +1090,15 @@ class AliigoWidget extends HTMLElement {
 
 
     const session = this.state.session;
-    const locale = this.getLocaleOverride() || this.state.locale;
+    const localeOverride = this.getLocaleOverride();
+    let locale = localeOverride || this.state.locale;
+    if (!localeOverride && session?.locale_auto) {
+      const detected = this.detectWebsiteLocale();
+      if (detected && detected !== locale) {
+        locale = detected;
+        this.state.locale = detected;
+      }
+    }
     const t = UI[locale];
 
 

@@ -250,7 +250,9 @@
       "generateTokenTitle": "Token de desarrollo",
       "generateTokenDesc": "Genera un token de vista previa para flujos avanzados o depuración.",
       "rotatePublicKeyTitle": "Clave pública de embed",
-      "rotatePublicKeyDesc": "Rótala solo si sospechas fuga o abuso de la clave."
+      "rotatePublicKeyDesc": "Rótala solo si sospechas fuga o abuso de la clave.",
+      "rotatePublicKeyWarning": "Aviso: al rotar esta clave se invalidan las instalaciones actuales. Debes actualizar el código del widget en todos los sitios.",
+      "rotatePublicKeyConfirm": "¿Rotar la clave pública ahora? Las instalaciones actuales dejarán de funcionar hasta que se actualicen con la nueva clave."
     }
   },
   "Dashboard": {

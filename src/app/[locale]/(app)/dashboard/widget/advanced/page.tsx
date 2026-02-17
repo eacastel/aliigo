@@ -123,6 +123,9 @@ export default function WidgetAdvancedPage() {
   };
 
   const rotatePublicKey = async () => {
+    const ok = window.confirm(t("advanced.rotatePublicKeyConfirm"));
+    if (!ok) return;
+
     setMsg(null);
     setRotatingKey(true);
     try {
@@ -209,6 +212,7 @@ export default function WidgetAdvancedPage() {
       <section className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <h2 className="font-semibold">{t("advanced.rotatePublicKeyTitle")}</h2>
         <p className="text-sm text-zinc-400">{t("advanced.rotatePublicKeyDesc")}</p>
+        <p className="text-xs text-amber-300">{t("advanced.rotatePublicKeyWarning")}</p>
         <button className={btnNeutralStrong} onClick={rotatePublicKey} disabled={widgetLocked || rotatingKey}>
           {rotatingKey ? t("buttons.saving") : t("buttons.rotatePublicKey")}
         </button>

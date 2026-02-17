@@ -249,7 +249,9 @@
       "generateTokenTitle": "Developer token",
       "generateTokenDesc": "Generate a preview token for advanced/debug workflows.",
       "rotatePublicKeyTitle": "Public embed key",
-      "rotatePublicKeyDesc": "Rotate only if you suspect key leakage or abuse."
+      "rotatePublicKeyDesc": "Rotate only if you suspect key leakage or abuse.",
+      "rotatePublicKeyWarning": "Warning: rotating this key invalidates current embed installs. You must update widget code on every site.",
+      "rotatePublicKeyConfirm": "Rotate public key now? Existing widget installs will stop working until updated with the new key."
     }
   },
   "Dashboard": {
