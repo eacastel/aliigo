@@ -636,6 +636,14 @@ class AliigoWidget extends HTMLElement {
     return null;
   }
 
+  private getShowHeaderIconOverride(): boolean | null {
+    const v = (this.getAttribute("show-header-icon") || "").trim().toLowerCase();
+    if (!v) return null;
+    if (v === "true") return true;
+    if (v === "false") return false;
+    return null;
+  }
+
   private getHideHeader(): boolean {
     return (this.getAttribute("hide-header") || "").toLowerCase() === "true";
   }
@@ -668,6 +676,7 @@ class AliigoWidget extends HTMLElement {
           slug: "",
           theme: themeOverride,
           show_branding: this.getShowBrandingOverride() ?? false,
+          show_header_icon: this.getShowHeaderIconOverride() ?? false,
           locale_auto: false,
         };
 
