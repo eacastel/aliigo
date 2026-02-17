@@ -6,6 +6,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 import { type AliigoCurrency } from "@/lib/currency";
 import BillingCheckout from "@/components/billing/BillingCheckout";
+import { formatPlanPrice, planPriceAmount, type PublicPlan } from "@/lib/pricing";
 
 type BillingStatus = "incomplete" | "trialing" | "active" | "canceled" | "past_due";
 type BillingPlan = "basic" | "growth" | "pro" | "custom" | "starter" | null;
@@ -69,17 +70,23 @@ export default function BillingPageClient({ initialCurrency }: BillingPageClient
 
   // --- pricing (display only; keep in sync with Stripe) ---
   const currency = initialCurrency;
-  const displayLocale = currency === "USD" ? "en-US" : locale;
-  const priceFmt = new Intl.NumberFormat(displayLocale, { style: "currency", currency, maximumFractionDigits: 0 });
+  const priceFor = (plan: PublicPlan) =>
+    formatPlanPrice({
+      amount: planPriceAmount(currency, plan),
+      currency,
+      locale,
+      forceLeadingEuroForSpanish: true,
+    });
+
   const priceForPlan = (p: BillingPlan) =>
     p === "basic" || p === "starter"
-      ? priceFmt.format(currency === "USD" ? 49 : 39)
+      ? priceFor("basic")
       : p === "growth"
-        ? priceFmt.format(currency === "USD" ? 99 : 89)
+        ? priceFor("growth")
         : p === "pro"
-          ? priceFmt.format(currency === "USD" ? 149 : 129)
+          ? priceFor("pro")
           : p === "custom"
-            ? priceFmt.format(currency === "USD" ? 349 : 299)
+            ? priceFor("custom")
             : "—";
   const basicPrice = priceForPlan("basic");
   const growthPrice = priceForPlan("growth");

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 
 type Plan = "basic" | "growth" | "pro";
 
@@ -16,10 +17,24 @@ export default function PlanSelector({
   currency: "EUR" | "USD";
 }) {
   const t = useTranslations("Billing");
-  const fmt = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
-  const basic = fmt.format(currency === "USD" ? 49 : 39);
-  const growth = fmt.format(currency === "USD" ? 99 : 89);
-  const pro = fmt.format(currency === "USD" ? 149 : 129);
+  const basic = formatPlanPrice({
+    amount: planPriceAmount(currency, "basic"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const growth = formatPlanPrice({
+    amount: planPriceAmount(currency, "growth"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
+  const pro = formatPlanPrice({
+    amount: planPriceAmount(currency, "pro"),
+    currency,
+    locale,
+    forceLeadingEuroForSpanish: true,
+  });
 
   return (
     <div className="grid gap-3">
