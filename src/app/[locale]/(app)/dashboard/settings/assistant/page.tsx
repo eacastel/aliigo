@@ -46,6 +46,7 @@ type JoinedBusiness = {
   knowledge?: string | null;
   assistant_settings?: AssistantSettings | null;
   allowed_domains?: string[] | null;
+  billing_plan?: string | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -399,6 +400,7 @@ export default function SettingsAssistantPage() {
   const [ackAuthorized, setAckAuthorized] = useState(false);
   const [settingsEnvelope, setSettingsEnvelope] =
     useState<AssistantSettingsEnvelope | null>(null);
+  const [billingPlan, setBillingPlan] = useState<string>("basic");
   const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
   const [autofillUrl, setAutofillUrl] = useState("");
   const [autofilling, setAutofilling] = useState(false);
@@ -417,6 +419,10 @@ export default function SettingsAssistantPage() {
   const [msgTone, setMsgTone] = useState<"success" | "error">("success");
   const [saving, setSaving] = useState(false);
   const [editorMode, setEditorMode] = useState<"quick" | "advanced">("quick");
+
+  const isBasicPlan = billingPlan === "basic";
+  const canUseAdvancedSetup = !isBasicPlan;
+  const canUseWebsiteIndexing = !isBasicPlan;
 
   // --- UI parity buttons ---
   const btnBase =
@@ -497,7 +503,8 @@ export default function SettingsAssistantPage() {
             qualification_prompt,
             knowledge,
             assistant_settings,
-            allowed_domains
+            allowed_domains,
+            billing_plan
           )
         `,
         )
@@ -531,6 +538,7 @@ export default function SettingsAssistantPage() {
         const parsedSystem = parseSystemPrompt(next.system_prompt);
         const parsedKnowledge = parseKnowledge(next.knowledge);
         const settings = (biz.assistant_settings ?? null) as AssistantSettingsEnvelope | null;
+        setBillingPlan((biz.billing_plan ?? "basic").toLowerCase());
         setSettingsEnvelope(settings);
         const domains = (biz.allowed_domains ?? [])
           .map((d) => d.trim().toLowerCase())
@@ -590,6 +598,7 @@ export default function SettingsAssistantPage() {
         }
       } else {
         setBusinessId(null);
+        setBillingPlan("basic");
         setSettingsEnvelope(null);
         const empty = {
           system_prompt: "",
@@ -633,6 +642,18 @@ export default function SettingsAssistantPage() {
     if (activeTab !== "indexed") return;
     void loadIndexSummary(indexPage);
   }, [activeTab, indexPage]);
+
+  useEffect(() => {
+    if (!canUseAdvancedSetup && editorMode === "advanced") {
+      setEditorMode("quick");
+    }
+  }, [canUseAdvancedSetup, editorMode]);
+
+  useEffect(() => {
+    if (!canUseWebsiteIndexing && activeTab === "indexed") {
+      setActiveTab("assistant");
+    }
+  }, [canUseWebsiteIndexing, activeTab]);
 
   const dirty = useMemo(() => {
     const ia = initialAssistant.current;
@@ -1175,11 +1196,15 @@ export default function SettingsAssistantPage() {
         <button
           type="button"
           onClick={() => setActiveTab("indexed")}
+          disabled={!canUseWebsiteIndexing}
           className={activeTab === "indexed" ? btnBrand : btnNeutral}
         >
           {t("tabs.indexed")}
         </button>
       </div>
+      {!canUseWebsiteIndexing ? (
+        <p className="mb-4 text-xs text-amber-300">{t("plans.indexingUpgradeHint")}</p>
+      ) : null}
 
       <div className={activeTab === "assistant" ? "" : "hidden"}>
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
@@ -1207,7 +1232,7 @@ export default function SettingsAssistantPage() {
           <button
             type="button"
             onClick={() => void runIndexing("website")}
-            disabled={indexing}
+            disabled={indexing || !canUseWebsiteIndexing}
             className="rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-medium text-zinc-200 ring-1 ring-inset ring-zinc-700 transition-colors hover:bg-zinc-900/80 disabled:opacity-60"
           >
             {indexing && indexingMode === "website"
@@ -1217,7 +1242,7 @@ export default function SettingsAssistantPage() {
           <button
             type="button"
             onClick={() => void runIndexing("single_page")}
-            disabled={indexing}
+            disabled={indexing || !canUseWebsiteIndexing}
             className="rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-medium text-zinc-200 ring-1 ring-inset ring-zinc-700 transition-colors hover:bg-zinc-900/80 disabled:opacity-60"
           >
             {indexing && indexingMode === "single_page"
@@ -1297,11 +1322,15 @@ export default function SettingsAssistantPage() {
             <button
               type="button"
               onClick={() => setEditorMode("advanced")}
+              disabled={!canUseAdvancedSetup}
               className={editorMode === "advanced" ? btnBrand : btnNeutral}
             >
               {t("mode.advanced")}
             </button>
           </div>
+          {!canUseAdvancedSetup ? (
+            <p className="mt-2 text-[11px] text-amber-300">{t("plans.advancedUpgradeHint")}</p>
+          ) : null}
         </div>
 
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
@@ -1340,6 +1369,7 @@ export default function SettingsAssistantPage() {
                         key={opt}
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, goal: opt }))}
+                        disabled={isBasicPlan}
                         className={`${opt === form.goal ? btnBrand : btnNeutral}`}
                       >
                         {t(`goal.options.${opt}`)}
@@ -1364,6 +1394,7 @@ export default function SettingsAssistantPage() {
                           onClick={() =>
                             setForm((f) => ({ ...f, handoff: opt }))
                           }
+                          disabled={isBasicPlan}
                           className={`${opt === form.handoff ? btnBrand : btnNeutral}`}
                         >
                           {t(`handoff.options.${opt}`)}
@@ -1386,6 +1417,7 @@ export default function SettingsAssistantPage() {
                         key={opt}
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, cta: opt }))}
+                        disabled={isBasicPlan}
                         className={`${opt === form.cta ? btnBrand : btnNeutral}`}
                       >
                         {t(`cta.options.${opt}`)}
@@ -1394,6 +1426,9 @@ export default function SettingsAssistantPage() {
                   </div>
                 </div>
                 </div>
+                {isBasicPlan ? (
+                  <p className="mt-3 text-[11px] text-amber-300">{t("plans.basicToneOnlyHint")}</p>
+                ) : null}
             </div>
           </div>
         </div>

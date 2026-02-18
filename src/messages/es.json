@@ -9,7 +9,7 @@
     "links": {
       "dashboard": "Resumen",
       "business": "Empresa",
-      "assistant": "Conocimientos",
+      "assistant": "Inteligencia",
       "widget": "Widget",
       "messages": "Mensajes",
       "billing": "Facturación",
@@ -488,7 +488,7 @@
     }
   },
   "AssistantSettings": {
-    "title": "Conocimientos",
+    "title": "Inteligencia",
     "description": "Configura cómo habla el asistente, qué debe cubrir y qué enlaces compartir. Empieza por lo esencial y añade detalles cuando lo necesites.",
     "tabs": {
       "assistant": "Configuración del asistente",
@@ -496,6 +496,11 @@
       "prev": "Anterior",
       "next": "Siguiente",
       "page": "Página"
+    },
+    "plans": {
+      "indexingUpgradeHint": "El indexado de sitio y contenido indexado están disponibles en planes Growth+.",
+      "advancedUpgradeHint": "La configuración avanzada está disponible en planes Growth+.",
+      "basicToneOnlyHint": "En Basic solo puedes ajustar el tono del asistente."
     },
     "mode": {
       "title": "Modo de configuración",
@@ -684,7 +689,7 @@
     },
     "autofill": {
       "title": "Asistencia de onboarding",
-      "desc": "Genera borradores de configuración desde tu web e indexa conocimiento para respuestas en vivo del asistente.",
+      "desc": "Genera borradores de configuración desde tu web e indexa el sitio para respuestas en vivo del asistente.",
       "placeholder": "https://tu-dominio.com",
       "action": "Generar borrador de configuración",
       "replaceAction": "Regenerar y reemplazar borrador",
@@ -704,7 +709,7 @@
       "indexSinglePageAction": "Agregar página",
       "indexing": "Indexando…",
       "indexSuccess": "Indexación completa: {pages} páginas, {docs} documentos, {chunks} fragmentos.",
-      "indexError": "No se pudo indexar conocimiento",
+      "indexError": "No se pudo indexar el sitio",
       "monitor": {
         "title": "Monitor de contenido indexado",
         "open": "Abrir",
@@ -712,7 +717,7 @@
         "refresh": "Actualizar",
         "collapsedHint": "Ábrelo para revisar páginas indexadas, fragmentos y estado de la última ejecución.",
         "loading": "Cargando detalles del índice…",
-        "empty": "Aún no hay contenido indexado. Usa “Indexar conocimiento” para generar documentos y fragmentos.",
+        "empty": "Aún no hay contenido indexado. Usa “Indexar web” para generar documentos y fragmentos.",
         "docs": "Documentos",
         "chunks": "Fragmentos",
         "runs": "Ejecuciones",

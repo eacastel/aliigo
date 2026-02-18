@@ -214,10 +214,18 @@ export async function POST(req: NextRequest) {
 
     const { data: business, error: bErr } = await admin
       .from("businesses")
-      .select("allowed_domains")
+      .select("allowed_domains,billing_plan")
       .eq("id", businessId)
-      .single<{ allowed_domains: string[] | null }>();
+      .single<{ allowed_domains: string[] | null; billing_plan: string | null }>();
     if (bErr) return NextResponse.json({ error: bErr.message }, { status: 400 });
+
+    const plan = (business.billing_plan ?? "basic").toLowerCase();
+    if (plan === "basic") {
+      return NextResponse.json(
+        { error: "Website indexing is available on Growth+ plans." },
+        { status: 403 },
+      );
+    }
 
     const allowed = new Set((business.allowed_domains ?? []).map((d) => d.toLowerCase()));
     if (!allowed.has(normalizedHost) && !allowed.has(`www.${normalizedHost}`)) {

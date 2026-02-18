@@ -496,6 +496,11 @@
       "next": "Next",
       "page": "Page"
     },
+    "plans": {
+      "indexingUpgradeHint": "Website indexing and indexed content are available on Growth+ plans.",
+      "advancedUpgradeHint": "Advanced setup is available on Growth+ plans.",
+      "basicToneOnlyHint": "On Basic, only assistant tone can be adjusted."
+    },
     "mode": {
       "title": "Setup mode",
       "desc": "Use Quick setup for onboarding. Switch to Advanced when you want deeper control.",
@@ -703,7 +708,7 @@
       "indexSinglePageAction": "Add single page",
       "indexing": "Indexing…",
       "indexSuccess": "Index complete: {pages} pages, {docs} documents, {chunks} chunks.",
-      "indexError": "Could not index knowledge",
+      "indexError": "Could not index website",
       "monitor": {
         "title": "Indexed content monitor",
         "open": "Open",
@@ -711,7 +716,7 @@
         "refresh": "Refresh",
         "collapsedHint": "Open to review indexed pages, chunks, and latest run status.",
         "loading": "Loading index details…",
-        "empty": "No indexed content yet. Run “Index knowledge” to generate documents and chunks.",
+        "empty": "No indexed content yet. Run “Index website” to generate documents and chunks.",
         "docs": "Documents",
         "chunks": "Chunks",
         "runs": "Runs",

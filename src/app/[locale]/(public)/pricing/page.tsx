@@ -93,6 +93,22 @@ export default async function PricingPage() {
       type: "text",
     },
     {
+      feature: isEs ? "Indexado web" : "Website indexing",
+      basic: isEs ? "No incluido" : "Not included",
+      growth: isEs ? "Incluido" : "Included",
+      pro: isEs ? "Incluido" : "Included",
+      custom: isEs ? "Incluido" : "Included",
+      type: "text",
+    },
+    {
+      feature: isEs ? "Identidad: logo de cabecera" : "Identity: header logo upload",
+      basic: isEs ? "No incluido" : "Not included",
+      growth: isEs ? "Incluido" : "Included",
+      pro: isEs ? "Incluido" : "Included",
+      custom: isEs ? "Incluido" : "Included",
+      type: "text",
+    },
+    {
       feature: isEs ? "Entrenamiento" : "Training sources",
       basic: isEs ? "Solo web (autogestión)" : "Website only (self-serve)",
       growth: isEs ? "Web + PDF (autogestión)" : "Website + PDF (self-serve)",
