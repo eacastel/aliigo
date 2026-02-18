@@ -676,10 +676,10 @@
       "loginRequired": "Debes iniciar sesión para continuar."
     },
     "autofill": {
-      "title": "Autocompletar desde web",
-      "desc": "Extrae contenido de una URL permitida para sugerir campos del asistente. Revisa y guarda borrador antes de publicar.",
+      "title": "Asistencia de onboarding",
+      "desc": "Genera borradores de configuración desde tu web e indexa conocimiento para respuestas en vivo del asistente.",
       "placeholder": "https://tu-dominio.com",
-      "action": "Traer sugerencias",
+      "action": "Generar borrador de configuración",
       "loading": "Extrayendo…",
       "allowed": "Dominios permitidos",
       "success": "Sugerencias cargadas. Revisa los campos y guarda borrador.",
@@ -691,7 +691,8 @@
         "missing": "Falta"
       },
       "successWithPages": "Sugerencias cargadas desde {count} páginas. Revisa los campos y guarda borrador.",
-      "indexAction": "Indexar conocimiento",
+      "indexWebsiteAction": "Indexar web",
+      "indexSinglePageAction": "Agregar página",
       "indexing": "Indexando…",
       "indexSuccess": "Indexación completa: {pages} páginas, {docs} documentos, {chunks} fragmentos.",
       "indexError": "No se pudo indexar conocimiento",

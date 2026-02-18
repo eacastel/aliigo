@@ -174,13 +174,20 @@ export async function POST(req: NextRequest) {
       : "";
     if (!token) return NextResponse.json({ error: "Missing Authorization token" }, { status: 401 });
 
-    const body = (await req.json().catch(() => ({}))) as { url?: string; locale?: string };
+    const body = (await req.json().catch(() => ({}))) as {
+      url?: string;
+      locale?: string;
+      mode?: "website" | "single_page";
+    };
     const sourceUrl = (body.url ?? "").trim();
     if (!sourceUrl) return NextResponse.json({ error: "Missing url" }, { status: 400 });
     const normalizedHost = normalizeHostname(sourceUrl);
     if (!normalizedHost) return NextResponse.json({ error: "Invalid url" }, { status: 400 });
 
     const locale = normalizeLocale(body.locale);
+    const crawlMode = body.mode === "single_page" ? "single_page" : "website";
+    const maxPages = crawlMode === "single_page" ? 1 : MAX_CRAWL_PAGES;
+    const maxDepth = crawlMode === "single_page" ? 0 : MAX_CRAWL_DEPTH;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -225,6 +232,7 @@ export async function POST(req: NextRequest) {
         source_url: sourceUrl,
         requested_by: userId,
         status: "running",
+        metadata: { mode: crawlMode },
       })
       .select("id")
       .single<{ id: string }>();
@@ -240,7 +248,7 @@ export async function POST(req: NextRequest) {
     let chunksUpserted = 0;
     const errors: string[] = [];
 
-    while (queue.length > 0 && seen.size < MAX_CRAWL_PAGES) {
+    while (queue.length > 0 && seen.size < maxPages) {
       if (Date.now() - startedAt > MAX_CRAWL_MS) break;
       const current = queue.shift();
       if (!current) break;
@@ -346,10 +354,10 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      if (current.depth >= MAX_CRAWL_DEPTH) continue;
+      if (current.depth >= maxDepth) continue;
       const hrefRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
       let m: RegExpExecArray | null;
-      while ((m = hrefRegex.exec(html)) && queue.length < MAX_CRAWL_PAGES * 4) {
+      while ((m = hrefRegex.exec(html)) && queue.length < maxPages * 4) {
         const next = normalizeUrl(m[1], current.url);
         if (!next) continue;
         if (!isSameDomain(next, normalizedHost) || !isCrawlAllowed(next)) continue;
@@ -377,10 +385,11 @@ export async function POST(req: NextRequest) {
       chunksUpserted: chunksUpserted,
       errors,
       limits: {
-        maxPages: MAX_CRAWL_PAGES,
-        maxDepth: MAX_CRAWL_DEPTH,
+        maxPages,
+        maxDepth,
         maxMs: MAX_CRAWL_MS,
       },
+      mode: crawlMode,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Server error";

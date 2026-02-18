@@ -387,6 +387,7 @@ export default function SettingsAssistantPage() {
   const [autofillUrl, setAutofillUrl] = useState("");
   const [autofilling, setAutofilling] = useState(false);
   const [indexing, setIndexing] = useState(false);
+  const [indexingMode, setIndexingMode] = useState<"website" | "single_page" | null>(null);
   const [indexSummary, setIndexSummary] = useState<IndexSummary | null>(null);
   const [indexSummaryLoading, setIndexSummaryLoading] = useState(false);
   const [indexMonitorOpen, setIndexMonitorOpen] = useState(false);
@@ -767,7 +768,7 @@ export default function SettingsAssistantPage() {
     }
   };
 
-  const runIndexing = async () => {
+  const runIndexing = async (mode: "website" | "single_page") => {
     setMsg(null);
     if (!autofillUrl.trim()) {
       setMsgTone("error");
@@ -775,6 +776,7 @@ export default function SettingsAssistantPage() {
       return;
     }
     setIndexing(true);
+    setIndexingMode(mode);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess.session?.access_token;
@@ -789,7 +791,7 @@ export default function SettingsAssistantPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ url: autofillUrl.trim() }),
+        body: JSON.stringify({ url: autofillUrl.trim(), mode }),
       });
       const j: { error?: string; pagesScanned?: number; documentsUpserted?: number; chunksUpserted?: number } =
         await res.json().catch(() => ({}));
@@ -813,6 +815,7 @@ export default function SettingsAssistantPage() {
       setMsg(t("autofill.indexError"));
     } finally {
       setIndexing(false);
+      setIndexingMode(null);
     }
   };
 
@@ -1048,11 +1051,23 @@ export default function SettingsAssistantPage() {
           </button>
           <button
             type="button"
-            onClick={() => void runIndexing()}
+            onClick={() => void runIndexing("website")}
             disabled={indexing}
             className="rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-medium text-zinc-200 ring-1 ring-inset ring-zinc-700 transition-colors hover:bg-zinc-900/80 disabled:opacity-60"
           >
-            {indexing ? t("autofill.indexing") : t("autofill.indexAction")}
+            {indexing && indexingMode === "website"
+              ? t("autofill.indexing")
+              : t("autofill.indexWebsiteAction")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void runIndexing("single_page")}
+            disabled={indexing}
+            className="rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-medium text-zinc-200 ring-1 ring-inset ring-zinc-700 transition-colors hover:bg-zinc-900/80 disabled:opacity-60"
+          >
+            {indexing && indexingMode === "single_page"
+              ? t("autofill.indexing")
+              : t("autofill.indexSinglePageAction")}
           </button>
           <input
             className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
@@ -1140,7 +1155,7 @@ export default function SettingsAssistantPage() {
                   <div className="text-xs text-zinc-500">{t("autofill.monitor.emptyDocs")}</div>
                 ) : (
                   <div className="space-y-2">
-                    {indexSummary.documents.slice(0, 8).map((doc) => (
+                    {indexSummary.documents.map((doc) => (
                       <div key={doc.id} className="rounded-md border border-zinc-800 p-2">
                         <div className="truncate text-[11px] text-zinc-200">
                           {doc.source_url || doc.source_label || "Untitled"}
