@@ -2,7 +2,8 @@
 
 import { Link } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
-import { Building2, CheckCircle2, Store, Zap } from "lucide-react";
+import { Building2, CheckCircle2, ChevronLeft, ChevronRight, Store, Zap } from "lucide-react";
+import { useRef } from "react";
 
 type PricingCardsProps = {
   basicPrice: string;
@@ -20,16 +21,48 @@ export function PricingCards({
   const t = useTranslations("Landing");
   const locale = useLocale();
   const isEs = locale.startsWith("es");
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
   const cardBase =
     "snap-start flex min-w-[280px] max-w-[320px] flex-col rounded-2xl border bg-zinc-900/20 p-5 sm:p-6 lg:p-8 transition-all";
+
+  const scrollByCards = (dir: "left" | "right") => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const amount = Math.round(el.clientWidth * 0.82);
+    el.scrollBy({
+      left: dir === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <>
       <div className="mx-auto max-w-6xl">
-        <div className="mb-2 flex items-center justify-between px-1 text-xs text-zinc-500">
+        <div className="mb-2 flex items-center justify-between gap-3 px-1 text-xs text-zinc-500">
           <span>{isEs ? "Desliza para ver más planes" : "Swipe to see more plans"}</span>
+          <div className="hidden items-center gap-2 md:flex">
+            <button
+              type="button"
+              onClick={() => scrollByCards("left")}
+              className="rounded-md border border-white/15 bg-zinc-900/60 p-1.5 text-zinc-300 transition hover:border-white/30 hover:text-white"
+              aria-label={isEs ? "Ver planes anteriores" : "View previous plans"}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollByCards("right")}
+              className="rounded-md border border-white/15 bg-zinc-900/60 p-1.5 text-zinc-300 transition hover:border-white/30 hover:text-white"
+              aria-label={isEs ? "Ver más planes" : "View more plans"}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
-        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:thin]">
+        <div
+          ref={scrollerRef}
+          className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:thin]"
+        >
           <div className={`${cardBase} border-white/5 hover:border-white/10`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-zinc-800 rounded-lg text-white">
