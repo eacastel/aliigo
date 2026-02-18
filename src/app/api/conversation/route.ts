@@ -53,6 +53,77 @@ function sanitizeHost(v: string) {
   return (v || "").trim().toLowerCase().replace(/:\d+$/, "");
 }
 
+function extractUrls(text: string): string[] {
+  const matches = text.match(/https?:\/\/[^\s<>\])}]+/gi) ?? [];
+  const cleaned = matches
+    .map((u) => u.replace(/[.,;!?]+$/g, ""))
+    .filter(Boolean);
+  return Array.from(new Set(cleaned));
+}
+
+function sameDomainHost(url: string, host: string): boolean {
+  try {
+    const u = new URL(url);
+    const normalizedUrlHost = sanitizeHost(u.host);
+    const normalizedHost = sanitizeHost(host);
+    return !!normalizedUrlHost && !!normalizedHost && normalizedUrlHost === normalizedHost;
+  } catch {
+    return false;
+  }
+}
+
+async function checkUrlReachable(url: string): Promise<boolean> {
+  const ctrl = new AbortController();
+  const timeout = setTimeout(() => ctrl.abort(), 2500);
+  try {
+    const head = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      cache: "no-store",
+      signal: ctrl.signal,
+      headers: { "User-Agent": "Aliigo LinkValidator/1.0" },
+    });
+    if (head.ok) return true;
+    if (head.status === 405 || head.status === 403 || head.status === 401) {
+      const getRes = await fetch(url, {
+        method: "GET",
+        redirect: "follow",
+        cache: "no-store",
+        signal: ctrl.signal,
+        headers: { "User-Agent": "Aliigo LinkValidator/1.0" },
+      });
+      return getRes.ok;
+    }
+    return false;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function validateAndFixUrl(rawUrl: string, locale: string, host: string): Promise<string | null> {
+  const url = rawUrl.replace(/[.,;!?]+$/g, "");
+  if (!/^https?:\/\//i.test(url)) return null;
+  if (await checkUrlReachable(url)) return url;
+
+  // Locale repair: try /{locale}/... for same-domain URLs that 404 without locale segment.
+  try {
+    const u = new URL(url);
+    if (!sameDomainHost(url, host)) return null;
+    if (!(locale === "es" || locale === "en")) return null;
+    const segments = u.pathname.split("/").filter(Boolean);
+    const hasLocalePrefix = segments[0] === "es" || segments[0] === "en";
+    if (hasLocalePrefix) return null;
+    u.pathname = `/${locale}${u.pathname.startsWith("/") ? u.pathname : `/${u.pathname}`}`;
+    const repaired = u.toString();
+    if (await checkUrlReachable(repaired)) return repaired;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function corsHeadersFor(req: NextRequest): HeadersInit {
   const origin = req.headers.get("origin") || "";
 
@@ -1062,6 +1133,39 @@ CTA links:
               : "We had a temporary issue and we’ll reply shortly.";
         }
       }
+    }
+
+    // Validate URLs in reply/actions; remove broken links and try locale-repair for same-domain URLs.
+    const urlResolutionCache = new Map<string, Promise<string | null>>();
+    const resolveUrl = (u: string) => {
+      if (!urlResolutionCache.has(u)) {
+        urlResolutionCache.set(u, validateAndFixUrl(u, locale, host));
+      }
+      return urlResolutionCache.get(u)!;
+    };
+
+    const replyUrls = extractUrls(reply);
+    for (const raw of replyUrls) {
+      const fixed = await resolveUrl(raw);
+      if (!fixed) {
+        reply = reply.split(raw).join("");
+      } else if (fixed !== raw) {
+        reply = reply.split(raw).join(fixed);
+      }
+    }
+
+    if (actions.length > 0) {
+      const nextActions: Action[] = [];
+      for (const action of actions) {
+        if (action.type !== "cta") {
+          nextActions.push(action);
+          continue;
+        }
+        const fixed = await resolveUrl(action.url);
+        if (!fixed) continue;
+        nextActions.push({ ...action, url: fixed });
+      }
+      actions = nextActions;
     }
 
     // Save extracted lead (if any)
