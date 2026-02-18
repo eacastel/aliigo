@@ -490,6 +490,13 @@
   "AssistantSettings": {
     "title": "Conocimientos",
     "description": "Configura cómo habla el asistente, qué debe cubrir y qué enlaces compartir. Empieza por lo esencial y añade detalles cuando lo necesites.",
+    "tabs": {
+      "assistant": "Configuración del asistente",
+      "indexed": "Contenido indexado",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "page": "Página"
+    },
     "mode": {
       "title": "Modo de configuración",
       "desc": "Usa Configuración mínima para onboarding. Cambia a Avanzado para tener más control.",

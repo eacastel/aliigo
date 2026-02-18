@@ -6,6 +6,14 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const pageRaw = Number.parseInt(searchParams.get("page") ?? "1", 10);
+    const limitRaw = Number.parseInt(searchParams.get("limit") ?? "20", 10);
+    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+    const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(limitRaw, 1), 50) : 20;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     const authHeader = req.headers.get("authorization") || "";
     const token = authHeader.startsWith("Bearer ")
       ? authHeader.slice("Bearer ".length).trim()
@@ -47,7 +55,7 @@ export async function GET(req: NextRequest) {
         .select("id,source_url,source_label,locale,status,updated_at")
         .eq("business_id", businessId)
         .order("updated_at", { ascending: false })
-        .limit(20),
+        .range(from, to),
       admin
         .from("knowledge_chunks")
         .select("document_id,content,chunk_index,updated_at")
@@ -97,6 +105,10 @@ export async function GET(req: NextRequest) {
         documents: docsCountRes.count ?? 0,
         chunks: chunksCountRes.count ?? 0,
       },
+      pagination: {
+        page,
+        limit,
+      },
       runs: runsRes.data ?? [],
       documents,
     });
@@ -105,4 +117,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-

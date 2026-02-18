@@ -94,10 +94,14 @@ UI actions per field:
 
 ## Knowledge monitor (implemented)
 
-In Assistant settings, an indexed content monitor is available (collapsible):
+In Assistant settings, indexed content is available in a dedicated tab:
+- `Assistant setup`
+- `Indexed content`
+
+Indexed content tab includes:
 - totals: documents/chunks
 - latest ingestion run status and timestamps
-- recent indexed pages with chunk counts and preview snippets
+- paginated indexed pages with chunk counts and preview snippets
 
 Backed by:
 - `GET /api/knowledge/index-summary`

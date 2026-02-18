@@ -489,6 +489,13 @@
   "AssistantSettings": {
     "title": "Knowledge",
     "description": "Configure how your assistant speaks, what it should cover, and which links to share. Start with the essentials, then add details as needed.",
+    "tabs": {
+      "assistant": "Assistant setup",
+      "indexed": "Indexed content",
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page"
+    },
     "mode": {
       "title": "Setup mode",
       "desc": "Use Quick setup for onboarding. Switch to Advanced when you want deeper control.",
