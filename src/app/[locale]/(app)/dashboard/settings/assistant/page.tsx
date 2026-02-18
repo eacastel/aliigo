@@ -389,6 +389,7 @@ export default function SettingsAssistantPage() {
   const [indexing, setIndexing] = useState(false);
   const [indexSummary, setIndexSummary] = useState<IndexSummary | null>(null);
   const [indexSummaryLoading, setIndexSummaryLoading] = useState(false);
+  const [indexMonitorOpen, setIndexMonitorOpen] = useState(false);
 
   const initialAssistant = useRef<AssistantState | null>(null);
   const publishedFormRef = useRef<AssistantForm | null>(null);
@@ -1070,15 +1071,30 @@ export default function SettingsAssistantPage() {
             <div className="text-xs font-semibold text-zinc-200">
               {t("autofill.monitor.title")}
             </div>
-            <button
-              type="button"
-              onClick={() => void loadIndexSummary()}
-              className="rounded-md border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-900/70"
-            >
-              {t("autofill.monitor.refresh")}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIndexMonitorOpen((v) => !v)}
+                className="rounded-md border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-900/70"
+              >
+                {indexMonitorOpen
+                  ? t("autofill.monitor.close")
+                  : t("autofill.monitor.open")}
+              </button>
+              {indexMonitorOpen ? (
+                <button
+                  type="button"
+                  onClick={() => void loadIndexSummary()}
+                  className="rounded-md border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-900/70"
+                >
+                  {t("autofill.monitor.refresh")}
+                </button>
+              ) : null}
+            </div>
           </div>
-          {indexSummaryLoading ? (
+          {!indexMonitorOpen ? (
+            <p className="text-xs text-zinc-500">{t("autofill.monitor.collapsedHint")}</p>
+          ) : indexSummaryLoading ? (
             <p className="text-xs text-zinc-400">{t("autofill.monitor.loading")}</p>
           ) : indexSummary ? (
             <div className="space-y-3">

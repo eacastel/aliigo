@@ -697,7 +697,10 @@
       "indexError": "No se pudo indexar conocimiento",
       "monitor": {
         "title": "Monitor de contenido indexado",
+        "open": "Abrir",
+        "close": "Cerrar",
         "refresh": "Actualizar",
+        "collapsedHint": "Ábrelo para revisar páginas indexadas, fragmentos y estado de la última ejecución.",
         "loading": "Cargando detalles del índice…",
         "empty": "Aún no hay contenido indexado. Usa “Indexar conocimiento” para generar documentos y fragmentos.",
         "docs": "Documentos",

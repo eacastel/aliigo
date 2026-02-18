@@ -696,7 +696,10 @@
       "indexError": "Could not index knowledge",
       "monitor": {
         "title": "Indexed content monitor",
+        "open": "Open",
+        "close": "Close",
         "refresh": "Refresh",
+        "collapsedHint": "Open to review indexed pages, chunks, and latest run status.",
         "loading": "Loading index details…",
         "empty": "No indexed content yet. Run “Index knowledge” to generate documents and chunks.",
         "docs": "Documents",
