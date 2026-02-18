@@ -15,6 +15,9 @@ type BusinessRow = {
   system_prompt: string | null;
   qualification_prompt: string | null; // ✅ make it consistent
   knowledge: string | null;
+  widget_theme: Record<string, unknown> | null;
+  widget_header_logo_path: string | null;
+  billing_plan: string | null;
 };
 
 type BusinessProfile = {
@@ -151,7 +154,10 @@ export default function DashboardPage() {
               default_locale,
               system_prompt,
               qualification_prompt,
-              knowledge
+              knowledge,
+              widget_theme,
+              widget_header_logo_path,
+              billing_plan
             )
           `
           )
@@ -320,10 +326,31 @@ export default function DashboardPage() {
       group: t("groups.widget"),
       items: [
         {
-          id: "token",
-          label: t("items.token"),
-          done: nonEmpty(embedToken),
-          required: true,
+          id: "widget_personalized",
+          label: t("items.widget_personalized"),
+          done: !!(biz?.widget_theme && Object.keys(biz.widget_theme).length > 0),
+          required: false,
+          href: "/dashboard/widget",
+        },
+        {
+          id: "widget_colors",
+          label: t("items.widget_colors"),
+          done: !!(
+            biz?.widget_theme &&
+            typeof biz.widget_theme === "object" &&
+            (nonEmpty(String((biz.widget_theme as Record<string, unknown>).headerBg ?? "")) ||
+              nonEmpty(String((biz.widget_theme as Record<string, unknown>).userBg ?? "")) ||
+              nonEmpty(String((biz.widget_theme as Record<string, unknown>).assistantBg ?? "")) ||
+              nonEmpty(String((biz.widget_theme as Record<string, unknown>).sendBg ?? "")))
+          ),
+          required: false,
+          href: "/dashboard/widget",
+        },
+        {
+          id: "header_logo",
+          label: t("items.header_logo"),
+          done: nonEmpty(biz?.widget_header_logo_path),
+          required: false,
           href: "/dashboard/widget",
         },
       ],
@@ -496,7 +523,7 @@ export default function DashboardPage() {
                             it.done
                               ? "bg-brand-500/10 border-brand-500/20"
                               : it.required
-                              ? "bg-amber-500/10 border-amber-500/20"
+                              ? "bg-zinc-700/30 border-zinc-600/40"
                               : "bg-zinc-800/40 border-zinc-700/50",
                           ].join(" ")}
                           aria-hidden="true"
@@ -504,7 +531,7 @@ export default function DashboardPage() {
                           {it.done ? (
                             <span className="text-brand-300 text-xs">✓</span>
                           ) : it.required ? (
-                            <span className="text-amber-300 text-xs">!</span>
+                            <span className="text-zinc-300 text-xs">!</span>
                           ) : (
                             <span className="text-zinc-400 text-xs">•</span>
                           )}
@@ -528,7 +555,7 @@ export default function DashboardPage() {
                           className={[
                             "text-sm font-medium shrink-0",
                             it.required
-                              ? "text-amber-300 hover:text-amber-200"
+                              ? "text-zinc-300 hover:text-zinc-200"
                               : "text-brand-400 hover:text-brand-300",
                           ].join(" ")}
                         >

@@ -66,20 +66,16 @@
 
 ## WhatsApp Integration (Next Priority)
 
-1. Wire inbound webhook to conversation pipeline:
-   - `/api/webhooks/whatsapp` should map inbound messages to business + contact and call assistant response generation.
+1. Phase 1 complete:
+   - `/api/webhooks/whatsapp` wired for verify + inbound text handling.
+   - Inbound mapped to business routing (`WHATSAPP_PHONE_NUMBER_MAP`) and sent to `/api/conversation`.
+   - Outbound replies sent via Meta Cloud API.
+   - Messages persisted in existing tables with `channel='whatsapp'`.
+   - Growth+ gating enforced before processing.
+   - Idempotency guard for inbound `wa_message_id`.
 
-2. Send outbound replies via WhatsApp Cloud API:
-   - Add sender helper with retries, error logging, and idempotency guard.
-
-3. Conversation persistence:
-   - Store channel=`whatsapp` messages in existing conversation tables.
-   - Reuse lead-capture flow and knowledge retrieval behavior.
-
-4. Tenant routing:
-   - Route incoming numbers/phone IDs to the correct business.
-   - Add config fields for WhatsApp credentials per environment/business as needed.
-
-5. Safety / compliance:
-   - Respect WhatsApp session window + template rules.
-   - Add rate limits and abuse controls.
+2. Next:
+   - Add delivery status sync (`sent`, `delivered`, `read`) into message metadata.
+   - Add support for media/template and 24-hour session fallback behavior.
+   - Add stronger abuse controls/rate limiting specific to WhatsApp channel.
+   - Add dashboard WhatsApp connectivity/config UI.

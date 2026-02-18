@@ -487,7 +487,9 @@
       "system_prompt": "Prompt del sistema completado",
       "qualification_prompt": "Criterios de cualificación completados",
       "knowledge": "Base de conocimiento completada",
-      "token": "Token generado"
+      "widget_personalized": "Widget personalizado",
+      "widget_colors": "Colores del widget configurados",
+      "header_logo": "Logo de cabecera subido"
     }
   },
   "AssistantSettings": {

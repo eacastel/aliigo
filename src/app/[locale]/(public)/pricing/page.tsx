@@ -69,6 +69,14 @@ export default async function PricingPage() {
       type: "text",
     },
     {
+      feature: isEs ? "Historial de mensajes" : "Message history",
+      basic: isEs ? "Últimos 30 mensajes" : "Last 30 messages",
+      growth: isEs ? "Últimos 30 días" : "Last 30 days",
+      pro: isEs ? "Últimos 6 meses" : "Last 6 months",
+      custom: isEs ? "Ilimitado" : "Unlimited",
+      type: "text",
+    },
+    {
       feature: isEs ? "Marca en widget" : "Widget branding",
       basic: isEs ? "\"Powered by Aliigo\" (fijo)" : "\"Powered by Aliigo\" (fixed)",
       growth: isEs ? "Sin marca de Aliigo" : "Aliigo branding removed",

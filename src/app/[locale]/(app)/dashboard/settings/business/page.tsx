@@ -725,9 +725,12 @@ export default function SettingsBusinessPage() {
                 onChange={(e) =>
                   setBusiness((b) => {
                     const nextDefault = e.target.value === "es" ? "es" : "en";
-                    const nextLocales: ("en" | "es")[] = b.enabled_locales.includes(nextDefault)
-                      ? b.enabled_locales
-                      : [...b.enabled_locales, nextDefault];
+                    const nextLocales: ("en" | "es")[] =
+                      localeLimit === 1
+                        ? [nextDefault]
+                        : b.enabled_locales.includes(nextDefault)
+                          ? b.enabled_locales
+                          : [...b.enabled_locales, nextDefault];
                     return {
                       ...b,
                       default_locale: nextDefault,
@@ -736,13 +739,11 @@ export default function SettingsBusinessPage() {
                   })
                 }
               >
-                {localeOptions
-                  .filter((opt) => business.enabled_locales.includes(opt.code))
-                  .map((opt) => (
-                    <option key={opt.code} value={opt.code}>
-                      {opt.label}
-                    </option>
-                  ))}
+                {localeOptions.map((opt) => (
+                  <option key={opt.code} value={opt.code}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -784,9 +785,6 @@ export default function SettingsBusinessPage() {
                       : String(localeLimit),
                 })}
               </p>
-              {localeLimit === 1 && (
-                <p className="text-[11px] text-amber-400 mt-1">{t("languages.basicLocked")}</p>
-              )}
             </div>
 
             <div>

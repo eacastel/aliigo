@@ -486,7 +486,9 @@
       "system_prompt": "System prompt filled",
       "qualification_prompt": "Qualification criteria filled",
       "knowledge": "Knowledge filled",
-      "token": "Token generated"
+      "widget_personalized": "Widget personalized",
+      "widget_colors": "Widget colors configured",
+      "header_logo": "Header logo uploaded"
     }
   },
   "AssistantSettings": {

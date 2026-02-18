@@ -38,6 +38,14 @@ type MessageRow = {
 };
 
 type ViewTab = "recent" | "conversations";
+type BillingPlan = "basic" | "starter" | "growth" | "pro" | "custom";
+
+function retentionForPlan(plan: BillingPlan | null): { mode: "count" | "days" | "unlimited"; value?: number } {
+  if (plan === "pro") return { mode: "days", value: 180 };
+  if (plan === "growth") return { mode: "days", value: 30 };
+  if (plan === "custom") return { mode: "unlimited" };
+  return { mode: "count", value: 30 }; // basic + starter
+}
 
 function safeStr(v: unknown) {
   return typeof v === "string" ? v : "";
@@ -97,6 +105,7 @@ export default function DashboardMessagesPage() {
   const [selectedMessages, setSelectedMessages] = useState<MessageRow[]>([]);
   const [selectedLoading, setSelectedLoading] = useState(false);
   const [selectedError, setSelectedError] = useState<string | null>(null);
+  const [billingPlan, setBillingPlan] = useState<BillingPlan | null>(null);
 
   const initialQuery = "";
   const [query, setQuery] = useState(initialQuery);
@@ -138,9 +147,9 @@ export default function DashboardMessagesPage() {
         // Fetch business_id for this user (business_profiles.id == auth.user.id)
         const { data: prof, error: profErr } = await supabase
           .from("business_profiles")
-          .select("business_id")
+          .select("business_id,businesses:businesses!business_profiles_business_id_fkey(billing_plan)")
           .eq("id", session.user.id)
-          .maybeSingle<{ business_id: string | null }>();
+          .maybeSingle<{ business_id: string | null; businesses?: { billing_plan: BillingPlan | null } | null }>();
 
         if (profErr) {
           throw new Error(profErr.message || "Failed to load business profile.");
@@ -151,11 +160,15 @@ export default function DashboardMessagesPage() {
           throw new Error("Missing business_id for this account.");
         }
         if (!cancelled) setBusinessId(bid);
+        if (!cancelled) setBillingPlan(prof?.businesses?.billing_plan ?? null);
+
+        const retention = retentionForPlan(prof?.businesses?.billing_plan ?? null);
+        const recentLimit = retention.mode === "count" ? retention.value ?? 30 : 1000;
 
         // 1) Recent messages across all conversations for this business
         const { data: rec, error: recErr } = await supabase.rpc("messages_recent_for_business", {
           p_business_id: bid,
-          p_limit: 200,
+          p_limit: recentLimit,
         });
 
         // 2) Conversation list for this business
@@ -171,8 +184,22 @@ export default function DashboardMessagesPage() {
           throw new Error(`Missing RPC "conversations_recent_for_business" or query failed: ${cvErr.message}`);
         }
 
-        const recRows = (Array.isArray(rec) ? rec : []) as RecentMessageRow[];
-        const cvRows = (Array.isArray(cv) ? cv : []) as ConversationRow[];
+        let recRows = (Array.isArray(rec) ? rec : []) as RecentMessageRow[];
+        let cvRows = (Array.isArray(cv) ? cv : []) as ConversationRow[];
+
+        if (retention.mode === "days" && retention.value) {
+          const cutoff = Date.now() - retention.value * 24 * 60 * 60 * 1000;
+          recRows = recRows.filter((m) => {
+            const ts = new Date(m.created_at).getTime();
+            return Number.isFinite(ts) && ts >= cutoff;
+          });
+          cvRows = cvRows.filter((c) => {
+            const ts = c.last_message_at ? new Date(c.last_message_at).getTime() : NaN;
+            return Number.isFinite(ts) && ts >= cutoff;
+          });
+        } else if (retention.mode === "count" && retention.value) {
+          recRows = recRows.slice(0, retention.value);
+        }
 
         if (!cancelled) {
           setRecent(recRows);
@@ -222,7 +249,19 @@ export default function DashboardMessagesPage() {
           .order("created_at", { ascending: true });
 
         if (error) throw error;
-        if (!cancelled) setSelectedMessages((data as MessageRow[]) || []);
+        const rows = ((data as MessageRow[]) || []).slice();
+        const retention = retentionForPlan(billingPlan);
+        let filtered = rows;
+        if (retention.mode === "days" && retention.value) {
+          const cutoff = Date.now() - retention.value * 24 * 60 * 60 * 1000;
+          filtered = rows.filter((m) => {
+            const ts = new Date(m.created_at).getTime();
+            return Number.isFinite(ts) && ts >= cutoff;
+          });
+        } else if (retention.mode === "count" && retention.value) {
+          filtered = rows.slice(-retention.value);
+        }
+        if (!cancelled) setSelectedMessages(filtered);
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Failed to load conversation.";
         if (!cancelled) setSelectedError(msg);
@@ -235,7 +274,7 @@ export default function DashboardMessagesPage() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams]);
+  }, [searchParams, billingPlan]);
 
   const openConversation = (conversationId: string) => {
     if (!conversationId) return;

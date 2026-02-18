@@ -220,6 +220,24 @@ async function retrieveKnowledgeChunks(params: {
 
 type ToolExtract = { name: string; arguments: string };
 
+function internalBusinessIdFromRequest(
+  req: NextRequest,
+  bodyBusinessId: unknown
+): string | null {
+  const internalToken = process.env.WHATSAPP_INTERNAL_TOKEN;
+  if (!internalToken) return null;
+
+  const auth = req.headers.get("authorization") || "";
+  if (!auth.toLowerCase().startsWith("bearer ")) return null;
+  const token = auth.slice(7).trim();
+  if (!token || token !== internalToken) return null;
+
+  if (typeof bodyBusinessId !== "string") return null;
+  const businessId = bodyBusinessId.trim();
+  if (!businessId) return null;
+  return businessId;
+}
+
 function getFunctionToolCall(
   tc: OpenAI.Chat.Completions.ChatCompletionMessageToolCall | null | undefined
 ): ToolExtract | null {
@@ -628,6 +646,8 @@ export async function POST(req: NextRequest) {
       customerName?: string;
       channel?: unknown;
       locale?: unknown;
+      businessId?: string;
+      meta?: unknown;
       // NEW: allow widget to pass structured lead directly
       lead?: LeadPayload;
     };
@@ -640,6 +660,8 @@ export async function POST(req: NextRequest) {
       customerName,
       channel: bodyChannel,
       locale: bodyLocale,
+      businessId: bodyBusinessId,
+      meta: bodyMeta,
       lead: leadFromClient,
     } = body;
 
@@ -649,12 +671,14 @@ export async function POST(req: NextRequest) {
     const externalRef =
       typeof inputExternalRef === "string" ? inputExternalRef.trim().slice(0, 120) : null;
 
+    const internalBusinessId = internalBusinessIdFromRequest(req, bodyBusinessId);
+
     const origin = req.headers.get("origin") || "";
     const host = sanitizeHost(origin ? new URL(origin).host : originHost(req));
 
     // Enterprise hardening: for embed session tokens, we expect an Origin.
     // If origin is missing, we allow only same-site requests from aliigo.com.
-    if (!origin && host !== aliigoHost()) {
+    if (!internalBusinessId && !origin && host !== aliigoHost()) {
       return NextResponse.json(
         { error: "Forbidden: missing origin" },
         { status: 403, headers: corsHeadersFor(req) }
@@ -667,17 +691,31 @@ export async function POST(req: NextRequest) {
         { status: 400, headers: corsHeadersFor(req) }
       );
     }
+    const safeMeta =
+      bodyMeta && typeof bodyMeta === "object" && !Array.isArray(bodyMeta)
+        ? (bodyMeta as Record<string, unknown>)
+        : {};
 
-    // token + domain gate
-    const gate = await validateEmbedAccess(token || "", host);
-    if (!gate.ok) {
+    let businessId = internalBusinessId;
+    let isPreviewSession = false;
+    if (!businessId) {
+      // token + domain gate
+      const gate = await validateEmbedAccess(token || "", host);
+      if (!gate.ok) {
+        return NextResponse.json(
+          { error: `Forbidden: ${gate.reason}` },
+          { status: 403, headers: corsHeadersFor(req) }
+        );
+      }
+      businessId = gate.businessId;
+      isPreviewSession = gate.isPreview === true;
+    }
+    if (!businessId) {
       return NextResponse.json(
-        { error: `Forbidden: ${gate.reason}` },
+        { error: "Forbidden: missing business context" },
         { status: 403, headers: corsHeadersFor(req) }
       );
     }
-    const businessId = gate.businessId;
-    const isPreviewSession = gate.isPreview === true;
 
     // business prompt (also gives us default_locale + qualification_prompt + billing gate)
     const bizRes = await supabase
@@ -827,7 +865,7 @@ export async function POST(req: NextRequest) {
       channel: ch,
       role: "user",
       content: message,
-      meta: hasAnyLead(leadFromClient) ? { lead: leadFromClient } : {},
+      meta: hasAnyLead(leadFromClient) ? { ...safeMeta, lead: leadFromClient } : safeMeta,
     });
     if (m1.error) throw m1.error;
 
