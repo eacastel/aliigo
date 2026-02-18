@@ -92,6 +92,7 @@ type AssistantSettingsEnvelope = AssistantSettings & {
     fieldProvenance?: Record<string, "manual" | "suggested">;
     generationMode?: "merge" | "replace";
     generatorVersion?: string;
+    advancedRecommendations?: Partial<Record<AdvancedRecField, AdvancedRecommendation>>;
     savedAt?: string;
     savedBy?: string;
   } | null;
@@ -134,6 +135,14 @@ type IndexSummary = {
   };
   runs: IndexRun[];
   documents: IndexedDocument[];
+};
+
+type AdvancedRecField = "scope" | "styleRules" | "additionalInstructions" | "qualificationPrompt";
+type AdvancedRecommendation = {
+  value: string;
+  confidence: "low" | "medium" | "high";
+  rationale: string;
+  sources: string[];
 };
 
 const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "");
@@ -692,6 +701,76 @@ export default function SettingsAssistantPage() {
     ) : null
   );
 
+  const getAdvancedRecommendation = (field: AdvancedRecField): AdvancedRecommendation | null =>
+    settingsEnvelope?.draft?.advancedRecommendations?.[field] ?? null;
+
+  const setAdvancedRecommendation = (
+    field: AdvancedRecField,
+    value: AdvancedRecommendation | null,
+  ) => {
+    setSettingsEnvelope((prev) => {
+      if (!prev) return prev;
+      const draft = prev.draft ?? {};
+      const nextRecs = { ...(draft.advancedRecommendations ?? {}) };
+      if (!value) delete nextRecs[field];
+      else nextRecs[field] = value;
+      return {
+        ...prev,
+        draft: {
+          ...draft,
+          advancedRecommendations: nextRecs,
+        },
+      };
+    });
+  };
+
+  const renderAdvancedRecommendation = (field: AdvancedRecField) => {
+    const rec = getAdvancedRecommendation(field);
+    if (!rec?.value?.trim()) return null;
+    return (
+      <div className="mt-2 rounded-md border border-emerald-900/60 bg-emerald-950/20 p-2">
+        <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px]">
+          <span className="rounded-full border border-emerald-800/70 px-2 py-0.5 text-emerald-300">
+            {t(`recommendations.confidence.${rec.confidence}`)}
+          </span>
+          <span className="text-zinc-400">{rec.rationale}</span>
+        </div>
+        <pre className="whitespace-pre-wrap text-[11px] text-zinc-300">{rec.value}</pre>
+        {rec.sources?.length ? (
+          <div className="mt-1 text-[10px] text-zinc-500">
+            {t("recommendations.sources")}: {rec.sources.slice(0, 3).join(", ")}
+          </div>
+        ) : null}
+        <div className="mt-2 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setForm((prev) => ({ ...prev, [field]: rec.value }));
+              setAdvancedRecommendation(field, null);
+            }}
+            className="rounded-md border border-emerald-800/70 px-2 py-0.5 text-[10px] text-emerald-300 hover:bg-emerald-900/30"
+          >
+            {t("recommendations.apply")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setAdvancedRecommendation(field, null)}
+            className="rounded-md border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300 hover:bg-zinc-900/60"
+          >
+            {t("recommendations.keepOriginal")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setForm((prev) => ({ ...prev, [field]: "" }))}
+            className="rounded-md border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300 hover:bg-zinc-900/60"
+          >
+            {t("recommendations.clear")}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const runAutofill = async (mode: "merge" | "replace") => {
     setMsg(null);
     if (!autofillUrl.trim()) {
@@ -726,6 +805,7 @@ export default function SettingsAssistantPage() {
         pagesCrawled?: number;
         draftForm?: Partial<AssistantForm>;
         fieldStatuses?: Record<string, "suggested" | "needs_review" | "missing">;
+        advancedRecommendations?: Partial<Record<AdvancedRecField, AdvancedRecommendation>>;
       } = await res.json().catch(() => ({}));
       if (!res.ok || !j.draftForm) {
         setMsgTone("error");
@@ -770,6 +850,7 @@ export default function SettingsAssistantPage() {
           fieldProvenance,
           generationMode: j.mode ?? mode,
           generatorVersion: "autofill-v2",
+          advancedRecommendations: j.advancedRecommendations ?? {},
           savedAt: j.fetchedAt ?? new Date().toISOString(),
           savedBy: userId ?? undefined,
         },
@@ -1565,6 +1646,7 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, scope: e.target.value }))
               }
             />
+            {renderAdvancedRecommendation("scope")}
           </div>
 
           <div>
@@ -1579,6 +1661,7 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, styleRules: e.target.value }))
               }
             />
+            {renderAdvancedRecommendation("styleRules")}
           </div>
 
           <div>
@@ -1598,6 +1681,7 @@ export default function SettingsAssistantPage() {
                 }))
               }
             />
+            {renderAdvancedRecommendation("additionalInstructions")}
           </div>
           </div>
         ) : null}
@@ -1624,6 +1708,7 @@ export default function SettingsAssistantPage() {
                 setForm((f) => ({ ...f, qualificationPrompt: e.target.value }))
               }
             />
+            {renderAdvancedRecommendation("qualificationPrompt")}
           </div>
           </div>
         ) : null}

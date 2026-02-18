@@ -718,6 +718,17 @@
         "emptyDocs": "Aún no hay documentos indexados.",
         "updated": "Actualizado"
       }
+    },
+    "recommendations": {
+      "apply": "Aplicar",
+      "keepOriginal": "Mantener original",
+      "clear": "Limpiar",
+      "sources": "Fuentes",
+      "confidence": {
+        "low": "Confianza: Baja",
+        "medium": "Confianza: Media",
+        "high": "Confianza: Alta"
+      }
     }
   },
   "Landing": {

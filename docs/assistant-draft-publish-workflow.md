@@ -37,6 +37,9 @@ Stored under `assistant_settings.draft`:
 - `form` (partial assistant form values)
 - `sourceUrl` (reserved for autofill importer)
 - `fieldStatuses` (`suggested|needs_review|missing`)
+- `fieldProvenance` (`manual|suggested`)
+- `generationMode` (`merge|replace`)
+- `generatorVersion` (e.g. `autofill-v2`)
 - `savedAt`
 - `savedBy`
 
@@ -44,7 +47,7 @@ Stored under `assistant_settings.draft`:
 
 - This uses existing JSON storage and does not require a DB migration.
 
-## Website autofill (implemented)
+## Onboarding assistance (implemented)
 
 - Endpoint: `POST /api/settings/assistant/autofill`
 - Auth: requires bearer session token.
@@ -62,10 +65,39 @@ Stored under `assistant_settings.draft`:
 - Output:
   - `draftForm` suggestions for assistant fields
   - `fieldStatuses`
+  - `mode` (`merge` or `replace`)
   - `sourceUrl`, `fetchedAt`, `pagesCrawled`
 
 In UI (`dashboard/settings/assistant`):
 - user enters an allowed URL
-- clicks `Fetch suggestions`
-- suggestions are merged into empty form fields
+- clicks `Generate setup draft` (`merge`)
+- or clicks `Regenerate and replace draft` (`replace`)
 - then user can `Save draft` and later `Publish changes`
+
+## Pass B (implemented): advanced recommendations
+
+Autofill now also generates optional advanced recommendations for:
+- `scope`
+- `styleRules`
+- `additionalInstructions`
+- `qualificationPrompt`
+
+Each recommendation includes:
+- confidence (`low|medium|high`)
+- rationale
+- source URLs
+
+UI actions per field:
+- `Apply` (writes suggestion to field)
+- `Keep original` (dismiss suggestion)
+- `Clear` (clear field text)
+
+## Knowledge monitor (implemented)
+
+In Assistant settings, an indexed content monitor is available (collapsible):
+- totals: documents/chunks
+- latest ingestion run status and timestamps
+- recent indexed pages with chunk counts and preview snippets
+
+Backed by:
+- `GET /api/knowledge/index-summary`

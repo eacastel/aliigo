@@ -6,6 +6,14 @@ export const dynamic = "force-dynamic";
 
 type FieldStatus = "suggested" | "needs_review" | "missing";
 type CrawledLink = { href: string; text: string };
+type RecConfidence = "low" | "medium" | "high";
+type AdvancedRecField = "scope" | "styleRules" | "additionalInstructions" | "qualificationPrompt";
+type AdvancedRecommendation = {
+  value: string;
+  confidence: RecConfidence;
+  rationale: string;
+  sources: string[];
+};
 
 const MAX_CRAWL_PAGES = 20;
 const MAX_CRAWL_DEPTH = 2;
@@ -244,6 +252,89 @@ function parseAutofill(crawled: Awaited<ReturnType<typeof crawlSite>>) {
   return { draftForm, fieldStatuses, pagesCrawled: crawled.pagesCrawled };
 }
 
+function uniqUrls(urls: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const u of urls) {
+    if (!u || seen.has(u)) continue;
+    seen.add(u);
+    out.push(u);
+  }
+  return out;
+}
+
+function buildAdvancedRecommendations(crawled: Awaited<ReturnType<typeof crawlSite>>) {
+  const sources = uniqUrls(crawled.links.map((l) => l.href)).slice(0, 5);
+  const policyLinks = crawled.links
+    .filter((l) => /(privacy|terms|cookies|policy|refund|gdpr|privacidad|terminos|condiciones)/i.test(l.text + " " + l.href))
+    .map((l) => l.href);
+  const ctaLinks = crawled.links
+    .filter((l) => /(book|reserve|contact|signup|register|join|demo|pricing|planes|precio|contacto|reserv)/i.test(l.text + " " + l.href))
+    .map((l) => l.href);
+  const summary = [crawled.titles[0], crawled.h1s[0], crawled.descriptions[0]].filter(Boolean).join(" — ").trim();
+  const hasSignal = crawled.pagesCrawled >= 3 && crawled.snippets.length >= 8;
+  const confidence: RecConfidence = hasSignal ? "high" : crawled.pagesCrawled >= 2 ? "medium" : "low";
+
+  const recs: Partial<Record<AdvancedRecField, AdvancedRecommendation>> = {};
+
+  const scopeValue = [
+    "Answer only with information that appears in approved business content.",
+    "If information is missing, say it clearly and ask one short clarifying question.",
+    "Do not invent policies, pricing, availability, or legal details.",
+    summary ? `Business context: ${summary}.` : "",
+    policyLinks.length ? `Policy references available: ${uniqUrls(policyLinks).slice(0, 3).join(", ")}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+  recs.scope = {
+    value: scopeValue,
+    confidence,
+    rationale: `Built from ${crawled.pagesCrawled} crawled pages and detected policy links.`,
+    sources,
+  };
+
+  const styleValue = [
+    "Use short paragraphs and bullet points when listing steps.",
+    "Be clear and practical. Avoid hype language.",
+    "When sharing a link, explain what the user will find there.",
+    "End with one concise next-step question.",
+  ].join("\n");
+  recs.styleRules = {
+    value: styleValue,
+    confidence: crawled.pagesCrawled >= 2 ? "medium" : "low",
+    rationale: "Default conversion-safe style template based on business support flow.",
+    sources,
+  };
+
+  const additionalValue = [
+    "If user asks for rules/policies, prefer official policy pages first.",
+    "If user asks for signup/joining, share the best matching CTA link.",
+    "If user asks for unavailable data, offer to collect lead details for follow-up.",
+  ].join("\n");
+  recs.additionalInstructions = {
+    value: additionalValue,
+    confidence: "medium",
+    rationale: "Generated from detected CTA and policy intents.",
+    sources: uniqUrls([...ctaLinks, ...policyLinks]).slice(0, 5),
+  };
+
+  const qualificationValue = [
+    "Collect lead details only when user asks for follow-up, demo, or cannot be answered with available content.",
+    "Required fields: name and email. Phone optional unless user offers it.",
+    ctaLinks.length
+      ? `When intent is explicit, guide user to one CTA link: ${uniqUrls(ctaLinks).slice(0, 3).join(", ")}`
+      : "When intent is explicit, guide user to the primary contact/signup page.",
+  ].join("\n");
+  recs.qualificationPrompt = {
+    value: qualificationValue,
+    confidence: ctaLinks.length > 0 ? "high" : "medium",
+    rationale: `Detected ${uniqUrls(ctaLinks).length} CTA-like links from crawled pages.`,
+    sources: uniqUrls(ctaLinks).slice(0, 5),
+  };
+
+  return recs as Record<AdvancedRecField, AdvancedRecommendation>;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization") || "";
@@ -309,6 +400,7 @@ export async function POST(req: NextRequest) {
 
     const crawled = await crawlSite(sourceUrl, normalizedHost);
     const { draftForm, fieldStatuses, pagesCrawled } = parseAutofill(crawled);
+    const advancedRecommendations = buildAdvancedRecommendations(crawled);
 
     return NextResponse.json({
       ok: true,
@@ -317,6 +409,7 @@ export async function POST(req: NextRequest) {
       fetchedAt: new Date().toISOString(),
       draftForm,
       fieldStatuses,
+      advancedRecommendations,
       pagesCrawled,
       limits: {
         maxPages: MAX_CRAWL_PAGES,

@@ -23,3 +23,7 @@
    - `on public.knowledge_chunks`
    - `using ivfflat (embedding vector_cosine_ops)`
    - `with (lists = 100);`
+
+2. Pass B follow-up:
+   - Persist dismissed recommendations per-field across reloads.
+   - Add optional dedicated monitor page with pagination/filtering for all indexed docs/runs.

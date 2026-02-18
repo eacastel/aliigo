@@ -37,10 +37,22 @@ This schema supports both onboarding paths:
 - `POST /api/knowledge/crawl`
   - Auth required
   - Validates URL belongs to `allowed_domains`
-  - Crawls same-domain up to 20 pages, depth 2, 20s max
+  - Mode-aware crawl:
+    - `website`: same-domain up to 20 pages, depth 2, 20s max
+    - `single_page`: one URL only (maxPages=1, depth=0)
   - Chunks + embeds text and writes `knowledge_documents` + `knowledge_chunks`
   - Tracks run in `knowledge_ingestion_runs`
 
 - `POST /api/settings/assistant/autofill`
   - Onboarding helper (draft suggestions)
+  - Supports `merge` and `replace` draft generation modes
   - Does not replace full retrieval index
+
+- `GET /api/knowledge/index-summary`
+  - Returns totals, recent runs, and recent indexed documents with preview snippets
+
+## Runtime safety updates
+
+- Conversation replies now validate outbound URLs before returning them.
+- Broken links are removed from response text/CTA actions.
+- Same-domain locale repair is attempted (`/es/...` or `/en/...`) before dropping a link.
