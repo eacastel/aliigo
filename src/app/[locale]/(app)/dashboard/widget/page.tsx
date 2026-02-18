@@ -786,37 +786,33 @@ export default function WidgetSettingsPage() {
             />
           </div>
 
-          <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
-            <label className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-sm text-zinc-200">{t("showPoweredBy")}</div>
-                <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByHelp")}</p>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={theme.showBranding}
-                disabled={!canToggleBranding}
-                onClick={() => setTheme((prev) => ({ ...prev, showBranding: !prev.showBranding }))}
-                className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
-                  canToggleBranding
-                    ? theme.showBranding
-                      ? "bg-brand-500/80"
-                      : "bg-zinc-700"
-                    : "bg-zinc-800"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
-                    canToggleBranding ? "bg-white" : "bg-zinc-500"
-                  } ${
-                    theme.showBranding ? "translate-x-5" : "translate-x-0.5"
+          {canToggleBranding ? (
+            <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+              <label className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm text-zinc-200">{t("showPoweredBy")}</div>
+                  <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByHelp")}</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={theme.showBranding}
+                  onClick={() => setTheme((prev) => ({ ...prev, showBranding: !prev.showBranding }))}
+                  className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
+                    theme.showBranding ? "bg-brand-500/80" : "bg-zinc-700"
                   }`}
-                />
-              </button>
-            </label>
-          </div>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      theme.showBranding ? "translate-x-5" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </label>
+            </div>
+          ) : null}
 
+          {canManageHeaderLogo ? (
           <div className="space-y-2">
             <label className="block text-sm text-zinc-300">{t("headerLogoUrl")}</label>
             {logoUrl ? (
@@ -870,11 +866,9 @@ export default function WidgetSettingsPage() {
               }}
             />
             <p className="text-xs text-zinc-500">{t("headerLogoHelp")}</p>
-            {!canManageHeaderLogo ? (
-              <p className="text-xs text-zinc-500">{t("plans.logoUpgradeHint")}</p>
-            ) : null}
             {logoMsg ? <p className="text-xs text-zinc-400">{logoMsg}</p> : null}
           </div>
+          ) : null}
 
           {widgetLocked ? (
             <div className="space-y-2">

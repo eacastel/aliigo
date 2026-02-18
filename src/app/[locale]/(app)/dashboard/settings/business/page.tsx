@@ -94,6 +94,14 @@ function domainsToBaseText(domains: string[] | null | undefined): string {
   return Array.from(bases).join("\n");
 }
 
+function localeLimitForPlan(plan: string | null | undefined): number {
+  const p = (plan || "basic").toLowerCase();
+  if (p === "growth") return 2;
+  if (p === "pro") return 3;
+  if (p === "custom") return Number.MAX_SAFE_INTEGER;
+  return 1;
+}
+
 export default function SettingsBusinessPage() {
   const router = useRouter();
   const locale = useLocale();
@@ -227,29 +235,33 @@ export default function SettingsBusinessPage() {
       const biz = data.businesses;
       if (data.business_id && biz) {
         setBusinessId(data.business_id);
+        const nextPlan = (biz.billing_plan || "basic").toLowerCase();
+        const planLocaleLimit = localeLimitForPlan(nextPlan);
+        const fallbackDefault = biz.default_locale === "es" ? "es" : "en";
+        const hydratedLocales = (() => {
+          const langs = Array.isArray(biz.enabled_locales)
+            ? Array.from(
+                new Set(
+                  biz.enabled_locales
+                    .map((l) => (String(l).toLowerCase().startsWith("es") ? "es" : "en"))
+                )
+              )
+            : [];
+          if (!langs.length) langs.push(fallbackDefault);
+          if (!langs.includes(fallbackDefault)) langs.push(fallbackDefault);
+          if (planLocaleLimit === 1) return [fallbackDefault] as ("en" | "es")[];
+          return langs.slice(0, planLocaleLimit) as ("en" | "es")[];
+        })();
 
       const nextBusiness: BusinessState = {
           name: biz.name ?? "",
           timezone: biz.timezone ?? "Europe/Madrid",
           allowed_domains_text: domainsToBaseText(biz.allowed_domains),
-          default_locale: biz.default_locale === "es" ? "es" : "en",
-          enabled_locales: (() => {
-            const langs = Array.isArray(biz.enabled_locales)
-              ? Array.from(
-                  new Set(
-                    biz.enabled_locales
-                      .map((l) => (String(l).toLowerCase().startsWith("es") ? "es" : "en"))
-                  )
-                )
-              : [];
-            const fallbackDefault = biz.default_locale === "es" ? "es" : "en";
-            if (!langs.length) langs.push(fallbackDefault);
-            if (!langs.includes(fallbackDefault)) langs.push(fallbackDefault);
-            return langs as ("en" | "es")[];
-          })(),
+          default_locale: fallbackDefault,
+          enabled_locales: hydratedLocales,
         };
         setDomainLimit(typeof biz.domain_limit === "number" && biz.domain_limit > 0 ? biz.domain_limit : 1);
-        setBillingPlan((biz.billing_plan || "basic").toLowerCase());
+        setBillingPlan(nextPlan);
 
         setBusiness(nextBusiness);
         initialBusiness.current = nextBusiness;
@@ -295,12 +307,7 @@ export default function SettingsBusinessPage() {
     );
   }, [profile, business]);
 
-  const localeLimit = useMemo(() => {
-    if (billingPlan === "growth") return 2;
-    if (billingPlan === "pro") return 3;
-    if (billingPlan === "custom") return Number.MAX_SAFE_INTEGER;
-    return 1;
-  }, [billingPlan]);
+  const localeLimit = useMemo(() => localeLimitForPlan(billingPlan), [billingPlan]);
 
   const localeOptions: Array<{ code: "en" | "es"; label: string }> = [
     { code: "en", label: t("languages.english") },
@@ -751,32 +758,38 @@ export default function SettingsBusinessPage() {
               <label className="block text-xs text-zinc-400 mb-1">
                 {t("languages.label")}
               </label>
-              <div className="flex flex-wrap gap-2">
-                {localeOptions.map((opt) => {
-                  const checked = business.enabled_locales.includes(opt.code);
-                  const blockAdd = !checked && business.enabled_locales.length >= localeLimit;
-                  const disabled = (checked && business.enabled_locales.length === 1) || blockAdd;
-                  return (
-                    <label
-                      key={opt.code}
-                      className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
-                        checked
-                          ? "border-brand-600/50 bg-brand-500/10 text-brand-100"
-                          : "border-zinc-800 bg-zinc-950 text-zinc-300"
-                      } ${disabled ? "opacity-60" : ""}`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleEnabledLocale(opt.code)}
-                        disabled={disabled}
-                        className="accent-emerald-500"
-                      />
-                      {opt.label}
-                    </label>
-                  );
-                })}
-              </div>
+              {localeLimit === 1 ? (
+                <div className="text-sm text-zinc-300">
+                  {localeOptions.find((opt) => opt.code === business.default_locale)?.label ?? "English"}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {localeOptions.map((opt) => {
+                    const checked = business.enabled_locales.includes(opt.code);
+                    const blockAdd = !checked && business.enabled_locales.length >= localeLimit;
+                    const disabled = (checked && business.enabled_locales.length === 1) || blockAdd;
+                    return (
+                      <label
+                        key={opt.code}
+                        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+                          checked
+                            ? "border-brand-600/50 bg-brand-500/10 text-brand-100"
+                            : "border-zinc-800 bg-zinc-950 text-zinc-300"
+                        } ${disabled ? "opacity-60" : ""}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleEnabledLocale(opt.code)}
+                          disabled={disabled}
+                          className="accent-emerald-500"
+                        />
+                        {opt.label}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
               <p className="text-[11px] text-zinc-500 mt-2">
                 {t("languages.limit", {
                   count:

@@ -1193,18 +1193,16 @@ export default function SettingsAssistantPage() {
         >
           {t("tabs.assistant")}
         </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("indexed")}
-          disabled={!canUseWebsiteIndexing}
-          className={activeTab === "indexed" ? btnBrand : btnNeutral}
-        >
-          {t("tabs.indexed")}
-        </button>
+        {canUseWebsiteIndexing ? (
+          <button
+            type="button"
+            onClick={() => setActiveTab("indexed")}
+            className={activeTab === "indexed" ? btnBrand : btnNeutral}
+          >
+            {t("tabs.indexed")}
+          </button>
+        ) : null}
       </div>
-      {!canUseWebsiteIndexing ? (
-        <p className="mb-4 text-xs text-zinc-500">{t("plans.indexingUpgradeHint")}</p>
-      ) : null}
 
       <div className={activeTab === "assistant" ? "" : "hidden"}>
       {canUseWebsiteIndexing ? (
@@ -1263,12 +1261,7 @@ export default function SettingsAssistantPage() {
           </p>
         ) : null}
       </section>
-      ) : (
-      <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-2">
-        <div className="text-sm font-semibold text-zinc-300">{t("autofill.title")}</div>
-        <p className="text-xs text-zinc-500">{t("plans.indexingUpgradeHint")}</p>
-      </section>
-      )}
+      ) : null}
 
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="text-sm font-semibold text-zinc-100">{t("workflow.title")}</div>
@@ -1317,18 +1310,16 @@ export default function SettingsAssistantPage() {
             >
               {t("mode.quick")}
             </button>
-            <button
-              type="button"
-              onClick={() => setEditorMode("advanced")}
-              disabled={!canUseAdvancedSetup}
-              className={editorMode === "advanced" ? btnBrand : btnNeutral}
-            >
-              {t("mode.advanced")}
-            </button>
+            {canUseAdvancedSetup ? (
+              <button
+                type="button"
+                onClick={() => setEditorMode("advanced")}
+                className={editorMode === "advanced" ? btnBrand : btnNeutral}
+              >
+                {t("mode.advanced")}
+              </button>
+            ) : null}
           </div>
-          {!canUseAdvancedSetup ? (
-            <p className="mt-2 text-[11px] text-zinc-500">{t("plans.advancedUpgradeHint")}</p>
-          ) : null}
         </div>
 
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
@@ -1424,9 +1415,7 @@ export default function SettingsAssistantPage() {
                   </div>
                 </div>
                 </div>
-                {isBasicPlan ? (
-                  <p className="mt-3 text-[11px] text-zinc-500">{t("plans.basicToneOnlyHint")}</p>
-                ) : null}
+                {null}
             </div>
           </div>
         </div>
