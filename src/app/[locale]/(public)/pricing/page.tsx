@@ -95,7 +95,7 @@ export default async function PricingPage() {
     {
       feature: isEs ? "Indexado web" : "Website indexing",
       basic: isEs ? "No incluido" : "None",
-      growth: isEs ? "Configuración mínima" : "Minimal setup",
+      growth: isEs ? "Configuración inteligente" : "Smart setup",
       pro: isEs ? "Configuración avanzada" : "Advanced setup",
       custom: isEs ? "Configuración personalizada" : "Custom setup",
       type: "text",

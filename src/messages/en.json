@@ -503,10 +503,10 @@
     },
     "mode": {
       "title": "Setup mode",
-      "desc": "Use Quick setup for onboarding. Switch to Advanced when you want deeper control.",
-      "quick": "Minimal setup",
+      "desc": "Use Smart setup for onboarding. Switch to Advanced Setup when you want deeper control.",
+      "quick": "Smart setup",
       "advanced": "Advanced setup",
-      "quickHint": "Advanced fields are hidden in Minimal setup. Switch to Advanced to edit extra links, behavior rules, and qualification criteria."
+      "quickHint": "Upgrade to Pro to access this feature."
     },
     "loading": "Loading…",
     "loginRequired": {
@@ -521,7 +521,7 @@
     },
     "sections": {
       "presets": {
-        "title": "Quick setup",
+      "title": "Smart setup",
         "desc": "Choose how the assistant should sound and how it should guide visitors."
       },
       "business": {

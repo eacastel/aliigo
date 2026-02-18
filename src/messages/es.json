@@ -504,10 +504,10 @@
     },
     "mode": {
       "title": "Modo de configuración",
-      "desc": "Usa Configuración mínima para onboarding. Cambia a Avanzado para tener más control.",
-      "quick": "Configuración mínima",
+      "desc": "Usa Configuración inteligente para onboarding. Cambia a Configuración avanzada para tener más control.",
+      "quick": "Configuración inteligente",
       "advanced": "Configuración avanzada",
-      "quickHint": "Los campos avanzados están ocultos en Configuración mínima. Cambia a Avanzado para editar enlaces extra, reglas de comportamiento y criterios de calificación."
+      "quickHint": "Actualiza a Pro para acceder a esta funcionalidad."
     },
     "loading": "Cargando…",
     "loginRequired": {
@@ -522,7 +522,7 @@
     },
     "sections": {
       "presets": {
-        "title": "Configuración rápida",
+      "title": "Configuración inteligente",
         "desc": "Elige cómo debe sonar el asistente y cómo guiar a los visitantes."
       },
       "business": {
