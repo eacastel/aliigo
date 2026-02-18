@@ -426,7 +426,7 @@ export default function SettingsAssistantPage() {
 
   // --- UI parity buttons ---
   const btnBase =
-    "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-60 disabled:!cursor-not-allowed";
+    "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-45 disabled:!cursor-not-allowed disabled:pointer-events-none";
 
   const btnBrand = `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
 
@@ -698,7 +698,7 @@ export default function SettingsAssistantPage() {
       status === "suggested"
         ? "text-emerald-300 border-emerald-800/70 bg-emerald-900/20"
         : status === "missing"
-          ? "text-amber-300 border-amber-800/70 bg-amber-900/20"
+          ? "text-zinc-300 border-zinc-700 bg-zinc-900/40"
           : "text-zinc-300 border-zinc-700 bg-zinc-900/40";
     return (
       <span className={`ml-2 rounded-full border px-2 py-0.5 text-[10px] ${cls}`}>
@@ -1203,7 +1203,7 @@ export default function SettingsAssistantPage() {
         </button>
       </div>
       {!canUseWebsiteIndexing ? (
-        <p className="mb-4 text-xs text-amber-300">{t("plans.indexingUpgradeHint")}</p>
+        <p className="mb-4 text-xs text-zinc-500">{t("plans.indexingUpgradeHint")}</p>
       ) : null}
 
       <div className={activeTab === "assistant" ? "" : "hidden"}>
@@ -1264,9 +1264,9 @@ export default function SettingsAssistantPage() {
         ) : null}
       </section>
       ) : (
-      <section className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
-        <div className="text-sm font-semibold text-amber-200">{t("autofill.title")}</div>
-        <p className="text-xs text-amber-300">{t("plans.indexingUpgradeHint")}</p>
+      <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-2">
+        <div className="text-sm font-semibold text-zinc-300">{t("autofill.title")}</div>
+        <p className="text-xs text-zinc-500">{t("plans.indexingUpgradeHint")}</p>
       </section>
       )}
 
@@ -1293,7 +1293,7 @@ export default function SettingsAssistantPage() {
             {t("workflow.missingRequired")} ({missingRequired.length})
           </span>
           <span className="mx-2 text-zinc-500">•</span>
-          <span className={missingRequired.length === 0 ? "text-green-300" : "text-amber-300"}>
+          <span className={missingRequired.length === 0 ? "text-green-300" : "text-zinc-400"}>
             {missingRequired.length === 0
               ? t("workflow.noneMissing")
               : REQUIRED_FIELDS.filter(({ key }) => missingRequired.includes(key))
@@ -1327,7 +1327,7 @@ export default function SettingsAssistantPage() {
             </button>
           </div>
           {!canUseAdvancedSetup ? (
-            <p className="mt-2 text-[11px] text-amber-300">{t("plans.advancedUpgradeHint")}</p>
+            <p className="mt-2 text-[11px] text-zinc-500">{t("plans.advancedUpgradeHint")}</p>
           ) : null}
         </div>
 
@@ -1425,7 +1425,7 @@ export default function SettingsAssistantPage() {
                 </div>
                 </div>
                 {isBasicPlan ? (
-                  <p className="mt-3 text-[11px] text-amber-300">{t("plans.basicToneOnlyHint")}</p>
+                  <p className="mt-3 text-[11px] text-zinc-500">{t("plans.basicToneOnlyHint")}</p>
                 ) : null}
             </div>
           </div>

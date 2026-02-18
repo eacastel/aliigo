@@ -281,6 +281,9 @@
     "showPoweredByHelp": "Basic always shows branding. Growth, Pro, and Custom can toggle this.",
     "headerLogoUrl": "Header logo URL (Growth+)",
     "headerLogoHelp": "Optional. Icon appears only on Growth, Pro, and Custom when this URL is set.",
+    "plans": {
+      "logoUpgradeHint": "Upgrade to Growth+ to enable logo upload."
+    },
     "embedSnippet": "Embed snippet",
     "emptyDash": "—",
     "lockedHint": "Activate billing to unlock the widget install code.",

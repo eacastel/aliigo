@@ -282,6 +282,9 @@
     "showPoweredByHelp": "Basic siempre muestra branding. Growth, Pro y Custom pueden alternarlo.",
     "headerLogoUrl": "URL del logo de cabecera (Growth+)",
     "headerLogoHelp": "Opcional. El icono solo aparece en Growth, Pro y Custom cuando esta URL está definida.",
+    "plans": {
+      "logoUpgradeHint": "Actualiza a Growth+ para habilitar la subida de logo."
+    },
     "embedSnippet": "Snippet de instalación",
     "emptyDash": "—",
     "lockedHint": "Activa la facturación para desbloquear el código del widget.",

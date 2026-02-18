@@ -28,6 +28,7 @@ type BizLocal = {
   slug: string;
   public_embed_key: string;
   default_locale: "en" | "es";
+  billing_plan: string | null;
   widget_theme: ThemeDb;
 };
 
@@ -74,7 +75,7 @@ const splitTwoHex = (v?: string) => {
 
   // --- UI parity with Billing + Messages buttons ---
   const btnBase =
-    "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-60 disabled:!cursor-not-allowed";
+    "rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors !cursor-pointer disabled:opacity-45 disabled:!cursor-not-allowed disabled:pointer-events-none";
 
   const btnBrand =
     `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
@@ -210,6 +211,12 @@ export default function WidgetSettingsPage() {
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoMsg, setLogoMsg] = useState<string | null>(null);
+  const [billingPlan, setBillingPlan] = useState<string>("basic");
+
+  const isBasicPlan = billingPlan === "basic" || billingPlan === "starter";
+  const canToggleBranding = !isBasicPlan;
+  const canManageHeaderLogo =
+    billingPlan === "growth" || billingPlan === "pro" || billingPlan === "custom";
 
   type BizRow = {
     id: string;
@@ -218,6 +225,7 @@ export default function WidgetSettingsPage() {
     brand_name: string | null;
     public_embed_key: string | null;
     default_locale: string | null;
+    billing_plan: string | null;
     widget_theme?: unknown;
   };
 
@@ -246,6 +254,7 @@ export default function WidgetSettingsPage() {
             slug,
             public_embed_key,
             default_locale,
+            billing_plan,
             widget_theme
           )
         `
@@ -270,7 +279,8 @@ export default function WidgetSettingsPage() {
               name,
               brand_name,
               public_embed_key,
-              default_locale
+              default_locale,
+              billing_plan
             )
           `
           )
@@ -335,17 +345,23 @@ export default function WidgetSettingsPage() {
 
 
       const effectiveBrand = (b.brand_name || b.name || "Aliigo").trim();
+      const plan = (b.billing_plan ?? "basic").toLowerCase();
+      setBillingPlan(plan);
       setBrand(effectiveBrand);
       setInitialBrand(effectiveBrand);
 
       const dbTheme = toThemeDb(b.widget_theme);
       const merged = mergeTheme(dbTheme);
+      if (plan === "basic" || plan === "starter") {
+        merged.showBranding = true;
+      }
 
       setBiz({
         id: b.id,
         slug: b.slug,
         public_embed_key: b.public_embed_key ?? "",
         default_locale: b.default_locale === "es" ? "es" : "en",
+        billing_plan: b.billing_plan ?? null,
         widget_theme: dbTheme ?? {},
       });
 
@@ -780,13 +796,20 @@ export default function WidgetSettingsPage() {
                 type="button"
                 role="switch"
                 aria-checked={theme.showBranding}
+                disabled={!canToggleBranding}
                 onClick={() => setTheme((prev) => ({ ...prev, showBranding: !prev.showBranding }))}
                 className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
-                  theme.showBranding ? "bg-brand-500/80" : "bg-zinc-700"
+                  canToggleBranding
+                    ? theme.showBranding
+                      ? "bg-brand-500/80"
+                      : "bg-zinc-700"
+                    : "bg-zinc-800"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                    canToggleBranding ? "bg-white" : "bg-zinc-500"
+                  } ${
                     theme.showBranding ? "translate-x-5" : "translate-x-0.5"
                   }`}
                 />
@@ -803,7 +826,7 @@ export default function WidgetSettingsPage() {
                   <button
                     type="button"
                     className={btnNeutral}
-                    disabled={logoBusy}
+                    disabled={logoBusy || !canManageHeaderLogo}
                     onClick={() => {
                       const input = document.getElementById("widget-logo-input") as HTMLInputElement | null;
                       input?.click();
@@ -814,7 +837,7 @@ export default function WidgetSettingsPage() {
                   <button
                     type="button"
                     className={btnNeutralStrong}
-                    disabled={logoBusy}
+                    disabled={logoBusy || !canManageHeaderLogo}
                     onClick={removeHeaderLogo}
                   >
                     {t("buttons.removeLogo")}
@@ -825,7 +848,7 @@ export default function WidgetSettingsPage() {
               <button
                 type="button"
                 className={btnNeutral}
-                disabled={logoBusy}
+                disabled={logoBusy || !canManageHeaderLogo}
                 onClick={() => {
                   const input = document.getElementById("widget-logo-input") as HTMLInputElement | null;
                   input?.click();
@@ -839,6 +862,7 @@ export default function WidgetSettingsPage() {
               type="file"
               className="hidden"
               accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              disabled={!canManageHeaderLogo}
               onChange={(e) => {
                 const file = e.target.files?.[0] ?? null;
                 void uploadHeaderLogo(file);
@@ -846,6 +870,9 @@ export default function WidgetSettingsPage() {
               }}
             />
             <p className="text-xs text-zinc-500">{t("headerLogoHelp")}</p>
+            {!canManageHeaderLogo ? (
+              <p className="text-xs text-zinc-500">{t("plans.logoUpgradeHint")}</p>
+            ) : null}
             {logoMsg ? <p className="text-xs text-zinc-400">{logoMsg}</p> : null}
           </div>
 
