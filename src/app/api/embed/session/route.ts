@@ -38,6 +38,13 @@ function sanitizeHost(v: string) {
 
 type ThemeDb = Record<string, unknown> | null;
 
+function domainLimitForPlan(plan: string | null | undefined): number {
+  const p = (plan ?? "basic").toLowerCase();
+  if (p === "pro") return 3;
+  if (p === "custom") return Number.MAX_SAFE_INTEGER;
+  return 1; // basic, starter, growth
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -52,7 +59,7 @@ export async function GET(req: NextRequest) {
     const primaryBizRes = await supabase
       .from("businesses")
       .select(
-        "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, widget_header_logo_path"
+        "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, domain_limit, widget_header_logo_path"
       )
       .eq("public_embed_key", key)
       .maybeSingle<{
@@ -65,6 +72,7 @@ export async function GET(req: NextRequest) {
         enabled_locales: string[] | null;
         widget_theme: ThemeDb;
         billing_plan: string | null;
+        domain_limit: number | null;
         widget_header_logo_path: string | null;
       }>();
 
@@ -75,7 +83,7 @@ export async function GET(req: NextRequest) {
       const fallback = await supabase
         .from("businesses")
         .select(
-          "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan"
+          "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, domain_limit"
         )
         .eq("public_embed_key", key)
         .maybeSingle<{
@@ -88,6 +96,7 @@ export async function GET(req: NextRequest) {
           enabled_locales: string[] | null;
           widget_theme: ThemeDb;
           billing_plan: string | null;
+          domain_limit: number | null;
         }>();
       bizData = fallback.data ? { ...fallback.data, widget_header_logo_path: null } : null;
       bizError = fallback.error;
@@ -98,7 +107,12 @@ export async function GET(req: NextRequest) {
     }
     if (!bizData) return json(req, { error: "Invalid key" }, 403);
 
-    const allowed = bizData.allowed_domains ?? [];
+    const planDomainLimit = domainLimitForPlan(bizData.billing_plan);
+    const effectiveLimit =
+      typeof bizData.domain_limit === "number" && Number.isFinite(bizData.domain_limit) && bizData.domain_limit > 0
+        ? Math.min(bizData.domain_limit, planDomainLimit)
+        : planDomainLimit;
+    const allowed = (bizData.allowed_domains ?? []).slice(0, effectiveLimit);
     if (!hostAllowed(host, allowed)) {
       return json(req, { error: "Domain not allowed" }, 403);
     }

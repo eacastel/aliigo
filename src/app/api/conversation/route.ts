@@ -289,6 +289,13 @@ function aliigoHost() {
   }
 }
 
+function domainLimitForPlan(plan: string | null | undefined): number {
+  const p = (plan ?? "basic").toLowerCase();
+  if (p === "pro") return 3;
+  if (p === "custom") return Number.MAX_SAFE_INTEGER;
+  return 1; // basic, starter, growth
+}
+
 async function validateEmbedAccess(token: string, host: string) {
   if (!token) return { ok: false as const, reason: "Missing token" };
   if (!host) return { ok: false as const, reason: "Missing host" };
@@ -334,10 +341,28 @@ async function validateEmbedAccess(token: string, host: string) {
   const tok = await supabase.from("embed_tokens").select("business_id").eq("token", token).single();
   if (tok.error || !tok.data) return { ok: false as const, reason: "Invalid token" };
 
-  const biz = await supabase.from("businesses").select("id,allowed_domains").eq("id", tok.data.business_id).single();
+  const biz = await supabase
+    .from("businesses")
+    .select("id,allowed_domains,billing_plan,domain_limit")
+    .eq("id", tok.data.business_id)
+    .single<{
+      id: string;
+      allowed_domains: string[] | null;
+      billing_plan: string | null;
+      domain_limit: number | null;
+    }>();
   if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
 
-  if (!hostAllowed(host, biz.data.allowed_domains)) {
+  const planDomainLimit = domainLimitForPlan(biz.data.billing_plan);
+  const effectiveLimit =
+    typeof biz.data.domain_limit === "number" &&
+    Number.isFinite(biz.data.domain_limit) &&
+    biz.data.domain_limit > 0
+      ? Math.min(biz.data.domain_limit, planDomainLimit)
+      : planDomainLimit;
+  const effectiveAllowedDomains = (biz.data.allowed_domains ?? []).slice(0, effectiveLimit);
+
+  if (!hostAllowed(host, effectiveAllowedDomains)) {
     return { ok: false as const, reason: "Domain not allowed" };
   }
 
@@ -858,11 +883,15 @@ Universal guardrails (always on):
 - Always reply in the user’s language; follow if they switch.`;
 
     const knowledge = (bizRes.data?.knowledge ?? "").trim();
-    const retrievedChunks = await retrieveKnowledgeChunks({
-      businessId,
-      locale,
-      query: message,
-    });
+    const planNow = (bizRes.data?.billing_plan ?? "basic").toLowerCase();
+    const canUseIndexedKnowledge = planNow !== "basic" && planNow !== "starter";
+    const retrievedChunks = canUseIndexedKnowledge
+      ? await retrieveKnowledgeChunks({
+          businessId,
+          locale,
+          query: message,
+        })
+      : [];
     const retrievedKnowledge = retrievedChunks
       .map((c, i) => {
         const src = c.sourceUrl ? ` [source: ${c.sourceUrl}]` : c.sourceLabel ? ` [source: ${c.sourceLabel}]` : "";

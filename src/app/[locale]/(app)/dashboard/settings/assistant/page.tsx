@@ -1207,6 +1207,7 @@ export default function SettingsAssistantPage() {
       ) : null}
 
       <div className={activeTab === "assistant" ? "" : "hidden"}>
+      {canUseWebsiteIndexing ? (
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="text-sm font-semibold text-zinc-100">{t("autofill.title")}</div>
         <p className="text-xs text-zinc-400">{t("autofill.desc")}</p>
@@ -1262,6 +1263,12 @@ export default function SettingsAssistantPage() {
           </p>
         ) : null}
       </section>
+      ) : (
+      <section className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
+        <div className="text-sm font-semibold text-amber-200">{t("autofill.title")}</div>
+        <p className="text-xs text-amber-300">{t("plans.indexingUpgradeHint")}</p>
+      </section>
+      )}
 
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="text-sm font-semibold text-zinc-100">{t("workflow.title")}</div>
@@ -1294,15 +1301,6 @@ export default function SettingsAssistantPage() {
                   .join(", ")}
           </span>
         </div>
-        <label className="flex items-start gap-2 text-xs text-zinc-300">
-          <input
-            type="checkbox"
-            checked={ackAuthorized}
-            onChange={(e) => setAckAuthorized(e.target.checked)}
-            className="mt-0.5"
-          />
-          <span>{t("workflow.ack")}</span>
-        </label>
       </section>
 
       <section className="space-y-6">
@@ -1689,6 +1687,16 @@ export default function SettingsAssistantPage() {
           </div>
         ) : null}
 
+        <div className="space-y-3">
+          <label className="flex items-start gap-2 text-xs text-zinc-300">
+            <input
+              type="checkbox"
+              checked={ackAuthorized}
+              onChange={(e) => setAckAuthorized(e.target.checked)}
+              className="mt-0.5"
+            />
+            <span>{t("workflow.ack")}</span>
+          </label>
         <div className="flex gap-2">
           <button
             onClick={saveDraft}
@@ -1709,6 +1717,7 @@ export default function SettingsAssistantPage() {
           <button onClick={() => void load()} className={btnNeutral}>
             {t("actions.reset")}
           </button>
+        </div>
         </div>
       </section>
       </div>
@@ -1820,9 +1829,20 @@ export default function SettingsAssistantPage() {
 
       {activeTab === "assistant" && dirty ? (
         <div className="fixed bottom-4 left-4 right-4 z-40">
-          <div className="mx-auto max-w-5xl rounded-xl border border-zinc-800 bg-zinc-950/90 backdrop-blur px-4 py-3 flex items-center justify-between gap-3">
-            <div className="text-xs text-zinc-400">{t("actions.unsaved")}</div>
-            <div className="flex gap-2">
+          <div className="mx-auto max-w-5xl rounded-xl border border-zinc-800 bg-zinc-950/90 backdrop-blur px-4 py-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0">
+              <div className="text-xs text-zinc-400">{t("actions.unsaved")}</div>
+              <label className="mt-2 flex items-start gap-2 text-[11px] text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={ackAuthorized}
+                  onChange={(e) => setAckAuthorized(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <span>{t("workflow.ack")}</span>
+              </label>
+            </div>
+            <div className="flex gap-2 shrink-0">
               <button onClick={saveDraft} disabled={saving} className={btnBrand}>
                 {saving ? t("actions.saving") : t("actions.saveDraft")}
               </button>

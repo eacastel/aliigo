@@ -94,10 +94,18 @@ export default async function PricingPage() {
     },
     {
       feature: isEs ? "Indexado web" : "Website indexing",
-      basic: isEs ? "No incluido" : "Not included",
-      growth: isEs ? "Incluido" : "Included",
-      pro: isEs ? "Incluido" : "Included",
-      custom: isEs ? "Incluido" : "Included",
+      basic: isEs ? "No incluido" : "None",
+      growth: isEs ? "Configuración mínima" : "Minimal setup",
+      pro: isEs ? "Configuración avanzada" : "Advanced setup",
+      custom: isEs ? "Configuración personalizada" : "Custom setup",
+      type: "text",
+    },
+    {
+      feature: isEs ? "Subida de documentos" : "Document uploading",
+      basic: isEs ? "No incluido" : "None",
+      growth: isEs ? "No incluido" : "None",
+      pro: isEs ? "Sí" : "Yes",
+      custom: isEs ? "Cargas personalizadas" : "Custom uploads",
       type: "text",
     },
     {
@@ -134,8 +142,8 @@ export default async function PricingPage() {
     },
     {
       feature: isEs ? "Soporte" : "Support",
-      basic: isEs ? "Email" : "Email",
-      growth: isEs ? "Email + chat" : "Email + chat",
+      basic: isEs ? "Ayuda online y documentación" : "Online help & docs",
+      growth: isEs ? "Email" : "Email",
       pro: isEs ? "Prioritario" : "Priority",
       custom: isEs ? "Manager dedicado" : "Dedicated manager",
       type: "text",

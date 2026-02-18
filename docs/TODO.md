@@ -27,3 +27,59 @@
 2. Pass B follow-up:
    - Persist dismissed recommendations per-field across reloads.
    - Add optional dedicated monitor page with pagination/filtering for all indexed docs/runs.
+
+3. Advanced setup quality:
+   - Improve generated advanced-field recommendations (scope/style/qualification/instructions) so they are higher quality and less generic.
+   - Generate conversation-oriented guidance (rapport and follow-up behavior), not only factual snippets.
+   - Keep strict validation and source-grounding to reduce off-topic answers.
+
+4. Knowledge completeness and ingestion UX:
+   - Make indexed-content monitor show full coverage clearly (all pages/docs/chunks with pagination/search).
+   - Add manual “add single page” + full website indexing paths with explicit overwrite/merge behavior.
+   - Add URL health checks for indexed links (detect/remove dead links).
+
+5. Document ingestion (Pro+ / Custom):
+   - Add secure file upload pipeline (PDF/TXT/CSV/MD) into `knowledge_documents` + `knowledge_chunks`.
+   - Parse, chunk, embed, and expose uploaded docs in monitor and assistant retrieval.
+   - Define limits by plan (file types, max size, max files, total storage).
+
+## Plan Enforcement / Downgrade Safety
+
+1. Enforce **access gating, not deletion** on downgrade:
+   - Keep historical data (domains, indexed docs/chunks, advanced settings, logos).
+   - Block feature usage above current plan limits.
+   - Restore access automatically on re-upgrade.
+
+2. Domains:
+   - Enforce effective domain allowance by plan (`basic:1`, `growth:1`, `pro:3`, `custom:unlimited`) at runtime in embed/session checks.
+   - If stored domains exceed limit after downgrade, mark extras as locked/inactive without deleting.
+
+3. Knowledge indexing / retrieval:
+   - Basic: block indexing + retrieval from indexed knowledge.
+   - Growth+: allow.
+   - Keep indexed assets in DB on downgrade, but ignore them while plan is below entitlement.
+
+4. Advanced assistant controls:
+   - Basic: tone only.
+   - Growth+: full advanced controls.
+   - Preserve advanced values in storage when downgraded; hide/lock in UI and API.
+
+## WhatsApp Integration (Next Priority)
+
+1. Wire inbound webhook to conversation pipeline:
+   - `/api/webhooks/whatsapp` should map inbound messages to business + contact and call assistant response generation.
+
+2. Send outbound replies via WhatsApp Cloud API:
+   - Add sender helper with retries, error logging, and idempotency guard.
+
+3. Conversation persistence:
+   - Store channel=`whatsapp` messages in existing conversation tables.
+   - Reuse lead-capture flow and knowledge retrieval behavior.
+
+4. Tenant routing:
+   - Route incoming numbers/phone IDs to the correct business.
+   - Add config fields for WhatsApp credentials per environment/business as needed.
+
+5. Safety / compliance:
+   - Respect WhatsApp session window + template rules.
+   - Add rate limits and abuse controls.
