@@ -15,3 +15,11 @@
    - contact name
    - phone number
 5. Add lightweight nudges in dashboard onboarding/checklist when contact name or phone is missing.
+
+## Knowledge Index / RAG (New)
+
+1. Add vector index once `knowledge_chunks` row count is meaningful:
+   - `create index if not exists idx_knowledge_chunks_embedding_cosine`
+   - `on public.knowledge_chunks`
+   - `using ivfflat (embedding vector_cosine_ops)`
+   - `with (lists = 100);`

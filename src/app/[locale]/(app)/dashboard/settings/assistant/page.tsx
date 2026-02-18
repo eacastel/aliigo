@@ -354,6 +354,7 @@ export default function SettingsAssistantPage() {
   const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
   const [autofillUrl, setAutofillUrl] = useState("");
   const [autofilling, setAutofilling] = useState(false);
+  const [indexing, setIndexing] = useState(false);
 
   const initialAssistant = useRef<AssistantState | null>(null);
   const publishedFormRef = useRef<AssistantForm | null>(null);
@@ -690,6 +691,54 @@ export default function SettingsAssistantPage() {
     }
   };
 
+  const runIndexing = async () => {
+    setMsg(null);
+    if (!autofillUrl.trim()) {
+      setMsgTone("error");
+      setMsg(t("autofill.missingUrl"));
+      return;
+    }
+    setIndexing(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) {
+        setMsgTone("error");
+        setMsg(t("workflow.loginRequired"));
+        return;
+      }
+      const res = await fetch("/api/knowledge/crawl", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ url: autofillUrl.trim() }),
+      });
+      const j: { error?: string; pagesScanned?: number; documentsUpserted?: number; chunksUpserted?: number } =
+        await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setMsgTone("error");
+        setMsg(`${t("autofill.indexError")}: ${j.error || "unknown"}`);
+        return;
+      }
+      setMsgTone("success");
+      setMsg(
+        t("autofill.indexSuccess", {
+          pages: j.pagesScanned ?? 0,
+          docs: j.documentsUpserted ?? 0,
+          chunks: j.chunksUpserted ?? 0,
+        }),
+      );
+    } catch (e) {
+      console.error("[settings-assistant] index", e);
+      setMsgTone("error");
+      setMsg(t("autofill.indexError"));
+    } finally {
+      setIndexing(false);
+    }
+  };
+
   const saveDraft = async () => {
     setMsg(null);
     if (!dirty) return;
@@ -919,6 +968,14 @@ export default function SettingsAssistantPage() {
             className="rounded-lg bg-brand-500/10 px-3 py-2 text-xs font-medium text-brand-200 ring-1 ring-inset ring-brand-500/25 transition-colors hover:bg-brand-500/15 disabled:opacity-60"
           >
             {autofilling ? t("autofill.loading") : t("autofill.action")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void runIndexing()}
+            disabled={indexing}
+            className="rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-medium text-zinc-200 ring-1 ring-inset ring-zinc-700 transition-colors hover:bg-zinc-900/80 disabled:opacity-60"
+          >
+            {indexing ? t("autofill.indexing") : t("autofill.indexAction")}
           </button>
           <input
             className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"

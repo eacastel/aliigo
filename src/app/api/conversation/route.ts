@@ -35,6 +35,12 @@ const openai = process.env.OPENAI_API_KEY
 
 type ChatRole = "user" | "assistant" | "system" | "tool";
 type MessagesRow = { role: ChatRole; content: string; created_at: string };
+type RetrievedChunk = {
+  content: string;
+  score: number;
+  sourceUrl?: string | null;
+  sourceLabel?: string | null;
+};
 
 class RateLimitError extends Error {
   status = 429 as const;
@@ -73,6 +79,71 @@ function clampText(v: string, max = 160) {
   const s = (v || "").trim();
   if (s.length <= max) return s;
   return `${s.slice(0, max)}…`;
+}
+
+function cosineSimilarity(a: number[], b: number[]): number {
+  if (a.length === 0 || b.length === 0 || a.length !== b.length) return -1;
+  let dot = 0;
+  let na = 0;
+  let nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  if (na === 0 || nb === 0) return -1;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+
+async function retrieveKnowledgeChunks(params: {
+  businessId: string;
+  locale: string;
+  query: string;
+}): Promise<RetrievedChunk[]> {
+  if (!openai) return [];
+
+  const model = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
+  const emb = await openai.embeddings.create({ model, input: params.query });
+  const queryVector = emb.data[0]?.embedding ?? [];
+  if (queryVector.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("knowledge_chunks")
+    .select("content, embedding, metadata, locale")
+    .eq("business_id", params.businessId)
+    .in("locale", [params.locale, "en"])
+    .limit(250);
+  if (error || !data) return [];
+
+  const scored: RetrievedChunk[] = [];
+  for (const row of data as Array<{
+    content: string;
+    embedding: number[] | string | null;
+    metadata: Record<string, unknown> | null;
+  }>) {
+    const vec = Array.isArray(row.embedding)
+      ? row.embedding
+      : typeof row.embedding === "string"
+        ? row.embedding
+            .replace(/^\[|\]$/g, "")
+            .split(",")
+            .map((x) => Number(x.trim()))
+            .filter((n) => Number.isFinite(n))
+        : [];
+    if (vec.length === 0) continue;
+    const score = cosineSimilarity(queryVector, vec);
+    if (score < 0.2) continue;
+    const meta = row.metadata ?? {};
+    scored.push({
+      content: row.content,
+      score,
+      sourceUrl: typeof meta.source_url === "string" ? meta.source_url : null,
+      sourceLabel: typeof meta.source_label === "string" ? meta.source_label : null,
+    });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 6);
 }
 
 
@@ -716,15 +787,39 @@ Universal guardrails (always on):
 - Always reply in the user’s language; follow if they switch.`;
 
     const knowledge = (bizRes.data?.knowledge ?? "").trim();
+    const retrievedChunks = await retrieveKnowledgeChunks({
+      businessId,
+      locale,
+      query: message,
+    });
+    const retrievedKnowledge = retrievedChunks
+      .map((c, i) => {
+        const src = c.sourceUrl ? ` [source: ${c.sourceUrl}]` : c.sourceLabel ? ` [source: ${c.sourceLabel}]` : "";
+        return `(${i + 1}) ${c.content}${src}`;
+      })
+      .join("\n\n");
     const isAliigoSite = host === aliigoHost() || bizSlug === "aliigo";
     const strictKnowledgeMode = process.env.STRICT_KNOWLEDGE_MODE !== "false";
-    const blockUnverifiedAnswers = strictKnowledgeMode && !isAliigoSite && knowledge.length === 0;
+    const hasAnyKnowledge = knowledge.length > 0 || retrievedChunks.length > 0;
+    const blockUnverifiedAnswers = strictKnowledgeMode && !isAliigoSite && !hasAnyKnowledge;
 
     if (knowledge) {
       sys += `
 
 Business knowledge (authoritative):
 ${knowledge}`;
+    }
+
+    if (retrievedKnowledge) {
+      sys += `
+
+Retrieved context (authoritative for this reply):
+${retrievedKnowledge}
+
+Rules:
+- Prefer retrieved context over assumptions.
+- If retrieved context is insufficient, say what is missing and ask one clarifying question.
+- When possible, include a short source reference in plain language.`;
     }
 
     if (isAliigoSite) {

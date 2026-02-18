@@ -689,7 +689,11 @@
         "needs_review": "Review",
         "missing": "Missing"
       },
-      "successWithPages": "Suggestions loaded from {count} pages. Review fields and save draft."
+      "successWithPages": "Suggestions loaded from {count} pages. Review fields and save draft.",
+      "indexAction": "Index knowledge",
+      "indexing": "Indexing…",
+      "indexSuccess": "Index complete: {pages} pages, {docs} documents, {chunks} chunks.",
+      "indexError": "Could not index knowledge"
     }
   },
   "Landing": {

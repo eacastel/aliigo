@@ -690,7 +690,11 @@
         "needs_review": "Revisar",
         "missing": "Falta"
       },
-      "successWithPages": "Sugerencias cargadas desde {count} páginas. Revisa los campos y guarda borrador."
+      "successWithPages": "Sugerencias cargadas desde {count} páginas. Revisa los campos y guarda borrador.",
+      "indexAction": "Indexar conocimiento",
+      "indexing": "Indexando…",
+      "indexSuccess": "Indexación completa: {pages} páginas, {docs} documentos, {chunks} fragmentos.",
+      "indexError": "No se pudo indexar conocimiento"
     }
   },
   "Landing": {
