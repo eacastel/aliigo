@@ -101,6 +101,38 @@ type AssistantSettingsEnvelope = AssistantSettings & {
   };
 };
 
+type IndexRun = {
+  id: string;
+  status: string;
+  pages_scanned: number;
+  documents_upserted: number;
+  chunks_upserted: number;
+  started_at: string;
+  finished_at: string | null;
+  errors: string[] | null;
+};
+
+type IndexedDocument = {
+  id: string;
+  source_url: string | null;
+  source_label: string | null;
+  locale: string | null;
+  status: string | null;
+  updated_at: string;
+  chunkCount: number;
+  preview: string;
+  previewUpdatedAt: string | null;
+};
+
+type IndexSummary = {
+  totals: {
+    documents: number;
+    chunks: number;
+  };
+  runs: IndexRun[];
+  documents: IndexedDocument[];
+};
+
 const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "");
 
 const sanitizeMarkdown = (value: string) =>
@@ -355,6 +387,8 @@ export default function SettingsAssistantPage() {
   const [autofillUrl, setAutofillUrl] = useState("");
   const [autofilling, setAutofilling] = useState(false);
   const [indexing, setIndexing] = useState(false);
+  const [indexSummary, setIndexSummary] = useState<IndexSummary | null>(null);
+  const [indexSummaryLoading, setIndexSummaryLoading] = useState(false);
 
   const initialAssistant = useRef<AssistantState | null>(null);
   const publishedFormRef = useRef<AssistantForm | null>(null);
@@ -370,6 +404,46 @@ export default function SettingsAssistantPage() {
   const btnBrand = `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
 
   const btnNeutral = `${btnBase} bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40`;
+
+  const formatDateTime = (value?: string | null) => {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(date);
+  };
+
+  const loadIndexSummary = async () => {
+    setIndexSummaryLoading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) {
+        setIndexSummary(null);
+        return;
+      }
+      const res = await fetch("/api/knowledge/index-summary", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const j: { error?: string; totals?: IndexSummary["totals"]; runs?: IndexRun[]; documents?: IndexedDocument[] } =
+        await res.json().catch(() => ({}));
+      if (!res.ok || !j.totals) {
+        setIndexSummary(null);
+        return;
+      }
+      setIndexSummary({
+        totals: j.totals,
+        runs: j.runs ?? [],
+        documents: j.documents ?? [],
+      });
+    } finally {
+      setIndexSummaryLoading(false);
+    }
+  };
 
   async function load() {
     setMsg(null);
@@ -524,6 +598,7 @@ export default function SettingsAssistantPage() {
 
   useEffect(() => {
     void load();
+    void loadIndexSummary();
   }, []);
 
   const dirty = useMemo(() => {
@@ -730,6 +805,7 @@ export default function SettingsAssistantPage() {
           chunks: j.chunksUpserted ?? 0,
         }),
       );
+      void loadIndexSummary();
     } catch (e) {
       console.error("[settings-assistant] index", e);
       setMsgTone("error");
@@ -989,6 +1065,87 @@ export default function SettingsAssistantPage() {
             {t("autofill.allowed")}: {allowedDomains.join(", ")}
           </p>
         ) : null}
+        <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <div className="text-xs font-semibold text-zinc-200">
+              {t("autofill.monitor.title")}
+            </div>
+            <button
+              type="button"
+              onClick={() => void loadIndexSummary()}
+              className="rounded-md border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-900/70"
+            >
+              {t("autofill.monitor.refresh")}
+            </button>
+          </div>
+          {indexSummaryLoading ? (
+            <p className="text-xs text-zinc-400">{t("autofill.monitor.loading")}</p>
+          ) : indexSummary ? (
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2 text-[11px] text-zinc-300">
+                <span className="rounded-md border border-zinc-700 px-2 py-1">
+                  {t("autofill.monitor.docs")}: {indexSummary.totals.documents}
+                </span>
+                <span className="rounded-md border border-zinc-700 px-2 py-1">
+                  {t("autofill.monitor.chunks")}: {indexSummary.totals.chunks}
+                </span>
+                <span className="rounded-md border border-zinc-700 px-2 py-1">
+                  {t("autofill.monitor.runs")}: {indexSummary.runs.length}
+                </span>
+              </div>
+              {indexSummary.runs.length > 0 ? (
+                <div className="space-y-1">
+                  <div className="text-[11px] font-medium text-zinc-400">
+                    {t("autofill.monitor.latestRun")}
+                  </div>
+                  <div className="rounded-md border border-zinc-800 px-2 py-2 text-[11px] text-zinc-300">
+                    <div>
+                      {t("autofill.monitor.status")}: {indexSummary.runs[0]?.status ?? "unknown"}
+                    </div>
+                    <div>
+                      {t("autofill.monitor.started")}: {formatDateTime(indexSummary.runs[0]?.started_at)}
+                    </div>
+                    <div>
+                      {t("autofill.monitor.finished")}: {formatDateTime(indexSummary.runs[0]?.finished_at)}
+                    </div>
+                    <div>
+                      {t("autofill.monitor.scanned")}: {indexSummary.runs[0]?.pages_scanned ?? 0} ·{" "}
+                      {t("autofill.monitor.docs")}: {indexSummary.runs[0]?.documents_upserted ?? 0} ·{" "}
+                      {t("autofill.monitor.chunks")}: {indexSummary.runs[0]?.chunks_upserted ?? 0}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+              <div className="space-y-1">
+                <div className="text-[11px] font-medium text-zinc-400">
+                  {t("autofill.monitor.recentDocs")}
+                </div>
+                {indexSummary.documents.length === 0 ? (
+                  <div className="text-xs text-zinc-500">{t("autofill.monitor.emptyDocs")}</div>
+                ) : (
+                  <div className="space-y-2">
+                    {indexSummary.documents.slice(0, 8).map((doc) => (
+                      <div key={doc.id} className="rounded-md border border-zinc-800 p-2">
+                        <div className="truncate text-[11px] text-zinc-200">
+                          {doc.source_url || doc.source_label || "Untitled"}
+                        </div>
+                        <div className="text-[10px] text-zinc-500">
+                          {t("autofill.monitor.updated")}: {formatDateTime(doc.updated_at)} · {t("autofill.monitor.chunks")}:
+                          {" "}{doc.chunkCount}
+                        </div>
+                        {doc.preview ? (
+                          <p className="mt-1 max-h-8 overflow-hidden text-[11px] text-zinc-400">{doc.preview}</p>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-zinc-500">{t("autofill.monitor.empty")}</p>
+          )}
+        </div>
       </section>
 
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">

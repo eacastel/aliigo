@@ -151,6 +151,12 @@ export default async function PricingPage() {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
+              href={{ pathname: "/pricing", hash: "plans-matrix" }}
+              className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/20"
+            >
+              {isEs ? "Comparar planes" : "Compare plans"}
+            </Link>
+            <Link
               href="/signup"
               className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
             >
@@ -161,12 +167,6 @@ export default async function PricingPage() {
               className="rounded-lg border border-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/30"
             >
               {p("ctaSecondary")}
-            </Link>
-            <Link
-              href={{ pathname: "/pricing", hash: "plans-matrix" }}
-              className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/20"
-            >
-              {isEs ? "Comparar planes" : "Compare plans"}
             </Link>
           </div>
         </div>

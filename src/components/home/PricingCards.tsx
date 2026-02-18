@@ -115,7 +115,7 @@ export function PricingCards({
         </div>
 
         <div className="relative z-10 flex min-w-[280px] max-w-[320px] snap-start flex-col rounded-2xl border-2 border-[#84c9ad] bg-zinc-900 p-5 shadow-2xl shadow-[#84c9ad]/10 sm:p-6 lg:p-8">
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-4 w-auto">
+          <div className="absolute right-3 top-3 w-auto">
             <div className="bg-[#84c9ad] text-black text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full shadow-lg">
               {t("pricing.growth.tag")}
             </div>

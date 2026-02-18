@@ -694,7 +694,24 @@
       "indexAction": "Indexar conocimiento",
       "indexing": "Indexando…",
       "indexSuccess": "Indexación completa: {pages} páginas, {docs} documentos, {chunks} fragmentos.",
-      "indexError": "No se pudo indexar conocimiento"
+      "indexError": "No se pudo indexar conocimiento",
+      "monitor": {
+        "title": "Monitor de contenido indexado",
+        "refresh": "Actualizar",
+        "loading": "Cargando detalles del índice…",
+        "empty": "Aún no hay contenido indexado. Usa “Indexar conocimiento” para generar documentos y fragmentos.",
+        "docs": "Documentos",
+        "chunks": "Fragmentos",
+        "runs": "Ejecuciones",
+        "latestRun": "Última ejecución",
+        "status": "Estado",
+        "started": "Inicio",
+        "finished": "Fin",
+        "scanned": "Páginas escaneadas",
+        "recentDocs": "Páginas indexadas recientes",
+        "emptyDocs": "Aún no hay documentos indexados.",
+        "updated": "Actualizado"
+      }
     }
   },
   "Landing": {

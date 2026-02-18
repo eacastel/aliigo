@@ -693,7 +693,24 @@
       "indexAction": "Index knowledge",
       "indexing": "Indexing…",
       "indexSuccess": "Index complete: {pages} pages, {docs} documents, {chunks} chunks.",
-      "indexError": "Could not index knowledge"
+      "indexError": "Could not index knowledge",
+      "monitor": {
+        "title": "Indexed content monitor",
+        "refresh": "Refresh",
+        "loading": "Loading index details…",
+        "empty": "No indexed content yet. Run “Index knowledge” to generate documents and chunks.",
+        "docs": "Documents",
+        "chunks": "Chunks",
+        "runs": "Runs",
+        "latestRun": "Latest run",
+        "status": "Status",
+        "started": "Started",
+        "finished": "Finished",
+        "scanned": "Pages scanned",
+        "recentDocs": "Recent indexed pages",
+        "emptyDocs": "No documents indexed yet.",
+        "updated": "Updated"
+      }
     }
   },
   "Landing": {
