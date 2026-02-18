@@ -258,35 +258,66 @@ export async function POST(req: NextRequest) {
       const text = stripTags(html);
       const docChecksum = checksum(`${title}\n${text}`);
 
-      const docUpsert = await admin
-        .from("knowledge_documents")
-        .upsert(
-          {
-            business_id: businessId,
-            source_type: "website",
-            source_url: current.url,
-            source_label: title || current.url,
-            locale,
-            checksum: docChecksum,
-            status: "active",
-            metadata: { runId, depth: current.depth },
-            updated_by: userId,
-            created_by: userId,
-          },
-          {
-            onConflict: "business_id,source_type,source_url,source_label,locale",
-            ignoreDuplicates: false,
-          },
-        )
-        .select("id")
-        .single<{ id: string }>();
+      const docPayload = {
+        business_id: businessId,
+        source_type: "website" as const,
+        source_url: current.url,
+        source_label: title || current.url,
+        locale,
+        checksum: docChecksum,
+        status: "active" as const,
+        metadata: { runId, depth: current.depth },
+        updated_by: userId,
+      };
 
-      if (docUpsert.error || !docUpsert.data?.id) {
-        errors.push(`Doc upsert failed: ${current.url}`);
+      const existing = await admin
+        .from("knowledge_documents")
+        .select("id")
+        .eq("business_id", businessId)
+        .eq("source_type", "website")
+        .eq("source_url", current.url)
+        .eq("locale", locale)
+        .maybeSingle<{ id: string }>();
+
+      if (existing.error) {
+        errors.push(`Doc lookup failed: ${current.url} (${existing.error.message})`);
+        continue;
+      }
+
+      let documentId: string | null = null;
+      if (existing.data?.id) {
+        const updated = await admin
+          .from("knowledge_documents")
+          .update(docPayload)
+          .eq("id", existing.data.id)
+          .select("id")
+          .single<{ id: string }>();
+        if (updated.error || !updated.data?.id) {
+          errors.push(`Doc update failed: ${current.url} (${updated.error?.message ?? "unknown"})`);
+          continue;
+        }
+        documentId = updated.data.id;
+      } else {
+        const inserted = await admin
+          .from("knowledge_documents")
+          .insert({
+            ...docPayload,
+            created_by: userId,
+          })
+          .select("id")
+          .single<{ id: string }>();
+        if (inserted.error || !inserted.data?.id) {
+          errors.push(`Doc insert failed: ${current.url} (${inserted.error?.message ?? "unknown"})`);
+          continue;
+        }
+        documentId = inserted.data.id;
+      }
+
+      if (!documentId) {
+        errors.push(`Doc upsert failed: ${current.url} (unknown)`);
         continue;
       }
       docsUpserted += 1;
-      const documentId = docUpsert.data.id;
 
       const chunks = chunkText(text);
       if (chunks.length > 0) {
@@ -356,4 +387,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-
