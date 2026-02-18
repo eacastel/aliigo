@@ -254,8 +254,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing Authorization token" }, { status: 401 });
     }
 
-    const body = (await req.json().catch(() => ({}))) as { url?: string };
+    const body = (await req.json().catch(() => ({}))) as {
+      url?: string;
+      mode?: "merge" | "replace";
+    };
     const sourceUrl = (body.url ?? "").trim();
+    const mode = body.mode === "replace" ? "replace" : "merge";
     if (!sourceUrl) {
       return NextResponse.json({ error: "Missing url" }, { status: 400 });
     }
@@ -309,6 +313,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       sourceUrl,
+      mode,
       fetchedAt: new Date().toISOString(),
       draftForm,
       fieldStatuses,

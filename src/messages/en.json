@@ -624,7 +624,7 @@
       "reset": "Reset changes",
       "unsaved": "You have unsaved changes.",
       "clearField": "Clear field",
-      "revertField": "Restore published"
+      "revertField": "Keep original"
     },
     "preview": {
       "title": "Assistant preview",
@@ -679,6 +679,7 @@
       "desc": "Generate setup drafts from your site and index knowledge for live assistant answers.",
       "placeholder": "https://your-domain.com",
       "action": "Generate setup draft",
+      "replaceAction": "Regenerate and replace draft",
       "loading": "Fetching…",
       "allowed": "Allowed domains",
       "success": "Suggestions loaded. Review fields and save draft.",
@@ -690,6 +691,7 @@
         "missing": "Missing"
       },
       "successWithPages": "Suggestions loaded from {count} pages. Review fields and save draft.",
+      "successReplaceWithPages": "Draft regenerated from {count} pages and replaced. Review before publishing.",
       "indexWebsiteAction": "Index website",
       "indexSinglePageAction": "Add single page",
       "indexing": "Indexing…",

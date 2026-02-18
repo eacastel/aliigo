@@ -625,7 +625,7 @@
       "reset": "Restablecer cambios",
       "unsaved": "Tienes cambios sin guardar.",
       "clearField": "Limpiar campo",
-      "revertField": "Restaurar publicado"
+      "revertField": "Mantener original"
     },
     "preview": {
       "title": "Vista previa del asistente",
@@ -680,6 +680,7 @@
       "desc": "Genera borradores de configuración desde tu web e indexa conocimiento para respuestas en vivo del asistente.",
       "placeholder": "https://tu-dominio.com",
       "action": "Generar borrador de configuración",
+      "replaceAction": "Regenerar y reemplazar borrador",
       "loading": "Extrayendo…",
       "allowed": "Dominios permitidos",
       "success": "Sugerencias cargadas. Revisa los campos y guarda borrador.",
@@ -691,6 +692,7 @@
         "missing": "Falta"
       },
       "successWithPages": "Sugerencias cargadas desde {count} páginas. Revisa los campos y guarda borrador.",
+      "successReplaceWithPages": "Borrador regenerado desde {count} páginas y reemplazado. Revisa antes de publicar.",
       "indexWebsiteAction": "Indexar web",
       "indexSinglePageAction": "Agregar página",
       "indexing": "Indexando…",

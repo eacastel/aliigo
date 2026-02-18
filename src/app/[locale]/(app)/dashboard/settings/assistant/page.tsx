@@ -89,6 +89,9 @@ type AssistantSettingsEnvelope = AssistantSettings & {
     form?: Partial<AssistantForm>;
     sourceUrl?: string | null;
     fieldStatuses?: Record<string, "suggested" | "needs_review" | "missing">;
+    fieldProvenance?: Record<string, "manual" | "suggested">;
+    generationMode?: "merge" | "replace";
+    generatorVersion?: string;
     savedAt?: string;
     savedBy?: string;
   } | null;
@@ -386,6 +389,7 @@ export default function SettingsAssistantPage() {
   const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
   const [autofillUrl, setAutofillUrl] = useState("");
   const [autofilling, setAutofilling] = useState(false);
+  const [autofillMode, setAutofillMode] = useState<"merge" | "replace" | null>(null);
   const [indexing, setIndexing] = useState(false);
   const [indexingMode, setIndexingMode] = useState<"website" | "single_page" | null>(null);
   const [indexSummary, setIndexSummary] = useState<IndexSummary | null>(null);
@@ -688,7 +692,7 @@ export default function SettingsAssistantPage() {
     ) : null
   );
 
-  const runAutofill = async () => {
+  const runAutofill = async (mode: "merge" | "replace") => {
     setMsg(null);
     if (!autofillUrl.trim()) {
       setMsgTone("error");
@@ -696,6 +700,7 @@ export default function SettingsAssistantPage() {
       return;
     }
     setAutofilling(true);
+    setAutofillMode(mode);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess.session?.access_token;
@@ -711,10 +716,11 @@ export default function SettingsAssistantPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ url: autofillUrl.trim() }),
+        body: JSON.stringify({ url: autofillUrl.trim(), mode }),
       });
       const j: {
         error?: string;
+        mode?: "merge" | "replace";
         sourceUrl?: string;
         fetchedAt?: string;
         pagesCrawled?: number;
@@ -728,15 +734,32 @@ export default function SettingsAssistantPage() {
       }
 
       setForm((prev) => {
-        const next = { ...prev };
+        const next = mode === "replace" ? { ...prev } : { ...prev };
         const writable = next as Record<string, string>;
+        if (mode === "replace") {
+          for (const key of Object.keys(j.draftForm ?? {})) {
+            writable[key] = "";
+          }
+        }
         for (const [key, val] of Object.entries(j.draftForm ?? {})) {
           if (typeof val !== "string") continue;
           if (!val.trim()) continue;
+          if (mode === "replace") {
+            writable[key] = val;
+            continue;
+          }
           if (!(writable[key] ?? "").trim()) writable[key] = val;
         }
         return next;
       });
+
+      const suggestedKeys = new Set(Object.entries(j.fieldStatuses ?? {})
+        .filter(([, status]) => status === "suggested")
+        .map(([k]) => k));
+      const fieldProvenance: Record<string, "manual" | "suggested"> = {};
+      for (const key of Object.keys(j.draftForm ?? {})) {
+        fieldProvenance[key] = suggestedKeys.has(key) ? "suggested" : "manual";
+      }
 
       setSettingsEnvelope((prev) => ({
         ...(prev ?? {}),
@@ -744,6 +767,9 @@ export default function SettingsAssistantPage() {
           form: j.draftForm ?? {},
           sourceUrl: j.sourceUrl ?? autofillUrl.trim(),
           fieldStatuses: j.fieldStatuses ?? {},
+          fieldProvenance,
+          generationMode: j.mode ?? mode,
+          generatorVersion: "autofill-v2",
           savedAt: j.fetchedAt ?? new Date().toISOString(),
           savedBy: userId ?? undefined,
         },
@@ -755,7 +781,7 @@ export default function SettingsAssistantPage() {
       }));
       setMsgTone("success");
       setMsg(
-        t("autofill.successWithPages", {
+        t(mode === "replace" ? "autofill.successReplaceWithPages" : "autofill.successWithPages", {
           count: j.pagesCrawled ?? 1,
         }),
       );
@@ -765,6 +791,7 @@ export default function SettingsAssistantPage() {
       setMsg(t("autofill.error"));
     } finally {
       setAutofilling(false);
+      setAutofillMode(null);
     }
   };
 
@@ -1043,11 +1070,21 @@ export default function SettingsAssistantPage() {
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="button"
-            onClick={() => void runAutofill()}
+            onClick={() => void runAutofill("merge")}
             disabled={autofilling}
             className="rounded-lg bg-brand-500/10 px-3 py-2 text-xs font-medium text-brand-200 ring-1 ring-inset ring-brand-500/25 transition-colors hover:bg-brand-500/15 disabled:opacity-60"
           >
-            {autofilling ? t("autofill.loading") : t("autofill.action")}
+            {autofilling && autofillMode === "merge" ? t("autofill.loading") : t("autofill.action")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void runAutofill("replace")}
+            disabled={autofilling}
+            className="rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-medium text-zinc-200 ring-1 ring-inset ring-zinc-700 transition-colors hover:bg-zinc-900/80 disabled:opacity-60"
+          >
+            {autofilling && autofillMode === "replace"
+              ? t("autofill.loading")
+              : t("autofill.replaceAction")}
           </button>
           <button
             type="button"
