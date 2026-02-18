@@ -1,8 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { PricingCards } from "@/components/home/PricingCards";
+import { Link } from "@/i18n/routing";
 
 type PricingSectionProps = {
   basicPrice: string;
@@ -13,6 +15,8 @@ type PricingSectionProps = {
 
 export function PricingSection({ basicPrice, growthPrice, proPrice, customPrice }: PricingSectionProps) {
   const t = useTranslations("Landing");
+  const locale = useLocale();
+  const isEs = locale.startsWith("es");
 
   return (
     <section className="py-20 md:py-24 border-t border-white/5 bg-zinc-950 relative overflow-hidden">
@@ -31,6 +35,14 @@ export function PricingSection({ basicPrice, growthPrice, proPrice, customPrice 
           <p className="mt-2 text-xs text-zinc-500">
             {t("pricing.badgeNote")}
           </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs">
+            <Link
+              href={{ pathname: "/pricing", hash: "plans-matrix" }}
+              className="rounded-md border border-white/15 px-3 py-1.5 font-medium text-zinc-200 transition hover:border-white/30 hover:text-white"
+            >
+              {isEs ? "Comparar planes" : "Compare plans"}
+            </Link>
+          </div>
         </div>
 
         <PricingCards

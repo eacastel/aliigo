@@ -20,11 +20,17 @@ export function PricingCards({
   const t = useTranslations("Landing");
   const locale = useLocale();
   const isEs = locale.startsWith("es");
+  const cardBase =
+    "snap-start flex min-w-[280px] max-w-[320px] flex-col rounded-2xl border bg-zinc-900/20 p-5 sm:p-6 lg:p-8 transition-all";
 
   return (
     <>
-      <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
-        <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-5 sm:p-6 lg:p-8 hover:border-white/10 transition-all">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-2 flex items-center justify-between px-1 text-xs text-zinc-500">
+          <span>{isEs ? "Desliza para ver más planes" : "Swipe to see more plans"}</span>
+        </div>
+        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:thin]">
+          <div className={`${cardBase} border-white/5 hover:border-white/10`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-zinc-800 rounded-lg text-white">
               <Store size={20} />
@@ -75,7 +81,7 @@ export function PricingCards({
           </div>
         </div>
 
-        <div className="flex flex-col relative rounded-2xl border-2 border-[#84c9ad] bg-zinc-900 p-5 sm:p-6 lg:p-8 shadow-2xl shadow-[#84c9ad]/10 lg:scale-105 z-10">
+        <div className="relative z-10 flex min-w-[280px] max-w-[320px] snap-start flex-col rounded-2xl border-2 border-[#84c9ad] bg-zinc-900 p-5 shadow-2xl shadow-[#84c9ad]/10 sm:p-6 lg:p-8">
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-4 w-auto">
             <div className="bg-[#84c9ad] text-black text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full shadow-lg">
               {t("pricing.growth.tag")}
@@ -132,7 +138,7 @@ export function PricingCards({
           </div>
         </div>
 
-        <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-5 sm:p-6 lg:p-8 hover:border-white/10 transition-all">
+        <div className={`${cardBase} border-white/5 hover:border-white/10`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-zinc-800 rounded-lg text-white">
               <Building2 size={20} />
@@ -182,10 +188,7 @@ export function PricingCards({
             </ul>
           </div>
         </div>
-      </div>
-
-      <div className="mt-4 md:mt-6 max-w-6xl mx-auto">
-        <div className="flex flex-col rounded-2xl border border-white/5 bg-zinc-900/20 p-5 sm:p-6 lg:p-8 hover:border-white/10 transition-all">
+        <div className={`${cardBase} border-white/5 hover:border-white/10`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-zinc-800 rounded-lg text-white">
               <Building2 size={20} />
@@ -240,7 +243,7 @@ export function PricingCards({
           </div>
         </div>
       </div>
+      </div>
     </>
   );
 }
-

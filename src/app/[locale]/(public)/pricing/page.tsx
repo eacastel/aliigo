@@ -162,6 +162,12 @@ export default async function PricingPage() {
             >
               {p("ctaSecondary")}
             </Link>
+            <Link
+              href={{ pathname: "/pricing", hash: "plans-matrix" }}
+              className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/20"
+            >
+              {isEs ? "Comparar planes" : "Compare plans"}
+            </Link>
           </div>
         </div>
       </section>
@@ -177,7 +183,8 @@ export default async function PricingPage() {
         </div>
       </section>
 
-      <section id="pro-contact" className="border-t border-white/5 bg-zinc-900/30 pt-12 pb-24">
+      <section id="plans-matrix" className="border-t border-white/5 bg-zinc-900/30 pt-6 pb-24 scroll-mt-24">
+        <div id="pro-contact" className="scroll-mt-24" />
         <div className="mx-auto max-w-6xl px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold md:text-4xl">
@@ -285,7 +292,7 @@ export default async function PricingPage() {
             </div>
           </div>
         </div>
-        <div id="sales-contact" className="mx-auto mt-24 max-w-4xl scroll-mt-24 px-4">
+        <div id="sales-contact" className="mx-auto mt-16 max-w-4xl scroll-mt-24 px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white">{p("contactTitle")}</h2>
             <p className="mt-3 text-sm text-zinc-400">{p("contactSubtitle")}</p>
