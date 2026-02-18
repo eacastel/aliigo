@@ -232,7 +232,6 @@ export async function POST(req: NextRequest) {
         source_url: sourceUrl,
         requested_by: userId,
         status: "running",
-        metadata: { mode: crawlMode },
       })
       .select("id")
       .single<{ id: string }>();

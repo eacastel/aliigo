@@ -1181,36 +1181,34 @@ export default function SettingsAssistantPage() {
 
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="text-sm font-semibold text-zinc-100">{t("workflow.title")}</div>
-        <p className="text-xs text-zinc-400">{t("workflow.desc")}</p>
-        <div className="grid gap-2 text-xs text-zinc-300">
-          <div>
+        <div className="text-xs leading-6 text-zinc-300">
+          <span>{t("workflow.desc")}</span>
+          <span className="mx-2 text-zinc-500">•</span>
+          <span>
             {t("workflow.lastDraft")}:{" "}
             <span className="text-zinc-400">
               {settingsEnvelope?.workflow?.lastDraftSavedAt || t("workflow.never")}
             </span>
-          </div>
-          <div>
+          </span>
+          <span className="mx-2 text-zinc-500">•</span>
+          <span>
             {t("workflow.lastPublished")}:{" "}
             <span className="text-zinc-400">
               {settingsEnvelope?.workflow?.lastPublishedAt || t("workflow.never")}
             </span>
-          </div>
-        </div>
-        <div>
-          <div className="text-xs font-medium text-zinc-200 mb-1">
+          </span>
+          <span className="mx-2 text-zinc-500">•</span>
+          <span>
             {t("workflow.missingRequired")} ({missingRequired.length})
-          </div>
-          {missingRequired.length === 0 ? (
-            <div className="text-xs text-green-300">{t("workflow.noneMissing")}</div>
-          ) : (
-            <ul className="text-xs text-amber-300 list-disc pl-5 space-y-1">
-              {REQUIRED_FIELDS.filter(({ key }) => missingRequired.includes(key)).map(
-                ({ key, labelKey }) => (
-                  <li key={key}>{t(labelKey)}</li>
-                ),
-              )}
-            </ul>
-          )}
+          </span>
+          <span className="mx-2 text-zinc-500">•</span>
+          <span className={missingRequired.length === 0 ? "text-green-300" : "text-amber-300"}>
+            {missingRequired.length === 0
+              ? t("workflow.noneMissing")
+              : REQUIRED_FIELDS.filter(({ key }) => missingRequired.includes(key))
+                  .map(({ labelKey }) => t(labelKey))
+                  .join(", ")}
+          </span>
         </div>
         <label className="flex items-start gap-2 text-xs text-zinc-300">
           <input

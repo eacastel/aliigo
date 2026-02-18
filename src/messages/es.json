@@ -9,7 +9,7 @@
     "links": {
       "dashboard": "Resumen",
       "business": "Empresa",
-      "assistant": "Asistente",
+      "assistant": "Conocimientos",
       "widget": "Widget",
       "messages": "Mensajes",
       "billing": "Facturación",
@@ -492,10 +492,10 @@
     "description": "Configura cómo habla el asistente, qué debe cubrir y qué enlaces compartir. Empieza por lo esencial y añade detalles cuando lo necesites.",
     "mode": {
       "title": "Modo de configuración",
-      "desc": "Usa Configuración rápida para onboarding. Cambia a Avanzado para tener más control.",
-      "quick": "Configuración rápida",
+      "desc": "Usa Configuración mínima para onboarding. Cambia a Avanzado para tener más control.",
+      "quick": "Configuración mínima",
       "advanced": "Configuración avanzada",
-      "quickHint": "Los campos avanzados están ocultos en Configuración rápida. Cambia a Avanzado para editar enlaces extra, reglas de comportamiento y criterios de calificación."
+      "quickHint": "Los campos avanzados están ocultos en Configuración mínima. Cambia a Avanzado para editar enlaces extra, reglas de comportamiento y criterios de calificación."
     },
     "loading": "Cargando…",
     "loginRequired": {

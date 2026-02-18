@@ -9,7 +9,7 @@
     "links": {
       "dashboard": "Overview",
       "business": "Business",
-      "assistant": "Assistant",
+      "assistant": "Knowledge",
       "widget": "Widget",
       "messages": "Messages",
       "billing": "Billing",
@@ -492,9 +492,9 @@
     "mode": {
       "title": "Setup mode",
       "desc": "Use Quick setup for onboarding. Switch to Advanced when you want deeper control.",
-      "quick": "Quick setup",
+      "quick": "Minimal setup",
       "advanced": "Advanced setup",
-      "quickHint": "Advanced fields are hidden in Quick setup. Switch to Advanced to edit extra links, behavior rules, and qualification criteria."
+      "quickHint": "Advanced fields are hidden in Minimal setup. Switch to Advanced to edit extra links, behavior rules, and qualification criteria."
     },
     "loading": "Loading…",
     "loginRequired": {
