@@ -1,4 +1,22 @@
 import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { buildLegalMetadata } from "@/lib/legalMetadata";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> }
+): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "LegalV4.subscriptionAgreement" });
+
+  return buildLegalMetadata({
+    locale,
+    title: t("title"),
+    description: t("intro"),
+    enPath: "/en/legal/subscription-agreement",
+    esPath: "/es/legal/acuerdo-suscripcion",
+  });
+}
 
 export default function SubscriptionAgreementPage() {
   const t = useTranslations("LegalV4.subscriptionAgreement");

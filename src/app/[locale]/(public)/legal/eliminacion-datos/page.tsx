@@ -7,19 +7,19 @@ export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> }
 ): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "LegalV3.cookies" });
+  const t = await getTranslations({ locale, namespace: "LegalV3.dataDeletion" });
 
   return buildLegalMetadata({
     locale,
     title: t("title"),
     description: t("intro"),
-    enPath: "/en/legal/cookies",
-    esPath: "/es/legal/cookies",
+    enPath: "/en/legal/data-deletion",
+    esPath: "/es/legal/eliminacion-datos",
   });
 }
 
-export default function CookiesPage() {
-  const t = useTranslations("LegalV3.cookies");
+export default function DataDeletionPage() {
+  const t = useTranslations("LegalV3.dataDeletion");
   const sections = [1, 2, 3, 4, 5];
 
   return (

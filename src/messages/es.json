@@ -40,7 +40,8 @@
       "subscriptionAgreement": "Acuerdo de Suscripción",
       "dpa": "DPA",
       "subprocessors": "Subencargados y terceros",
-      "title": "Legal"
+      "title": "Legal",
+      "dataDeletion": "Eliminación de datos"
     },
     "footerCompany": {
       "title": "Empresa",
@@ -49,7 +50,8 @@
       "privacy": "Privacidad",
       "dpa": "DPA",
       "subprocessors": "Subencargados y terceros",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "dataDeletion": "Eliminación de datos"
     },
     "mobileMenu": {
       "open": "Abrir menú",
@@ -258,8 +260,7 @@
       "english": "English",
       "spanish": "Español",
       "limit": "Límite del plan: hasta {count} idioma(s).",
-      "unlimited": "ilimitado",
-      "basicLocked": "Basic incluye un solo idioma. Sube de plan para activar el soporte multilingüe."
+      "unlimited": "ilimitado"
     }
   },
   "DashboardWidget": {
@@ -282,9 +283,6 @@
     "showPoweredByHelp": "Basic siempre muestra branding. Growth, Pro y Custom pueden alternarlo.",
     "headerLogoUrl": "URL del logo de cabecera (Growth+)",
     "headerLogoHelp": "Opcional. El icono solo aparece en Growth, Pro y Custom cuando esta URL está definida.",
-    "plans": {
-      "logoUpgradeHint": "Actualiza a Growth+ para habilitar la subida de logo."
-    },
     "embedSnippet": "Snippet de instalación",
     "emptyDash": "—",
     "lockedHint": "Activa la facturación para desbloquear el código del widget.",
@@ -502,11 +500,6 @@
       "next": "Siguiente",
       "page": "Página"
     },
-    "plans": {
-      "indexingUpgradeHint": "El indexado de sitio y contenido indexado están disponibles en planes Growth+.",
-      "advancedUpgradeHint": "La configuración avanzada está disponible en planes Growth+.",
-      "basicToneOnlyHint": "En Basic solo puedes ajustar el tono del asistente."
-    },
     "mode": {
       "title": "Modo de configuración",
       "desc": "Usa Configuración inteligente para onboarding. Cambia a Configuración avanzada para tener más control.",
@@ -527,7 +520,7 @@
     },
     "sections": {
       "presets": {
-      "title": "Configuración inteligente",
+        "title": "Configuración inteligente",
         "desc": "Elige cómo debe sonar el asistente y cómo guiar a los visitantes."
       },
       "business": {
@@ -1462,6 +1455,31 @@
         "meta": "Meta Pixel — medición publicitaria (opcional; con consentimiento cuando proceda)",
         "searchConsole": "Google Search Console — diagnóstico del sitio (normalmente sin cookies de visitante)",
         "clarity": "Microsoft Clarity — analítica de sesiones (opcional; con consentimiento cuando proceda)"
+      }
+    },
+    "dataDeletion": {
+      "title": "Solicitud de eliminación de datos",
+      "lastUpdated": "Última actualización: {date}",
+      "intro": "Si deseas eliminar tus datos personales de Aliigo, esta página explica cómo solicitar la eliminación y qué ocurre después.",
+      "section1": {
+        "title": "1. Cómo solicitar la eliminación",
+        "content": "Envía tu solicitud a legal@aliigo.com desde el correo asociado a tu cuenta. Usa este asunto: “Solicitud de eliminación de datos”.\n\nSi no puedes usar ese correo, incluye información suficiente para verificar tu identidad (nombre del negocio, email de cuenta y actividad reciente)."
+      },
+      "section2": {
+        "title": "2. Qué datos se pueden eliminar",
+        "content": "Puedes solicitar la eliminación de datos de cuenta y negocio, incluyendo perfil, configuración del asistente, historial de conversaciones y leads almacenados, sujeto a obligaciones legales y contractuales de conservación."
+      },
+      "section3": {
+        "title": "3. Verificación y plazos de respuesta",
+        "content": "Verificamos la solicitud antes de procesar la eliminación. Nuestro objetivo es confirmar la recepción rápidamente y completar la eliminación en un plazo razonable, normalmente dentro de 30 días, salvo casos complejos u obligaciones legales."
+      },
+      "section4": {
+        "title": "4. Qué información puede conservarse",
+        "content": "Podemos conservar registros limitados cuando la ley lo exija (por ejemplo, obligaciones fiscales, de facturación, prevención de fraude o seguridad). Cualquier dato retenido se mantiene solo durante el plazo y finalidad exigidos."
+      },
+      "section5": {
+        "title": "5. Subencargados y terceros",
+        "content": "Aliigo utiliza subencargados (como hosting, base de datos y pagos). Tras validar tu solicitud, iniciamos el borrado en nuestros sistemas y en subencargados conforme a nuestros acuerdos y a la normativa aplicable. Consulta la página de Subencargados para más información."
       }
     }
   },

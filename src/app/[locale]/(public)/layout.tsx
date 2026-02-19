@@ -56,6 +56,7 @@ export default async function PublicLayout({
                 <li><Link href="/why-aliigo" className="hover:text-white transition-colors">{t("footerCompany.whyAliigo")}</Link></li>
                 <li><Link href="/founder" className="hover:text-white transition-colors">{t("footerCompany.founder")}</Link></li>
                 <li><Link href="/legal/privacidad" className="hover:text-white transition-colors">{t("footerCompany.privacy")}</Link></li>
+                <li><Link href="/legal/eliminacion-datos" className="hover:text-white transition-colors">{t("footerCompany.dataDeletion")}</Link></li>
                 <li><Link href="/legal/dpa" className="hover:text-white transition-colors">{t("footerCompany.dpa")}</Link></li>
                 <li><Link href="/legal/subprocessors" className="hover:text-white transition-colors">{t("footerCompany.subprocessors")}</Link></li>
                 <li><a href="mailto:legal@aliigo.com" className="hover:text-white transition-colors">{t("footerCompany.contact")}</a></li>
@@ -66,6 +67,8 @@ export default async function PublicLayout({
                 <Link href="/founder" className="hover:text-white transition-colors">{t("footerCompany.founder")}</Link>
                 <span className="px-2 text-zinc-600">|</span>
                 <Link href="/legal/privacidad" className="hover:text-white transition-colors">{t("footerCompany.privacy")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/eliminacion-datos" className="hover:text-white transition-colors">{t("footerCompany.dataDeletion")}</Link>
                 <span className="px-2 text-zinc-600">|</span>
                 <Link href="/legal/dpa" className="hover:text-white transition-colors">{t("footerCompany.dpa")}</Link>
                 <span className="px-2 text-zinc-600">|</span>
@@ -82,6 +85,7 @@ export default async function PublicLayout({
                 <li><Link href="/legal/aviso-legal" className="hover:text-white transition-colors">{t("footerLinks.avisoLegal")}</Link></li>
                 <li><Link href="/legal/cookies" className="hover:text-white transition-colors">{t("footerLinks.cookies")}</Link></li>
                 <li><Link href="/legal/terminos" className="hover:text-white transition-colors">{t("footerLinks.terminos")}</Link></li>
+                <li><Link href="/legal/eliminacion-datos" className="hover:text-white transition-colors">{t("footerLinks.dataDeletion")}</Link></li>
                 <li><Link href="/legal/subscription-agreement" className="hover:text-white transition-colors">{t("footerLinks.subscriptionAgreement")}</Link></li>
               </ul>
               <div className="md:hidden text-sm text-zinc-400 leading-7">
@@ -90,6 +94,8 @@ export default async function PublicLayout({
                 <Link href="/legal/cookies" className="hover:text-white transition-colors">{t("footerLinks.cookies")}</Link>
                 <span className="px-2 text-zinc-600">|</span>
                 <Link href="/legal/terminos" className="hover:text-white transition-colors">{t("footerLinks.terminos")}</Link>
+                <span className="px-2 text-zinc-600">|</span>
+                <Link href="/legal/eliminacion-datos" className="hover:text-white transition-colors">{t("footerLinks.dataDeletion")}</Link>
                 <span className="px-2 text-zinc-600">|</span>
                 <Link href="/legal/subscription-agreement" className="hover:text-white transition-colors">{t("footerLinks.subscriptionAgreement")}</Link>
               </div>

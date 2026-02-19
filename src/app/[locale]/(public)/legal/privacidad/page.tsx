@@ -1,4 +1,22 @@
 import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { buildLegalMetadata } from "@/lib/legalMetadata";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> }
+): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "LegalV3.privacy" });
+
+  return buildLegalMetadata({
+    locale,
+    title: t("title"),
+    description: t("intro"),
+    enPath: "/en/legal/privacy",
+    esPath: "/es/legal/privacidad",
+  });
+}
 
 export default function PrivacyPage() {
   const t = useTranslations("LegalV3.privacy");

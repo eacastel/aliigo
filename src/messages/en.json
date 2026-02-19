@@ -40,7 +40,8 @@
       "subscriptionAgreement": "Subscription Agreement",
       "dpa": "DPA",
       "subprocessors": "Subprocessors",
-      "title": "Legal"
+      "title": "Legal",
+      "dataDeletion": "Data Deletion"
     },
     "footerCompany": {
       "title": "Company",
@@ -49,7 +50,8 @@
       "privacy": "Privacy",
       "dpa": "DPA",
       "subprocessors": "Subprocessors",
-      "contact": "Contact"
+      "contact": "Contact",
+      "dataDeletion": "Data Deletion"
     },
     "mobileMenu": {
       "open": "Open menu",
@@ -257,8 +259,7 @@
       "english": "English",
       "spanish": "Español",
       "limit": "Plan limit: up to {count} language(s).",
-      "unlimited": "unlimited",
-      "basicLocked": "Basic includes one language. Upgrade to add multilingual support."
+      "unlimited": "unlimited"
     }
   },
   "DashboardWidget": {
@@ -281,9 +282,6 @@
     "showPoweredByHelp": "Basic always shows branding. Growth, Pro, and Custom can toggle this.",
     "headerLogoUrl": "Header logo URL (Growth+)",
     "headerLogoHelp": "Optional. Icon appears only on Growth, Pro, and Custom when this URL is set.",
-    "plans": {
-      "logoUpgradeHint": "Upgrade to Growth+ to enable logo upload."
-    },
     "embedSnippet": "Embed snippet",
     "emptyDash": "—",
     "lockedHint": "Activate billing to unlock the widget install code.",
@@ -501,11 +499,6 @@
       "next": "Next",
       "page": "Page"
     },
-    "plans": {
-      "indexingUpgradeHint": "Website indexing and indexed content are available on Growth+ plans.",
-      "advancedUpgradeHint": "Advanced setup is available on Growth+ plans.",
-      "basicToneOnlyHint": "On Basic, only assistant tone can be adjusted."
-    },
     "mode": {
       "title": "Setup mode",
       "desc": "Use Smart setup for onboarding. Switch to Advanced Setup when you want deeper control.",
@@ -526,7 +519,7 @@
     },
     "sections": {
       "presets": {
-      "title": "Smart setup",
+        "title": "Smart setup",
         "desc": "Choose how the assistant should sound and how it should guide visitors."
       },
       "business": {
@@ -1461,6 +1454,31 @@
         "meta": "Meta Pixel — marketing/ads measurement (optional; consent-based where required)",
         "searchConsole": "Google Search Console — site diagnostics (typically does not set visitor cookies)",
         "clarity": "Microsoft Clarity — session analytics (optional; consent-based where required)"
+      }
+    },
+    "dataDeletion": {
+      "title": "Data Deletion Request",
+      "lastUpdated": "Last updated: {date}",
+      "intro": "If you want your personal data deleted from Aliigo, this page explains how to request deletion and what happens next.",
+      "section1": {
+        "title": "1. How to request deletion",
+        "content": "Send your request to legal@aliigo.com from the email associated with your account. Include the subject line: “Data Deletion Request”.\n\nIf you cannot use the original email, provide enough information for identity verification (business name, account email, and recent account activity)."
+      },
+      "section2": {
+        "title": "2. What data can be deleted",
+        "content": "You can request deletion of account and workspace data, including profile details, assistant configuration, conversation history, and stored leads, subject to legal and contractual retention requirements."
+      },
+      "section3": {
+        "title": "3. Verification and response time",
+        "content": "We verify the request before processing deletion. We aim to confirm receipt promptly and complete deletion within a reasonable timeframe, typically within 30 days unless complexity or legal obligations require more time."
+      },
+      "section4": {
+        "title": "4. What may be retained",
+        "content": "We may retain limited records when required by law (for example tax, billing, fraud prevention, or security obligations). Any retained data is kept only for the required period and purpose."
+      },
+      "section5": {
+        "title": "5. Third-party processors",
+        "content": "Aliigo uses subprocessors (such as hosting, database, and payment providers). After validating your request, we initiate deletion through our systems and subprocessors according to our agreements and applicable law. See the Subprocessors page for details."
       }
     }
   },

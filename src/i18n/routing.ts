@@ -79,11 +79,11 @@ export const routing = defineRouting({
       es: '/dashboard/settings/assistant'
     },
     '/legal/aviso-legal': {
-      en: '/legal/aviso-legal',
+      en: '/legal/legal-notice',
       es: '/legal/aviso-legal'
     },
     '/legal/privacidad': {
-      en: '/legal/privacidad',
+      en: '/legal/privacy',
       es: '/legal/privacidad'
     },
     '/legal/cookies': {
@@ -91,12 +91,12 @@ export const routing = defineRouting({
       es: '/legal/cookies'
     },
     '/legal/terminos': {
-      en: '/legal/terminos',
+      en: '/legal/terms-of-use',
       es: '/legal/terminos'
     },
     '/legal/subscription-agreement': {
       en: '/legal/subscription-agreement',
-      es: '/legal/subscription-agreement'
+      es: '/legal/acuerdo-suscripcion'
     },
     '/legal/dpa': {
       en: '/legal/dpa',
@@ -105,6 +105,10 @@ export const routing = defineRouting({
     '/legal/subprocessors': {
       en: '/legal/subprocessors',
       es: '/legal/subprocessors'
+    },
+    '/legal/eliminacion-datos': {
+      en: '/legal/data-deletion',
+      es: '/legal/eliminacion-datos'
     }
   }
 });
