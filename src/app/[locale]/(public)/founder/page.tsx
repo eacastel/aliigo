@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
+import { buildLocalePageMetadata } from "@/lib/localePageMetadata";
 
 export async function generateMetadata({
   params,
@@ -10,10 +11,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.founder" });
-  return {
+  return buildLocalePageMetadata({
+    locale,
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+    enPath: "/en/founder",
+    esPath: "/es/fundador",
+  });
 }
 
 export default async function FounderPage({
@@ -172,9 +176,9 @@ export default async function FounderPage({
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
-            <a href={`/${locale}/privacy`} className="hover:text-white transition-colors">{t("finalCta.linkPrivacy")}</a>
-            <a href={`/${locale}/dpa`} className="hover:text-white transition-colors">{t("finalCta.linkDpa")}</a>
-            <a href={`/${locale}/subprocessors`} className="hover:text-white transition-colors">{t("finalCta.linkSubprocessors")}</a>
+            <Link href="/legal/privacidad" className="hover:text-white transition-colors">{t("finalCta.linkPrivacy")}</Link>
+            <Link href="/legal/dpa" className="hover:text-white transition-colors">{t("finalCta.linkDpa")}</Link>
+            <Link href="/legal/subprocessors" className="hover:text-white transition-colors">{t("finalCta.linkSubprocessors")}</Link>
           </div>
         </div>
       </section>

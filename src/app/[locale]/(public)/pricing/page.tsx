@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
 import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 import { PricingCards } from "@/components/home/PricingCards";
+import { buildLocalePageMetadata } from "@/lib/localePageMetadata";
 
 export async function generateMetadata({
   params,
@@ -15,10 +16,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const p = await getTranslations({ locale, namespace: "PricingPage" });
-  return {
+  return buildLocalePageMetadata({
+    locale,
     title: p("title"),
     description: p("description"),
-  };
+    enPath: "/en/pricing",
+    esPath: "/es/precios",
+  });
 }
 
 export default async function PricingPage() {

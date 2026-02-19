@@ -342,9 +342,38 @@ export default function DashboardLayout({
       </div>
 
       {/* FOOTER */}
-      <footer className="bg-zinc-950 border-t border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-5 text-center text-sm text-zinc-500">
-          © {new Date().getFullYear()} Aliigo — {t('footer')}
+      <footer className="bg-zinc-950 border-t border-zinc-800 py-10">
+        <div className="max-w-6xl mx-auto px-4 lg:px-8">
+          <div className="mx-auto max-w-3xl grid gap-8 md:grid-cols-2 md:gap-14">
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
+                {t("footerCompany.title")}
+              </h4>
+              <ul className="space-y-2 text-sm text-zinc-400">
+                <li><Link href="/why-aliigo" className="hover:text-white transition-colors">{t("footerCompany.whyAliigo")}</Link></li>
+                <li><Link href="/founder" className="hover:text-white transition-colors">{t("footerCompany.founder")}</Link></li>
+                <li><Link href="/legal/privacidad" className="hover:text-white transition-colors">{t("footerCompany.privacy")}</Link></li>
+                <li><Link href="/legal/eliminacion-datos" className="hover:text-white transition-colors">{t("footerCompany.dataDeletion")}</Link></li>
+                <li><Link href="/legal/dpa" className="hover:text-white transition-colors">{t("footerCompany.dpa")}</Link></li>
+                <li><Link href="/legal/subprocessors" className="hover:text-white transition-colors">{t("footerCompany.subprocessors")}</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
+                {t("footerLinks.title")}
+              </h4>
+              <ul className="space-y-2 text-sm text-zinc-400">
+                <li><Link href="/legal/aviso-legal" className="hover:text-white transition-colors">{t("footerLinks.avisoLegal")}</Link></li>
+                <li><Link href="/legal/cookies" className="hover:text-white transition-colors">{t("footerLinks.cookies")}</Link></li>
+                <li><Link href="/legal/terminos" className="hover:text-white transition-colors">{t("footerLinks.terminos")}</Link></li>
+                <li><Link href="/legal/eliminacion-datos" className="hover:text-white transition-colors">{t("footerLinks.dataDeletion")}</Link></li>
+                <li><Link href="/legal/subscription-agreement" className="hover:text-white transition-colors">{t("footerLinks.subscriptionAgreement")}</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-zinc-800 pt-6 text-center text-xs text-zinc-600">
+            © {new Date().getFullYear()} Aliigo — {t("footer")}
+          </div>
         </div>
       </footer>
     </div>

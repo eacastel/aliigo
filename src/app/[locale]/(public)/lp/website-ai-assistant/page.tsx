@@ -17,6 +17,7 @@ import { FaqSection } from "@/components/home/FaqSection";
 import { FounderTrustCard } from "@/components/home/FounderTrustCard";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { HomeFloatingWidgetGate } from "@/components/home/FloatingWidgetGate";
+import { buildLocalePageMetadata } from "@/lib/localePageMetadata";
 
 export async function generateMetadata({
   params,
@@ -25,12 +26,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
-  return {
-    title: locale.startsWith("es")
-      ? "Asistente web IA para empresas"
-      : "AI Website Assistant for Businesses",
+  const title = locale.startsWith("es")
+    ? "Asistente web IA para empresas"
+    : "AI Website Assistant for Businesses";
+  return buildLocalePageMetadata({
+    locale,
+    title,
     description: t("description"),
-  };
+    enPath: "/en/lp/website-ai-assistant",
+    esPath: "/es/lp/asistente-web-ia",
+  });
 }
 
 function resolveMarketCurrency(params: {

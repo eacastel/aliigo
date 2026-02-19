@@ -64,6 +64,11 @@
    - Growth+: full advanced controls.
    - Preserve advanced values in storage when downgraded; hide/lock in UI and API.
 
+5. Admin operations:
+   - Add internal admin account + safe impersonation flow to access a tenant as support without sharing credentials.
+   - Log impersonation start/end, actor, target business, and reason (audit trail).
+   - Restrict impersonation to explicit admin role only.
+
 ## WhatsApp Integration (Next Priority)
 
 1. Phase 1 complete:

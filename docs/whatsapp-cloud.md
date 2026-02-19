@@ -15,18 +15,33 @@
 
 - `META_WEBHOOK_VERIFY_TOKEN`  
   Verify token configured in Meta Webhooks.
+  - You generate this yourself (random string), e.g.:
+    ```bash
+    openssl rand -hex 32
+    ```
+  - This is **not** your App Secret and **not** your access token.
 
 - `META_WHATSAPP_ACCESS_TOKEN`  
   Permanent/long-lived token with WhatsApp messaging permissions.
+  - Created from Business Manager System User token flow.
+  - Required permissions:
+    - `whatsapp_business_messaging`
+    - `whatsapp_business_management`
 
 - `META_APP_SECRET`  
   Optional but recommended. Enables webhook signature verification.
+  - Source: Meta Developers → App settings → Basic → App Secret.
+  - Do not use this value as webhook verify token.
 
 - `META_GRAPH_API_VERSION`  
   Optional (default: `v21.0`).
 
 - `WHATSAPP_INTERNAL_TOKEN`  
   Internal token used by webhook route to call `/api/conversation` securely.
+  - You generate this yourself (random string), e.g.:
+    ```bash
+    openssl rand -hex 32
+    ```
 
 - `WHATSAPP_PHONE_NUMBER_MAP`  
   JSON map from Meta phone_number_id to `business_id`.
@@ -37,6 +52,8 @@
     "987654321098765": "ffffffff-1111-2222-3333-444444444444"
   }
   ```
+  - Left side (`phone_number_id`) comes from Meta WhatsApp Manager.
+  - Right side is your **Aliigo DB** business UUID (`public.businesses.id`), not Meta App ID and not WABA ID.
 
 - `WHATSAPP_DEFAULT_BUSINESS_ID`  
   Optional fallback when no map entry exists (single-tenant setups).
@@ -76,14 +93,35 @@ Use Business Manager System User (not temporary token):
 5. Generate token for your app with WhatsApp messaging permissions
 6. Save as `META_WHATSAPP_ACCESS_TOKEN`
 
+### 3.1) If number stays "Pending", register phone via API
+
+Use your `META_WHATSAPP_ACCESS_TOKEN` and phone number ID:
+
+```bash
+curl -X POST "https://graph.facebook.com/v21.0/<PHONE_NUMBER_ID>/register" \
+  -H "Authorization: Bearer <META_WHATSAPP_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"messaging_product":"whatsapp","pin":"123456"}'
+```
+
+Then check:
+
+```bash
+curl -X GET "https://graph.facebook.com/v21.0/<PHONE_NUMBER_ID>?fields=verified_name,code_verification_status,quality_rating" \
+  -H "Authorization: Bearer <META_WHATSAPP_ACCESS_TOKEN>"
+```
+
+`code_verification_status` should be verified/approved before production sending is reliable.
+
 ### 4) Configure webhook in Meta
 
-App Dashboard → WhatsApp → Configuration:
+App Dashboard → Webhooks:
 1. Callback URL:
    - `https://aliigo.com/api/webhooks/whatsapp` (or your domain)
 2. Verify token:
    - same value as `META_WEBHOOK_VERIFY_TOKEN`
 3. Verify and save
+4. Ensure selected object/product is **WhatsApp Business Account** (not User)
 4. Subscribe fields:
    - `messages` (required)
    - optionally `message_status` later
@@ -128,9 +166,38 @@ Basic plan is blocked by design.
   - bad `WHATSAPP_PHONE_NUMBER_MAP`
   - business plan is Basic
   - invalid/expired `META_WHATSAPP_ACCESS_TOKEN`
+  - no `POST /api/webhooks/whatsapp` event arriving (only GET verify succeeded)
+  - webhook object subscribed as `User` instead of `WhatsApp Business Account`
+  - app not subscribed to `messages` field
 
 - **Graph API error 400/401/403**  
   Token scope/expiry issue or wrong phone-number-id context.
+
+## "Webhook verifies but no WhatsApp reply" Checklist
+
+1. In Vercel logs, confirm **POST** events:
+   - `POST /api/webhooks/whatsapp`
+   - If you only see GET, verification works but inbound messages are not reaching your webhook subscription.
+
+2. Confirm webhook object is:
+   - `WhatsApp Business Account`
+   - field `messages` subscribed.
+
+3. Confirm env values in Vercel Production:
+   - `META_WEBHOOK_VERIFY_TOKEN`
+   - `META_WHATSAPP_ACCESS_TOKEN`
+   - `WHATSAPP_INTERNAL_TOKEN`
+   - `WHATSAPP_PHONE_NUMBER_MAP`
+   - `META_APP_SECRET` (if signature verification is enabled in code)
+
+4. Confirm phone mapping:
+   - `WHATSAPP_PHONE_NUMBER_MAP={"<meta_phone_number_id>":"<aliigo_business_uuid>"}`
+
+5. Confirm target Aliigo business plan:
+   - Must be `growth`, `pro`, or `custom` (Basic is blocked by design).
+
+6. Confirm phone registration status in Meta:
+   - Not pending.
 
 ## Notes
 

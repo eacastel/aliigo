@@ -2,6 +2,7 @@ import { Link } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { FitFilterSection } from "@/components/home/FitFilterSection";
+import { buildLocalePageMetadata } from "@/lib/localePageMetadata";
 
 export async function generateMetadata({
   params,
@@ -10,10 +11,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "pages.whyAliigo" });
-  return {
+  return buildLocalePageMetadata({
+    locale,
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+    enPath: "/en/why-aliigo",
+    esPath: "/es/por-que-aliigo",
+  });
 }
 
 export default async function WhyAliigoPage({
