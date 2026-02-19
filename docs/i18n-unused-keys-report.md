@@ -1,0 +1,155 @@
+# i18n Unused Keys Report
+
+Scanned files: **137**
+
+## Method (3 passes)
+1. Namespace extraction from `useTranslations/getTranslations` translator variables.
+2. Literal full-key rescue (quoted `"Namespace.key.path"` anywhere in source).
+3. Dynamic-key guard: namespace marked `maybe_dynamic` when template-based keys are detected.
+
+## Counts
+- EN total: 1113, used: 448, maybe: 166, unused: 499
+- ES total: 1114, used: 448, maybe: 166, unused: 500
+- Unused in both locales: 499
+
+## Maybe-dynamic namespaces
+- AssistantSettings
+- Auth.checkEmail
+- Dashboard
+- Landing
+- Landing.clarity
+- Landing.credibility
+- Landing.fitFilter
+- Landing.impact
+- LandingLP
+- LegalV3.cookies
+- LegalV3.dataDeletion
+- LegalV3.dpa
+- LegalV3.legalNotice
+- LegalV3.privacy
+- LegalV3.terms
+- LegalV4.subscriptionAgreement
+- pages.founder
+- pages.whyAliigo
+
+## Unused in both (first 120)
+- Navigation.publicLinks.features
+- Navigation.publicLinks.blog
+- Navigation.publicLinks.founder
+- Navigation.footerLinks.privacidad
+- Navigation.footerLinks.dpa
+- Navigation.footerLinks.subprocessors
+- Billing.title
+- Billing.statusLabel
+- Billing.step1
+- Billing.step2
+- Billing.step3
+- Billing.contact
+- Billing.logout
+- Billing.loading
+- Billing.statusPrefix
+- Billing.activeMessage
+- Billing.activePanelHint
+- Billing.stepConfirmEmail
+- Billing.stepChoosePlan
+- Billing.subscribedIntro
+- Billing.alreadyActiveTitle
+- Billing.currentPlan
+- Billing.trialEnds
+- Billing.renewsOn
+- Billing.cancelAtPeriodEnd
+- Billing.noNeedToPayAgain
+- Billing.planStarter
+- Billing.planGrowth
+- Billing.planUnknown
+- Billing.planStarterDesc
+- Billing.starterF1
+- Billing.starterF2
+- Billing.starterF3
+- Billing.starterF4
+- Billing.starterF5
+- Billing.planGrowthDesc
+- Billing.growthIntro
+- Billing.growthF1
+- Billing.growthF2
+- Billing.growthF3
+- Billing.growthF4
+- Billing.planProDesc
+- Billing.planProPrice
+- Billing.planProIntro
+- Billing.proF1
+- Billing.proF2
+- Billing.proF3
+- Billing.proF4
+- Billing.daysLeft
+- Billing.managePlan
+- Billing.openingPortal
+- Billing.perMonth
+- Billing.plansTitle
+- Billing.upgradeToGrowth
+- Billing.switchToStarter
+- Billing.resumeMembership
+- Billing.cancelMembership
+- Billing.planProTitle
+- Billing.planProCta
+- Billing.planBasic
+- Billing.planPro
+- Billing.planCustom
+- Billing.planBasicDesc
+- Billing.basicF1
+- Billing.basicF2
+- Billing.basicF3
+- Billing.basicF4
+- Billing.basicF5
+- Billing.upgradeToPro
+- Billing.switchToBasic
+- Billing.planCustomDesc
+- Billing.planCustomPrice
+- Billing.planCustomCta
+- Billing.customF1
+- Billing.customF2
+- Billing.customF3
+- Billing.customF4
+- DashboardWidget.defaultLanguage
+- Auth.login.title
+- Auth.login.emailLabel
+- Auth.login.passwordLabel
+- Auth.login.submitButton
+- Auth.login.loading
+- Auth.login.forgotPassword
+- Auth.login.resetLink
+- Auth.login.okVerified
+- Auth.login.msgValidation
+- Auth.login.msgUnconfirmed
+- Auth.login.msgTooManyRequests
+- Auth.login.msgInvalidCreds
+- Auth.login.resendButton
+- Auth.login.resending
+- Auth.login.msgResendSuccess
+- Auth.login.msgResendError
+- Auth.signup.introTitle
+- Auth.signup.introText
+- Auth.signup.emailPlaceholder
+- Auth.signup.businessPlaceholder
+- Auth.signup.businessNeededHint
+- Auth.signup.googleUrlPlaceholder
+- Auth.signup.passwordPlaceholder
+- Auth.signup.submitButton
+- Auth.signup.disclaimer
+- Auth.signup.acceptTermsPrefix
+- Auth.signup.acceptTermsAgreement
+- Auth.signup.acceptTermsTerms
+- Auth.signup.acceptTermsAnd
+- Auth.signup.acceptTermsPrivacy
+- Auth.signup.marketingOptIn
+- Auth.signup.errorAcceptTerms
+- Auth.signup.alreadyAccount
+- Auth.signup.signInLink
+- Auth.signup.errorValidation
+- Auth.signup.errorPassword
+- Auth.signup.loading
+- Auth.signup.trialBillingNote
+- Auth.checkEmail.title
+- Auth.checkEmail.subtitle
+- Auth.checkEmail.desc1
+- Auth.checkEmail.desc2

@@ -823,29 +823,6 @@
       "item4": "No training required",
       "item5": "Install with one script"
     },
-    "demo": {
-      "badge": "Live interactive demo",
-      "headlineLine1": "Don’t just read about it.",
-      "headlineEmphasis": "Try it right now.",
-      "subtitle": "Ask a question here. See how Aliigo answers clearly using your business info, captures leads only when intent is real, and guides visitors to the right next step — without your team needing to reply immediately.",
-      "feature1": "Instant, helpful replies",
-      "feature2": "Lead capture only on intent",
-      "feature3": "Clear next-step guidance",
-      "cta": "Start free trial",
-      "worksWith": {
-        "label": "Works with",
-        "note": "Install with one script tag",
-        "items": "WordPress · Webflow · Shopify · Wix · Squarespace · Custom sites"
-      },
-      "phone": {
-        "time": "9:41",
-        "statusConnection": "Connection",
-        "statusWifi": "WiFi",
-        "statusBattery": "Batt",
-        "agentName": "Aliigo Assistant",
-        "agentSub": "Replies instantly when possible"
-      }
-    },
     "socialProof": {
       "title": "WHERE A CONVERSATION MAKES THE DIFFERENCE",
       "industries": {

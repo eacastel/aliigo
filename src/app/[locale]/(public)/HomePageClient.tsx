@@ -4,7 +4,6 @@ import { useLocale } from "next-intl";
 import { type AliigoCurrency } from "@/lib/currency";
 import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 import { HomeHeroSection } from "@/components/home/Hero";
-import { AssistantDemoSection } from "@/components/home/AssistantDemoSection";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { FounderTrustCard } from "@/components/home/FounderTrustCard";
 import { WorksWithStrip } from "@/components/home/WorksWithStrip";
@@ -53,7 +52,6 @@ export default function HomePageClient({ initialCurrency }: HomePageClientProps)
       <HomeHeroSection />
       <CredibilityStrip />
       <WorksWithStrip />
-      <AssistantDemoSection />
       <PricingSection
         basicPrice={basicPrice}
         growthPrice={growthPrice}

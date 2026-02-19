@@ -83,6 +83,19 @@ In App Dashboard → WhatsApp → API Setup, copy:
 
 You’ll use **Phone Number ID** in `WHATSAPP_PHONE_NUMBER_MAP`.
 
+### 2.1) Find WABA ID in Meta Business Suite app (mobile)
+
+If you use the **Meta Business Suite app** (not the regular Facebook app):
+
+1. Open **Meta Business Suite** app.
+2. Tap **Tools** (hamburger/three lines).
+3. Tap **Settings** (gear icon).
+4. Open **WhatsApp** / **WhatsApp Business Account**.
+5. Select the account.
+6. Copy the **WABA ID** (15-digit number) shown under the account name/details.
+
+Use this value as `WHATSAPP_BUSINESS_ACCOUNT_ID`.
+
 ### 3) Create production access token (recommended)
 
 Use Business Manager System User (not temporary token):
@@ -113,6 +126,37 @@ curl -X GET "https://graph.facebook.com/v21.0/<PHONE_NUMBER_ID>?fields=verified_
 
 `code_verification_status` should be verified/approved before production sending is reliable.
 
+### 3.2) Subscribe app to WABA via API (required if UI is not subscribing)
+
+```bash
+curl -X POST "https://graph.facebook.com/v21.0/<WABA_ID>/subscribed_apps" \
+  -H "Authorization: Bearer <META_WHATSAPP_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+Verify:
+
+```bash
+curl -X GET "https://graph.facebook.com/v21.0/<WABA_ID>/subscribed_apps" \
+  -H "Authorization: Bearer <META_WHATSAPP_ACCESS_TOKEN>"
+```
+
+You should see your app in `data`.
+
+### 3.3) Useful ID lookup curls
+
+Get WABA from Phone Number ID:
+
+```bash
+curl -X GET "https://graph.facebook.com/v21.0/<PHONE_NUMBER_ID>?fields=display_phone_number,verified_name,whatsapp_business_account" \
+  -H "Authorization: Bearer <META_WHATSAPP_ACCESS_TOKEN>"
+```
+
+If Meta returns permission errors (`business_management`), use:
+- the WABA ID from WhatsApp Manager / Business Suite app, or
+- a System User token with business permissions.
+
 ### 4) Configure webhook in Meta
 
 App Dashboard → Webhooks:
@@ -124,7 +168,7 @@ App Dashboard → Webhooks:
 4. Ensure selected object/product is **WhatsApp Business Account** (not User)
 4. Subscribe fields:
    - `messages` (required)
-   - optionally `message_status` later
+   - optionally `message_template_status_update` / other status fields later
 
 ### 5) Configure Vercel env vars
 

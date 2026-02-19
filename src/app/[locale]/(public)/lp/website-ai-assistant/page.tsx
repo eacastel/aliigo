@@ -10,7 +10,6 @@ import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 import { LpHeroSection } from "@/components/home/LpHeroSection";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { PricingSection } from "@/components/home/PricingSection";
-import { AssistantDemoSection } from "@/components/home/AssistantDemoSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { FeaturesGridSection } from "@/components/home/FeaturesGridSection";
 import { FaqSection } from "@/components/home/FaqSection";
@@ -117,7 +116,6 @@ export default async function PaidLandingPage({
         </div>
       </div>
       <div className="max-md:[&>section]:py-16">
-        <AssistantDemoSection />
       </div>
       <div className="max-md:[&>section]:py-16">
         <HowItWorksSection />

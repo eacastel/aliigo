@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FileText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { pushToGTM } from "@/lib/gtm";
+import { openSupportWidgetPill } from "@/lib/openSupportWidget";
 
 export function HeroGhostPreview({
   trackEventName,
@@ -78,15 +79,15 @@ export function HeroGhostPreview({
   }, [showSecondAssistant, fullSecondReply, reduceMotion]);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4 shadow-2xl ring-1 ring-white/10 overflow-hidden">
-      <div className="h-[480px] w-full flex flex-col rounded-xl border border-white/10 overflow-hidden">
-        <div className="h-14 bg-white px-5 flex items-center border-b border-zinc-200">
+    <div className="relative rounded-2xl bg-zinc-900/35 p-3 shadow-xl overflow-hidden">
+      <div className="h-[480px] w-full flex flex-col rounded-xl border border-white/[0.08] overflow-hidden saturate-90">
+        <div className="h-14 bg-zinc-100 px-5 flex items-center border-b border-zinc-300">
           <div className="text-zinc-900 font-semibold text-xl">{t("title")}</div>
         </div>
 
         <div className="flex-1 bg-zinc-300 p-4 overflow-hidden">
           <div className="space-y-3 text-sm h-full overflow-y-auto pr-1">
-            <div className="ml-auto max-w-[80%] rounded-xl bg-[#84c9ad] text-zinc-950 px-3 py-2">
+            <div className="ml-auto max-w-[80%] rounded-xl bg-[#7fb79f] text-zinc-950 px-3 py-2">
               {t("user")}
             </div>
 
@@ -106,7 +107,7 @@ export function HeroGhostPreview({
             ) : null}
 
             {showSecondUser ? (
-              <div className="ml-auto max-w-[80%] rounded-xl bg-[#84c9ad] text-zinc-950 px-3 py-2">
+              <div className="ml-auto max-w-[80%] rounded-xl bg-[#7fb79f] text-zinc-950 px-3 py-2">
                 {t("userBook")}
               </div>
             ) : null}
@@ -115,7 +116,7 @@ export function HeroGhostPreview({
                 <p>{typedSecond}</p>
                 <button
                   type="button"
-                  className="mt-3 inline-flex items-center justify-center rounded-lg bg-[#84c9ad] px-3 py-1.5 text-xs font-semibold text-zinc-900 hover:bg-[#73bba0] transition-colors"
+                  className="mt-3 inline-flex items-center justify-center rounded-lg bg-[#7fb79f] px-3 py-1.5 text-xs font-semibold text-zinc-900 hover:bg-[#6faa92] transition-colors"
                 >
                   {t("bookNow")}
                 </button>
@@ -125,20 +126,22 @@ export function HeroGhostPreview({
         </div>
 
         <div className="bg-zinc-200 px-4 py-3 border-t border-zinc-300">
-          <a
-            href="#assistant-demo"
+          <button
+            type="button"
             onClick={() => {
+              openSupportWidgetPill();
               if (!trackEventName) return;
               pushToGTM(trackEventName, {
                 placement: "hero_ghost",
               });
             }}
-            className="block w-full rounded-lg bg-[#84c9ad] px-3 py-2.5 text-center text-sm font-bold text-black shadow-[0_0_20px_rgba(132,201,173,0.35)] hover:bg-[#73bba0] transition-colors"
+            className="block w-full rounded-lg bg-[#7fb79f] px-3 py-2.5 text-center text-sm font-bold text-black hover:bg-[#6faa92] transition-colors"
           >
             {t("tryOwnQuestion")}
-          </a>
+          </button>
         </div>
       </div>
+      <div className="pointer-events-none absolute inset-0 bg-black/10" />
     </div>
   );
 }

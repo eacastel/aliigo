@@ -824,29 +824,6 @@
       "item4": "Sin formación técnica",
       "item5": "Instalación con un solo script"
     },
-    "demo": {
-      "badge": "Demo interactiva en vivo",
-      "headlineLine1": "No te quedes solo con la teoría.",
-      "headlineEmphasis": "Pruébalo ahora mismo.",
-      "subtitle": "Haz una pregunta aquí. Observa como Aliigo responde con claridad usando la información de tu negocio, capta contactos solo cuando hay intención real y guía a los visitantes al siguiente paso — sin que tu equipo tenga que contestar al instante.",
-      "feature1": "Respuestas útiles al instante",
-      "feature2": "Captura de leads solo con intención",
-      "feature3": "Guía clara al siguiente paso",
-      "cta": "Empieza tu prueba gratis",
-      "worksWith": {
-        "label": "Funciona con",
-        "note": "Instalación con un solo script",
-        "items": "WordPress · Webflow · Shopify · Wix · Squarespace · Sitios a medida"
-      },
-      "phone": {
-        "time": "9:41",
-        "statusConnection": "Conexión",
-        "statusWifi": "WiFi",
-        "statusBattery": "Batería",
-        "agentName": "Agente de soporte",
-        "agentSub": "Responde al instante, casi siempre"
-      }
-    },
     "socialProof": {
       "title": "CASOS DONDE UNA CONVERSACIÓN MARCA LA DIFERENCIA",
       "industries": {

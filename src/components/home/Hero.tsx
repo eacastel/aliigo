@@ -3,6 +3,7 @@
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { HeroGhostPreview } from "@/components/home/HeroGhostPreview";
+import { openSupportWidgetPill } from "@/lib/openSupportWidget";
 
 export function HomeHeroSection() {
   const t = useTranslations("Landing");
@@ -49,12 +50,13 @@ export function HomeHeroSection() {
               >
                 {t("hero.ctaPrimary")}
               </Link>
-              <Link
-                href={{ pathname: "/", hash: "assistant-demo" }}
+              <button
+                type="button"
+                onClick={openSupportWidgetPill}
                 className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/50 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-800 transition-all"
               >
                 {t("hero.ctaSecondary")}
-              </Link>
+              </button>
             </div>
 
             <p className="mt-3 text-sm text-zinc-500 leading-relaxed max-w-xl">
