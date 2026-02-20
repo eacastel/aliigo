@@ -802,6 +802,26 @@
       "title": "Se integra con tu flujo actual en minutos",
       "note": "Instalación con un solo script."
     },
+    "proof": {
+      "title": "Resultados reales con conversaciones bajo control",
+      "subtitle": "Aliigo responde con tu contenido aprobado, capta la intención y guía a los visitantes al siguiente paso — para que ahorres tiempo y cierres más oportunidades.",
+      "relax": {
+        "title": "Tu negocio sigue funcionando aunque desconectes.",
+        "desc": "Aliigo responde dudas, detecta intención y guía al siguiente paso, incluso cuando tú no estás al teléfono."
+      },
+      "handshake": {
+        "title": "Cierra operaciones con más seguridad.",
+        "desc": "Aliigo filtra mejor cada contacto, responde con información validada de tu negocio y envía los leads con intención real al siguiente paso."
+      },
+      "vet": {
+        "title": "Tú céntrate en tu trabajo. Aliigo cubre el primer contacto.",
+        "desc": "Aliigo resuelve las preguntas más frecuentes y dirige a reserva o contacto para que tú te ocupes de lo que aporta más valor."
+      },
+      "stats": {
+        "title": "Convierte conversaciones en mejoras reales del negocio.",
+        "desc": "Aliigo te enseña qué preguntan, qué frena la conversión y qué conviene aclarar, para mejorar onboarding y FAQs cada semana."
+      }
+    },
     "fitFilter": {
       "ideal": {
         "title": "Aliigo es ideal si:",

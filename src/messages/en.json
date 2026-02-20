@@ -801,6 +801,26 @@
       "title": "Integrates with your existing workflow in minutes",
       "note": "Install with one script tag."
     },
+    "proof": {
+      "title": "Real outcomes from controlled conversations",
+        "subtitle": "Aliigo answers from your approved content, captures intent, and guides visitors to the next step — so you save time and win more deals.",
+      "relax": {
+        "title": "Your business keeps working while you unplug.",
+        "desc": "Aliigo answers questions, captures intent, and guides visitors to the next step -- even when you're off the clock."
+      },
+      "handshake": {
+        "title": "Close the deal with confidence.",
+        "desc": "Aliigo prequalifies visitors, answers questions from your approved business knowledge, and routes high-intent leads to the next step."
+      },
+      "vet": {
+        "title": "Stay focused. Aliigo handles first contact.",
+        "desc": "Aliigo answers common questions and routes visitors to booking so you can focus on the work only you can do."
+      },
+      "stats": {
+        "title": "Turn conversations into a better business.",
+        "desc": "Aliigo shows what people ask, what blocks conversions, and what to clarify next -- so your onboarding and FAQs improve every week."
+      }
+    },
     "fitFilter": {
       "ideal": {
         "title": "Aliigo is ideal if:",

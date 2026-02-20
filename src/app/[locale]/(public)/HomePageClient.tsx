@@ -7,6 +7,7 @@ import { HomeHeroSection } from "@/components/home/Hero";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { FounderTrustCard } from "@/components/home/FounderTrustCard";
 import { WorksWithStrip } from "@/components/home/WorksWithStrip";
+import { HumanProofSection } from "@/components/home/HumanProofSection";
 import { FeaturesGridSection } from "@/components/home/FeaturesGridSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { PricingSection } from "@/components/home/PricingSection";
@@ -51,7 +52,7 @@ export default function HomePageClient({ initialCurrency }: HomePageClientProps)
     <div className="bg-zinc-950 overflow-hidden selection:bg-[#84c9ad]/30">
       <HomeHeroSection />
       <CredibilityStrip />
-      <WorksWithStrip />
+      <HumanProofSection />
       <PricingSection
         basicPrice={basicPrice}
         growthPrice={growthPrice}
@@ -62,6 +63,7 @@ export default function HomePageClient({ initialCurrency }: HomePageClientProps)
       <FeaturesGridSection />
       <FaqSection />
       <FounderTrustCard />
+      <WorksWithStrip />
       <FinalCtaSection />
       <HomeFloatingWidgetGate />
     </div>

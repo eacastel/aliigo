@@ -9,12 +9,14 @@ import {
 import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
 import { LpHeroSection } from "@/components/home/LpHeroSection";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
+import { HumanProofSection } from "@/components/home/HumanProofSection";
 import { PricingSection } from "@/components/home/PricingSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { FeaturesGridSection } from "@/components/home/FeaturesGridSection";
 import { FaqSection } from "@/components/home/FaqSection";
 import { FounderTrustCard } from "@/components/home/FounderTrustCard";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
+import { WorksWithStrip } from "@/components/home/WorksWithStrip";
 import { HomeFloatingWidgetGate } from "@/components/home/FloatingWidgetGate";
 import { buildLocalePageMetadata } from "@/lib/localePageMetadata";
 
@@ -105,6 +107,7 @@ export default async function PaidLandingPage({
     <div className="bg-zinc-950 overflow-hidden selection:bg-[#84c9ad]/30">
       <LpHeroSection startingPrice={basicPrice} />
       <CredibilityStrip />
+      <HumanProofSection />
       <div id="pricing">
         <div className="max-md:[&>section]:py-16">
           <PricingSection
@@ -130,6 +133,7 @@ export default async function PaidLandingPage({
         <FounderTrustCard />
       </div>
       <FinalCtaSection />
+      <WorksWithStrip />
       <HomeFloatingWidgetGate />
     </div>
   );
