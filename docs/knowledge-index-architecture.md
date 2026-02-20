@@ -19,6 +19,7 @@ This schema supports both onboarding paths:
 ## Why this works with current assistant settings
 
 - `assistant_settings` remains the control layer (tone, behavior, qualification).
+- `assistant_settings.supportPanel` adds context routing + support-specific knowledge blocks.
 - `knowledge_*` becomes the retrieval layer (facts and source-grounded answers).
 - Conversation API can:
   1) query top chunks by embedding similarity
@@ -56,3 +57,8 @@ This schema supports both onboarding paths:
 - Conversation replies now validate outbound URLs before returning them.
 - Broken links are removed from response text/CTA actions.
 - Same-domain locale repair is attempted (`/es/...` or `/en/...`) before dropping a link.
+- Support context resolution order is now:
+  1) signed-in override
+  2) URI override
+  3) intent override
+  4) default context mode

@@ -39,3 +39,55 @@ Migration:
   - growth: 2
   - pro: 3
   - custom: unlimited
+
+## SQL examples (quick reference)
+Use these when limits look inconsistent in the dashboard.
+
+### Check current limits for one business
+```sql
+select
+  id,
+  slug,
+  billing_plan,
+  seat_limit,
+  domain_limit,
+  default_locale,
+  enabled_locales
+from public.businesses
+where slug = 'aliigo';
+```
+
+### Check which business a user is linked to
+```sql
+select
+  bp.id as user_id,
+  bp.email,
+  bp.business_id,
+  b.slug,
+  b.billing_plan,
+  b.seat_limit,
+  b.domain_limit
+from public.business_profiles bp
+left join public.businesses b on b.id = bp.business_id
+where bp.email = 'you@example.com';
+```
+
+### Force plan limits to Pro for a business
+```sql
+update public.businesses
+set
+  billing_plan = 'pro',
+  seat_limit = 5,
+  domain_limit = 3
+where slug = 'aliigo';
+```
+
+### Force plan limits by business id
+```sql
+update public.businesses
+set
+  billing_plan = 'pro',
+  seat_limit = 5,
+  domain_limit = 3
+where id = 'BUSINESS_UUID_HERE';
+```

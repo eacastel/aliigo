@@ -41,6 +41,33 @@ type RetrievedChunk = {
   sourceUrl?: string | null;
   sourceLabel?: string | null;
 };
+type AssistantContextMode = "sales" | "support" | "catalog";
+type SupportPanelSettings = {
+  enabled?: boolean;
+  defaultMode?: AssistantContextMode;
+  overrides?: {
+    signedIn?: {
+      enabled?: boolean;
+      mode?: AssistantContextMode;
+    };
+    uri?: {
+      enabled?: boolean;
+      mode?: AssistantContextMode;
+      patterns?: string[];
+    };
+    intent?: {
+      enabled?: boolean;
+      mode?: AssistantContextMode;
+      terms?: string[];
+      requireConfirmation?: boolean;
+    };
+  };
+  knowledge?: {
+    concepts?: string;
+    procedures?: string;
+    rules?: string;
+  };
+};
 
 class RateLimitError extends Error {
   status = 429 as const;
@@ -150,6 +177,144 @@ function clampText(v: string, max = 160) {
   const s = (v || "").trim();
   if (s.length <= max) return s;
   return `${s.slice(0, max)}…`;
+}
+
+function safeStringList(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((v) => (typeof v === "string" ? v.trim() : ""))
+    .filter(Boolean);
+}
+
+function readSupportPanelSettings(input: unknown): SupportPanelSettings | null {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return null;
+  const root = input as Record<string, unknown>;
+  const panelRaw = root.supportPanel;
+  if (!panelRaw || typeof panelRaw !== "object" || Array.isArray(panelRaw)) return null;
+  const panel = panelRaw as Record<string, unknown>;
+
+  const toMode = (v: unknown): AssistantContextMode | undefined =>
+    v === "sales" || v === "support" || v === "catalog" ? v : undefined;
+
+  const overridesRaw =
+    panel.overrides && typeof panel.overrides === "object" && !Array.isArray(panel.overrides)
+      ? (panel.overrides as Record<string, unknown>)
+      : {};
+  const signedInRaw =
+    overridesRaw.signedIn && typeof overridesRaw.signedIn === "object" && !Array.isArray(overridesRaw.signedIn)
+      ? (overridesRaw.signedIn as Record<string, unknown>)
+      : {};
+  const uriRaw =
+    overridesRaw.uri && typeof overridesRaw.uri === "object" && !Array.isArray(overridesRaw.uri)
+      ? (overridesRaw.uri as Record<string, unknown>)
+      : {};
+  const intentRaw =
+    overridesRaw.intent && typeof overridesRaw.intent === "object" && !Array.isArray(overridesRaw.intent)
+      ? (overridesRaw.intent as Record<string, unknown>)
+      : {};
+  const knowledgeRaw =
+    panel.knowledge && typeof panel.knowledge === "object" && !Array.isArray(panel.knowledge)
+      ? (panel.knowledge as Record<string, unknown>)
+      : {};
+
+  return {
+    enabled: panel.enabled === true,
+    defaultMode: toMode(panel.defaultMode) ?? "support",
+    overrides: {
+      signedIn: {
+        enabled: signedInRaw.enabled === true,
+        mode: toMode(signedInRaw.mode) ?? "support",
+      },
+      uri: {
+        enabled: uriRaw.enabled === true,
+        mode: toMode(uriRaw.mode) ?? "support",
+        patterns: safeStringList(uriRaw.patterns),
+      },
+      intent: {
+        enabled: intentRaw.enabled === true,
+        mode: toMode(intentRaw.mode) ?? "support",
+        terms: safeStringList(intentRaw.terms),
+        requireConfirmation: intentRaw.requireConfirmation === true,
+      },
+    },
+    knowledge: {
+      concepts: typeof knowledgeRaw.concepts === "string" ? knowledgeRaw.concepts.trim() : "",
+      procedures: typeof knowledgeRaw.procedures === "string" ? knowledgeRaw.procedures.trim() : "",
+      rules: typeof knowledgeRaw.rules === "string" ? knowledgeRaw.rules.trim() : "",
+    },
+  };
+}
+
+function signedInFromMeta(meta: Record<string, unknown>): boolean {
+  const candidates = ["signed_in", "signedIn", "is_signed_in", "isSignedIn", "auth", "authenticated"];
+  for (const key of candidates) {
+    const v = meta[key];
+    if (typeof v === "boolean") return v;
+    if (typeof v === "string") {
+      const normalized = v.toLowerCase().trim();
+      if (normalized === "true" || normalized === "1" || normalized === "yes") return true;
+      if (normalized === "false" || normalized === "0" || normalized === "no") return false;
+    }
+    if (typeof v === "number") return v === 1;
+  }
+  return false;
+}
+
+function requestPathFromMeta(meta: Record<string, unknown>): string {
+  const candidates = ["path", "pathname", "uri", "url_path", "page_path", "current_path"];
+  for (const key of candidates) {
+    const v = meta[key];
+    if (typeof v === "string" && v.trim()) return v.trim().toLowerCase();
+  }
+  return "";
+}
+
+function resolveSupportContext(params: {
+  settings: SupportPanelSettings | null;
+  message: string;
+  meta: Record<string, unknown>;
+}): { mode: AssistantContextMode; reason: string; intentTerm?: string; intentNeedsConfirm: boolean } {
+  const settings = params.settings;
+  if (!settings?.enabled) {
+    return { mode: "support", reason: "disabled", intentNeedsConfirm: false };
+  }
+
+  let mode: AssistantContextMode = settings.defaultMode ?? "support";
+  let reason = "default";
+
+  const reqPath = requestPathFromMeta(params.meta);
+  const uriOverride = settings.overrides?.uri;
+  if (uriOverride?.enabled && reqPath) {
+    const patterns = uriOverride.patterns ?? [];
+    const hit = patterns.find((p) => p && reqPath.includes(p.toLowerCase()));
+    if (hit) {
+      mode = uriOverride.mode ?? mode;
+      reason = `uri:${hit}`;
+    }
+  }
+
+  const signedInOverride = settings.overrides?.signedIn;
+  if (signedInOverride?.enabled && signedInFromMeta(params.meta)) {
+    mode = signedInOverride.mode ?? mode;
+    reason = "signed_in";
+  }
+
+  let intentTerm: string | undefined;
+  let intentNeedsConfirm = false;
+  const msg = params.message.toLowerCase();
+  const intentOverride = settings.overrides?.intent;
+  if (intentOverride?.enabled) {
+    const terms = intentOverride.terms ?? [];
+    const hit = terms.find((term) => term && msg.includes(term.toLowerCase()));
+    if (hit) {
+      mode = intentOverride.mode ?? mode;
+      reason = `intent:${hit}`;
+      intentTerm = hit;
+      intentNeedsConfirm = intentOverride.requireConfirmation === true;
+    }
+  }
+
+  return { mode, reason, intentTerm, intentNeedsConfirm };
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
@@ -341,11 +506,6 @@ async function validateEmbedAccess(token: string, host: string) {
     const tokenHost = (sess.data.host || "").toLowerCase().trim().replace(/:\d+$/, "");
     if (tokenHost !== host) {
       return { ok: false as const, reason: "Host mismatch" };
-    }
-
-    // Preview sessions must only be usable from aliigo.com
-    if (sess.data.is_preview) {
-      if (host !== aliigoHost()) return { ok: false as const, reason: "Preview token forbidden" };
     }
 
     return {
@@ -721,7 +881,7 @@ export async function POST(req: NextRequest) {
     const bizRes = await supabase
       .from("businesses")
       .select(
-        "name, timezone, system_prompt, slug, knowledge, default_locale, qualification_prompt, billing_status, billing_plan, trial_end, current_period_end"
+        "name, timezone, system_prompt, slug, knowledge, assistant_settings, default_locale, qualification_prompt, billing_status, billing_plan, trial_end, current_period_end"
       )
       .eq("id", businessId)
       .single<{
@@ -730,6 +890,7 @@ export async function POST(req: NextRequest) {
         system_prompt: string | null;
         slug: string;
         knowledge: string | null;
+        assistant_settings: Record<string, unknown> | null;
         default_locale: string | null;
         qualification_prompt: string | null;
         billing_status: BillingStatus | null;
@@ -919,6 +1080,44 @@ Universal guardrails (always on):
 - No jokes, trivia, or unrelated topics.
 - Avoid repetition. Summarize if asked again.
 - Always reply in the user’s language; follow if they switch.`;
+
+    const supportPanel = readSupportPanelSettings(bizRes.data?.assistant_settings ?? null);
+    const supportContext = resolveSupportContext({
+      settings: supportPanel,
+      message,
+      meta: safeMeta,
+    });
+    if (supportPanel?.enabled) {
+      sys += `
+
+Context routing (support panel):
+- Active mode for this turn: ${supportContext.mode} (reason: ${supportContext.reason}).
+- Modes:
+  - support: prioritize operational help, onboarding help, setup guidance, and policy/process clarity.
+  - sales: prioritize qualification, value framing, and next-step conversion.
+  - catalog: prioritize structured service/product/program guidance and comparisons.
+- If user intent changes clearly, you may switch mode once and continue.
+- Keep tone calm and practical; do not sound like a hard handoff.`;
+
+      if (supportContext.intentNeedsConfirm && supportContext.intentTerm) {
+        sys += `
+- Intent override matched "${supportContext.intentTerm}". Before changing direction, ask one short confirmation question.`;
+      }
+
+      if (supportContext.mode === "support") {
+        const supportKnowledgeParts = [
+          supportPanel.knowledge?.concepts ? `Concepts & definitions:\n${supportPanel.knowledge.concepts}` : "",
+          supportPanel.knowledge?.procedures ? `Procedures & steps:\n${supportPanel.knowledge.procedures}` : "",
+          supportPanel.knowledge?.rules ? `Support rules:\n${supportPanel.knowledge.rules}` : "",
+        ].filter(Boolean);
+        if (supportKnowledgeParts.length > 0) {
+          sys += `
+
+Support panel knowledge (authoritative in support mode):
+${supportKnowledgeParts.join("\n\n")}`;
+        }
+      }
+    }
 
     const knowledge = (bizRes.data?.knowledge ?? "").trim();
     const planNow = (bizRes.data?.billing_plan ?? "basic").toLowerCase();

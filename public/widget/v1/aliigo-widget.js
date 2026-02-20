@@ -93,24 +93,20 @@
         font-size: 16px;
         letter-spacing: -0.01em;
       }
-      .header.has-logo .header-main {
-        padding-left: 52px;
-      }
       .header-main {
+        flex: 1;
         min-width: 0;
         display: inline-flex;
         align-items: center;
+        gap: 10px;
       }
       .header-icon {
-        width: 40px;
-        height: 40px;
+        width: 34px;
+        height: 34px;
         border-radius: 4px;
         object-fit: contain;
         display: block;
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
+        flex: 0 0 auto;
         pointer-events: none;
       }
       .header-title {
@@ -352,12 +348,12 @@
           border-radius: 0;
         }
       }
-    `}render(){var J,X;this.ensureRoot();let e=this.getVariant();if(!!this.getEmbedKey()&&!this.getThemeOverride()&&!this.cachedTheme&&!((J=this.state.session)!=null&&J.theme)&&!this.sessionHydrated){let f=e==="floating"?`wrap floating ${this.getFloatingMode()}`:e==="hero"?"wrap hero":"wrap inline",g=e==="hero"?"panel hero":e==="inline"?"panel inline":"panel";this.root.innerHTML=`
+    `}render(){var Y,X;this.ensureRoot();let e=this.getVariant();if(!!this.getEmbedKey()&&!this.getThemeOverride()&&!this.cachedTheme&&!((Y=this.state.session)!=null&&Y.theme)&&!this.sessionHydrated){let f=e==="floating"?`wrap floating ${this.getFloatingMode()}`:e==="hero"?"wrap hero":"wrap inline",g=e==="hero"?"panel hero":e==="inline"?"panel inline":"panel";this.root.innerHTML=`
           <style>${this.css()}</style>
           <div class="${f}">
             <div class="${g}" style="visibility:hidden"></div>
           </div>
-        `;return}let s=this.state.session,n=this.getLocaleOverride(),a=n||this.state.locale;if(!n&&(s!=null&&s.locale_auto)){let f=this.detectWebsiteLocale(),g=Q(s==null?void 0:s.enabled_locales,(s==null?void 0:s.locale)||a);f&&g.includes(f)&&f!==a&&(a=f,this.state.locale=f)}let i=P[a],h=this.getThemeOverride()||(s==null?void 0:s.theme)||this.cachedTheme||{},c=(h.panelBg||"").trim(),l=typeof h.panelOpacity=="number"?ee(h.panelOpacity):1,p=c?le(c,l):null,m=p?`style="--panel-bg:${p};"`:"",d=(this.getBrandOverride()||(s==null?void 0:s.brand)||this.cachedBrand||"").trim(),u=N(h.headerBg,{bg:"#111827",text:"#ffffff"}),I=N(h.bubbleUser,{bg:"#2563eb",text:"#ffffff"}),A=N(h.bubbleBot,{bg:"#f3f4f6",text:"#111827"}),v=N(h.sendBg,{bg:"#2563eb",text:"#ffffff"}),w=this.getHideHeader(),_=(X=this.getShowBrandingOverride())!=null?X:!!(s!=null&&s.show_branding),S=!!(s!=null&&s.show_header_icon),C=(h.headerLogoUrl||"").trim(),y=S&&C.length>0,T=y?ce(C):"",k=e!=="floating"?!0:this.state.open,H=k,U=H&&!this.lastRenderOpen;this.lastRenderOpen=H;let te=this.getFloatingMode(),V=e==="floating"?`wrap floating ${te}${H?" open":""}`:e==="hero"?"wrap hero":"wrap inline",G=e==="hero"?"panel hero":e==="inline"?"panel inline":"panel",Y=U?`${G} animate-in`:G,se=w?`${Y} no-header`:Y,q=this.state.msgs,ne=q.length===0?`<div class="row bot" id="msg-0">
+        `;return}let s=this.state.session,n=this.getLocaleOverride(),a=n||this.state.locale;if(!n&&(s!=null&&s.locale_auto)){let f=this.detectWebsiteLocale(),g=Q(s==null?void 0:s.enabled_locales,(s==null?void 0:s.locale)||a);f&&g.includes(f)&&f!==a&&(a=f,this.state.locale=f)}let i=P[a],h=this.getThemeOverride()||(s==null?void 0:s.theme)||this.cachedTheme||{},c=(h.panelBg||"").trim(),l=typeof h.panelOpacity=="number"?ee(h.panelOpacity):1,p=c?le(c,l):null,m=p?`style="--panel-bg:${p};"`:"",d=(this.getBrandOverride()||(s==null?void 0:s.brand)||this.cachedBrand||"").trim(),u=N(h.headerBg,{bg:"#111827",text:"#ffffff"}),I=N(h.bubbleUser,{bg:"#2563eb",text:"#ffffff"}),A=N(h.bubbleBot,{bg:"#f3f4f6",text:"#111827"}),v=N(h.sendBg,{bg:"#2563eb",text:"#ffffff"}),w=this.getHideHeader(),_=(X=this.getShowBrandingOverride())!=null?X:!!(s!=null&&s.show_branding),S=!!(s!=null&&s.show_header_icon),C=(h.headerLogoUrl||"").trim(),y=S&&C.length>0,T=y?ce(C):"",k=e!=="floating"?!0:this.state.open,H=k,U=H&&!this.lastRenderOpen;this.lastRenderOpen=H;let te=this.getFloatingMode(),V=e==="floating"?`wrap floating ${te}${H?" open":""}`:e==="hero"?"wrap hero":"wrap inline",G=e==="hero"?"panel hero":e==="inline"?"panel inline":"panel",J=U?`${G} animate-in`:G,se=w?`${J} no-header`:J,q=this.state.msgs,ne=q.length===0?`<div class="row bot" id="msg-0">
             <div class="bubble bot anim" style="--bg:${A.bg};--fg:${A.text};background:var(--bg);color:var(--fg);">
               ${i.welcome}
             </div>
@@ -390,8 +386,8 @@
       <div class="${V}">
       <div class="${se}" ${m}>
           ${w?"":`<div class="header ${y?"has-logo":""}" style="background:${u.bg};color:${u.text};">
-            ${y?`<img class="header-icon" src="${T}" alt="" onerror="this.style.display='none'" />`:""}
             <div class="header-main">
+              ${y?`<img class="header-icon" src="${T}" alt="" onerror="this.style.display='none'" />`:""}
               <span class="header-title">${i.title(d)}</span>
             </div>
             ${e==="floating"?`<button class="close" aria-label="Close" style="color:${u.text};">\xD7</button>`:""}

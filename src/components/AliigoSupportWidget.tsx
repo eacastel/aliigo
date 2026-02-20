@@ -14,6 +14,7 @@ type SupportCfg = {
   token: string;
   brand: string;
   theme: WidgetTheme | null;
+  showHeaderIcon: boolean;
 };
 
 function isWidgetTheme(x: unknown): x is WidgetTheme {
@@ -35,6 +36,7 @@ function isWidgetTheme(x: unknown): x is WidgetTheme {
 
 export function AliigoSupportWidget() {
   const [cfg, setCfg] = useState<SupportCfg | null>(null);
+  const [apiBase, setApiBase] = useState<string>("");
   const pathname = usePathname();
   const locale = pathLocale(pathname);
 
@@ -54,8 +56,9 @@ export function AliigoSupportWidget() {
 
         const brand = typeof o.brand === "string" && o.brand.trim() ? o.brand.trim() : "Aliigo";
         const theme = isWidgetTheme(o.theme) ? o.theme : null;
+        const showHeaderIcon = Boolean(o.show_header_icon);
 
-        if (!cancelled) setCfg({ token, brand, theme });
+        if (!cancelled) setCfg({ token, brand, theme, showHeaderIcon });
       } catch {
         // noop
       }
@@ -66,7 +69,13 @@ export function AliigoSupportWidget() {
     };
   }, []);
 
-  if (!cfg?.token) return null;
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setApiBase(window.location.origin);
+    }
+  }, []);
+
+  if (!cfg?.token || !apiBase) return null;
 
   return (
     <AliigoWidgetElement
@@ -75,10 +84,12 @@ export function AliigoSupportWidget() {
       noTeleport
       variant="floating"
       floatingMode="fixed"
+      apiBase={apiBase}
       locale={locale}
       brand={cfg.brand}
       sessionToken={cfg.token}
       theme={cfg.theme ?? undefined}
+      showHeaderIcon={cfg.showHeaderIcon}
     />
   );
 }

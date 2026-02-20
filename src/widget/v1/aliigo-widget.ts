@@ -858,24 +858,20 @@ class AliigoWidget extends HTMLElement {
         font-size: 16px;
         letter-spacing: -0.01em;
       }
-      .header.has-logo .header-main {
-        padding-left: 52px;
-      }
       .header-main {
+        flex: 1;
         min-width: 0;
         display: inline-flex;
         align-items: center;
+        gap: 10px;
       }
       .header-icon {
-        width: 40px;
-        height: 40px;
+        width: 34px;
+        height: 34px;
         border-radius: 4px;
         object-fit: contain;
         display: block;
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
+        flex: 0 0 auto;
         pointer-events: none;
       }
       .header-title {
@@ -1329,8 +1325,8 @@ class AliigoWidget extends HTMLElement {
             hideHeader
               ? ""
               : `<div class="header ${shouldShowHeaderLogo ? "has-logo" : ""}" style="background:${header.bg};color:${header.text};">
-            ${shouldShowHeaderLogo ? `<img class="header-icon" src="${safeHeaderLogoUrl}" alt="" onerror="this.style.display='none'" />` : ``}
             <div class="header-main">
+              ${shouldShowHeaderLogo ? `<img class="header-icon" src="${safeHeaderLogoUrl}" alt="" onerror="this.style.display='none'" />` : ``}
               <span class="header-title">${t.title(brand)}</span>
             </div>
             ${variant === "floating" ? `<button class="close" aria-label="Close" style="color:${header.text};">×</button>` : ``}

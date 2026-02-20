@@ -28,6 +28,7 @@ export function AliigoWidgetElement({
   embedKey,
   dataOwner,
   noTeleport,
+  showHeaderIcon,
 }: {
   sessionToken?: string | null;
   locale: "en" | "es";
@@ -41,6 +42,7 @@ export function AliigoWidgetElement({
   embedKey?: string; // optional for real installs
   dataOwner?: string; // optional scoping for cleanup
   noTeleport?: boolean;
+  showHeaderIcon?: boolean;
 }) {
   const elRef = useRef<HTMLElement | null>(null);
 
@@ -114,6 +116,7 @@ export function AliigoWidgetElement({
       theme={themeAttr}
       start-open={startOpen ? "true" : undefined}
       hide-header={hideHeader ? "true" : undefined}
+      show-header-icon={showHeaderIcon ? "true" : undefined}
     />
   );
 }

@@ -122,6 +122,14 @@ export default async function PricingPage() {
       type: "text",
     },
     {
+      feature: isEs ? "Integración con WhatsApp" : "WhatsApp integration",
+      basic: isEs ? "No incluido" : "None",
+      growth: isEs ? "Complemento" : "Add-on",
+      pro: isEs ? "Complemento" : "Add-on",
+      custom: isEs ? "Incluido" : "Included",
+      type: "text",
+    },
+    {
       feature: isEs ? "Identidad: logo de cabecera" : "Identity: header logo upload",
       basic: isEs ? "No incluido" : "Not included",
       growth: isEs ? "Incluido" : "Included",

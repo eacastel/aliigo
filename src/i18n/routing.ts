@@ -78,6 +78,10 @@ export const routing = defineRouting({
       en: '/dashboard/settings/assistant',
       es: '/dashboard/settings/assistant'
     },
+    '/dashboard/settings/assistant/support': {
+      en: '/dashboard/settings/assistant/support',
+      es: '/dashboard/settings/assistant/support'
+    },
     '/legal/aviso-legal': {
       en: '/legal/legal-notice',
       es: '/legal/aviso-legal'

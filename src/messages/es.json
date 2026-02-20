@@ -331,7 +331,7 @@
       "quickLinks": {
         "title": "Accesos rápidos",
         "widget": "Configuración del widget",
-        "assistant": "Configuración del asistente",
+        "assistant": "Configuración de inteligencia",
         "messages": "Mensajes",
         "billing": "Facturación"
       },
@@ -373,7 +373,7 @@
         "desc": "Haz que el asistente suene como tu marca y responda con precisión.",
         "bullets": [
           "Actualiza tu conocimiento: servicios, políticas, horarios y FAQ.",
-          "Define tono e instrucciones en Ajustes del asistente.",
+          "Define tono e instrucciones en Configuración de inteligencia.",
           "Elige el idioma por defecto y prueba con preguntas reales.",
           "Activa la captura de leads y notificaciones si quieres seguimiento."
         ],
@@ -516,6 +516,7 @@
     "tabs": {
       "assistant": "Configuración del asistente",
       "indexed": "Contenido indexado",
+      "supportPanel": "Panel de soporte",
       "prev": "Anterior",
       "next": "Siguiente",
       "page": "Página"
@@ -637,6 +638,31 @@
     "qualification": {
       "label": "Calificación (fit + captación)",
       "help": "Guía cómo el asistente califica y cuándo recoge datos."
+    },
+    "supportPanel": {
+      "title": "Panel de soporte",
+      "desc": "Activa el enrutado por contexto orientado a soporte y define reglas de override por sesión iniciada, URI e intención.",
+      "enabled": "Activar contexto del panel de soporte",
+      "defaultMode": "Modo de contexto predeterminado",
+      "modes": {
+        "support": "Soporte",
+        "sales": "Ventas",
+        "catalog": "Catálogo"
+      },
+      "overrides": {
+        "title": "Overrides",
+        "signedIn": "Override por sesión iniciada",
+        "uri": "Override por URI",
+        "intent": "Override por intención",
+        "uriPlaceholder": "/ayuda\n/faq\n/dashboard",
+        "intentPlaceholder": "onboarding\nconfigurar widget\nnecesito soporte",
+        "intentConfirm": "Hacer una pregunta de confirmación antes de aplicar el override por intención"
+      },
+      "knowledge": {
+        "concepts": "Conceptos y definiciones",
+        "procedures": "Procedimientos y pasos",
+        "rules": "Reglas de soporte y límites de escalado"
+      }
     },
     "additionalInstructions": {
       "label": "Instrucciones adicionales (opcional)",
@@ -933,7 +959,8 @@
           "f1": "500 conversaciones / mes",
           "f2": "1 dominio",
           "f3": "Captura de leads más completa",
-          "f4": "Soporte por email + chat"
+          "f4": "Soporte por email + chat",
+          "f5": "Integración de WhatsApp como complemento"
         }
       },
       "pro": {
@@ -945,7 +972,8 @@
           "f1": "2.000 conversaciones / mes",
           "f2": "3 dominios",
           "f3": "Soporte prioritario",
-          "f4": "Controles avanzados del asistente"
+          "f4": "Controles avanzados del asistente",
+          "f5": "Integración de WhatsApp como complemento"
         }
       },
       "custom": {
@@ -957,7 +985,8 @@
           "f1": "10k+ conversaciones / mes",
           "f2": "Dominios ilimitados",
           "f3": "Flujos e integraciones a medida",
-          "f4": "Soporte dedicado"
+          "f4": "Soporte dedicado",
+          "f5": "Canal de WhatsApp incluido"
         }
       }
     },

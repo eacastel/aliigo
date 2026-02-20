@@ -330,7 +330,7 @@
       "quickLinks": {
         "title": "Quick links",
         "widget": "Widget settings",
-        "assistant": "Assistant settings",
+        "assistant": "Knowledge settings",
         "messages": "Messages",
         "billing": "Billing"
       },
@@ -372,7 +372,7 @@
         "desc": "Make the assistant sound like your brand and answer accurately.",
         "bullets": [
           "Update your business knowledge: services, policies, hours, and FAQs.",
-          "Set tone and instructions in Assistant settings.",
+          "Set tone and instructions in Knowledge settings.",
           "Choose a default language and test with real questions.",
           "Enable lead capture and notifications if you want follow‑ups."
         ],
@@ -515,6 +515,7 @@
     "tabs": {
       "assistant": "Assistant setup",
       "indexed": "Indexed content",
+      "supportPanel": "Support panel",
       "prev": "Previous",
       "next": "Next",
       "page": "Page"
@@ -636,6 +637,31 @@
     "qualification": {
       "label": "Qualification (fit + lead capture)",
       "help": "This guides how the assistant qualifies and when it should collect contact info."
+    },
+    "supportPanel": {
+      "title": "Support panel",
+      "desc": "Enable support-first context routing and define override rules for signed-in state, URI, and intent.",
+      "enabled": "Enable support panel context",
+      "defaultMode": "Default context mode",
+      "modes": {
+        "support": "Support",
+        "sales": "Sales",
+        "catalog": "Catalog"
+      },
+      "overrides": {
+        "title": "Overrides",
+        "signedIn": "Signed-in override",
+        "uri": "URI override",
+        "intent": "Intent override",
+        "uriPlaceholder": "/help\n/faq\n/dashboard",
+        "intentPlaceholder": "onboarding\nsetup widget\nneed support",
+        "intentConfirm": "Ask one confirmation question before applying intent override"
+      },
+      "knowledge": {
+        "concepts": "Concepts and definitions",
+        "procedures": "Procedures and steps",
+        "rules": "Support rules and escalation limits"
+      }
     },
     "additionalInstructions": {
       "label": "Additional instructions (optional)",
@@ -932,7 +958,8 @@
           "f1": "500 conversations / month",
           "f2": "1 domain",
           "f3": "Richer lead capture fields",
-          "f4": "Email + chat support"
+          "f4": "Email + chat support",
+          "f5": "WhatsApp integration add-on"
         }
       },
       "pro": {
@@ -944,7 +971,8 @@
           "f1": "2,000 conversations / month",
           "f2": "3 domains",
           "f3": "Priority support",
-          "f4": "Advanced assistant controls"
+          "f4": "Advanced assistant controls",
+          "f5": "WhatsApp integration add-on"
         }
       },
       "custom": {
@@ -956,7 +984,8 @@
           "f1": "10k+ conversations / month",
           "f2": "Unlimited domains",
           "f3": "Custom workflows and integrations",
-          "f4": "Dedicated support"
+          "f4": "Dedicated support",
+          "f5": "WhatsApp channel setup included"
         }
       }
     },

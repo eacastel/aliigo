@@ -167,6 +167,10 @@ export function PricingCards({
                 <CheckCircle2 className="w-5 h-5 text-[#84c9ad] shrink-0" />
                 {t("pricing.growth.features.f4")}
               </li>
+              <li className="flex gap-3">
+                <CheckCircle2 className="w-5 h-5 text-[#84c9ad] shrink-0" />
+                {t("pricing.growth.features.f5")}
+              </li>
             </ul>
           </div>
         </div>
@@ -217,6 +221,10 @@ export function PricingCards({
               <li className="flex gap-3">
                 <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
                 {t("pricing.pro.features.f4")}
+              </li>
+              <li className="flex gap-3">
+                <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
+                {t("pricing.pro.features.f5")}
               </li>
             </ul>
           </div>
@@ -271,6 +279,10 @@ export function PricingCards({
               <li className="flex gap-3">
                 <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
                 {t("pricing.custom.features.f4")}
+              </li>
+              <li className="flex gap-3">
+                <CheckCircle2 className="w-5 h-5 text-zinc-600 shrink-0" />
+                {t("pricing.custom.features.f5")}
               </li>
             </ul>
           </div>

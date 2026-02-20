@@ -13,6 +13,8 @@ It ships with EN/ES content and is intended for authenticated users only.
 1) Getting Started  
 2) Install the Widget  
 3) Customize the Assistant  
+4) Knowledge Onboarding (smart draft + website indexing)  
+5) Support Panel (context overrides + support knowledge blocks)  
 5) Billing & Plans
 6) Partners & Affiliates
 
@@ -30,3 +32,7 @@ to match each section.
   - `/dashboard/widget/advanced`
   - This keeps the main widget page focused on install + theme settings.
 - The dashboard sidebar includes an `Advanced` link (above `Help`) that points to `/dashboard/widget/advanced`.
+- Knowledge settings now include:
+  - `Assistant setup` tab
+  - `Indexed content` tab
+  - `Support panel` opens a dedicated page at `/dashboard/settings/assistant/support`

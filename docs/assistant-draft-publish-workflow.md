@@ -105,3 +105,34 @@ Indexed content tab includes:
 
 Backed by:
 - `GET /api/knowledge/index-summary`
+
+## Support panel split (implemented)
+
+Support context configuration was moved to a dedicated page:
+
+- `/dashboard/settings/assistant/support`
+
+Main assistant page (`/dashboard/settings/assistant`) keeps:
+- `Assistant setup`
+- `Indexed content`
+- top link to `Support panel`
+
+Support panel stores config in:
+- `businesses.assistant_settings.supportPanel`
+
+Current shape:
+- `enabled`
+- `defaultMode` (`support|sales|catalog`)
+- `overrides.signedIn`
+- `overrides.uri` (`patterns[]`)
+- `overrides.intent` (`terms[]`, `requireConfirmation`)
+- `knowledge.concepts`
+- `knowledge.procedures`
+- `knowledge.rules`
+
+## Runtime behavior alignment (implemented)
+
+- Conversation API reads `assistant_settings.supportPanel` and resolves active context per turn.
+- Support pill widget now uses same-origin API base in local dev to avoid environment drift (`window.location.origin`).
+- Floating support pill now receives/sends header-logo metadata (`show_header_icon` + signed `theme.headerLogoUrl`) so it matches preview behavior.
+- Widget header logo alignment was normalized by rendering logo inside the header flex row (instead of absolute positioning).

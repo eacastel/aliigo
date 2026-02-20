@@ -3,9 +3,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
+import { Link } from "@/i18n/routing";
 
 /* ---------- Types ---------- */
 type AssistantState = {
@@ -18,6 +19,7 @@ type PresetTone = "friendly" | "professional" | "concise";
 type PresetGoal = "support" | "leads" | "bookings" | "mixed";
 type PresetHandoff = "rare" | "balanced" | "proactive";
 type PresetCta = "soft" | "direct";
+type AssistantContextMode = "sales" | "support" | "catalog";
 
 type AssistantForm = {
   tone: PresetTone;
@@ -37,7 +39,24 @@ type AssistantForm = {
   ctaUrls: string;
   additionalBusinessInfo: string;
   qualificationPrompt: string;
+  supportPanelEnabled: boolean;
+  supportDefaultMode: AssistantContextMode;
+  overrideSignedInEnabled: boolean;
+  overrideSignedInMode: AssistantContextMode;
+  overrideUriEnabled: boolean;
+  overrideUriMode: AssistantContextMode;
+  overrideUriPatterns: string;
+  overrideIntentEnabled: boolean;
+  overrideIntentMode: AssistantContextMode;
+  overrideIntentTerms: string;
+  overrideIntentConfirm: boolean;
+  supportConcepts: string;
+  supportProcedures: string;
+  supportRules: string;
 };
+type TextAssistantField = {
+  [K in keyof AssistantForm]: AssistantForm[K] extends string ? K : never;
+}[keyof AssistantForm];
 
 type JoinedBusiness = {
   id?: string | null;
@@ -82,6 +101,32 @@ type AssistantSettings = {
     ctaUrls?: string;
     supportEmail?: string;
     additionalBusinessInfo?: string;
+  };
+  supportPanel?: {
+    enabled?: boolean;
+    defaultMode?: AssistantContextMode;
+    overrides?: {
+      signedIn?: {
+        enabled?: boolean;
+        mode?: AssistantContextMode;
+      };
+      uri?: {
+        enabled?: boolean;
+        mode?: AssistantContextMode;
+        patterns?: string[];
+      };
+      intent?: {
+        enabled?: boolean;
+        mode?: AssistantContextMode;
+        terms?: string[];
+        requireConfirmation?: boolean;
+      };
+    };
+    knowledge?: {
+      concepts?: string;
+      procedures?: string;
+      rules?: string;
+    };
   };
 };
 
@@ -173,6 +218,11 @@ const sanitizeForm = (form: AssistantForm): AssistantForm => ({
   ctaUrls: sanitizeMarkdown(form.ctaUrls),
   additionalBusinessInfo: sanitizeMarkdown(form.additionalBusinessInfo),
   qualificationPrompt: sanitizeMarkdown(form.qualificationPrompt),
+  overrideUriPatterns: sanitizeMarkdown(form.overrideUriPatterns),
+  overrideIntentTerms: sanitizeMarkdown(form.overrideIntentTerms),
+  supportConcepts: sanitizeMarkdown(form.supportConcepts),
+  supportProcedures: sanitizeMarkdown(form.supportProcedures),
+  supportRules: sanitizeMarkdown(form.supportRules),
 });
 
 const toAssistantSettings = (form: AssistantForm): AssistantSettings => ({
@@ -195,6 +245,38 @@ const toAssistantSettings = (form: AssistantForm): AssistantSettings => ({
     ctaUrls: form.ctaUrls,
     supportEmail: form.supportEmail,
     additionalBusinessInfo: form.additionalBusinessInfo,
+  },
+  supportPanel: {
+    enabled: form.supportPanelEnabled,
+    defaultMode: form.supportDefaultMode,
+    overrides: {
+      signedIn: {
+        enabled: form.overrideSignedInEnabled,
+        mode: form.overrideSignedInMode,
+      },
+      uri: {
+        enabled: form.overrideUriEnabled,
+        mode: form.overrideUriMode,
+        patterns: form.overrideUriPatterns
+          .split("\n")
+          .map((v) => v.trim())
+          .filter(Boolean),
+      },
+      intent: {
+        enabled: form.overrideIntentEnabled,
+        mode: form.overrideIntentMode,
+        terms: form.overrideIntentTerms
+          .split("\n")
+          .map((v) => v.trim())
+          .filter(Boolean),
+        requireConfirmation: form.overrideIntentConfirm,
+      },
+    },
+    knowledge: {
+      concepts: form.supportConcepts,
+      procedures: form.supportProcedures,
+      rules: form.supportRules,
+    },
   },
 });
 
@@ -343,12 +425,26 @@ function hasAdvancedContent(form: AssistantForm) {
     form.additionalInstructions.trim().length > 0 ||
     form.qualificationPrompt.trim().length > 0 ||
     form.links.trim().length > 0 ||
-    form.additionalBusinessInfo.trim().length > 0
+    form.additionalBusinessInfo.trim().length > 0 ||
+    form.supportPanelEnabled ||
+    form.overrideSignedInEnabled ||
+    form.overrideUriEnabled ||
+    form.overrideIntentEnabled ||
+    form.supportConcepts.trim().length > 0 ||
+    form.supportProcedures.trim().length > 0 ||
+    form.supportRules.trim().length > 0
   );
 }
 
+type RequiredAssistantField =
+  | "businessSummary"
+  | "businessDetails"
+  | "keyFacts"
+  | "ctaUrls"
+  | "supportEmail";
+
 const REQUIRED_FIELDS: Array<{
-  key: keyof AssistantForm;
+  key: RequiredAssistantField;
   labelKey:
     | "businessSummary.label"
     | "businessDetails.label"
@@ -365,6 +461,7 @@ const REQUIRED_FIELDS: Array<{
 
 export default function SettingsAssistantPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations("AssistantSettings");
 
   const [loading, setLoading] = useState(true);
@@ -396,6 +493,20 @@ export default function SettingsAssistantPage() {
     ctaUrls: "",
     additionalBusinessInfo: "",
     qualificationPrompt: "",
+    supportPanelEnabled: false,
+    supportDefaultMode: "support",
+    overrideSignedInEnabled: false,
+    overrideSignedInMode: "support",
+    overrideUriEnabled: false,
+    overrideUriMode: "support",
+    overrideUriPatterns: "",
+    overrideIntentEnabled: false,
+    overrideIntentMode: "support",
+    overrideIntentTerms: "",
+    overrideIntentConfirm: true,
+    supportConcepts: "",
+    supportProcedures: "",
+    supportRules: "",
   });
   const [ackAuthorized, setAckAuthorized] = useState(false);
   const [settingsEnvelope, setSettingsEnvelope] =
@@ -410,6 +521,9 @@ export default function SettingsAssistantPage() {
   const [indexSummary, setIndexSummary] = useState<IndexSummary | null>(null);
   const [indexSummaryLoading, setIndexSummaryLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"assistant" | "indexed">("assistant");
+  const [supportPanelTab, setSupportPanelTab] = useState<"concepts" | "procedures" | "rules">(
+    "concepts",
+  );
   const [indexPage, setIndexPage] = useState(1);
   const indexLimit = 20;
 
@@ -423,6 +537,7 @@ export default function SettingsAssistantPage() {
   const isBasicPlan = billingPlan === "basic";
   const canUseAdvancedSetup = !isBasicPlan;
   const canUseWebsiteIndexing = !isBasicPlan;
+  const contextModes: AssistantContextMode[] = ["support", "sales", "catalog"];
 
   // --- UI parity buttons ---
   const btnBase =
@@ -431,6 +546,10 @@ export default function SettingsAssistantPage() {
   const btnBrand = `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
 
   const btnNeutral = `${btnBase} bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40`;
+  const folderTabBase =
+    "rounded-t-lg border border-b-0 px-3 py-1.5 text-xs font-medium transition-colors";
+  const folderTabActive = `${folderTabBase} border-zinc-700 bg-zinc-900 text-zinc-100`;
+  const folderTabIdle = `${folderTabBase} border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:bg-zinc-900/70`;
 
   const formatDateTime = (value?: string | null) => {
     if (!value) return "—";
@@ -550,6 +669,7 @@ export default function SettingsAssistantPage() {
         const draftForm = settings?.draft?.form ?? null;
         const systemFromSettings = settings?.system ?? {};
         const knowledgeFromSettings = settings?.knowledge ?? {};
+        const supportPanelFromSettings = settings?.supportPanel ?? {};
 
         setAssistant(next);
         const nextFormBase: AssistantForm = {
@@ -577,6 +697,21 @@ export default function SettingsAssistantPage() {
             knowledgeFromSettings.additionalBusinessInfo ??
             parsedKnowledge.additionalBusinessInfo,
           qualificationPrompt: next.qualification_prompt,
+          supportPanelEnabled: supportPanelFromSettings.enabled ?? false,
+          supportDefaultMode: supportPanelFromSettings.defaultMode ?? "support",
+          overrideSignedInEnabled: supportPanelFromSettings.overrides?.signedIn?.enabled ?? false,
+          overrideSignedInMode: supportPanelFromSettings.overrides?.signedIn?.mode ?? "support",
+          overrideUriEnabled: supportPanelFromSettings.overrides?.uri?.enabled ?? false,
+          overrideUriMode: supportPanelFromSettings.overrides?.uri?.mode ?? "support",
+          overrideUriPatterns: (supportPanelFromSettings.overrides?.uri?.patterns ?? []).join("\n"),
+          overrideIntentEnabled: supportPanelFromSettings.overrides?.intent?.enabled ?? false,
+          overrideIntentMode: supportPanelFromSettings.overrides?.intent?.mode ?? "support",
+          overrideIntentTerms: (supportPanelFromSettings.overrides?.intent?.terms ?? []).join("\n"),
+          overrideIntentConfirm:
+            supportPanelFromSettings.overrides?.intent?.requireConfirmation ?? true,
+          supportConcepts: supportPanelFromSettings.knowledge?.concepts ?? "",
+          supportProcedures: supportPanelFromSettings.knowledge?.procedures ?? "",
+          supportRules: supportPanelFromSettings.knowledge?.rules ?? "",
         };
         const nextForm: AssistantForm = {
           ...nextFormBase,
@@ -624,6 +759,20 @@ export default function SettingsAssistantPage() {
           ctaUrls: "",
           additionalBusinessInfo: "",
           qualificationPrompt: "",
+          supportPanelEnabled: false,
+          supportDefaultMode: "support",
+          overrideSignedInEnabled: false,
+          overrideSignedInMode: "support",
+          overrideUriEnabled: false,
+          overrideUriMode: "support",
+          overrideUriPatterns: "",
+          overrideIntentEnabled: false,
+          overrideIntentMode: "support",
+          overrideIntentTerms: "",
+          overrideIntentConfirm: true,
+          supportConcepts: "",
+          supportProcedures: "",
+          supportRules: "",
         });
         publishedFormRef.current = null;
         initialAssistant.current = empty;
@@ -655,6 +804,17 @@ export default function SettingsAssistantPage() {
     }
   }, [canUseWebsiteIndexing, activeTab]);
 
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "indexed" && canUseWebsiteIndexing) {
+      setActiveTab("indexed");
+      return;
+    }
+    if (tab === "assistant") {
+      setActiveTab("assistant");
+    }
+  }, [canUseWebsiteIndexing, searchParams]);
+
   const dirty = useMemo(() => {
     const ia = initialAssistant.current;
     if (!ia) return false;
@@ -683,7 +843,7 @@ export default function SettingsAssistantPage() {
     return status;
   }, [form]);
 
-  const mergedFieldStatus = (key: keyof AssistantForm): "suggested" | "needs_review" | "missing" => {
+  const mergedFieldStatus = (key: TextAssistantField): "suggested" | "needs_review" | "missing" => {
     const fromDraft = settingsEnvelope?.draft?.fieldStatuses?.[key];
     if (fromDraft === "suggested" || fromDraft === "needs_review" || fromDraft === "missing") {
       if (form[key].trim().length === 0) return "missing";
@@ -692,7 +852,7 @@ export default function SettingsAssistantPage() {
     return fieldStatuses[key] ?? "needs_review";
   };
 
-  const statusBadge = (key: keyof AssistantForm) => {
+  const statusBadge = (key: TextAssistantField) => {
     const status = mergedFieldStatus(key);
     const cls =
       status === "suggested"
@@ -707,11 +867,11 @@ export default function SettingsAssistantPage() {
     );
   };
 
-  const clearField = (key: keyof AssistantForm) => {
+  const clearField = (key: TextAssistantField) => {
     setForm((prev) => ({ ...prev, [key]: "" }));
   };
 
-  const revertField = (key: keyof AssistantForm) => {
+  const revertField = (key: TextAssistantField) => {
     const published = publishedFormRef.current;
     setForm((prev) => ({
       ...prev,
@@ -719,7 +879,7 @@ export default function SettingsAssistantPage() {
     }));
   };
 
-  const fieldActions = (key: keyof AssistantForm) => (
+  const fieldActions = (key: TextAssistantField) => (
     mergedFieldStatus(key) === "suggested" ? (
       <div className="mt-1 flex items-center gap-2">
         <button
@@ -854,22 +1014,23 @@ export default function SettingsAssistantPage() {
 
       setForm((prev) => {
         const next = mode === "replace" ? { ...prev } : { ...prev };
-        const writable = next as Record<string, string>;
+      const writable = next as Record<string, unknown>;
+      if (mode === "replace") {
+        for (const key of Object.keys(j.draftForm ?? {})) {
+            if (typeof writable[key] === "string") writable[key] = "";
+        }
+      }
+      for (const [key, val] of Object.entries(j.draftForm ?? {})) {
+        if (typeof val !== "string") continue;
+        if (!val.trim()) continue;
+        if (typeof writable[key] !== "string") continue;
         if (mode === "replace") {
-          for (const key of Object.keys(j.draftForm ?? {})) {
-            writable[key] = "";
-          }
+          writable[key] = val;
+          continue;
         }
-        for (const [key, val] of Object.entries(j.draftForm ?? {})) {
-          if (typeof val !== "string") continue;
-          if (!val.trim()) continue;
-          if (mode === "replace") {
-            writable[key] = val;
-            continue;
-          }
-          if (!(writable[key] ?? "").trim()) writable[key] = val;
-        }
-        return next;
+          if (!(String(writable[key] ?? "").trim())) writable[key] = val;
+      }
+      return next;
       });
 
       const suggestedKeys = new Set(Object.entries(j.fieldStatuses ?? {})
@@ -1202,6 +1363,9 @@ export default function SettingsAssistantPage() {
             {t("tabs.indexed")}
           </button>
         ) : null}
+        <Link href="/dashboard/settings/assistant/support" className={btnNeutral}>
+          {t("tabs.supportPanel")}
+        </Link>
       </div>
 
       <div className={activeTab === "assistant" ? "" : "hidden"}>
