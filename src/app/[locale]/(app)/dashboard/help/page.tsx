@@ -101,6 +101,28 @@ export default function DashboardHelpPage() {
           <ScreenshotPlaceholder label={t("customize.screenshot")} />
         </Section>
 
+        <Section title={t("knowledge.title")}>
+          <p className="text-zinc-400">{t("knowledge.desc")}</p>
+          <ol className="mt-3 list-decimal pl-5 space-y-2 text-zinc-200">
+            <li>{t("knowledge.steps.0")}</li>
+            <li>{t("knowledge.steps.1")}</li>
+            <li>{t("knowledge.steps.2")}</li>
+            <li>{t("knowledge.steps.3")}</li>
+            <li>{t("knowledge.steps.4")}</li>
+            <li>{t("knowledge.steps.5")}</li>
+          </ol>
+          <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
+            <div className="text-xs font-semibold text-zinc-400 uppercase">{t("knowledge.bestPracticesTitle")}</div>
+            <ul className="mt-2 list-disc pl-5 space-y-1 text-zinc-300">
+              <li>{t("knowledge.bestPractices.0")}</li>
+              <li>{t("knowledge.bestPractices.1")}</li>
+              <li>{t("knowledge.bestPractices.2")}</li>
+              <li>{t("knowledge.bestPractices.3")}</li>
+            </ul>
+          </div>
+          <ScreenshotPlaceholder label={t("knowledge.screenshot")} />
+        </Section>
+
         <Section title={t("billing.title")}>
           <p className="text-zinc-400">{t("billing.desc")}</p>
           <ul className="mt-3 list-disc pl-5 space-y-2 text-zinc-200">

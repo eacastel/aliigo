@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import PublicTrackingEvents from "@/components/PublicTrackingEvents";
 import PublicHeaderNav from "@/components/PublicHeaderNav";
+import { HomeFloatingWidgetGate } from "@/components/home/FloatingWidgetGate";
 
 export default async function PublicLayout({
   children,
@@ -108,6 +109,8 @@ export default async function PublicLayout({
           </div>
         </div>
       </footer>
+
+      <HomeFloatingWidgetGate />
     </div>
   );
 }

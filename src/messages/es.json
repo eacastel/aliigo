@@ -327,7 +327,7 @@
   "Dashboard": {
     "help": {
       "title": "Centro de ayuda",
-      "subtitle": "Guías rápidas para configurar Aliigo y lanzar tu asistente.",
+      "subtitle": "Onboarding paso a paso para publicar rápido y mantener respuestas precisas con el tiempo.",
       "quickLinks": {
         "title": "Accesos rápidos",
         "widget": "Configuración del widget",
@@ -337,7 +337,7 @@
       },
       "tip": {
         "title": "Consejo",
-        "body": "Empieza por Widget y Asistente, y prueba un chat real para validar la captura de contactos y notificaciones."
+        "body": "Sigue este orden: perfil del negocio → instalación del widget → onboarding de inteligencia → prueba de conversaciones reales."
       },
       "gettingStarted": {
         "title": "1. Primeros pasos",
@@ -378,6 +378,26 @@
           "Activa la captura de leads y notificaciones si quieres seguimiento."
         ],
         "screenshot": "Marcador de captura: Ajustes del asistente y base de conocimiento."
+      },
+      "knowledge": {
+        "title": "4. Onboarding de inteligencia",
+        "desc": "Usa la asistencia de onboarding para generar un borrador limpio e indexar contenido web para respuestas en vivo.",
+        "steps": [
+          "En Ajustes del asistente, entra en Asistencia de onboarding.",
+          "Pulsa Generar borrador para pre-rellenar los campos clave desde tu web.",
+          "Revisa cada sugerencia y elige Mantener original o Usar sugerencia.",
+          "Ejecuta Indexar web para rastrear páginas permitidas y crear chunks de consulta.",
+          "Usa Añadir página individual para incluir URLs importantes que falten.",
+          "Confirma la autorización y publica para aplicar los cambios en producción."
+        ],
+        "bestPracticesTitle": "Buenas prácticas",
+        "bestPractices": [
+          "Mantén los campos factuales claros, concretos y específicos del negocio.",
+          "Vuelve a indexar cuando hagas cambios importantes en la web.",
+          "Prioriza páginas de servicios, políticas y FAQs frente a páginas genéricas.",
+          "Tras publicar, valida con 5–10 preguntas reales de clientes."
+        ],
+        "screenshot": "Marcador de captura: Asistencia de onboarding y monitor de contenido indexado."
       },
       "billing": {
         "title": "5. Facturación y planes",

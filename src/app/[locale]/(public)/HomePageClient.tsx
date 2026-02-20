@@ -13,7 +13,6 @@ import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { PricingSection } from "@/components/home/PricingSection";
 import { FaqSection } from "@/components/home/FaqSection";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
-import { HomeFloatingWidgetGate } from "@/components/home/FloatingWidgetGate";
 
 type HomePageClientProps = {
   initialCurrency: AliigoCurrency;
@@ -65,7 +64,6 @@ export default function HomePageClient({ initialCurrency }: HomePageClientProps)
       <FounderTrustCard />
       <WorksWithStrip />
       <FinalCtaSection />
-      <HomeFloatingWidgetGate />
     </div>
   );
 }

@@ -326,7 +326,7 @@
   "Dashboard": {
     "help": {
       "title": "Help Center",
-      "subtitle": "Quick guides to set up Aliigo and launch your assistant.",
+      "subtitle": "Step-by-step onboarding to go live fast and keep your assistant accurate over time.",
       "quickLinks": {
         "title": "Quick links",
         "widget": "Widget settings",
@@ -336,7 +336,7 @@
       },
       "tip": {
         "title": "Tip",
-        "body": "Start with Widget and Assistant settings, then test a real chat to confirm lead capture and notifications."
+        "body": "Run onboarding in this order: Business profile → Widget install → Knowledge onboarding → test real conversations."
       },
       "gettingStarted": {
         "title": "1. Getting Started",
@@ -377,6 +377,26 @@
           "Enable lead capture and notifications if you want follow‑ups."
         ],
         "screenshot": "Screenshot placeholder: Assistant settings + knowledge base."
+      },
+      "knowledge": {
+        "title": "4. Knowledge Onboarding",
+        "desc": "Use onboarding assistance to build a clean setup draft and index website content for live answers.",
+        "steps": [
+          "In Assistant settings, go to Onboarding assistance.",
+          "Click Generate setup draft to prefill core fields from your site.",
+          "Review each suggestion and choose Keep original or Use suggestion.",
+          "Run Index website to crawl allowed pages and build chunks for retrieval.",
+          "Use Add single page to include important URLs that were missed.",
+          "Confirm authorization and Publish to make changes live."
+        ],
+        "bestPracticesTitle": "Best practices",
+        "bestPractices": [
+          "Keep factual fields concise and business-specific.",
+          "Re-run indexing after major website updates.",
+          "Prefer policy and service pages over generic marketing pages.",
+          "Test with 5–10 real customer questions after publishing."
+        ],
+        "screenshot": "Screenshot placeholder: Onboarding assistance + indexed content monitor."
       },
       "billing": {
         "title": "5. Billing & Plans",

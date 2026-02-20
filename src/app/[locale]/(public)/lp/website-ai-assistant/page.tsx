@@ -17,7 +17,6 @@ import { FaqSection } from "@/components/home/FaqSection";
 import { FounderTrustCard } from "@/components/home/FounderTrustCard";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { WorksWithStrip } from "@/components/home/WorksWithStrip";
-import { HomeFloatingWidgetGate } from "@/components/home/FloatingWidgetGate";
 import { buildLocalePageMetadata } from "@/lib/localePageMetadata";
 
 export async function generateMetadata({
@@ -134,7 +133,6 @@ export default async function PaidLandingPage({
       </div>
       <FinalCtaSection />
       <WorksWithStrip />
-      <HomeFloatingWidgetGate />
     </div>
   );
 }

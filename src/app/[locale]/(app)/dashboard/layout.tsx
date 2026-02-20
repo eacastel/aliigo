@@ -10,6 +10,7 @@ import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { BillingGateProvider } from "@/components/BillingGateContext";
+import { HomeFloatingWidgetGate } from "@/components/home/FloatingWidgetGate";
 
 const UNVERIFIED_LAST_24H_THRESHOLD = 24;
 
@@ -376,6 +377,8 @@ export default function DashboardLayout({
           </div>
         </div>
       </footer>
+
+      <HomeFloatingWidgetGate />
     </div>
   );
 }
