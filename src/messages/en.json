@@ -641,6 +641,7 @@
     "supportPanel": {
       "title": "Support panel",
       "desc": "Enable support-first context routing and define override rules for signed-in state, URI, and intent.",
+      "saveAction": "Save support panel",
       "enabled": "Enable support panel context",
       "defaultMode": "Default context mode",
       "modes": {

@@ -533,7 +533,7 @@ export default function SupportPanelSettingsPage() {
 
       <div className="flex gap-2">
         <button type="button" onClick={save} disabled={saving} className={btnBrand}>
-          {saving ? t("actions.saving") : t("actions.saveDraft")}
+          {saving ? t("actions.saving") : t("supportPanel.saveAction")}
         </button>
         <Link href="/dashboard/settings/assistant" className={btnNeutral}>
           {t("actions.reset")}

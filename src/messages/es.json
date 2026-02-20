@@ -642,6 +642,7 @@
     "supportPanel": {
       "title": "Panel de soporte",
       "desc": "Activa el enrutado por contexto orientado a soporte y define reglas de override por sesión iniciada, URI e intención.",
+      "saveAction": "Guardar panel de soporte",
       "enabled": "Activar contexto del panel de soporte",
       "defaultMode": "Modo de contexto predeterminado",
       "modes": {
