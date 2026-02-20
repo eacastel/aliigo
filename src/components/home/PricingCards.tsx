@@ -23,7 +23,7 @@ export function PricingCards({
   const isEs = locale.startsWith("es");
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const cardBase =
-    "snap-start flex min-w-[280px] max-w-[320px] flex-col rounded-2xl border bg-zinc-900/20 p-5 sm:p-6 lg:p-8 transition-all";
+    "snap-start flex min-w-[288px] max-w-[300px] sm:min-w-[332px] sm:max-w-[332px] flex-col rounded-2xl border bg-zinc-900/20 p-5 sm:p-6 lg:p-8 transition-all";
 
   const scrollByCards = (dir: "left" | "right") => {
     const el = scrollerRef.current;
@@ -114,7 +114,7 @@ export function PricingCards({
           </div>
         </div>
 
-        <div className="relative z-10 flex min-w-[280px] max-w-[320px] snap-start flex-col rounded-2xl border-2 border-[#84c9ad] bg-zinc-900 p-5 shadow-2xl shadow-[#84c9ad]/10 sm:p-6 lg:p-8">
+        <div className="relative z-10 flex min-w-[288px] max-w-[300px] sm:min-w-[332px] sm:max-w-[332px] snap-start flex-col rounded-2xl border-2 border-[#84c9ad] bg-zinc-900 p-5 shadow-2xl shadow-[#84c9ad]/10 sm:p-6 lg:p-8">
           <div className="absolute right-3 top-3 w-auto">
             <div className="bg-[#84c9ad] text-black text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full shadow-lg">
               {t("pricing.growth.tag")}
