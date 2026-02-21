@@ -424,6 +424,7 @@ export default function WidgetSettingsPage() {
 
       setTheme(merged);
       setInitialTheme(merged);
+      setPreviewShowBranding(Boolean(merged.showBranding));
 
     })();
   }, []);
@@ -861,7 +862,13 @@ export default function WidgetSettingsPage() {
                   type="button"
                   role="switch"
                   aria-checked={theme.showBranding}
-                  onClick={() => setTheme((prev) => ({ ...prev, showBranding: !prev.showBranding }))}
+                  onClick={() =>
+                    setTheme((prev) => {
+                      const next = !prev.showBranding;
+                      setPreviewShowBranding(next);
+                      return { ...prev, showBranding: next };
+                    })
+                  }
                   className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
                     theme.showBranding ? "bg-brand-500/80" : "bg-zinc-700"
                   }`}

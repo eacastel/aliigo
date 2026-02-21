@@ -8,6 +8,8 @@ import {
   domainLimitForPlan,
   effectivePlanForEntitlements,
   isGrowthOrHigher,
+  isTrialActive,
+  normalizePlan,
   type NormalizedPlan,
 } from "@/lib/effectivePlan";
 
@@ -115,6 +117,8 @@ export async function GET(req: NextRequest) {
       billingStatus: bizData.billing_status,
       trialEnd: bizData.trial_end,
     });
+    const rawPlan = normalizePlan(bizData.billing_plan);
+    const trialActive = isTrialActive(bizData.billing_status, bizData.trial_end);
     const planDomainLimit = domainLimitForPlan(effectivePlan);
     const effectiveLimit =
       typeof bizData.domain_limit === "number" && Number.isFinite(bizData.domain_limit) && bizData.domain_limit > 0
@@ -133,10 +137,11 @@ export async function GET(req: NextRequest) {
       bizData.widget_theme && typeof bizData.widget_theme === "object"
         ? { ...(bizData.widget_theme as Record<string, unknown>) }
         : {};
-    const isBasicPlan = effectivePlan === "basic" || effectivePlan === "starter";
+    const forceBasicBranding = (rawPlan === "basic" || rawPlan === "starter") && !trialActive;
+    const defaultShowBranding = rawPlan === "basic" || rawPlan === "starter";
     const showBrandingPref =
       typeof themeObj.showBranding === "boolean" ? themeObj.showBranding : null;
-    const showBranding = isBasicPlan || showBrandingPref === true;
+    const showBranding = forceBasicBranding || (showBrandingPref ?? defaultShowBranding);
     const showHeaderIcon = isGrowthOrHigher(effectivePlan);
     const showWidget =
       typeof themeObj.widgetLive === "boolean" ? themeObj.widgetLive : true;
