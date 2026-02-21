@@ -446,7 +446,7 @@
     "loading": "Loading…",
     "welcome": "Welcome, {name}",
     "welcomeGeneric": "Welcome",
-    "trialDays": "{days} days left in your trial",
+    "trialDays": "Pick a plan. You still have full Pro features for {days} day(s) in your trial.",
     "businessInfo": {
       "defaultName": "Your business",
       "contactLabel": "Contact:",

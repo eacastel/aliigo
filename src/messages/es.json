@@ -447,7 +447,7 @@
     "loading": "Cargando…",
     "welcome": "Bienvenido, {name}",
     "welcomeGeneric": "Bienvenido",
-    "trialDays": "Te quedan {days} días de prueba",
+    "trialDays": "Elige un plan. Aún tienes acceso completo a funciones Pro durante {days} día(s) de tu prueba.",
     "businessInfo": {
       "defaultName": "Tu negocio",
       "contactLabel": "Contacto:",
