@@ -43,6 +43,7 @@ to match each section.
   - `Growth+` badges on gated capabilities (Knowledge and Business settings)
   - `Pro trial` and `Included in trial` badges when trial grants higher-tier access
   - Clearer domain error copy in Knowledge onboarding when a URL is outside allowed domains
+  - Signup default: `showBranding` is enabled so `Powered by Aliigo` is on from first install
 - Loading UX is now standardized with one shared spinner component:
   - `src/components/ui/LoadingState.tsx`
   - Used across Dashboard, Business settings, Widget settings, and Knowledge pages

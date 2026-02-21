@@ -343,8 +343,12 @@ export default function SettingsBusinessPage() {
         if (next.length <= 1) return prev;
         next = next.filter((l) => l !== localeCode);
       } else {
-        if (next.length >= localeLimit) return prev;
-        next.push(localeCode);
+        if (localeLimit === 1) {
+          next = [localeCode];
+        } else {
+          if (next.length >= localeLimit) return prev;
+          next.push(localeCode);
+        }
       }
       if (!next.includes(prev.default_locale)) {
         return {
@@ -354,6 +358,13 @@ export default function SettingsBusinessPage() {
         };
       }
       return { ...prev, enabled_locales: next };
+    });
+  };
+
+  const setDefaultLocale = (localeCode: "en" | "es") => {
+    setBusiness((prev) => {
+      if (!prev.enabled_locales.includes(localeCode)) return prev;
+      return { ...prev, default_locale: localeCode };
     });
   };
 
@@ -598,7 +609,7 @@ export default function SettingsBusinessPage() {
       {isProTrial ? (
         <div className="mb-4 flex flex-wrap items-center gap-2 text-xs" style={{ color: "lab(55% -12.85 3.72)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
+            <EntitlementPill label={t("badges.proPlus")} href="/dashboard/billing" />
             <span>{t("trialHint")}</span>
           </div>
         </div>
@@ -753,78 +764,55 @@ export default function SettingsBusinessPage() {
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                {t("fields.defaultLanguage.label")}
-              </label>
-              <select
-                className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm"
-                value={business.default_locale}
-                onChange={(e) =>
-                  setBusiness((b) => {
-                    const nextDefault = e.target.value === "es" ? "es" : "en";
-                    const nextLocales: ("en" | "es")[] =
-                      localeLimit === 1
-                        ? [nextDefault]
-                        : b.enabled_locales.includes(nextDefault)
-                          ? b.enabled_locales
-                          : [...b.enabled_locales, nextDefault];
-                    return {
-                      ...b,
-                      default_locale: nextDefault,
-                      enabled_locales: nextLocales,
-                    };
-                  })
-                }
-              >
-                {localeOptions.map((opt) => (
-                  <option key={opt.code} value={opt.code}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs text-zinc-400 mb-1">
                 <span className="inline-flex items-center gap-2">
                   {t("languages.label")}
-                  <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
+                  <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
                 </span>
               </label>
               <p className="text-[11px] mt-1" style={{ color: "lab(55% -12.85 3.72)" }}>
                 {t("languages.featureHelp")}
               </p>
-              {localeLimit === 1 ? (
-                <div className="text-sm text-zinc-300">
-                  {localeOptions.find((opt) => opt.code === business.default_locale)?.label ?? "English"}
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {localeOptions.map((opt) => {
-                    const checked = business.enabled_locales.includes(opt.code);
-                    const blockAdd = !checked && business.enabled_locales.length >= localeLimit;
-                    const disabled = (checked && business.enabled_locales.length === 1) || blockAdd;
-                    return (
-                      <label
-                        key={opt.code}
-                        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
-                          checked
-                            ? "border-brand-600/50 bg-brand-500/10 text-brand-100"
-                            : "border-zinc-800 bg-zinc-950 text-zinc-300"
-                        } ${disabled ? "opacity-60" : ""}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleEnabledLocale(opt.code)}
-                          disabled={disabled}
-                          className="accent-emerald-500"
-                        />
-                        {opt.label}
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {localeOptions.map((opt) => {
+                  const checked = business.enabled_locales.includes(opt.code);
+                  const blockAdd =
+                    !checked && localeLimit !== 1 && business.enabled_locales.length >= localeLimit;
+                  const disabled = (checked && business.enabled_locales.length === 1) || blockAdd;
+                  const isDefault = business.default_locale === opt.code;
+                  return (
+                    <div
+                      key={opt.code}
+                      className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+                        checked
+                          ? "border-brand-600/50 bg-brand-500/10 text-brand-100"
+                          : "border-zinc-800 bg-zinc-950 text-zinc-300"
+                      } ${disabled ? "opacity-60" : ""}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleEnabledLocale(opt.code)}
+                        disabled={disabled}
+                        className="accent-emerald-500"
+                      />
+                      <span>{opt.label}</span>
+                      {checked ? (
+                        <button
+                          type="button"
+                          onClick={() => setDefaultLocale(opt.code)}
+                          className="rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300"
+                          style={isDefault ? { color: "lab(55% -12.85 3.72)", borderColor: "lab(55% -12.85 3.72 / 0.55)" } : undefined}
+                        >
+                          {isDefault ? t("languages.defaultActive") : t("languages.setDefaultAction")}
+                        </button>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-zinc-500 mt-2">
+                {t("languages.defaultHelp")}
+              </p>
               <p className="text-[11px] text-zinc-500 mt-2">
                 {t("languages.limit", {
                   count:
@@ -839,7 +827,7 @@ export default function SettingsBusinessPage() {
               <label className="block text-xs text-zinc-400 mb-1">
                 <span className="inline-flex items-center gap-2">
                   {t("domains.label")}
-                  <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
+                  <EntitlementPill label={t("badges.proPlus")} href="/dashboard/billing" />
                 </span>
               </label>
               <p className="text-[11px] mt-1" style={{ color: "lab(55% -12.85 3.72)" }}>
@@ -850,7 +838,15 @@ export default function SettingsBusinessPage() {
                   <input
                     key={idx}
                     className="w-full border border-zinc-800 bg-zinc-950 rounded px-3 py-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                    placeholder={t("domains.placeholder")}
+                    placeholder={
+                      idx === 0
+                        ? t("domains.placeholderFirst")
+                        : idx === 1
+                          ? t("domains.placeholderSecond")
+                          : idx === 2
+                            ? t("domains.placeholderThird")
+                            : t("domains.placeholder")
+                    }
                     value={value}
                     onChange={(e) => {
                       const next = [...domainInputRows];

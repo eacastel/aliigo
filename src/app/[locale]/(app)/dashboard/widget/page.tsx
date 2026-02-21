@@ -650,7 +650,7 @@ export default function WidgetSettingsPage() {
       {isProTrial ? (
         <div className="mb-4 flex flex-wrap items-center gap-2 text-xs" style={{ color: "lab(55% -12.85 3.72)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
+            <EntitlementPill label={t("badges.proPlus")} href="/dashboard/billing" />
             <span>{t("trialHint")}</span>
           </div>
         </div>
@@ -872,7 +872,7 @@ export default function WidgetSettingsPage() {
               <div>
                 <div className="text-sm text-zinc-200 inline-flex items-center gap-2">
                   {t("showPoweredBy")}
-                  <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
+                  <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
                 </div>
                 <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByHelp")}</p>
                 {!canToggleBranding ? (
@@ -965,7 +965,7 @@ export default function WidgetSettingsPage() {
             <label className="block text-sm text-zinc-300">
               <span className="inline-flex items-center gap-2">
                 {t("headerLogoUrl")}
-                <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
+                <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
               </span>
             </label>
             {!canManageHeaderLogo ? (

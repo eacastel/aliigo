@@ -371,10 +371,10 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
 
                       <ul className="mt-3 space-y-1 text-xs text-zinc-400">
                         <li>• {safeT("basicF1", undefined, "50 conversations / month")}</li>
-                        <li>• {safeT("basicF2", undefined, "1 domain")}</li>
-                        <li>• {safeT("basicF3", undefined, "Reply-only assistant")}</li>
-                        <li>• {safeT("basicF4", undefined, "Lead capture (name, email)")}</li>
-                        <li>• {safeT("basicF5", undefined, "Email support")}</li>
+                        <li>• {safeT("basicF2", undefined, "Message history: last 30 messages")}</li>
+                        <li>• {safeT("basicF3", undefined, "\"Powered by Aliigo\" branding (fixed)")}</li>
+                        <li>• {safeT("basicF4", undefined, "1 domain")}</li>
+                        <li>• {safeT("basicF5", undefined, "Lead capture: name + email")}</li>
                       </ul>
 
                       <div className="mt-4">
@@ -391,11 +391,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           >
                             {portalLoading === "change_plan"
                               ? safeT("loading", undefined, "Loading…")
-                              : safeT(
-                                  "switchToBasic",
-                                  undefined,
-                                  `Switch to Basic (${basicPrice} ${perMonth})`
-                                )}
+                              : safeT("chooseBasic", undefined, `Choose Basic (${basicPrice} ${perMonth})`)}
                           </button>
                         )}
                       </div>
@@ -420,9 +416,10 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                       </div>
                       <ul className="mt-2 space-y-1 text-xs text-zinc-400">
                         <li>• {safeT("growthF1", undefined, "500 conversations / month")}</li>
-                        <li>• {safeT("growthF2", undefined, "1 domain")}</li>
-                        <li>• {safeT("growthF3", undefined, "Richer lead capture fields")}</li>
-                        <li>• {safeT("growthF4", undefined, "Email + chat support")}</li>
+                        <li>• {safeT("growthF2", undefined, "Message history: last 30 days")}</li>
+                        <li>• {safeT("growthF3", undefined, "Aliigo branding removed + header logo")}</li>
+                        <li>• {safeT("growthF4", undefined, "Languages: ES, EN + smart website indexing")}</li>
+                        <li>• {safeT("growthF5", undefined, "WhatsApp integration available as add-on")}</li>
                       </ul>
 
                       <div className="mt-4">
@@ -439,11 +436,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           >
                             {portalLoading === "change_plan"
                               ? safeT("loading", undefined, "Loading…")
-                              : safeT(
-                                  "upgradeToGrowth",
-                                  undefined,
-                                  `Upgrade to Growth (${growthPrice} ${perMonth})`
-                                )}
+                              : safeT("chooseGrowth", undefined, `Choose Growth (${growthPrice} ${perMonth})`)}
                           </button>
                         )}
                       </div>
@@ -464,9 +457,10 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
 
                       <ul className="mt-3 space-y-1 text-xs text-zinc-400">
                         <li>• {safeT("proF1", undefined, "2,000 conversations / month")}</li>
-                        <li>• {safeT("proF2", undefined, "3 domains")}</li>
-                        <li>• {safeT("proF3", undefined, "Priority support")}</li>
-                        <li>• {safeT("proF4", undefined, "Advanced assistant controls")}</li>
+                        <li>• {safeT("proF2", undefined, "Message history: last 6 months")}</li>
+                        <li>• {safeT("proF3", undefined, "3 domains + ES/EN +1 language")}</li>
+                        <li>• {safeT("proF4", undefined, "Advanced setup + document uploading + priority support")}</li>
+                        <li>• {safeT("proF5", undefined, "WhatsApp integration available as add-on")}</li>
                       </ul>
 
                       <div className="mt-4">
@@ -483,7 +477,7 @@ async function runBillingAction(action: BillingAction, nextPlan?: BillingPlan) {
                           >
                             {portalLoading === "change_plan"
                               ? safeT("loading", undefined, "Loading…")
-                              : safeT("upgradeToPro", undefined, `Upgrade to Pro (${proPrice} ${perMonth})`)}
+                              : safeT("choosePro", undefined, `Choose Pro (${proPrice} ${perMonth})`)}
                           </button>
                         )}
                       </div>

@@ -1373,7 +1373,7 @@ export default function SettingsAssistantPage() {
       {isProTrial ? (
         <div className="mb-4 flex flex-wrap items-center gap-2 text-xs" style={{ color: "lab(55% -12.85 3.72)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
+            <EntitlementPill label={t("badges.proPlus")} href="/dashboard/billing" />
             <span>{t("mode.trialHint")}</span>
           </div>
         </div>
@@ -1394,21 +1394,21 @@ export default function SettingsAssistantPage() {
         >
           {t("tabs.assistant")}
         </button>
-        {canUseWebsiteIndexing ? (
-          <button
-            type="button"
-            onClick={() => setActiveTab("indexed")}
-            className={activeTab === "indexed" ? btnBrand : btnNeutral}
-          >
-            <span className="inline-flex items-center gap-2">
-              {t("tabs.indexed")}
-              <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
-            </span>
-          </button>
-        ) : null}
         <Link href="/dashboard/settings/assistant/support" className={btnNeutral}>
           {t("tabs.supportPanel")}
         </Link>
+        {canUseWebsiteIndexing ? (
+          <div className="inline-flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab("indexed")}
+              className={activeTab === "indexed" ? btnBrand : btnNeutral}
+            >
+              {t("tabs.indexed")}
+            </button>
+            <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
+          </div>
+        ) : null}
       </div>
 
       <div className={activeTab === "assistant" ? "" : "hidden"}>
@@ -1416,7 +1416,7 @@ export default function SettingsAssistantPage() {
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
           <span>{t("autofill.title")}</span>
-          <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
+          <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
         </div>
         <p className="text-xs text-zinc-400">{t("autofill.desc")}</p>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -1520,22 +1520,26 @@ export default function SettingsAssistantPage() {
             >
               {t("mode.quick")}
             </button>
-            {canUseAdvancedSetup ? (
-              <button
-                type="button"
-                onClick={() => setEditorMode("advanced")}
-                className={editorMode === "advanced" ? btnBrand : btnNeutral}
-              >
-                <span className="inline-flex items-center gap-2">
-                  {t("mode.advanced")}
-                  <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
-                </span>
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={() => setEditorMode("advanced")}
+              disabled={!canUseAdvancedSetup}
+              className={editorMode === "advanced" ? btnBrand : btnNeutral}
+            >
+              {t("mode.advanced")}
+            </button>
+            <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
           </div>
+          <p className="mt-2 text-[11px]" style={{ color: "lab(55% -12.85 3.72)" }}>
+            {t("mode.advancedHelp")}
+          </p>
         </div>
 
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <div className="text-sm font-semibold text-zinc-100 mb-2">
+            {t("sections.style.title")}
+          </div>
+          <p className="text-xs text-zinc-400 mb-4">{t("sections.style.desc")}</p>
           <div className="grid gap-4 grid-cols-1">
             <div className="space-y-4">
               <div className="grid gap-4 lg:grid-cols-2">
@@ -1560,8 +1564,9 @@ export default function SettingsAssistantPage() {
                 </div>
 
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-                  <label className="block text-xs text-zinc-400 mb-2">
+                  <label className="block text-xs text-zinc-400 mb-2 inline-flex items-center gap-2">
                     {t("goal.label")}
+                    <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {(
@@ -1581,8 +1586,9 @@ export default function SettingsAssistantPage() {
                 </div>
 
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-                  <label className="block text-xs text-zinc-400 mb-2">
+                  <label className="block text-xs text-zinc-400 mb-2 inline-flex items-center gap-2">
                     {t("handoff.label")}
+                    <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
                   </label>
                   <p className="text-[11px] text-zinc-500 mb-2">
                     {t("handoff.help")}
@@ -1607,8 +1613,9 @@ export default function SettingsAssistantPage() {
                 </div>
 
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
-                  <label className="block text-xs text-zinc-400 mb-2">
+                  <label className="block text-xs text-zinc-400 mb-2 inline-flex items-center gap-2">
                     {t("cta.label")}
+                    <EntitlementPill label={t("badges.growthPlus")} href="/dashboard/billing" />
                   </label>
                   <p className="text-[11px] text-zinc-500 mb-2">
                     {t("cta.help")}

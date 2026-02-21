@@ -27,6 +27,8 @@ export default function DashboardLayout({
   const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
   const [billingStatus, setBillingStatus] = useState<"loading" | "active" | "inactive">("loading");
+  const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
+  const [billingRawStatus, setBillingRawStatus] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [verificationDeadline, setVerificationDeadline] = useState<string | null>(null);
   const [showVerifyDetails, setShowVerifyDetails] = useState(false);
@@ -88,6 +90,8 @@ export default function DashboardLayout({
       const ok = res.ok && (j.status === "trialing" || j.status === "active");
       if (!cancelled) {
         setBillingStatus(ok ? "active" : "inactive");
+        setBillingRawStatus(typeof j.status === "string" ? j.status : null);
+        setTrialEndsAt(typeof j.trial_end === "string" ? j.trial_end : null);
       }
     })();
 
@@ -134,8 +138,16 @@ export default function DashboardLayout({
   };
 
   const billingActive = billingStatus === "active";
+  const trialDaysLeft = useMemo(() => {
+    if (billingRawStatus !== "trialing" || !trialEndsAt) return null;
+    const end = Date.parse(trialEndsAt);
+    if (Number.isNaN(end)) return null;
+    const diff = end - Date.now();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }, [billingRawStatus, trialEndsAt]);
   const showBillingBanner =
     billingStatus === "inactive" && path !== "/dashboard/billing";
+  const showTrialBanner = billingRawStatus === "trialing";
   const showVerificationBanner = isVerified === false;
 
   return (
@@ -334,6 +346,32 @@ export default function DashboardLayout({
                       </ul>
                     </div>
                   ) : null}
+                </div>
+              )}
+              {showTrialBanner && (
+                <div
+                  className="mb-4 rounded-xl border p-4"
+                  style={{
+                    borderColor: "lab(55% -12.85 3.72 / 0.45)",
+                    backgroundColor: "lab(55% -12.85 3.72 / 0.08)",
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="text-xs" style={{ color: "lab(55% -12.85 3.72)" }}>
+                        {billingT("trialTitle")}
+                      </div>
+                      <div className="text-sm text-zinc-300 mt-1">
+                        {trialDaysLeft !== null
+                          ? billingT("daysLeft", { count: trialDaysLeft })
+                          : billingT("trialSubtitle")}
+                      </div>
+                    </div>
+
+                    <Link href="/dashboard/billing" className="rounded-xl px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-zinc-700 text-zinc-100 hover:bg-zinc-900/40">
+                      {billingT("choosePlanCta")}
+                    </Link>
+                  </div>
                 </div>
               )}
               {children}

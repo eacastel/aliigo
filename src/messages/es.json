@@ -99,6 +99,7 @@
     "trialBullet1": "Sin cargos si cancelas antes de que termine la prueba.",
     "trialBullet2": "Puedes subir, bajar o cancelar el plan desde esta misma página.",
     "trialBullet3": "Mantendrás el acceso hasta el final del periodo actual.",
+    "choosePlanCta": "Elige tu plan",
     "priceAfterTrial": "/ mes después de la prueba",
     "activateCta": "Activar Cuenta",
     "checkoutLoading": "Preparando el formulario de pago seguro…",
@@ -138,6 +139,7 @@
     "growthF2": "1 dominio",
     "growthF3": "Captura de leads más completa",
     "growthF4": "Soporte por email + chat",
+    "growthF5": "Integración con WhatsApp disponible como complemento",
     "planProDesc": "Personalizado. Contacta soporte para configurarlo.",
     "planProPrice": "desde {price}",
     "planProIntro": "Todo lo de Growth, y además:",
@@ -145,6 +147,7 @@
     "proF2": "Mayor volumen de mensajes o ilimitado",
     "proF3": "Comportamientos y flujos personalizados",
     "proF4": "Pensado para equipos con alto volumen",
+    "proF5": "Integración con WhatsApp disponible como complemento",
     "daysLeft": "{count, plural, one {# día restante} other {# días restantes}}",
     "managePlan": "Gestionar plan",
     "openingPortal": "Abriendo…",
@@ -152,6 +155,7 @@
     "perMonth": "/mes",
     "plansTitle": "Planes",
     "upgradeToGrowth": "Mejorar a Growth",
+    "chooseGrowth": "Elegir Growth",
     "switchToStarter": "Cambiar a Basic",
     "resumeMembership": "Mantener suscripción",
     "cancelMembership": "Cancelar suscripción",
@@ -167,7 +171,9 @@
     "basicF4": "Captura de leads (nombre y email)",
     "basicF5": "Soporte por email",
     "upgradeToPro": "Subir a Pro",
+    "choosePro": "Elegir Pro",
     "switchToBasic": "Cambiar a Basic",
+    "chooseBasic": "Elegir Basic",
     "planCustomDesc": "Para equipos avanzados con alto volumen y flujos personalizados.",
     "planCustomPrice": "desde {price}",
     "planCustomCta": "Contactar ventas",
@@ -254,6 +260,9 @@
       "label": "Dominios permitidos",
       "featureHelp": "El primer dominio está incluido en todos los planes. Los dominios extra (2.º/3.º) están disponibles en Pro (y durante la prueba).",
       "placeholder": "ejemplo.com\\nsegundo-dominio.com",
+      "placeholderFirst": "primer-dominio.com",
+      "placeholderSecond": "segundo-dominio.com",
+      "placeholderThird": "tercer-dominio.com",
       "help": "Introduce un dominio raíz por línea, sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
       "limit": "Límite del plan: hasta {count} dominio(s).",
       "used": "{used} / {count} espacios de dominio usados.",
@@ -266,6 +275,9 @@
     "languages": {
       "label": "Idiomas habilitados",
       "featureHelp": "Un idioma está incluido en Basic. Los idiomas extra requieren Growth+ (o prueba).",
+      "defaultHelp": "Define un idioma habilitado como predeterminado. El asistente y el widget lo usan como idioma de respaldo.",
+      "setDefaultAction": "Marcar por defecto",
+      "defaultActive": "Por defecto",
       "english": "English",
       "spanish": "Español",
       "limit": "Límite del plan: hasta {count} idioma(s).",
@@ -561,6 +573,7 @@
       "desc": "Usa Configuración inteligente para onboarding. Cambia a Configuración avanzada para tener más control.",
       "quick": "Configuración inteligente",
       "advanced": "Configuración avanzada",
+      "advancedHelp": "La configuración avanzada ofrece mayor control y está disponible en planes Growth+.",
       "quickHint": "Actualiza a Pro para acceder a esta funcionalidad.",
       "trialHint": "Prueba Pro activa: tienes incluidas la configuración avanzada y el contenido indexado hasta que termine tu prueba."
     },
@@ -579,6 +592,10 @@
       "presets": {
         "title": "Configuración inteligente",
         "desc": "Elige cómo debe sonar el asistente y cómo guiar a los visitantes."
+      },
+      "style": {
+        "title": "Estilo",
+        "desc": "Configura el comportamiento conversacional y la guía de conversión."
       },
       "business": {
         "title": "Esenciales del negocio",

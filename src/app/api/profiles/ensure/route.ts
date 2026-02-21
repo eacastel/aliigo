@@ -241,13 +241,14 @@ export async function POST(req: Request) {
 
       const { data: billingNow, error: billingReadErr } = await supabaseAdmin
         .from("businesses")
-        .select("billing_status,billing_plan,trial_end,current_period_end")
+        .select("billing_status,billing_plan,trial_end,current_period_end,widget_theme")
         .eq("id", biz.id)
         .single<{
           billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
           billing_plan: string | null;
           trial_end: string | null;
           current_period_end: string | null;
+          widget_theme: Record<string, unknown> | null;
         }>();
 
       if (billingReadErr) {
@@ -268,6 +269,11 @@ export async function POST(req: Request) {
         billingNow.billing_status === "incomplete";
 
       if (shouldStartTrial) {
+        const nextTheme =
+          billingNow?.widget_theme && typeof billingNow.widget_theme === "object"
+            ? { ...billingNow.widget_theme, showBranding: true }
+            : { showBranding: true };
+
         const { error: billingUpdErr } = await supabaseAdmin
           .from("businesses")
           .update({
@@ -275,6 +281,7 @@ export async function POST(req: Request) {
             billing_status: "trialing",
             trial_end: billingNow?.trial_end ?? trialEndIso,
             current_period_end: billingNow?.current_period_end ?? trialEndIso,
+            widget_theme: nextTheme,
             updated_at: nowIso,
           })
           .eq("id", biz.id);
