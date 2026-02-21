@@ -531,6 +531,11 @@
       "next": "Siguiente",
       "page": "Página"
     },
+    "badges": {
+      "growthPlus": "Growth+",
+      "proTrial": "Prueba Pro",
+      "includedTrial": "Incluido en la prueba"
+    },
     "mode": {
       "title": "Modo de configuración",
       "desc": "Usa Configuración inteligente para onboarding. Cambia a Configuración avanzada para tener más control.",
@@ -766,6 +771,9 @@
       "indexing": "Indexando…",
       "indexSuccess": "Indexación completa: {pages} páginas, {docs} documentos, {chunks} fragmentos.",
       "indexError": "No se pudo indexar el sitio",
+      "errors": {
+        "urlNotAllowed": "Esa URL no está en tus dominios permitidos. Añade primero el dominio en Ajustes de negocio."
+      },
       "monitor": {
         "title": "Monitor de contenido indexado",
         "open": "Abrir",

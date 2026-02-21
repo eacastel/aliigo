@@ -18,6 +18,8 @@ type BusinessRow = {
   widget_theme: Record<string, unknown> | null;
   widget_header_logo_path: string | null;
   billing_plan: string | null;
+  billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+  trial_end: string | null;
 };
 
 type BusinessProfile = {
@@ -102,10 +104,16 @@ export default function DashboardPage() {
   const [usage, setUsage] = useState<UsagePayload | null>(null);
 
   const daysLeft = useMemo(() => {
-    const start = business?.created_at
-      ? new Date(business.created_at).getTime()
-      : pending?.createdAtMs;
+    const billing = business?.businesses;
+    if (billing?.billing_status === "trialing" && billing.trial_end) {
+      const endMs = Date.parse(billing.trial_end);
+      if (Number.isFinite(endMs)) {
+        const msLeft = endMs - Date.now();
+        return msLeft > 0 ? Math.ceil(msLeft / 86_400_000) : 0;
+      }
+    }
 
+    const start = pending?.createdAtMs ?? null;
     if (!start) return null;
     const daysPassed = Math.floor((Date.now() - start) / 86_400_000);
     return Math.max(30 - daysPassed, 0);
@@ -157,7 +165,9 @@ export default function DashboardPage() {
               knowledge,
               widget_theme,
               widget_header_logo_path,
-              billing_plan
+              billing_plan,
+              billing_status,
+              trial_end
             )
           `
           )

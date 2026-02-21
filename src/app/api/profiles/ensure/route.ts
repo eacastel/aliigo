@@ -233,6 +233,67 @@ export async function POST(req: Request) {
       );
     }
 
+    // 1b) Auto-start 30-day trial for signup-created accounts
+    // without touching already-active paid/trial subscriptions.
+    if (source === "signup") {
+      const nowIso = new Date().toISOString();
+      const trialEndIso = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      const { data: billingNow, error: billingReadErr } = await supabaseAdmin
+        .from("businesses")
+        .select("billing_status,billing_plan,trial_end,current_period_end")
+        .eq("id", biz.id)
+        .single<{
+          billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+          billing_plan: string | null;
+          trial_end: string | null;
+          current_period_end: string | null;
+        }>();
+
+      if (billingReadErr) {
+        return NextResponse.json(
+          {
+            ok: false,
+            where: "businesses.select billing",
+            error: billingReadErr.message,
+            details: billingReadErr.details ?? null,
+            hint: billingReadErr.hint ?? null,
+          },
+          { status: 500, headers: CORS }
+        );
+      }
+
+      const shouldStartTrial =
+        !billingNow?.billing_status ||
+        billingNow.billing_status === "incomplete";
+
+      if (shouldStartTrial) {
+        const { error: billingUpdErr } = await supabaseAdmin
+          .from("businesses")
+          .update({
+            billing_plan: billingNow?.billing_plan ?? "basic",
+            billing_status: "trialing",
+            trial_end: billingNow?.trial_end ?? trialEndIso,
+            current_period_end: billingNow?.current_period_end ?? trialEndIso,
+            updated_at: nowIso,
+          })
+          .eq("id", biz.id);
+
+        if (billingUpdErr) {
+          return NextResponse.json(
+            {
+              ok: false,
+              where: "businesses.update billing trialing",
+              error: billingUpdErr.message,
+              details: billingUpdErr.details ?? null,
+              hint: billingUpdErr.hint ?? null,
+            },
+            { status: 500, headers: CORS }
+          );
+        }
+      }
+    }
+
     // 2) Upsert profile linking business_id
     const { error: profErr } = await supabaseAdmin
       .from("business_profiles")

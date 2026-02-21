@@ -550,6 +550,10 @@ export default function SettingsAssistantPage() {
   const btnBrand = `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
 
   const btnNeutral = `${btnBase} bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40`;
+  const featureBadgeClass =
+    "inline-flex items-center rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200";
+  const trialBadgeClass =
+    "inline-flex items-center rounded-full border border-cyan-500/35 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-200";
   const folderTabBase =
     "rounded-t-lg border border-b-0 px-3 py-1.5 text-xs font-medium transition-colors";
   const folderTabActive = `${folderTabBase} border-zinc-700 bg-zinc-900 text-zinc-100`;
@@ -563,6 +567,19 @@ export default function SettingsAssistantPage() {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(date);
+  };
+
+  const mapAutofillError = (raw?: string) => {
+    const message = (raw ?? "").trim();
+    if (!message) return "unknown";
+    const normalized = message.toLowerCase();
+    if (
+      normalized.includes("url is not in allowed_domains") ||
+      normalized.includes("domain not allowed")
+    ) {
+      return t("autofill.errors.urlNotAllowed");
+    }
+    return message;
   };
 
   const loadIndexSummary = async (page = indexPage) => {
@@ -1026,7 +1043,7 @@ export default function SettingsAssistantPage() {
       } = await res.json().catch(() => ({}));
       if (!res.ok || !j.draftForm) {
         setMsgTone("error");
-        setMsg(`${t("autofill.error")}: ${j.error || "unknown"}`);
+        setMsg(`${t("autofill.error")}: ${mapAutofillError(j.error)}`);
         return;
       }
 
@@ -1123,7 +1140,7 @@ export default function SettingsAssistantPage() {
         await res.json().catch(() => ({}));
       if (!res.ok) {
         setMsgTone("error");
-        setMsg(`${t("autofill.indexError")}: ${j.error || "unknown"}`);
+        setMsg(`${t("autofill.indexError")}: ${mapAutofillError(j.error)}`);
         return;
       }
       setMsgTone("success");
@@ -1358,7 +1375,10 @@ export default function SettingsAssistantPage() {
       <p className="mb-6 text-sm text-zinc-400">{t("description")}</p>
       {isProTrial ? (
         <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-          {t("mode.trialHint")}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={trialBadgeClass}>{t("badges.proTrial")}</span>
+            <span>{t("mode.trialHint")}</span>
+          </div>
         </div>
       ) : null}
       {msg && (
@@ -1383,7 +1403,11 @@ export default function SettingsAssistantPage() {
             onClick={() => setActiveTab("indexed")}
             className={activeTab === "indexed" ? btnBrand : btnNeutral}
           >
-            {t("tabs.indexed")}
+            <span className="inline-flex items-center gap-2">
+              {t("tabs.indexed")}
+              <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+              {isProTrial ? <span className={trialBadgeClass}>{t("badges.includedTrial")}</span> : null}
+            </span>
           </button>
         ) : null}
         <Link href="/dashboard/settings/assistant/support" className={btnNeutral}>
@@ -1394,7 +1418,11 @@ export default function SettingsAssistantPage() {
       <div className={activeTab === "assistant" ? "" : "hidden"}>
       {canUseWebsiteIndexing ? (
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
-        <div className="text-sm font-semibold text-zinc-100">{t("autofill.title")}</div>
+        <div className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
+          <span>{t("autofill.title")}</span>
+          <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+          {isProTrial ? <span className={trialBadgeClass}>{t("badges.includedTrial")}</span> : null}
+        </div>
         <p className="text-xs text-zinc-400">{t("autofill.desc")}</p>
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
@@ -1503,7 +1531,13 @@ export default function SettingsAssistantPage() {
                 onClick={() => setEditorMode("advanced")}
                 className={editorMode === "advanced" ? btnBrand : btnNeutral}
               >
-                {t("mode.advanced")}
+                <span className="inline-flex items-center gap-2">
+                  {t("mode.advanced")}
+                  <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+                  {isProTrial ? (
+                    <span className={trialBadgeClass}>{t("badges.includedTrial")}</span>
+                  ) : null}
+                </span>
               </button>
             ) : null}
           </div>

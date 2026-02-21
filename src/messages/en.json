@@ -530,6 +530,11 @@
       "next": "Next",
       "page": "Page"
     },
+    "badges": {
+      "growthPlus": "Growth+",
+      "proTrial": "Pro trial",
+      "includedTrial": "Included in trial"
+    },
     "mode": {
       "title": "Setup mode",
       "desc": "Use Smart setup for onboarding. Switch to Advanced Setup when you want deeper control.",
@@ -765,6 +770,9 @@
       "indexing": "Indexing…",
       "indexSuccess": "Index complete: {pages} pages, {docs} documents, {chunks} chunks.",
       "indexError": "Could not index website",
+      "errors": {
+        "urlNotAllowed": "This URL is not in your allowed domains. Add the domain first in Business settings."
+      },
       "monitor": {
         "title": "Indexed content monitor",
         "open": "Open",
