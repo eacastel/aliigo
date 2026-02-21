@@ -16,6 +16,17 @@ function sanitizeHost(v: string) {
   return (v || "").trim().toLowerCase().replace(/:\d+$/, "");
 }
 
+function isDashboardRequest(req: NextRequest): boolean {
+  const referer = req.headers.get("referer") || "";
+  if (!referer) return false;
+  try {
+    const url = new URL(referer);
+    return /\/dashboard(\/|$)/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, { status });
 }
@@ -59,11 +70,15 @@ export async function GET(req: NextRequest) {
     const token = crypto.randomBytes(24).toString("hex");
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
+    // Treat dashboard requests as preview sessions so they do not count as
+    // website installation heartbeat. Public pages should count.
+    const isPreview = isDashboardRequest(req);
+
     const ins = await supabaseAdmin.from("embed_sessions").insert({
       token,
       business_id: bizRes.data.id,
       host,
-      is_preview: true,
+      is_preview: isPreview,
       expires_at: expiresAt,
     });
 
