@@ -26,6 +26,7 @@ type SessionPayload = {
   theme: Theme | null;
   show_branding?: boolean;
   show_header_icon?: boolean;
+  show_widget?: boolean;
   locale_auto?: boolean;
   enabled_locales?: ("en" | "es")[];
 };
@@ -677,6 +678,7 @@ class AliigoWidget extends HTMLElement {
           theme: themeOverride,
           show_branding: this.getShowBrandingOverride() ?? false,
           show_header_icon: this.getShowHeaderIconOverride() ?? false,
+          show_widget: true,
           locale_auto: false,
         };
 
@@ -719,6 +721,7 @@ class AliigoWidget extends HTMLElement {
         theme: (data.theme as Theme | null) || null,
         show_branding: Boolean(data.show_branding),
         show_header_icon: Boolean((data as { show_header_icon?: boolean }).show_header_icon),
+        show_widget: (data as { show_widget?: boolean }).show_widget !== false,
         locale_auto: localeAuto,
         enabled_locales: enabledLocales,
       };
@@ -1210,6 +1213,11 @@ class AliigoWidget extends HTMLElement {
 
     const panelClass = animateIn ? `${basePanelClass} animate-in` : basePanelClass;
     const panelClassWithHeader = hideHeader ? `${panelClass} no-header` : panelClass;
+
+    if (session && session.show_widget === false) {
+      this.root.innerHTML = `<style>${this.css()}</style>`;
+      return;
+    }
 
 
     const msgs = this.state.msgs;

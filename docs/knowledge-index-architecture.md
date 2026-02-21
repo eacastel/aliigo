@@ -38,6 +38,7 @@ This schema supports both onboarding paths:
 - `POST /api/knowledge/crawl`
   - Auth required
   - Validates URL belongs to `allowed_domains`
+  - Requires recent non-preview widget activity on that domain (ownership/activity check)
   - Mode-aware crawl:
     - `website`: same-domain up to 20 pages, depth 2, 20s max
     - `single_page`: one URL only (maxPages=1, depth=0)

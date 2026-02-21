@@ -69,7 +69,7 @@ export function PlansMatrix({
           </colgroup>
           <thead>
             <tr className="border-b border-white/10 text-zinc-200">
-              <th className="sticky left-0 z-20 border-r border-white/10 bg-zinc-900 px-5 py-3 text-left font-semibold">
+              <th className="border-r border-white/10 bg-zinc-900 px-5 py-3 text-left font-semibold md:sticky md:left-0 md:z-20">
                 {isEs ? "Características" : "Features"}
               </th>
               <th className="border-l border-white/10 px-5 py-3 text-center font-semibold text-emerald-300">Basic</th>
@@ -87,7 +87,7 @@ export function PlansMatrix({
                 }`}
               >
                 <td
-                  className={`sticky left-0 z-10 border-r border-white/10 px-5 py-5 text-left text-zinc-200 ${
+                  className={`border-r border-white/10 px-5 py-5 text-left text-zinc-200 md:sticky md:left-0 md:z-10 ${
                     rowIndex % 2 === 0 ? "bg-zinc-900" : "bg-zinc-800"
                   }`}
                 >
@@ -113,7 +113,7 @@ export function PlansMatrix({
               </tr>
             ))}
             <tr className="bg-zinc-900/20">
-              <td className="sticky left-0 z-10 border-r border-white/10 bg-zinc-900 px-5 py-5 text-left text-zinc-200">
+              <td className="border-r border-white/10 bg-zinc-900 px-5 py-5 text-left text-zinc-200 md:sticky md:left-0 md:z-10">
                 {isEs ? "Elegir plan" : "Choose plan"}
               </td>
               <td className="border-l border-white/10 px-5 py-5 text-center">

@@ -134,6 +134,8 @@ export async function GET(req: NextRequest) {
       bizData.billing_plan === "growth" ||
       bizData.billing_plan === "pro" ||
       bizData.billing_plan === "custom";
+    const showWidget =
+      typeof themeObj.widgetLive === "boolean" ? themeObj.widgetLive : true;
     const headerLogoPath =
       bizData.widget_header_logo_path ||
       (typeof themeObj.headerLogoPath === "string" ? themeObj.headerLogoPath : null);
@@ -185,6 +187,7 @@ export async function GET(req: NextRequest) {
         show_branding: showBranding,
         locale_auto: localeAuto,
         show_header_icon: showHeaderIcon,
+        show_widget: showWidget,
         enabled_locales: enabledLocales,
       },
       200

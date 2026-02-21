@@ -16,6 +16,7 @@ type Theme = {
   panelOpacity?: number;
   headerLogoUrl?: string;
   showBranding?: boolean;
+  widgetLive?: boolean;
 };
 type ThemeDb = Partial<Theme>;
 

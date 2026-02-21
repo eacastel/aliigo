@@ -232,6 +232,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "URL is not in allowed domains" }, { status: 403 });
     }
 
+    // Ownership/activity validation: require recent widget heartbeat for this domain.
+    const domainCandidates = new Set([normalizedHost, `www.${normalizedHost}`]);
+    const activeSince = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const heartbeat = await admin
+      .from("embed_sessions")
+      .select("host,expires_at")
+      .eq("business_id", businessId)
+      .eq("is_preview", false)
+      .gte("expires_at", activeSince)
+      .order("expires_at", { ascending: false })
+      .limit(30);
+    if (heartbeat.error) {
+      return NextResponse.json({ error: heartbeat.error.message }, { status: 500 });
+    }
+    const activeDomain = (heartbeat.data ?? []).some((row) => {
+      const h = normalizeHostname(String(row.host ?? ""));
+      return !!h && (domainCandidates.has(h) || domainCandidates.has(`www.${h}`));
+    });
+    if (!activeDomain) {
+      return NextResponse.json(
+        {
+          error:
+            "Domain not validated yet. Install the widget on this domain and load the page once, then retry indexing.",
+        },
+        { status: 403 }
+      );
+    }
+
     const runInsert = await admin
       .from("knowledge_ingestion_runs")
       .insert({

@@ -36,3 +36,6 @@ to match each section.
   - `Assistant setup` tab
   - `Indexed content` tab
   - `Support panel` opens a dedicated page at `/dashboard/settings/assistant/support`
+- Widget controls now include:
+  - `Installed signal` (validated domain + last seen)
+  - `Widget live` toggle (show/hide public widget while keeping install active)

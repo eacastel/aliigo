@@ -881,7 +881,7 @@ export async function POST(req: NextRequest) {
     const bizRes = await supabase
       .from("businesses")
       .select(
-        "name, timezone, system_prompt, slug, knowledge, assistant_settings, default_locale, qualification_prompt, billing_status, billing_plan, trial_end, current_period_end"
+        "name, timezone, system_prompt, slug, knowledge, assistant_settings, default_locale, qualification_prompt, billing_status, billing_plan, trial_end, current_period_end, widget_theme"
       )
       .eq("id", businessId)
       .single<{
@@ -897,6 +897,7 @@ export async function POST(req: NextRequest) {
         billing_plan: BillingPlan;
         trial_end: string | null;
         current_period_end: string | null;
+        widget_theme: Record<string, unknown> | null;
       }>();
 
     if (bizRes.error) throw bizRes.error;
@@ -906,6 +907,18 @@ export async function POST(req: NextRequest) {
     const bizLocale = normalizeLeadLocale(bizRes.data.default_locale ?? null);
     const bizName = bizRes.data.name;
     const bizSlug = bizRes.data.slug;
+    const themeObj =
+      bizRes.data.widget_theme && typeof bizRes.data.widget_theme === "object"
+        ? bizRes.data.widget_theme
+        : {};
+    const widgetLive = typeof themeObj.widgetLive === "boolean" ? themeObj.widgetLive : true;
+
+    if (ch === "web" && !isPreviewSession && !widgetLive) {
+      return NextResponse.json(
+        { error: "Widget is offline" },
+        { status: 403, headers: corsHeadersFor(req) }
+      );
+    }
 
     if (!isBillingActive(billingStatus)) {
       return NextResponse.json(

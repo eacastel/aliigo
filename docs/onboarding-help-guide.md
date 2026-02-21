@@ -26,6 +26,10 @@ Add the script to your website and verify the widget appears and replies.
 2. Paste it before the closing `</body>` tag on your site.
 3. Publish changes and refresh your site.
 4. Open a conversation to verify messages arrive.
+5. In Dashboard -> Widget, confirm **Installed signal** shows your validated domain.
+6. Use **Widget live** to control visibility:
+   - ON: widget is visible on site
+   - OFF: widget stays installed for ownership validation but is hidden to visitors
 
 ### Embed script
 ```html
@@ -37,6 +41,7 @@ Add the script to your website and verify the widget appears and replies.
 - Make sure the script is loaded on every page you want to support.
 - Disable ad blockers for a quick test.
 - Confirm your domain is allowed in Widget settings.
+- If indexing is blocked, load one page with the widget installed first so the domain heartbeat is recorded.
 
 _Screenshot placeholder: Widget settings with embed key._
 

@@ -19,6 +19,7 @@ type Theme = {
   panelOpacity: number;   
   headerLogoUrl: string;
   showBranding: boolean;
+  widgetLive: boolean;
 };
 
 type ThemeDb = Partial<Theme>;
@@ -102,6 +103,7 @@ const DEFAULT_THEME: Theme = {
   panelOpacity: 0.72,
   headerLogoUrl: "",
   showBranding: false,
+  widgetLive: true,
 };
 
 function mergeTheme(db: ThemeDb | null | undefined): Theme {
@@ -212,6 +214,11 @@ export default function WidgetSettingsPage() {
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoMsg, setLogoMsg] = useState<string | null>(null);
   const [billingPlan, setBillingPlan] = useState<string>("basic");
+  const [installStatus, setInstallStatus] = useState<{
+    installed: boolean;
+    activeDomainHost: string | null;
+    lastSeenAt: string | null;
+  } | null>(null);
 
   const isBasicPlan = billingPlan === "basic" || billingPlan === "starter";
   const canToggleBranding = !isBasicPlan;
@@ -328,6 +335,31 @@ export default function WidgetSettingsPage() {
       }
 
       if (accessToken) {
+        const statusRes = await fetch("/api/widget/install-status", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const statusJson = (await statusRes.json().catch(() => ({}))) as {
+          ok?: boolean;
+          installed?: boolean;
+          activeDomainHost?: string | null;
+          lastSeenAt?: string | null;
+          widgetLive?: boolean;
+        };
+        if (statusRes.ok && statusJson.ok) {
+          setInstallStatus({
+            installed: Boolean(statusJson.installed),
+            activeDomainHost: statusJson.activeDomainHost ?? null,
+            lastSeenAt: statusJson.lastSeenAt ?? null,
+          });
+          if (typeof statusJson.widgetLive === "boolean") {
+            setTheme((prev) => ({ ...prev, widgetLive: statusJson.widgetLive as boolean }));
+            setInitialTheme((prev) => ({ ...prev, widgetLive: statusJson.widgetLive as boolean }));
+          }
+        }
+      }
+
+      if (accessToken) {
         const logoRes = await fetch("/api/widget/logo", {
           method: "GET",
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -354,6 +386,9 @@ export default function WidgetSettingsPage() {
       const merged = mergeTheme(dbTheme);
       if (plan === "basic" || plan === "starter") {
         merged.showBranding = true;
+      }
+      if (typeof merged.widgetLive !== "boolean") {
+        merged.widgetLive = true;
       }
 
       setBiz({
@@ -406,6 +441,7 @@ export default function WidgetSettingsPage() {
     panelOpacity: theme.panelOpacity,
     headerLogoUrl: theme.headerLogoUrl,
     showBranding: theme.showBranding,
+    widgetLive: theme.widgetLive,
   });
 }, [theme]);
 
@@ -439,6 +475,7 @@ export default function WidgetSettingsPage() {
             panelBg: theme.panelBg,
             panelOpacity: theme.panelOpacity,
             showBranding: theme.showBranding,
+            widgetLive: theme.widgetLive,
           },
           brand_name: brand,
         }),
@@ -811,6 +848,63 @@ export default function WidgetSettingsPage() {
               </label>
             </div>
           ) : null}
+
+          <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3 space-y-3">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm text-zinc-200">{t("liveControl")}</div>
+                <p className="text-xs text-zinc-500 mt-1">{t("liveControlHelp")}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={theme.widgetLive}
+                onClick={() => setTheme((prev) => ({ ...prev, widgetLive: !prev.widgetLive }))}
+                className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
+                  theme.widgetLive ? "bg-brand-500/80" : "bg-zinc-700"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    theme.widgetLive ? "translate-x-5" : "translate-x-0.5"
+                  }`}
+                />
+              </button>
+            </label>
+
+            <div className="flex items-start justify-between gap-3 rounded-md border border-zinc-800/80 bg-zinc-950/50 px-3 py-2">
+              <div>
+                <div className="text-xs font-medium text-zinc-200">{t("installedSignal")}</div>
+                {installStatus?.lastSeenAt ? (
+                  <div className="mt-1 text-[11px] text-zinc-500">
+                    {t("lastSeen")} {new Date(installStatus.lastSeenAt).toLocaleString()}
+                  </div>
+                ) : (
+                  <div className="mt-1 text-[11px] text-zinc-500">{t("notDetectedYet")}</div>
+                )}
+                {installStatus?.activeDomainHost ? (
+                  <div className="mt-1 text-[11px] text-zinc-400">
+                    {t("domainLabel")}{" "}
+                    <span className="font-medium text-zinc-300">{installStatus.activeDomainHost}</span>
+                  </div>
+                ) : null}
+              </div>
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                  installStatus?.installed
+                    ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30"
+                    : "bg-zinc-800 text-zinc-300 ring-1 ring-zinc-700"
+                }`}
+              >
+                <span
+                  className={`mr-1.5 inline-flex h-2 w-2 rounded-full ${
+                    installStatus?.installed ? "bg-emerald-300 animate-pulse" : "bg-zinc-500"
+                  }`}
+                />
+                {installStatus?.installed ? t("installedOnDomain") : t("notInstalled")}
+              </span>
+            </div>
+          </div>
 
           {canManageHeaderLogo ? (
           <div className="space-y-2">
