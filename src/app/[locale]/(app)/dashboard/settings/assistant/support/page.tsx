@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { Link } from "@/i18n/routing";
+import LoadingState from "@/components/ui/LoadingState";
 
 type AssistantContextMode = "sales" | "support" | "catalog";
 
@@ -312,7 +313,7 @@ export default function SupportPanelSettingsPage() {
   };
 
   if (loading) {
-    return <p className="p-4 text-sm text-zinc-400">{t("loading")}</p>;
+    return <LoadingState label={t("loading")} className="p-4" />;
   }
 
   if (unauth) {

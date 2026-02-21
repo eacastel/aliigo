@@ -179,6 +179,11 @@
   "DashboardBusiness": {
     "title": "Configuración del negocio",
     "trialHint": "Prueba Pro activa: tienes incluidas las capacidades de Growth y Pro hasta que termine tu prueba.",
+    "badges": {
+      "growthPlus": "Growth+",
+      "proTrial": "Prueba Pro",
+      "includedTrial": "Incluido en la prueba"
+    },
     "sections": {
       "profile": "Perfil",
       "business": "Negocio"
@@ -299,6 +304,9 @@
     "noLinkedBusiness": {
       "title": "No hay negocio vinculado",
       "body": "No encontramos un negocio asociado a tu perfil. Completa primero Ajustes → Negocio y vuelve aquí."
+    },
+    "status": {
+      "loading": "Cargando…"
     },
     "messages": {
       "loadBusinessError": "No se pudo cargar tu negocio.",

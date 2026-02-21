@@ -178,6 +178,11 @@
   "DashboardBusiness": {
     "title": "Business settings",
     "trialHint": "Pro trial active: Growth and Pro capabilities are included until your trial ends.",
+    "badges": {
+      "growthPlus": "Growth+",
+      "proTrial": "Pro trial",
+      "includedTrial": "Included in trial"
+    },
     "sections": {
       "profile": "Profile",
       "business": "Business"
@@ -298,6 +303,9 @@
     "noLinkedBusiness": {
       "title": "No linked business",
       "body": "We couldn’t find a business associated with your profile. Complete Settings → Business first, then return here."
+    },
+    "status": {
+      "loading": "Loading…"
     },
     "messages": {
       "loadBusinessError": "Could not load your business.",

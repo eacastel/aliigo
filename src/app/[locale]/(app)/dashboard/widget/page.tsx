@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useBillingGate } from "@/components/BillingGateContext";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import LoadingState from "@/components/ui/LoadingState";
 import {
   effectivePlanForEntitlements,
   isGrowthOrHigher,
@@ -200,6 +201,7 @@ export default function WidgetSettingsPage() {
   const t = useTranslations("DashboardWidget");
   const billingGate = useBillingGate();
   const widgetLocked = billingGate.status === "inactive";
+  const [loading, setLoading] = useState(true);
   const [biz, setBiz] = useState<BizLocal | null>(null);
 
   const [brand, setBrand] = useState("Aliigo");
@@ -252,6 +254,7 @@ export default function WidgetSettingsPage() {
   useEffect(() => {
     (async () => {
       setMsg(null);
+      setLoading(true);
 
       const { data: sess } = await supabase.auth.getSession();
       const uid = sess.session?.user?.id || null;
@@ -425,8 +428,13 @@ export default function WidgetSettingsPage() {
       setTheme(merged);
       setInitialTheme(merged);
       setPreviewShowBranding(Boolean(merged.showBranding));
-
-    })();
+    })()
+      .catch((e) => {
+        console.error("[widget] load error:", e);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -619,6 +627,10 @@ export default function WidgetSettingsPage() {
       floating,
     ].join("\n");
   }, [biz?.public_embed_key]);
+
+  if (loading) {
+    return <LoadingState label={t("status.loading")} className="p-4" />;
+  }
 
   if (!biz) {
     return (

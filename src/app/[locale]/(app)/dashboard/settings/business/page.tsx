@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useLocale, useTranslations } from "next-intl";
 import { useBillingGate } from "@/components/BillingGateContext";
+import LoadingState from "@/components/ui/LoadingState";
 import {
   domainLimitForPlan,
   effectivePlanForEntitlements,
@@ -155,6 +156,10 @@ export default function SettingsBusinessPage() {
 
       const btnNeutralStrong =
         `${btnBase} bg-zinc-950/40 text-zinc-200 ring-zinc-700/60 hover:bg-zinc-900/50`;
+      const featureBadgeClass =
+        "inline-flex items-center rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200";
+      const trialBadgeClass =
+        "inline-flex items-center rounded-full border border-cyan-500/35 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-200";
 
 
   async function load() {
@@ -555,7 +560,7 @@ export default function SettingsBusinessPage() {
     }
   };
 
-  if (loading) return <p className="p-4 text-sm text-zinc-400">{t("status.loading")}</p>;
+  if (loading) return <LoadingState label={t("status.loading")} className="p-4" />;
 
   if (unauth) {
     return (
@@ -596,7 +601,10 @@ export default function SettingsBusinessPage() {
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       {isProTrial ? (
         <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-          {t("trialHint")}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={trialBadgeClass}>{t("badges.proTrial")}</span>
+            <span>{t("trialHint")}</span>
+          </div>
         </div>
       ) : null}
 
@@ -781,7 +789,13 @@ export default function SettingsBusinessPage() {
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                {t("languages.label")}
+                <span className="inline-flex items-center gap-2">
+                  {t("languages.label")}
+                  <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+                  {isProTrial ? (
+                    <span className={trialBadgeClass}>{t("badges.includedTrial")}</span>
+                  ) : null}
+                </span>
               </label>
               {localeLimit === 1 ? (
                 <div className="text-sm text-zinc-300">
@@ -827,7 +841,13 @@ export default function SettingsBusinessPage() {
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1">
-                {t("domains.label")}
+                <span className="inline-flex items-center gap-2">
+                  {t("domains.label")}
+                  <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+                  {isProTrial ? (
+                    <span className={trialBadgeClass}>{t("badges.includedTrial")}</span>
+                  ) : null}
+                </span>
               </label>
               <div className="space-y-2">
                 {domainInputRows.map((value, idx) => (

@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter, Link } from "@/i18n/routing";
 import { supabase } from "@/lib/supabaseClient";
 import { useTranslations, useLocale } from "next-intl";
+import LoadingState from "@/components/ui/LoadingState";
 
 // Types
 type BusinessRow = {
@@ -244,8 +245,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-zinc-950/60">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-brand-600"></div>
-        <span className="ml-3 text-gray-500">{t("loading")}</span>
+        <LoadingState label={t("loading")} className="" />
       </div>
     );
   }

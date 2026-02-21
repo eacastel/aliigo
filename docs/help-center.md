@@ -39,3 +39,11 @@ to match each section.
 - Widget controls now include:
   - `Installed signal` (validated domain + last seen)
   - `Widget live` toggle (show/hide public widget while keeping install active)
+- Trial and entitlement UX now includes:
+  - `Growth+` badges on gated capabilities (Knowledge and Business settings)
+  - `Pro trial` and `Included in trial` badges when trial grants higher-tier access
+  - Clearer domain error copy in Knowledge onboarding when a URL is outside allowed domains
+- Loading UX is now standardized with one shared spinner component:
+  - `src/components/ui/LoadingState.tsx`
+  - Used across Dashboard, Business settings, Widget settings, and Knowledge pages
+  - Prevents false `No linked business` flashes during initial load on Widget settings

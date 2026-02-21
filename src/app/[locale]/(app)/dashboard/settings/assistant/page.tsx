@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { Link } from "@/i18n/routing";
 import { effectivePlanForEntitlements, isTrialActive, normalizePlan } from "@/lib/effectivePlan";
+import LoadingState from "@/components/ui/LoadingState";
 
 /* ---------- Types ---------- */
 type AssistantState = {
@@ -1334,8 +1335,7 @@ export default function SettingsAssistantPage() {
     }
   };
 
-  if (loading)
-    return <p className="p-4 text-sm text-zinc-400">{t("loading")}</p>;
+  if (loading) return <LoadingState label={t("loading")} className="p-4" />;
 
   if (unauth) {
     return (
