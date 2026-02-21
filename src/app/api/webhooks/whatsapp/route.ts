@@ -6,6 +6,7 @@ import {
   sendWhatsAppText,
   verifyWhatsAppSignature,
 } from "@/lib/whatsapp";
+import { effectivePlanForEntitlements, isGrowthOrHigher } from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,11 +18,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   { auth: { persistSession: false } }
 );
-
-function isGrowthOrHigher(plan: string | null | undefined): boolean {
-  const p = (plan ?? "basic").toLowerCase();
-  return p === "growth" || p === "pro" || p === "custom";
-}
 
 function appBaseUrl(request: Request): string {
   const envUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -85,10 +81,23 @@ export async function POST(request: Request) {
 
         const biz = await supabase
           .from("businesses")
-          .select("billing_plan")
+          .select("billing_plan,billing_status,trial_end")
           .eq("id", businessId)
-          .maybeSingle<{ billing_plan: string | null }>();
-        if (!biz.data || !isGrowthOrHigher(biz.data.billing_plan)) {
+          .maybeSingle<{
+            billing_plan: string | null;
+            billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+            trial_end: string | null;
+          }>();
+        if (
+          !biz.data ||
+          !isGrowthOrHigher(
+            effectivePlanForEntitlements({
+              billingPlan: biz.data.billing_plan,
+              billingStatus: biz.data.billing_status,
+              trialEnd: biz.data.trial_end,
+            })
+          )
+        ) {
           await sendWhatsAppText({
             phoneNumberId: inbound.phoneNumberId,
             to: inbound.fromWaId,
@@ -143,4 +152,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-

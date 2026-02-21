@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { originHost } from "@/lib/embedGate";
+import { effectivePlanForEntitlements, isGrowthOrHigher } from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
     const bizRes = await supabaseAdmin
       .from("businesses")
       .select(
-        "id, slug, name, brand_name, default_locale, widget_theme, billing_plan, widget_header_logo_path",
+        "id, slug, name, brand_name, default_locale, widget_theme, billing_plan, billing_status, trial_end, widget_header_logo_path",
       )
       .eq("slug", slug)
       .maybeSingle<{
@@ -41,6 +42,8 @@ export async function GET(req: NextRequest) {
         default_locale: string | null;
         widget_theme: ThemeDb;
         billing_plan: string | null;
+        billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+        trial_end: string | null;
         widget_header_logo_path: string | null;
       }>();
 
@@ -68,10 +71,12 @@ export async function GET(req: NextRequest) {
         ? { ...(bizRes.data.widget_theme as Record<string, unknown>) }
         : {};
 
-    const showHeaderIcon =
-      bizRes.data.billing_plan === "growth" ||
-      bizRes.data.billing_plan === "pro" ||
-      bizRes.data.billing_plan === "custom";
+    const effectivePlan = effectivePlanForEntitlements({
+      billingPlan: bizRes.data.billing_plan,
+      billingStatus: bizRes.data.billing_status,
+      trialEnd: bizRes.data.trial_end,
+    });
+    const showHeaderIcon = isGrowthOrHigher(effectivePlan);
 
     const headerLogoPath =
       bizRes.data.widget_header_logo_path ||

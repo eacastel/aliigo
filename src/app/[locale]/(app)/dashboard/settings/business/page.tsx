@@ -7,6 +7,13 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useLocale, useTranslations } from "next-intl";
 import { useBillingGate } from "@/components/BillingGateContext";
+import {
+  domainLimitForPlan,
+  effectivePlanForEntitlements,
+  isTrialActive,
+  localeLimitForPlan,
+  normalizePlan,
+} from "@/lib/effectivePlan";
 
 /* ---------- Types ---------- */
 type ProfileState = {
@@ -33,6 +40,8 @@ type JoinedBusiness = {
   default_locale?: string | null;
   enabled_locales?: string[] | null;
   billing_plan?: string | null;
+  billing_status?: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+  trial_end?: string | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -94,14 +103,6 @@ function domainsToBaseText(domains: string[] | null | undefined): string {
   return Array.from(bases).join("\n");
 }
 
-function localeLimitForPlan(plan: string | null | undefined): number {
-  const p = (plan || "basic").toLowerCase();
-  if (p === "growth") return 2;
-  if (p === "pro") return 3;
-  if (p === "custom") return Number.MAX_SAFE_INTEGER;
-  return 1;
-}
-
 export default function SettingsBusinessPage() {
   const router = useRouter();
   const locale = useLocale();
@@ -128,6 +129,7 @@ export default function SettingsBusinessPage() {
   });
   const [domainLimit, setDomainLimit] = useState<number>(1);
   const [billingPlan, setBillingPlan] = useState<string>("basic");
+  const [isProTrial, setIsProTrial] = useState(false);
 
   const initialProfile = useRef<ProfileState | null>(null);
   const initialBusiness = useRef<BusinessState | null>(null);
@@ -203,7 +205,9 @@ export default function SettingsBusinessPage() {
             domain_limit,
             default_locale,
             enabled_locales,
-            billing_plan
+            billing_plan,
+            billing_status,
+            trial_end
           )
         `
         )
@@ -235,7 +239,17 @@ export default function SettingsBusinessPage() {
       const biz = data.businesses;
       if (data.business_id && biz) {
         setBusinessId(data.business_id);
-        const nextPlan = (biz.billing_plan || "basic").toLowerCase();
+        const rawPlan = normalizePlan(biz.billing_plan || "basic");
+        const trialActive = isTrialActive(biz.billing_status ?? null, biz.trial_end ?? null);
+        const nextPlan = effectivePlanForEntitlements({
+          billingPlan: biz.billing_plan,
+          billingStatus: biz.billing_status,
+          trialEnd: biz.trial_end,
+        });
+        setIsProTrial(
+          trialActive &&
+            (rawPlan === "basic" || rawPlan === "starter" || rawPlan === "growth")
+        );
         const planLocaleLimit = localeLimitForPlan(nextPlan);
         const fallbackDefault = biz.default_locale === "es" ? "es" : "en";
         const hydratedLocales = (() => {
@@ -260,7 +274,12 @@ export default function SettingsBusinessPage() {
           default_locale: fallbackDefault,
           enabled_locales: hydratedLocales,
         };
-        setDomainLimit(typeof biz.domain_limit === "number" && biz.domain_limit > 0 ? biz.domain_limit : 1);
+        const planDomainLimit = domainLimitForPlan(nextPlan);
+        const effectiveDomainLimit =
+          typeof biz.domain_limit === "number" && biz.domain_limit > 0
+            ? Math.min(biz.domain_limit, planDomainLimit)
+            : planDomainLimit;
+        setDomainLimit(effectiveDomainLimit);
         setBillingPlan(nextPlan);
 
         setBusiness(nextBusiness);
@@ -276,6 +295,7 @@ export default function SettingsBusinessPage() {
         };
         setDomainLimit(1);
         setBillingPlan("basic");
+        setIsProTrial(false);
         setBusiness(empty);
         initialBusiness.current = empty;
       }
@@ -574,6 +594,11 @@ export default function SettingsBusinessPage() {
   return (
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
+      {isProTrial ? (
+        <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+          {t("trialHint")}
+        </div>
+      ) : null}
 
       {msg && (
         <div

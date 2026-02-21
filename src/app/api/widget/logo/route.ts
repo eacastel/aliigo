@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { adminFromTable, supabaseAdmin } from "@/lib/supabaseAdmin";
+import { effectivePlanForEntitlements, planAllowsHeaderLogo } from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,10 +12,6 @@ const BUCKET = "business-assets";
 function getBearer(req: NextRequest) {
   const auth = req.headers.get("authorization") || "";
   return auth.startsWith("Bearer ") ? auth.slice(7) : "";
-}
-
-function planAllowsHeaderLogo(plan: string | null | undefined) {
-  return plan === "growth" || plan === "pro" || plan === "custom";
 }
 
 function extForMime(mime: string) {
@@ -50,11 +47,13 @@ async function resolveUserAndBusiness(req: NextRequest) {
   }
 
   const withColumn = await adminFromTable("businesses")
-    .select("id,billing_plan,widget_header_logo_path,widget_theme")
+    .select("id,billing_plan,billing_status,trial_end,widget_header_logo_path,widget_theme")
     .eq("id", prof.business_id)
     .single<{
       id: string;
       billing_plan: string | null;
+      billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+      trial_end: string | null;
       widget_header_logo_path: string | null;
       widget_theme: ThemeDb;
     }>();
@@ -67,7 +66,11 @@ async function resolveUserAndBusiness(req: NextRequest) {
     return {
       userId,
       businessId: withColumn.data.id,
-      billingPlan: withColumn.data.billing_plan,
+      billingPlan: effectivePlanForEntitlements({
+        billingPlan: withColumn.data.billing_plan,
+        billingStatus: withColumn.data.billing_status,
+        trialEnd: withColumn.data.trial_end,
+      }),
       currentPath: withColumn.data.widget_header_logo_path,
       themeObj,
       hasPathColumn: true,
@@ -81,9 +84,15 @@ async function resolveUserAndBusiness(req: NextRequest) {
 
   // Backward compatibility before DB migration is applied.
   const withoutColumn = await adminFromTable("businesses")
-    .select("id,billing_plan,widget_theme")
+    .select("id,billing_plan,billing_status,trial_end,widget_theme")
     .eq("id", prof.business_id)
-    .single<{ id: string; billing_plan: string | null; widget_theme: ThemeDb }>();
+    .single<{
+      id: string;
+      billing_plan: string | null;
+      billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+      trial_end: string | null;
+      widget_theme: ThemeDb;
+    }>();
   if (withoutColumn.error || !withoutColumn.data) {
     return { error: "Business not found", status: 404 } as const;
   }
@@ -97,7 +106,11 @@ async function resolveUserAndBusiness(req: NextRequest) {
   return {
     userId,
     businessId: withoutColumn.data.id,
-    billingPlan: withoutColumn.data.billing_plan,
+    billingPlan: effectivePlanForEntitlements({
+      billingPlan: withoutColumn.data.billing_plan,
+      billingStatus: withoutColumn.data.billing_status,
+      trialEnd: withoutColumn.data.trial_end,
+    }),
     currentPath: pathFromTheme,
     themeObj,
     hasPathColumn: false,

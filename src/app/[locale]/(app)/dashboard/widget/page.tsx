@@ -7,6 +7,12 @@ import { supabase } from "@/lib/supabaseClient";
 import { useBillingGate } from "@/components/BillingGateContext";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import {
+  effectivePlanForEntitlements,
+  isGrowthOrHigher,
+  isTrialActive,
+  normalizePlan,
+} from "@/lib/effectivePlan";
 
 type Theme = {
   headerBg: string;
@@ -214,6 +220,7 @@ export default function WidgetSettingsPage() {
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoMsg, setLogoMsg] = useState<string | null>(null);
   const [billingPlan, setBillingPlan] = useState<string>("basic");
+  const [isProTrial, setIsProTrial] = useState(false);
   const [installStatus, setInstallStatus] = useState<{
     installed: boolean;
     activeDomainHost: string | null;
@@ -222,8 +229,7 @@ export default function WidgetSettingsPage() {
 
   const isBasicPlan = billingPlan === "basic" || billingPlan === "starter";
   const canToggleBranding = !isBasicPlan;
-  const canManageHeaderLogo =
-    billingPlan === "growth" || billingPlan === "pro" || billingPlan === "custom";
+  const canManageHeaderLogo = isGrowthOrHigher(billingPlan);
 
   type BizRow = {
     id: string;
@@ -233,6 +239,8 @@ export default function WidgetSettingsPage() {
     public_embed_key: string | null;
     default_locale: string | null;
     billing_plan: string | null;
+    billing_status?: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+    trial_end?: string | null;
     widget_theme?: unknown;
   };
 
@@ -262,6 +270,8 @@ export default function WidgetSettingsPage() {
             public_embed_key,
             default_locale,
             billing_plan,
+            billing_status,
+            trial_end,
             widget_theme
           )
         `
@@ -287,7 +297,9 @@ export default function WidgetSettingsPage() {
               brand_name,
               public_embed_key,
               default_locale,
-              billing_plan
+              billing_plan,
+              billing_status,
+              trial_end
             )
           `
           )
@@ -377,8 +389,18 @@ export default function WidgetSettingsPage() {
 
 
       const effectiveBrand = (b.brand_name || b.name || "Aliigo").trim();
-      const plan = (b.billing_plan ?? "basic").toLowerCase();
+      const rawPlan = normalizePlan(b.billing_plan ?? "basic");
+      const trialActive = isTrialActive(b.billing_status ?? null, b.trial_end ?? null);
+      const plan = effectivePlanForEntitlements({
+        billingPlan: b.billing_plan ?? "basic",
+        billingStatus: b.billing_status ?? null,
+        trialEnd: b.trial_end ?? null,
+      });
       setBillingPlan(plan);
+      setIsProTrial(
+        trialActive &&
+          (rawPlan === "basic" || rawPlan === "starter" || rawPlan === "growth")
+      );
       setBrand(effectiveBrand);
       setInitialBrand(effectiveBrand);
 
@@ -396,7 +418,7 @@ export default function WidgetSettingsPage() {
         slug: b.slug,
         public_embed_key: b.public_embed_key ?? "",
         default_locale: b.default_locale === "es" ? "es" : "en",
-        billing_plan: b.billing_plan ?? null,
+        billing_plan: plan,
         widget_theme: dbTheme ?? {},
       });
 
@@ -611,6 +633,11 @@ export default function WidgetSettingsPage() {
   return (
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
+      {isProTrial ? (
+        <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+          {t("trialHint")}
+        </div>
+      ) : null}
 
       {msg && (
         <div

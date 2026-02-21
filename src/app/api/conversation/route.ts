@@ -8,6 +8,7 @@ import {
   type BillingPlan,
   type BillingStatus,
 } from "@/lib/billingUsage";
+import { domainLimitForPlan, effectivePlanForEntitlements } from "@/lib/effectivePlan";
 import { buildLeadNotification, normalizeLocale as normalizeLeadLocale } from "@/emails/lead/notification";
 import { getCurrencyFromHeaders, type AliigoCurrency } from "@/lib/currency";
 import { formatPlanPrice, planPriceAmount } from "@/lib/pricing";
@@ -472,13 +473,6 @@ function aliigoHost() {
   }
 }
 
-function domainLimitForPlan(plan: string | null | undefined): number {
-  const p = (plan ?? "basic").toLowerCase();
-  if (p === "pro") return 3;
-  if (p === "custom") return Number.MAX_SAFE_INTEGER;
-  return 1; // basic, starter, growth
-}
-
 async function validateEmbedAccess(token: string, host: string) {
   if (!token) return { ok: false as const, reason: "Missing token" };
   if (!host) return { ok: false as const, reason: "Missing host" };
@@ -531,7 +525,13 @@ async function validateEmbedAccess(token: string, host: string) {
     }>();
   if (biz.error || !biz.data) return { ok: false as const, reason: "Business missing" };
 
-  const planDomainLimit = domainLimitForPlan(biz.data.billing_plan);
+  const planDomainLimit = domainLimitForPlan(
+    effectivePlanForEntitlements({
+      billingPlan: biz.data.billing_plan,
+      billingStatus: "active",
+      trialEnd: null,
+    })
+  );
   const effectiveLimit =
     typeof biz.data.domain_limit === "number" &&
     Number.isFinite(biz.data.domain_limit) &&
@@ -1133,8 +1133,12 @@ ${supportKnowledgeParts.join("\n\n")}`;
     }
 
     const knowledge = (bizRes.data?.knowledge ?? "").trim();
-    const planNow = (bizRes.data?.billing_plan ?? "basic").toLowerCase();
-    const canUseIndexedKnowledge = planNow !== "basic" && planNow !== "starter";
+    const effectivePlan = effectivePlanForEntitlements({
+      billingPlan: bizRes.data?.billing_plan ?? "basic",
+      billingStatus,
+      trialEnd: bizRes.data?.trial_end ?? null,
+    });
+    const canUseIndexedKnowledge = effectivePlan !== "basic" && effectivePlan !== "starter";
     const retrievedChunks = canUseIndexedKnowledge
       ? await retrieveKnowledgeChunks({
           businessId,

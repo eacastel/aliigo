@@ -4,6 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { originHost, hostAllowed } from "@/lib/embedGate";
+import {
+  domainLimitForPlan,
+  effectivePlanForEntitlements,
+  isGrowthOrHigher,
+  type NormalizedPlan,
+} from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,13 +44,6 @@ function sanitizeHost(v: string) {
 
 type ThemeDb = Record<string, unknown> | null;
 
-function domainLimitForPlan(plan: string | null | undefined): number {
-  const p = (plan ?? "basic").toLowerCase();
-  if (p === "pro") return 3;
-  if (p === "custom") return Number.MAX_SAFE_INTEGER;
-  return 1; // basic, starter, growth
-}
-
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -59,7 +58,7 @@ export async function GET(req: NextRequest) {
     const primaryBizRes = await supabase
       .from("businesses")
       .select(
-        "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, domain_limit, widget_header_logo_path"
+        "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, billing_status, trial_end, domain_limit, widget_header_logo_path"
       )
       .eq("public_embed_key", key)
       .maybeSingle<{
@@ -72,6 +71,8 @@ export async function GET(req: NextRequest) {
         enabled_locales: string[] | null;
         widget_theme: ThemeDb;
         billing_plan: string | null;
+        billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+        trial_end: string | null;
         domain_limit: number | null;
         widget_header_logo_path: string | null;
       }>();
@@ -83,7 +84,7 @@ export async function GET(req: NextRequest) {
       const fallback = await supabase
         .from("businesses")
         .select(
-          "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, domain_limit"
+          "id, slug, name, brand_name, allowed_domains, default_locale, enabled_locales, widget_theme, billing_plan, billing_status, trial_end, domain_limit"
         )
         .eq("public_embed_key", key)
         .maybeSingle<{
@@ -96,6 +97,8 @@ export async function GET(req: NextRequest) {
           enabled_locales: string[] | null;
           widget_theme: ThemeDb;
           billing_plan: string | null;
+          billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+          trial_end: string | null;
           domain_limit: number | null;
         }>();
       bizData = fallback.data ? { ...fallback.data, widget_header_logo_path: null } : null;
@@ -107,7 +110,12 @@ export async function GET(req: NextRequest) {
     }
     if (!bizData) return json(req, { error: "Invalid key" }, 403);
 
-    const planDomainLimit = domainLimitForPlan(bizData.billing_plan);
+    const effectivePlan: NormalizedPlan = effectivePlanForEntitlements({
+      billingPlan: bizData.billing_plan,
+      billingStatus: bizData.billing_status,
+      trialEnd: bizData.trial_end,
+    });
+    const planDomainLimit = domainLimitForPlan(effectivePlan);
     const effectiveLimit =
       typeof bizData.domain_limit === "number" && Number.isFinite(bizData.domain_limit) && bizData.domain_limit > 0
         ? Math.min(bizData.domain_limit, planDomainLimit)
@@ -125,15 +133,11 @@ export async function GET(req: NextRequest) {
       bizData.widget_theme && typeof bizData.widget_theme === "object"
         ? { ...(bizData.widget_theme as Record<string, unknown>) }
         : {};
-    const isBasicPlan =
-      bizData.billing_plan === "basic" || bizData.billing_plan === "starter";
+    const isBasicPlan = effectivePlan === "basic" || effectivePlan === "starter";
     const showBrandingPref =
       typeof themeObj.showBranding === "boolean" ? themeObj.showBranding : null;
     const showBranding = isBasicPlan || showBrandingPref === true;
-    const showHeaderIcon =
-      bizData.billing_plan === "growth" ||
-      bizData.billing_plan === "pro" ||
-      bizData.billing_plan === "custom";
+    const showHeaderIcon = isGrowthOrHigher(effectivePlan);
     const showWidget =
       typeof themeObj.widgetLive === "boolean" ? themeObj.widgetLive : true;
     const headerLogoPath =
@@ -147,10 +151,7 @@ export async function GET(req: NextRequest) {
         themeObj.headerLogoUrl = signed.data.signedUrl;
       }
     }
-    const localeAuto =
-      bizData.billing_plan === "growth" ||
-      bizData.billing_plan === "pro" ||
-      bizData.billing_plan === "custom";
+    const localeAuto = isGrowthOrHigher(effectivePlan);
 
     // Mint short-lived session token bound to this host
     const token = crypto.randomBytes(24).toString("hex");

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { effectiveDomainLimit } from "@/lib/planLimits";
+import { effectivePlanForEntitlements, localeLimitForPlan } from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,13 +40,6 @@ function normalizeEnabledLocales(input: unknown): SupportedLocale[] | null {
     if (!out.includes(l)) out.push(l);
   }
   return out;
-}
-
-function localeLimitForPlan(plan: string | null | undefined): number {
-  if (plan === "growth") return 2;
-  if (plan === "pro") return 3;
-  if (plan === "custom") return Number.MAX_SAFE_INTEGER;
-  return 1; // basic + legacy starter + fallback
 }
 
 const nonEmpty = (v: unknown) =>
@@ -155,10 +149,12 @@ export async function POST(req: NextRequest) {
 
     const { data: bizRow, error: bizReadErr } = await admin
       .from("businesses")
-      .select("billing_plan,domain_limit,default_locale,enabled_locales")
+      .select("billing_plan,billing_status,trial_end,domain_limit,default_locale,enabled_locales")
       .eq("id", businessId)
       .single<{
         billing_plan: string | null;
+        billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+        trial_end: string | null;
         domain_limit: number | null;
         default_locale: string | null;
         enabled_locales: string[] | null;
@@ -166,11 +162,16 @@ export async function POST(req: NextRequest) {
     if (bizReadErr) {
       return NextResponse.json({ error: bizReadErr.message }, { status: 400 });
     }
-    const domainLimit = effectiveDomainLimit({
+    const effectivePlan = effectivePlanForEntitlements({
       billingPlan: bizRow?.billing_plan,
+      billingStatus: bizRow?.billing_status,
+      trialEnd: bizRow?.trial_end,
+    });
+    const domainLimit = effectiveDomainLimit({
+      billingPlan: effectivePlan,
       domainLimit: bizRow?.domain_limit,
     });
-    const localeLimit = localeLimitForPlan(bizRow?.billing_plan);
+    const localeLimit = localeLimitForPlan(effectivePlan);
 
     // 4) Update profile (merge-only)
     if (body.profile) {

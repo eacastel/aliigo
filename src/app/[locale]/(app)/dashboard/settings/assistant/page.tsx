@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { Link } from "@/i18n/routing";
+import { effectivePlanForEntitlements, isTrialActive, normalizePlan } from "@/lib/effectivePlan";
 
 /* ---------- Types ---------- */
 type AssistantState = {
@@ -66,6 +67,8 @@ type JoinedBusiness = {
   assistant_settings?: AssistantSettings | null;
   allowed_domains?: string[] | null;
   billing_plan?: string | null;
+  billing_status?: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+  trial_end?: string | null;
 } | null;
 
 type ProfileJoinRow = {
@@ -512,6 +515,7 @@ export default function SettingsAssistantPage() {
   const [settingsEnvelope, setSettingsEnvelope] =
     useState<AssistantSettingsEnvelope | null>(null);
   const [billingPlan, setBillingPlan] = useState<string>("basic");
+  const [isProTrial, setIsProTrial] = useState(false);
   const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
   const [autofillUrl, setAutofillUrl] = useState("");
   const [autofilling, setAutofilling] = useState(false);
@@ -623,7 +627,9 @@ export default function SettingsAssistantPage() {
             knowledge,
             assistant_settings,
             allowed_domains,
-            billing_plan
+            billing_plan,
+            billing_status,
+            trial_end
           )
         `,
         )
@@ -657,7 +663,18 @@ export default function SettingsAssistantPage() {
         const parsedSystem = parseSystemPrompt(next.system_prompt);
         const parsedKnowledge = parseKnowledge(next.knowledge);
         const settings = (biz.assistant_settings ?? null) as AssistantSettingsEnvelope | null;
-        setBillingPlan((biz.billing_plan ?? "basic").toLowerCase());
+        const rawPlan = normalizePlan(biz.billing_plan ?? "basic");
+        const trialActive = isTrialActive(biz.billing_status ?? null, biz.trial_end ?? null);
+        const effectivePlan = effectivePlanForEntitlements({
+          billingPlan: biz.billing_plan ?? "basic",
+          billingStatus: biz.billing_status ?? null,
+          trialEnd: biz.trial_end ?? null,
+        });
+        setBillingPlan(effectivePlan);
+        setIsProTrial(
+          trialActive &&
+            (rawPlan === "basic" || rawPlan === "starter" || rawPlan === "growth")
+        );
         setSettingsEnvelope(settings);
         const domains = (biz.allowed_domains ?? [])
           .map((d) => d.trim().toLowerCase())
@@ -734,6 +751,7 @@ export default function SettingsAssistantPage() {
       } else {
         setBusinessId(null);
         setBillingPlan("basic");
+        setIsProTrial(false);
         setSettingsEnvelope(null);
         const empty = {
           system_prompt: "",
@@ -1338,6 +1356,11 @@ export default function SettingsAssistantPage() {
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       <p className="mb-6 text-sm text-zinc-400">{t("description")}</p>
+      {isProTrial ? (
+        <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+          {t("mode.trialHint")}
+        </div>
+      ) : null}
       {msg && (
         <div
           className={`mb-4 text-sm ${msgTone === "error" ? "text-red-400" : "text-green-400"}`}

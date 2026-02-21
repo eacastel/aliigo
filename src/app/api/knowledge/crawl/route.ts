@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { effectivePlanForEntitlements } from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -214,13 +215,22 @@ export async function POST(req: NextRequest) {
 
     const { data: business, error: bErr } = await admin
       .from("businesses")
-      .select("allowed_domains,billing_plan")
+      .select("allowed_domains,billing_plan,billing_status,trial_end")
       .eq("id", businessId)
-      .single<{ allowed_domains: string[] | null; billing_plan: string | null }>();
+      .single<{
+        allowed_domains: string[] | null;
+        billing_plan: string | null;
+        billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+        trial_end: string | null;
+      }>();
     if (bErr) return NextResponse.json({ error: bErr.message }, { status: 400 });
 
-    const plan = (business.billing_plan ?? "basic").toLowerCase();
-    if (plan === "basic") {
+    const effectivePlan = effectivePlanForEntitlements({
+      billingPlan: business.billing_plan,
+      billingStatus: business.billing_status,
+      trialEnd: business.trial_end,
+    });
+    if (effectivePlan === "basic" || effectivePlan === "starter") {
       return NextResponse.json(
         { error: "Website indexing is available on Growth+ plans." },
         { status: 403 },

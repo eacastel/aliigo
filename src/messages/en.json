@@ -177,6 +177,7 @@
   },
   "DashboardBusiness": {
     "title": "Business settings",
+    "trialHint": "Pro trial active: Growth and Pro capabilities are included until your trial ends.",
     "sections": {
       "profile": "Profile",
       "business": "Business"
@@ -264,6 +265,7 @@
   },
   "DashboardWidget": {
     "title": "Widget",
+    "trialHint": "Pro trial active: Growth and Pro widget capabilities are included until your trial ends.",
     "livePreview": "Live preview",
     "loadingPreview": "Loading preview…",
     "header": "Header",
@@ -533,7 +535,8 @@
       "desc": "Use Smart setup for onboarding. Switch to Advanced Setup when you want deeper control.",
       "quick": "Smart setup",
       "advanced": "Advanced setup",
-      "quickHint": "Upgrade to Pro to access this feature."
+      "quickHint": "Upgrade to Pro to access this feature.",
+      "trialHint": "Pro trial active: Advanced setup and indexed content are included until your trial ends."
     },
     "loading": "Loading…",
     "loginRequired": {

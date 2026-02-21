@@ -178,6 +178,7 @@
   },
   "DashboardBusiness": {
     "title": "Configuración del negocio",
+    "trialHint": "Prueba Pro activa: tienes incluidas las capacidades de Growth y Pro hasta que termine tu prueba.",
     "sections": {
       "profile": "Perfil",
       "business": "Negocio"
@@ -265,6 +266,7 @@
   },
   "DashboardWidget": {
     "title": "Widget",
+    "trialHint": "Prueba Pro activa: tienes incluidas las capacidades de widget de Growth y Pro hasta que termine tu prueba.",
     "livePreview": "Vista previa en vivo",
     "loadingPreview": "Cargando vista previa…",
     "header": "Cabecera",
@@ -534,7 +536,8 @@
       "desc": "Usa Configuración inteligente para onboarding. Cambia a Configuración avanzada para tener más control.",
       "quick": "Configuración inteligente",
       "advanced": "Configuración avanzada",
-      "quickHint": "Actualiza a Pro para acceder a esta funcionalidad."
+      "quickHint": "Actualiza a Pro para acceder a esta funcionalidad.",
+      "trialHint": "Prueba Pro activa: tienes incluidas la configuración avanzada y el contenido indexado hasta que termine tu prueba."
     },
     "loading": "Cargando…",
     "loginRequired": {

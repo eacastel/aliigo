@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import { effectivePlanForEntitlements, isGrowthOrHigher } from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -70,7 +71,7 @@ export async function GET(req: NextRequest) {
     const primaryBizRes = await supabaseAdmin
       .from("businesses")
       .select(
-        "id, slug, name, brand_name, default_locale, enabled_locales, widget_theme, billing_plan, widget_header_logo_path"
+        "id, slug, name, brand_name, default_locale, enabled_locales, widget_theme, billing_plan, billing_status, trial_end, widget_header_logo_path"
       )
       .eq("public_embed_key", key)
       .maybeSingle<{
@@ -82,6 +83,8 @@ export async function GET(req: NextRequest) {
         enabled_locales: string[] | null;
         widget_theme: ThemeDb;
         billing_plan: string | null;
+        billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+        trial_end: string | null;
         widget_header_logo_path: string | null;
       }>();
 
@@ -91,7 +94,7 @@ export async function GET(req: NextRequest) {
     if (bizError && /widget_header_logo_path.*does not exist/i.test(bizError.message || "")) {
       const fallback = await supabaseAdmin
         .from("businesses")
-        .select("id, slug, name, brand_name, default_locale, enabled_locales, widget_theme, billing_plan")
+        .select("id, slug, name, brand_name, default_locale, enabled_locales, widget_theme, billing_plan, billing_status, trial_end")
         .eq("public_embed_key", key)
         .maybeSingle<{
           id: string;
@@ -102,6 +105,8 @@ export async function GET(req: NextRequest) {
           enabled_locales: string[] | null;
           widget_theme: ThemeDb;
           billing_plan: string | null;
+          billing_status: "incomplete" | "trialing" | "active" | "canceled" | "past_due" | null;
+          trial_end: string | null;
         }>();
       bizData = fallback.data ? { ...fallback.data, widget_header_logo_path: null } : null;
       bizError = fallback.error;
@@ -129,15 +134,16 @@ export async function GET(req: NextRequest) {
       bizData.widget_theme && typeof bizData.widget_theme === "object"
         ? { ...(bizData.widget_theme as Record<string, unknown>) }
         : {};
-    const isBasicPlan =
-      bizData.billing_plan === "basic" || bizData.billing_plan === "starter";
+    const effectivePlan = effectivePlanForEntitlements({
+      billingPlan: bizData.billing_plan,
+      billingStatus: bizData.billing_status,
+      trialEnd: bizData.trial_end,
+    });
+    const isBasicPlan = effectivePlan === "basic" || effectivePlan === "starter";
     const showBrandingPref =
       typeof themeObj.showBranding === "boolean" ? themeObj.showBranding : null;
     const showBranding = isBasicPlan || showBrandingPref === true;
-    const showHeaderIcon =
-      bizData.billing_plan === "growth" ||
-      bizData.billing_plan === "pro" ||
-      bizData.billing_plan === "custom";
+    const showHeaderIcon = isGrowthOrHigher(effectivePlan);
     const headerLogoPath =
       bizData.widget_header_logo_path ||
       (typeof themeObj.headerLogoPath === "string" ? themeObj.headerLogoPath : null);
@@ -149,10 +155,7 @@ export async function GET(req: NextRequest) {
         themeObj.headerLogoUrl = signed.data.signedUrl;
       }
     }
-    const localeAuto =
-      bizData.billing_plan === "growth" ||
-      bizData.billing_plan === "pro" ||
-      bizData.billing_plan === "custom";
+    const localeAuto = isGrowthOrHigher(effectivePlan);
 
     const host = aliigoHost();
 
