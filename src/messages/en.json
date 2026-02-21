@@ -250,6 +250,7 @@
     },
     "domains": {
       "label": "Allowed domains",
+      "featureHelp": "The first domain is included in all plans. Additional domain slots (2nd/3rd) are available on Pro (and during trial).",
       "placeholder": "example.com\\nsecond-domain.com",
       "help": "Enter one root domain per line, without http(s) or www. We will automatically allow both versions.",
       "limit": "Plan limit: up to {count} domain(s).",
@@ -262,6 +263,7 @@
     },
     "languages": {
       "label": "Enabled languages",
+      "featureHelp": "One language is included in Basic. Extra language slots require Growth+ (or trial).",
       "english": "English",
       "spanish": "Español",
       "limit": "Plan limit: up to {count} language(s).",
@@ -271,6 +273,11 @@
   "DashboardWidget": {
     "title": "Widget",
     "trialHint": "Pro trial active: Growth and Pro widget capabilities are included until your trial ends.",
+    "badges": {
+      "growthPlus": "Growth+",
+      "proTrial": "Pro trial",
+      "includedTrial": "Included in trial"
+    },
     "livePreview": "Live preview",
     "loadingPreview": "Loading preview…",
     "header": "Header",
@@ -295,8 +302,10 @@
   "lastSeen": "Last seen:",
   "showPoweredBy": "Show “Powered by Aliigo”",
     "showPoweredByHelp": "Basic always shows branding. Growth, Pro, and Custom can toggle this.",
+    "showPoweredByLockedHelp": "This control unlocks on Growth+ (or during trial).",
     "headerLogoUrl": "Header logo URL (Growth+)",
     "headerLogoHelp": "Optional. Icon appears only on Growth, Pro, and Custom when this URL is set.",
+    "headerLogoLockedHelp": "Header logo upload unlocks on Growth+ (or during trial).",
     "embedSnippet": "Embed snippet",
     "emptyDash": "—",
     "lockedHint": "Activate billing to unlock the widget install code.",

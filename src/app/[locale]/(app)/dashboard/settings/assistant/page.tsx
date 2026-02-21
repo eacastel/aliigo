@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Link } from "@/i18n/routing";
 import { effectivePlanForEntitlements, isTrialActive, normalizePlan } from "@/lib/effectivePlan";
 import LoadingState from "@/components/ui/LoadingState";
+import EntitlementPill from "@/components/ui/EntitlementPill";
 
 /* ---------- Types ---------- */
 type AssistantState = {
@@ -551,10 +552,6 @@ export default function SettingsAssistantPage() {
   const btnBrand = `${btnBase} bg-brand-500/10 text-brand-200 ring-brand-500/25 hover:bg-brand-500/15`;
 
   const btnNeutral = `${btnBase} bg-zinc-950/30 text-zinc-300 ring-zinc-800 hover:bg-zinc-900/40`;
-  const featureBadgeClass =
-    "inline-flex items-center rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200";
-  const trialBadgeClass =
-    "inline-flex items-center rounded-full border border-cyan-500/35 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-200";
   const folderTabBase =
     "rounded-t-lg border border-b-0 px-3 py-1.5 text-xs font-medium transition-colors";
   const folderTabActive = `${folderTabBase} border-zinc-700 bg-zinc-900 text-zinc-100`;
@@ -1374,9 +1371,9 @@ export default function SettingsAssistantPage() {
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       <p className="mb-6 text-sm text-zinc-400">{t("description")}</p>
       {isProTrial ? (
-        <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+        <div className="mb-4 rounded-lg border border-emerald-700/45 bg-emerald-950/55 px-3 py-2 text-xs text-emerald-200">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={trialBadgeClass}>{t("badges.proTrial")}</span>
+            <EntitlementPill label={t("badges.proTrial")} tone="trial" />
             <span>{t("mode.trialHint")}</span>
           </div>
         </div>
@@ -1405,8 +1402,8 @@ export default function SettingsAssistantPage() {
           >
             <span className="inline-flex items-center gap-2">
               {t("tabs.indexed")}
-              <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
-              {isProTrial ? <span className={trialBadgeClass}>{t("badges.includedTrial")}</span> : null}
+              <EntitlementPill label={t("badges.growthPlus")} />
+              {isProTrial ? <EntitlementPill label={t("badges.includedTrial")} tone="included" /> : null}
             </span>
           </button>
         ) : null}
@@ -1420,8 +1417,8 @@ export default function SettingsAssistantPage() {
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
           <span>{t("autofill.title")}</span>
-          <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
-          {isProTrial ? <span className={trialBadgeClass}>{t("badges.includedTrial")}</span> : null}
+          <EntitlementPill label={t("badges.growthPlus")} />
+          {isProTrial ? <EntitlementPill label={t("badges.includedTrial")} tone="included" /> : null}
         </div>
         <p className="text-xs text-zinc-400">{t("autofill.desc")}</p>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -1533,9 +1530,9 @@ export default function SettingsAssistantPage() {
               >
                 <span className="inline-flex items-center gap-2">
                   {t("mode.advanced")}
-                  <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+                  <EntitlementPill label={t("badges.growthPlus")} />
                   {isProTrial ? (
-                    <span className={trialBadgeClass}>{t("badges.includedTrial")}</span>
+                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
                   ) : null}
                 </span>
               </button>

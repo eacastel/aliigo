@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useLocale, useTranslations } from "next-intl";
 import { useBillingGate } from "@/components/BillingGateContext";
 import LoadingState from "@/components/ui/LoadingState";
+import EntitlementPill from "@/components/ui/EntitlementPill";
 import {
   domainLimitForPlan,
   effectivePlanForEntitlements,
@@ -156,11 +157,6 @@ export default function SettingsBusinessPage() {
 
       const btnNeutralStrong =
         `${btnBase} bg-zinc-950/40 text-zinc-200 ring-zinc-700/60 hover:bg-zinc-900/50`;
-      const featureBadgeClass =
-        "inline-flex items-center rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200";
-      const trialBadgeClass =
-        "inline-flex items-center rounded-full border border-cyan-500/35 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-200";
-
 
   async function load() {
     setMsg(null);
@@ -600,9 +596,9 @@ export default function SettingsBusinessPage() {
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       {isProTrial ? (
-        <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+        <div className="mb-4 rounded-lg border border-emerald-700/45 bg-emerald-950/55 px-3 py-2 text-xs text-emerald-200">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={trialBadgeClass}>{t("badges.proTrial")}</span>
+            <EntitlementPill label={t("badges.proTrial")} tone="trial" />
             <span>{t("trialHint")}</span>
           </div>
         </div>
@@ -791,12 +787,13 @@ export default function SettingsBusinessPage() {
               <label className="block text-xs text-zinc-400 mb-1">
                 <span className="inline-flex items-center gap-2">
                   {t("languages.label")}
-                  <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+                  <EntitlementPill label={t("badges.growthPlus")} />
                   {isProTrial ? (
-                    <span className={trialBadgeClass}>{t("badges.includedTrial")}</span>
+                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
                   ) : null}
                 </span>
               </label>
+              <p className="text-[11px] text-zinc-500 mt-1">{t("languages.featureHelp")}</p>
               {localeLimit === 1 ? (
                 <div className="text-sm text-zinc-300">
                   {localeOptions.find((opt) => opt.code === business.default_locale)?.label ?? "English"}
@@ -843,12 +840,13 @@ export default function SettingsBusinessPage() {
               <label className="block text-xs text-zinc-400 mb-1">
                 <span className="inline-flex items-center gap-2">
                   {t("domains.label")}
-                  <span className={featureBadgeClass}>{t("badges.growthPlus")}</span>
+                  <EntitlementPill label={t("badges.growthPlus")} />
                   {isProTrial ? (
-                    <span className={trialBadgeClass}>{t("badges.includedTrial")}</span>
+                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
                   ) : null}
                 </span>
               </label>
+              <p className="text-[11px] text-zinc-500 mt-1">{t("domains.featureHelp")}</p>
               <div className="space-y-2">
                 {domainInputRows.map((value, idx) => (
                   <input

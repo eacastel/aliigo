@@ -251,6 +251,7 @@
     },
     "domains": {
       "label": "Dominios permitidos",
+      "featureHelp": "El primer dominio está incluido en todos los planes. Los dominios extra (2.º/3.º) están disponibles en Pro (y durante la prueba).",
       "placeholder": "ejemplo.com\\nsegundo-dominio.com",
       "help": "Introduce un dominio raíz por línea, sin http(s) ni www. Permitiremos automáticamente ambas versiones.",
       "limit": "Límite del plan: hasta {count} dominio(s).",
@@ -263,6 +264,7 @@
     },
     "languages": {
       "label": "Idiomas habilitados",
+      "featureHelp": "Un idioma está incluido en Basic. Los idiomas extra requieren Growth+ (o prueba).",
       "english": "English",
       "spanish": "Español",
       "limit": "Límite del plan: hasta {count} idioma(s).",
@@ -272,6 +274,11 @@
   "DashboardWidget": {
     "title": "Widget",
     "trialHint": "Prueba Pro activa: tienes incluidas las capacidades de widget de Growth y Pro hasta que termine tu prueba.",
+    "badges": {
+      "growthPlus": "Growth+",
+      "proTrial": "Prueba Pro",
+      "includedTrial": "Incluido en la prueba"
+    },
     "livePreview": "Vista previa en vivo",
     "loadingPreview": "Cargando vista previa…",
     "header": "Cabecera",
@@ -296,8 +303,10 @@
   "lastSeen": "Última señal:",
   "showPoweredBy": "Mostrar “Powered by Aliigo”",
     "showPoweredByHelp": "Basic siempre muestra branding. Growth, Pro y Custom pueden alternarlo.",
+    "showPoweredByLockedHelp": "Este control se desbloquea en Growth+ (o durante la prueba).",
     "headerLogoUrl": "URL del logo de cabecera (Growth+)",
     "headerLogoHelp": "Opcional. El icono solo aparece en Growth, Pro y Custom cuando esta URL está definida.",
+    "headerLogoLockedHelp": "La subida de logo de cabecera se desbloquea en Growth+ (o durante la prueba).",
     "embedSnippet": "Snippet de instalación",
     "emptyDash": "—",
     "lockedHint": "Activa la facturación para desbloquear el código del widget.",

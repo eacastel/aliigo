@@ -8,6 +8,7 @@ import { useBillingGate } from "@/components/BillingGateContext";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import LoadingState from "@/components/ui/LoadingState";
+import EntitlementPill from "@/components/ui/EntitlementPill";
 import {
   effectivePlanForEntitlements,
   isGrowthOrHigher,
@@ -647,8 +648,11 @@ export default function WidgetSettingsPage() {
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       {isProTrial ? (
-        <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-          {t("trialHint")}
+        <div className="mb-4 rounded-lg border border-emerald-700/45 bg-emerald-950/55 px-3 py-2 text-xs text-emerald-200">
+          <div className="flex flex-wrap items-center gap-2">
+            <EntitlementPill label={t("badges.proTrial")} tone="trial" />
+            <span>{t("trialHint")}</span>
+          </div>
         </div>
       ) : null}
 
@@ -863,37 +867,45 @@ export default function WidgetSettingsPage() {
             />
           </div>
 
-          {canToggleBranding ? (
-            <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
-              <label className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-sm text-zinc-200">{t("showPoweredBy")}</div>
-                  <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByHelp")}</p>
+          <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+            <label className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm text-zinc-200 inline-flex items-center gap-2">
+                  {t("showPoweredBy")}
+                  <EntitlementPill label={t("badges.growthPlus")} />
+                  {isProTrial ? (
+                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
+                  ) : null}
                 </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={theme.showBranding}
-                  onClick={() =>
-                    setTheme((prev) => {
-                      const next = !prev.showBranding;
-                      setPreviewShowBranding(next);
-                      return { ...prev, showBranding: next };
-                    })
-                  }
-                  className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
-                    theme.showBranding ? "bg-brand-500/80" : "bg-zinc-700"
+                <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByHelp")}</p>
+                {!canToggleBranding ? (
+                  <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByLockedHelp")}</p>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={theme.showBranding}
+                disabled={!canToggleBranding}
+                onClick={() =>
+                  setTheme((prev) => {
+                    const next = !prev.showBranding;
+                    setPreviewShowBranding(next);
+                    return { ...prev, showBranding: next };
+                  })
+                }
+                className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
+                  theme.showBranding ? "bg-brand-500/80" : "bg-zinc-700"
+                } ${!canToggleBranding ? "opacity-60 cursor-not-allowed" : ""}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    theme.showBranding ? "translate-x-5" : "translate-x-0.5"
                   }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      theme.showBranding ? "translate-x-5" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
-              </label>
-            </div>
-          ) : null}
+                />
+              </button>
+            </label>
+          </div>
 
           <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3 space-y-3">
             <label className="flex items-center justify-between gap-3">
@@ -952,9 +964,19 @@ export default function WidgetSettingsPage() {
             </div>
           </div>
 
-          {canManageHeaderLogo ? (
           <div className="space-y-2">
-            <label className="block text-sm text-zinc-300">{t("headerLogoUrl")}</label>
+            <label className="block text-sm text-zinc-300">
+              <span className="inline-flex items-center gap-2">
+                {t("headerLogoUrl")}
+                <EntitlementPill label={t("badges.growthPlus")} />
+                {isProTrial ? (
+                  <EntitlementPill label={t("badges.includedTrial")} tone="included" />
+                ) : null}
+              </span>
+            </label>
+            {!canManageHeaderLogo ? (
+              <p className="text-xs text-zinc-500">{t("headerLogoLockedHelp")}</p>
+            ) : null}
             {logoUrl ? (
               <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
                 <img src={logoUrl} alt="" className="h-8 w-8 rounded object-contain border border-zinc-700" />
@@ -1008,7 +1030,6 @@ export default function WidgetSettingsPage() {
             <p className="text-xs text-zinc-500">{t("headerLogoHelp")}</p>
             {logoMsg ? <p className="text-xs text-zinc-400">{logoMsg}</p> : null}
           </div>
-          ) : null}
 
           {widgetLocked ? (
             <div className="space-y-2">
