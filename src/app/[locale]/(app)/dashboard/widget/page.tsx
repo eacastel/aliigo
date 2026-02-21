@@ -134,6 +134,7 @@ function toThemeDb(x: unknown): ThemeDb | undefined {
   if (typeof o.panelOpacity === "number") out.panelOpacity = o.panelOpacity;
   if (typeof o.headerLogoUrl === "string") out.headerLogoUrl = o.headerLogoUrl;
   if (typeof o.showBranding === "boolean") out.showBranding = o.showBranding;
+  if (typeof o.widgetLive === "boolean") out.widgetLive = o.widgetLive;
 
 
   return out;
