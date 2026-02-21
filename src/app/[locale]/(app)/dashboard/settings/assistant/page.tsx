@@ -1371,9 +1371,9 @@ export default function SettingsAssistantPage() {
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       <p className="mb-6 text-sm text-zinc-400">{t("description")}</p>
       {isProTrial ? (
-        <div className="mb-4 rounded-lg border border-emerald-700/45 bg-emerald-950/55 px-3 py-2 text-xs text-emerald-200">
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-xs" style={{ color: "lab(55% -12.85 3.72)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <EntitlementPill label={t("badges.proTrial")} tone="trial" />
+            <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
             <span>{t("mode.trialHint")}</span>
           </div>
         </div>
@@ -1402,8 +1402,7 @@ export default function SettingsAssistantPage() {
           >
             <span className="inline-flex items-center gap-2">
               {t("tabs.indexed")}
-              <EntitlementPill label={t("badges.growthPlus")} />
-              {isProTrial ? <EntitlementPill label={t("badges.includedTrial")} tone="included" /> : null}
+              <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
             </span>
           </button>
         ) : null}
@@ -1417,8 +1416,7 @@ export default function SettingsAssistantPage() {
       <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
           <span>{t("autofill.title")}</span>
-          <EntitlementPill label={t("badges.growthPlus")} />
-          {isProTrial ? <EntitlementPill label={t("badges.includedTrial")} tone="included" /> : null}
+          <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
         </div>
         <p className="text-xs text-zinc-400">{t("autofill.desc")}</p>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -1530,10 +1528,7 @@ export default function SettingsAssistantPage() {
               >
                 <span className="inline-flex items-center gap-2">
                   {t("mode.advanced")}
-                  <EntitlementPill label={t("badges.growthPlus")} />
-                  {isProTrial ? (
-                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
-                  ) : null}
+                  <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
                 </span>
               </button>
             ) : null}

@@ -181,6 +181,7 @@
     "trialHint": "Prueba Pro activa: tienes incluidas las capacidades de Growth y Pro hasta que termine tu prueba.",
     "badges": {
       "growthPlus": "Growth+",
+      "proPlus": "Pro+",
       "proTrial": "Prueba Pro",
       "includedTrial": "Incluido en la prueba"
     },
@@ -276,6 +277,7 @@
     "trialHint": "Prueba Pro activa: tienes incluidas las capacidades de widget de Growth y Pro hasta que termine tu prueba.",
     "badges": {
       "growthPlus": "Growth+",
+      "proPlus": "Pro+",
       "proTrial": "Prueba Pro",
       "includedTrial": "Incluido en la prueba"
     },
@@ -550,6 +552,7 @@
     },
     "badges": {
       "growthPlus": "Growth+",
+      "proPlus": "Pro+",
       "proTrial": "Prueba Pro",
       "includedTrial": "Incluido en la prueba"
     },

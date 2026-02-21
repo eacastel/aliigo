@@ -648,9 +648,9 @@ export default function WidgetSettingsPage() {
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       {isProTrial ? (
-        <div className="mb-4 rounded-lg border border-emerald-700/45 bg-emerald-950/55 px-3 py-2 text-xs text-emerald-200">
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-xs" style={{ color: "lab(55% -12.85 3.72)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <EntitlementPill label={t("badges.proTrial")} tone="trial" />
+            <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
             <span>{t("trialHint")}</span>
           </div>
         </div>
@@ -872,10 +872,7 @@ export default function WidgetSettingsPage() {
               <div>
                 <div className="text-sm text-zinc-200 inline-flex items-center gap-2">
                   {t("showPoweredBy")}
-                  <EntitlementPill label={t("badges.growthPlus")} />
-                  {isProTrial ? (
-                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
-                  ) : null}
+                  <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
                 </div>
                 <p className="text-xs text-zinc-500 mt-1">{t("showPoweredByHelp")}</p>
                 {!canToggleBranding ? (
@@ -968,10 +965,7 @@ export default function WidgetSettingsPage() {
             <label className="block text-sm text-zinc-300">
               <span className="inline-flex items-center gap-2">
                 {t("headerLogoUrl")}
-                <EntitlementPill label={t("badges.growthPlus")} />
-                {isProTrial ? (
-                  <EntitlementPill label={t("badges.includedTrial")} tone="included" />
-                ) : null}
+                <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
               </span>
             </label>
             {!canManageHeaderLogo ? (

@@ -596,9 +596,9 @@ export default function SettingsBusinessPage() {
     <div className="max-w-5xl text-white">
       <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
       {isProTrial ? (
-        <div className="mb-4 rounded-lg border border-emerald-700/45 bg-emerald-950/55 px-3 py-2 text-xs text-emerald-200">
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-xs" style={{ color: "lab(55% -12.85 3.72)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <EntitlementPill label={t("badges.proTrial")} tone="trial" />
+            <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
             <span>{t("trialHint")}</span>
           </div>
         </div>
@@ -787,13 +787,12 @@ export default function SettingsBusinessPage() {
               <label className="block text-xs text-zinc-400 mb-1">
                 <span className="inline-flex items-center gap-2">
                   {t("languages.label")}
-                  <EntitlementPill label={t("badges.growthPlus")} />
-                  {isProTrial ? (
-                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
-                  ) : null}
+                  <EntitlementPill label={t("badges.growthPlus")} href="/pricing#plans-matrix" />
                 </span>
               </label>
-              <p className="text-[11px] text-zinc-500 mt-1">{t("languages.featureHelp")}</p>
+              <p className="text-[11px] mt-1" style={{ color: "lab(55% -12.85 3.72)" }}>
+                {t("languages.featureHelp")}
+              </p>
               {localeLimit === 1 ? (
                 <div className="text-sm text-zinc-300">
                   {localeOptions.find((opt) => opt.code === business.default_locale)?.label ?? "English"}
@@ -840,13 +839,12 @@ export default function SettingsBusinessPage() {
               <label className="block text-xs text-zinc-400 mb-1">
                 <span className="inline-flex items-center gap-2">
                   {t("domains.label")}
-                  <EntitlementPill label={t("badges.growthPlus")} />
-                  {isProTrial ? (
-                    <EntitlementPill label={t("badges.includedTrial")} tone="included" />
-                  ) : null}
+                  <EntitlementPill label={t("badges.proPlus")} href="/pricing#plans-matrix" />
                 </span>
               </label>
-              <p className="text-[11px] text-zinc-500 mt-1">{t("domains.featureHelp")}</p>
+              <p className="text-[11px] mt-1" style={{ color: "lab(55% -12.85 3.72)" }}>
+                {t("domains.featureHelp")}
+              </p>
               <div className="space-y-2">
                 {domainInputRows.map((value, idx) => (
                   <input

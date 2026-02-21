@@ -180,6 +180,7 @@
     "trialHint": "Pro trial active: Growth and Pro capabilities are included until your trial ends.",
     "badges": {
       "growthPlus": "Growth+",
+      "proPlus": "Pro+",
       "proTrial": "Pro trial",
       "includedTrial": "Included in trial"
     },
@@ -275,6 +276,7 @@
     "trialHint": "Pro trial active: Growth and Pro widget capabilities are included until your trial ends.",
     "badges": {
       "growthPlus": "Growth+",
+      "proPlus": "Pro+",
       "proTrial": "Pro trial",
       "includedTrial": "Included in trial"
     },
@@ -549,6 +551,7 @@
     },
     "badges": {
       "growthPlus": "Growth+",
+      "proPlus": "Pro+",
       "proTrial": "Pro trial",
       "includedTrial": "Included in trial"
     },

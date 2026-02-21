@@ -2,29 +2,36 @@
 
 type EntitlementPillProps = {
   label: string;
-  tone?: "default" | "trial" | "included";
+  href?: string;
   className?: string;
-};
-
-const toneClassMap: Record<NonNullable<EntitlementPillProps["tone"]>, string> = {
-  default:
-    "border-emerald-700/45 bg-emerald-950/55 text-emerald-200",
-  trial:
-    "border-emerald-600/35 bg-emerald-900/35 text-emerald-200",
-  included:
-    "border-emerald-500/30 bg-emerald-900/25 text-emerald-100",
 };
 
 export default function EntitlementPill({
   label,
-  tone = "default",
+  href,
   className = "",
 }: EntitlementPillProps) {
+  const color = "lab(55% -12.85 3.72)";
+  const borderColor = "lab(55% -12.85 3.72 / 0.55)";
   return (
-    <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${toneClassMap[tone]} ${className}`}
-    >
-      {label}
+    <span className={`inline-flex items-center gap-1.5 ${className}`}>
+      <span
+        className="inline-flex items-center rounded-full border bg-transparent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+        style={{ color, borderColor }}
+      >
+        {label}
+      </span>
+      {href ? (
+        <a
+          href={href}
+          className="inline-flex h-4 w-4 items-center justify-center rounded-full border text-[10px] font-semibold leading-none"
+          style={{ color, borderColor }}
+          aria-label="Open plans matrix"
+          title="Open plans matrix"
+        >
+          i
+        </a>
+      ) : null}
     </span>
   );
 }

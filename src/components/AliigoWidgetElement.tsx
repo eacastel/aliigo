@@ -29,6 +29,7 @@ export function AliigoWidgetElement({
   dataOwner,
   noTeleport,
   showHeaderIcon,
+  showBranding,
 }: {
   sessionToken?: string | null;
   locale: "en" | "es";
@@ -43,6 +44,7 @@ export function AliigoWidgetElement({
   dataOwner?: string; // optional scoping for cleanup
   noTeleport?: boolean;
   showHeaderIcon?: boolean;
+  showBranding?: boolean;
 }) {
   const elRef = useRef<HTMLElement | null>(null);
 
@@ -117,6 +119,7 @@ export function AliigoWidgetElement({
       start-open={startOpen ? "true" : undefined}
       hide-header={hideHeader ? "true" : undefined}
       show-header-icon={showHeaderIcon ? "true" : undefined}
+      show-branding={showBranding === undefined ? undefined : showBranding ? "true" : "false"}
     />
   );
 }

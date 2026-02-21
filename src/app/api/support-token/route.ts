@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import { originHost } from "@/lib/embedGate";
-import { effectivePlanForEntitlements, isGrowthOrHigher } from "@/lib/effectivePlan";
+import {
+  effectivePlanForEntitlements,
+  isGrowthOrHigher,
+  isTrialActive,
+  normalizePlan,
+} from "@/lib/effectivePlan";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,6 +81,13 @@ export async function GET(req: NextRequest) {
       billingStatus: bizRes.data.billing_status,
       trialEnd: bizRes.data.trial_end,
     });
+    const rawPlan = normalizePlan(bizRes.data.billing_plan);
+    const trialActive = isTrialActive(bizRes.data.billing_status, bizRes.data.trial_end);
+    const forceBasicBranding = (rawPlan === "basic" || rawPlan === "starter") && !trialActive;
+    const defaultShowBranding = rawPlan === "basic" || rawPlan === "starter";
+    const showBrandingPref =
+      typeof themeObj.showBranding === "boolean" ? themeObj.showBranding : null;
+    const showBranding = forceBasicBranding || (showBrandingPref ?? defaultShowBranding);
     const showHeaderIcon = isGrowthOrHigher(effectivePlan);
 
     const headerLogoPath =
@@ -90,7 +102,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return json({ token, locale, brand, theme: themeObj, show_header_icon: showHeaderIcon }, 200);
+    return json(
+      { token, locale, brand, theme: themeObj, show_branding: showBranding, show_header_icon: showHeaderIcon },
+      200,
+    );
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Server error";
     return json({ error: msg }, 500);

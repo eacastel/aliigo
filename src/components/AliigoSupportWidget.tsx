@@ -14,6 +14,7 @@ type SupportCfg = {
   token: string;
   brand: string;
   theme: WidgetTheme | null;
+  showBranding: boolean;
   showHeaderIcon: boolean;
 };
 
@@ -56,9 +57,10 @@ export function AliigoSupportWidget() {
 
         const brand = typeof o.brand === "string" && o.brand.trim() ? o.brand.trim() : "Aliigo";
         const theme = isWidgetTheme(o.theme) ? o.theme : null;
+        const showBranding = Boolean(o.show_branding);
         const showHeaderIcon = Boolean(o.show_header_icon);
 
-        if (!cancelled) setCfg({ token, brand, theme, showHeaderIcon });
+        if (!cancelled) setCfg({ token, brand, theme, showBranding, showHeaderIcon });
       } catch {
         // noop
       }
@@ -89,6 +91,7 @@ export function AliigoSupportWidget() {
       brand={cfg.brand}
       sessionToken={cfg.token}
       theme={cfg.theme ?? undefined}
+      showBranding={cfg.showBranding}
       showHeaderIcon={cfg.showHeaderIcon}
     />
   );
